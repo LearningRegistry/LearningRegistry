@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd"
+    >
+<html lang="en">
+<head>
+    <title>Learning Registry Search</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        var search = function(){
+            $(".result").remove();
+            $.getJSON('http://10.50.10.118:5984/learningregistry/_fti/_design/lucene/by_content?limit=500&q=' + $("#searchTerm").val(), function(data) {
+                    for (var i =0; i < data.total_rows; i++)
+                    {
+                        var d = data.rows[i];
+                        var result = $("#result");
+                        if(d)
+                        {
+                            $.getJSON('http://10.50.10.118:5984/learningregistry/'+d.id,function(data){
+                                var div = document.createElement("div");
+                                $(div).addClass("result").html(data.title);
+                                result.append(div);
+                            });
+                        }
+                    }
+            })
+        };
+    </script>
+</head>
+<body>
+    <div>
+        <input type="text" id="searchTerm"/>
+        <input type="button" id="search" value="Search" onclick="search();"/>
+    </div>
+    <div id="result"/>
+</body>
+</html>
