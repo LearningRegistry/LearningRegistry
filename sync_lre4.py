@@ -5,7 +5,7 @@ from oaipmh.common import Identify, Metadata, Header
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader , MetadataReader
 from util import *                     
 if __name__ == '__main__':
-    main_url = 'http://wegrata:g15t15@10.10.1.56:5984/'    
+    main_url = 'http://10.50.10.114:5984/'    
     oai_url = 'http://lrecoreprod.eun.org:6080/oaitarget/OAIHandler'    
     database_name = 'test_oai'
     oai_lre4_reader = MetadataReader(
