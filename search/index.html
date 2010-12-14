@@ -10,16 +10,17 @@
         var search = function(){
             $(".result").remove();
             $.getJSON('http://10.50.10.118:5984/learningregistry/_fti/_design/lucene/by_content?limit=500&q=' + $("#searchTerm").val(), function(data) {
+                var result = $("#result");
                     for (var i =0; i < data.total_rows; i++)
                     {
-                        var d = data.rows[i];
-                        var result = $("#result");
+                        var d = data.rows[i];                        
                         if(d)
                         {
-                            $.getJSON('http://10.50.10.118:5984/learningregistry/'+d.id,function(data){
-                                var div = document.createElement("div");
-                                $(div).addClass("result").html(data.title);
+                            $.getJSON('http://10.50.10.118:5984/learningregistry/'+d.id.replace('/','%2F'),function(data){
+                                var div = document.createElement("a");
+                                $(div).addClass("result").html(data.title).attr('href',data.location);
                                 result.append(div);
+                                result.append('<br/>');
                             });
                         }
                     }
