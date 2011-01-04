@@ -9,14 +9,14 @@
     <script type="text/javascript">
         var search = function(){
             $(".result").remove();
-            $.getJSON('http://10.50.10.118:5984/learningregistry/_fti/_design/lucene/by_content?limit=500&q=' + $("#searchTerm").val(), function(data) {
+            $.getJSON('/learningregistry/_fti/_design/lucene/by_content?limit=500&q=' + $("#searchTerm").val(), function(data) {
                 var result = $("#result");
                     for (var i =0; i < data.total_rows; i++)
                     {
                         var d = data.rows[i];                        
                         if(d)
                         {
-                            $.getJSON('http://10.50.10.118:5984/learningregistry/'+d.id.replace('/','%2F'),function(data){
+                            $.getJSON('/learningregistry/'+d.id.replace('/','%2F'),function(data){
                                 var div = document.createElement("a");
                                 $(div).addClass("result").html(data.title).attr('href',data.location);
                                 result.append(div);

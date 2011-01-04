@@ -19,23 +19,21 @@ def create_database(url,name):
         couch = couchdb.Server(url)
         db = couch.create(name)
     return db
-def get_documents(url, reader, prefix):
+def get_documents(main_url, database_name, url, reader, prefix, format):
     registry = MetadataRegistry()
     registry.registerReader(prefix, reader)
     client = Client(url, registry)
     return_stuff = []
     for record in client.listRecords(metadataPrefix=prefix):
         r = record[1]
-        if not ''.join(r.getField('identifier')).startswith('fedora'):
-          try:
-            value = {'title':''.join(r.getField('title')),'identifier':''.join(r.getField('identifier')), 'location': ''.join(r.getField('location'))}
-          except KeyError:
-            value = {'title':''.join(r.getField('title')),'identifier':''.join(r.getField('identifier')), 'location': ''}
-          return_stuff.append(value)
-    return return_stuff
-
+        value = format(r)
+        if value != None:
+            return_stuff.append(value)
+        if len(return_stuff) >= 10000:
+            sync_files(main_url, database_name, return_stuff)     
+            return_stuff = []
+    sync_files(main_url, database_name, return_stuff)                 
 def save_file(db, id, data):
-    print id
     try:    
         doc = db[id]
     except:
@@ -46,12 +44,13 @@ def save_file(db, id, data):
         doc['identifier'] = data['identifier']        
         doc['title']= data['title']
         db[id] = doc
-
-def index_documents(oai_url,main_url,database_name, reader, prefix):
-   
-    files_to_replicate = get_documents(oai_url, reader,prefix)
+def sync_files(main_url, database_name, files_to_replicate):
     db = get_database(main_url,database_name)
     if db == None:
         db = create_database(main_url,database_name)
-    for file in files_to_replicate:
-        save_file(db,file['identifier'],file)
+    db.update(files_to_replicate)    
+def index_documents(oai_url,main_url,database_name, reader, prefix, format):
+   
+    get_documents(main_url, database_name, oai_url, reader,prefix, format)
+    #sync_files(main_url, database_name, files_to_replicate)
+
