@@ -1,0 +1,825 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+ <title>Server Error</title>
+
+<script type="text/javascript">
+  debug_base = 'http://localhost/_debug';
+  debug_count = 1296153431;
+</script>
+
+<!-- CSS Imports -->
+<link rel="stylesheet" href="http://localhost/_debug/media/traceback.css" type="text/css" media="screen" />
+<!-- Pygments highlighting -->
+<style type="text/css">
+.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #808080 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0040D0 } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+</style>
+
+<link rel="stylesheet" href="http://localhost/_debug/media/pylons/style/itraceback.css" type="text/css" media="screen" />
+
+</head>
+
+<body id="documentation" onload="switch_display('traceback_data')">
+<!-- We are only using a table to ensure old browsers see the message correctly -->
+
+<noscript>
+<div style="border-bottom: 1px solid #808080">
+<div style="border-bottom: 1px solid #404040">
+<table width="100%" border="0" cellpadding="0" bgcolor="#FFFFE1"><tr><td>&nbsp;</td><td><span style="padding: 0px; margin: 0px; font-family: Tahoma, sans-serif; font-size: 11px">Warning, your browser does not support JavaScript so you will not be able to use the interactive debugging on this page.</span></td></tr></table>
+</div>
+</div>
+</noscript>
+
+    <!-- Top anchor -->
+    <a name="top"></a>
+
+    <!-- Main Content -->
+    <div id="nav-bar">
+
+        <!-- Section Navigation -->
+        <h4 class="invisible">Section Links</h4>
+
+            <ul id="navlist">
+               <!--   -->
+               <li id="source_data_tab"><a href="#source_data" onclick="javascript:return switch_display('source_data');" accesskey="4" id="source_data_link">Source</a></li>
+               <li id="template_data_tab"><a href="#template_data" onclick="javascript:return switch_display('template_data');" accesskey="3" id="template_data_link">Template</a></li>
+               <li id="extra_data_tab"><a href="#extra_data" onclick="javascript:return switch_display('extra_data');" id="extra_data_link" accesskey="2" >Extra Data</a></li>
+               <li id="traceback_data_tab" class="active"><a href="#traceback_data" onclick="javascript:return switch_display('traceback_data');" id="traceback_data_link" class="active" accesskey="1">Traceback</a></li>
+            </ul>
+    </div>
+    <div id="main-content">
+        <div class="hr"><hr class="hr" /></div>
+        <div class="content-padding">
+            <div id="source_data" class="hidden-data">
+              There is no source code to display. Click a 'view' link in the <a href="#traceback_data" onclick="javascript:switch_display('traceback_data')" id="traceback_data_link" class="active" accesskey="1">Traceback</a> tab to load source code.
+            </div>
+            <div id="extra_data" class="hidden-data">
+                <h1 class="first"><a name="content"></a>Extra Data</h1>
+                <table class="variables">
+<tr class="header"><th colspan="2">CGI Variables</th></tr>
+<tr class="odd"><td>CONTENT_LENGTH</td>
+<td><tt>'68'</tt></td></tr>
+<tr class="even"><td>CONTENT_TYPE</td>
+<td><tt>'application/json'</tt></td></tr>
+<tr class="odd"><td>DOCUMENT_ROOT</td>
+<td><tt>'/user/wgrata/LR/'</tt></td></tr>
+<tr class="even"><td>GATEWAY_INTERFACE</td>
+<td><tt>'CGI/1.1'</tt></td></tr>
+<tr class="odd"><td>HTTP_ACCEPT</td>
+<td><tt>'*/*'</tt></td></tr>
+<tr class="even"><td>HTTP_CONTENT_LENGTH</td>
+<td><tt>'68'</tt></td></tr>
+<tr class="odd"><td>HTTP_HOST</td>
+<td><tt>'localhost'</tt></td></tr>
+<tr class="even"><td>HTTP_USER_AGENT</td>
+<td><tt>'curl/7.21.0 (i686-pc-linux-gnu) libcurl/7.21.0 OpenSSL/0.9.8o zlib/1.2.3.4 libidn/1.18'</tt></td></tr>
+<tr class="odd"><td>PATH_INFO</td>
+<td><tt>'/publish'</tt></td></tr>
+<tr class="even"><td>PATH_TRANSLATED</td>
+<td><tt>'/user/wgrata/LR//publish'</tt></td></tr>
+<tr class="odd"><td>REDIRECT_STATUS</td>
+<td><tt>'200'</tt></td></tr>
+<tr class="even"><td>REMOTE_ADDR</td>
+<td><tt>'127.0.0.1'</tt></td></tr>
+<tr class="odd"><td>REMOTE_PORT</td>
+<td><tt>'51921'</tt></td></tr>
+<tr class="even"><td>REQUEST_METHOD</td>
+<td><tt>'POST'</tt></td></tr>
+<tr class="odd"><td>REQUEST_URI</td>
+<td><tt>'/publish'</tt></td></tr>
+<tr class="even"><td>SCGI</td>
+<td><tt>'1'</tt></td></tr>
+<tr class="odd"><td>SCRIPT_FILENAME</td>
+<td><tt>'/user/wgrata/LR/'</tt></td></tr>
+<tr class="even"><td>SERVER_ADDR</td>
+<td><tt>'127.0.0.1'</tt></td></tr>
+<tr class="odd"><td>SERVER_NAME</td>
+<td><tt>'localhost'</tt></td></tr>
+<tr class="even"><td>SERVER_PORT</td>
+<td><tt>'80'</tt></td></tr>
+<tr class="odd"><td>SERVER_PROTOCOL</td>
+<td><tt>'HTTP/1.1'</tt></td></tr>
+<tr class="even"><td>SERVER_SOFTWARE</td>
+<td><tt>'lighttpd/1.4.26'</tt></td></tr>
+</table>
+                <h1 class="first"><a name="content"></a>Extra Data</h1>
+                <table class="variables">
+<tr class="header"><th colspan="2">WSGI Variables</th></tr>
+<tr class="odd"><td>application</td>
+<td><tt>&lt;beaker.middleware.SessionMiddleware object at 0x98d1e8c&gt;</tt></td></tr>
+<tr class="even"><td>beaker.get_session</td>
+<td><tt>&lt;bound method SessionMiddleware._get_session of &lt;beaker.middleware.SessionMiddleware object at 0x98d1e8c&gt;&gt;</tt></td></tr>
+<tr class="odd"><td>beaker.session</td>
+<td><tt>{'_accessed_time': 1296153487.73596, '_creation_time': 1296153487.73596}</tt></td></tr>
+<tr class="even"><td>paste.evalexception</td>
+<td><tt>&lt;weberror.evalexception.EvalException object at 0x98d1ecc&gt;</tt></td></tr>
+<tr class="odd"><td>paste.evalexception.debug_count</td>
+<td><tt>1296153431</tt></td></tr>
+<tr class="even"><td>paste.registry</td>
+<td><tt>&lt;paste.registry.Registry object at 0x9a255cc&gt;</tt></td></tr>
+<tr class="odd"><td>paste.throw_errors</td>
+<td><tt>True</tt></td></tr>
+<tr class="even"><td>pylons.action_method</td>
+<td><tt>&lt;bound method PublishController.create of &lt;lr.controllers.publish.PublishController object at 0x9a25eac&gt;&gt;</tt></td></tr>
+<tr class="odd"><td>pylons.controller</td>
+<td><tt>&lt;lr.controllers.publish.PublishController object at 0x9a25eac&gt;</tt></td></tr>
+<tr class="even"><td>pylons.environ_config</td>
+<td><tt>{'session': 'beaker.session', 'cache': 'beaker.cache'}</tt></td></tr>
+<tr class="odd"><td>pylons.pylons</td>
+<td><tt>&lt;pylons.util.PylonsContext object at 0x9a2586c&gt;</tt></td></tr>
+<tr class="even"><td>pylons.routes_dict</td>
+<td><tt>{'action': u'create', 'controller': u'publish'}</tt></td></tr>
+<tr class="odd"><td>routes.route</td>
+<td><tt>&lt;routes.route.Route object at 0x985ea2c&gt;</tt></td></tr>
+<tr class="even"><td>routes.url</td>
+<td><tt>&lt;routes.util.URLGenerator object at 0x9a25d4c&gt;</tt></td></tr>
+<tr class="odd"><td>weberror.evalexception</td>
+<td><tt>&lt;weberror.evalexception.EvalException object at 0x98d1ecc&gt;</tt></td></tr>
+<tr class="even"><td>webob.adhoc_attrs</td>
+<td><tt>{'language': 'en-us'}</tt></td></tr>
+<tr class="odd"><td>wsgi process</td>
+<td><tt>'Multithreaded'</tt></td></tr>
+<tr class="even"><td>wsgiorg.routing_args</td>
+<td><tt>(&lt;routes.util.URLGenerator object at 0x9a25d4c&gt;, {'action': u'create', 'controller': u'publish'})</tt></td></tr>
+</table>
+            </div>
+            <div id="template_data" class="hidden-data">
+                <p>No Template information available.</p>
+            </div>
+            <div id="traceback_data">
+<div style="float: left; width: 100%; padding-bottom: 20px;">
+<h1 class="first"><a name="content"></a>WebError Traceback:</h1>
+<div class="main-exception-bar">
+  <span class="main-exception" style="color: #f00;">&#8669;</span>
+  <code class="main-exception">TypeError: ServerError((403, ('forbidden', 'update')),) is not JSON serializable</code>
+</div>
+<div id="formats">
+   <span class="title">View as: &nbsp;</span> <a id="view_short_html" class="active" href="#">Interactive</a> 
+   <a id="view_long_html" href="#">(full)</a> &nbsp;|&nbsp; <a id="view_short_text" href="#">Text</a>  
+   <a id="view_long_text" href="#">(full)</a> &nbsp;|&nbsp; <a id="view_short_xml" href="#">XML</a> 
+   <a id="view_long_xml" href="#">(full)</a>
+</div>  
+<div style="clear: both;">
+<div id="error-area" style="display: none; background-color: #600; color: #fff; border: 2px solid black">
+<button onclick="return clearError()">clear this</button>
+<div id="error-container"></div>
+<button onclick="return clearError()">clear this</button>
+</div>
+
+    <div id="short_traceback">
+    <div class="frame">
+Module <span class="module" title="/home/wegrata/LearningRegistry/LR/lr/controllers/publish.py">lr.controllers.publish</span>:<b>45</b> in <code>create</code>  <a href="#" class="show_locals" tbid="162042420" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="lr.controllers.publish:45" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">results</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">publish_func</span><span class="p">,</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;documents&#39;</span><span class="p">])</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;OK&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;document_results&#39;</span><span class="p">:</span><span class="n">results</span><span class="p">})</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="sd">&quot;&quot;&quot;POST /publisher: Create a new item&quot;&quot;&quot;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># url(&#39;publisher&#39;)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;OK&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;document_results&#39;</span><span class="p">:</span><span class="n">results</span><span class="p">})</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/__init__.py">json</span>:<b>230</b> in <code>dumps</code>  <a href="#" class="show_locals" tbid="162042060" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json:230" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">cls</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">indent</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">separators</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">encoding</span> <span class="o">==</span> <span class="s">&#39;utf-8&#39;</span> <span class="ow">and</span> <span class="n">default</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kw</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">_default_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">cls</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">cls</span> <span class="o">=</span> <span class="n">JSONEncoder</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">_default_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>367</b> in <code>encode</code>  <a href="#" class="show_locals" tbid="162042100" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:367" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># exceptions aren&#39;t as detailed.&nbsp; The list call should be roughly</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># equivalent to the PySequence_Fast that &#39;&#39;.join() would do.</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterencode</span><span class="p">(</span><span class="n">o</span><span class="p">))</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterencode</span><span class="p">(</span><span class="n">o</span><span class="p">))</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>309</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162041980" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:309" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>275</b> in <code>_iterencode_dict</code>  <a href="#" class="show_locals" tbid="162041940" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:275" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">encoder</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">key_separator</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">newline_indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>306</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162041900" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:306" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">floatstr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_nan</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_list</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_list</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>204</b> in <code>_iterencode_list</code>  <a href="#" class="show_locals" tbid="162042140" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:204" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">separator</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">newline_indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>309</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162042220" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:309" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>275</b> in <code>_iterencode_dict</code>  <a href="#" class="show_locals" tbid="162042380" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:275" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">encoder</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">key_separator</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">newline_indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>317</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162042340" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:317" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Circular reference detected&quot;</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">markers</span><span class="p">[</span><span class="n">markerid</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_default</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">markers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_default</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>323</b> in <code>_iterencode_default</code>  <a href="#" class="show_locals" tbid="162042260" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:323" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp; <span class="k">def</span> <span class="nf">_iterencode_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">newobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">newobj</span><span class="p">,</span> <span class="n">markers</span><span class="p">)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">newobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>344</b> in <code>default</code>  <a href="#" class="show_locals" tbid="162042300" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:344" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">&quot;&quot;&quot;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; raise TypeError(repr(o) + &quot; is not JSON serializable&quot;)</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">&nbsp;&nbsp;&nbsp; def encode(self, o):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; is not JSON serializable&quot;</span><span class="p">)</span></div>
+</div>
+<b>TypeError: ServerError((403, ('forbidden', 'update')),) is not JSON serializable</b><br>
+    </div>
+    <div id="short_text_version" class="hidden-data">
+    <textarea style="width: 100%" rows=25 cols=60>File '/home/wegrata/LearningRegistry/LR/lr/controllers/publish.py', line 45 in create
+  return json.dumps({'OK':True, 'document_results':results})
+File '/usr/lib/python2.6/json/__init__.py', line 230 in dumps
+  return _default_encoder.encode(obj)
+File '/usr/lib/python2.6/json/encoder.py', line 367 in encode
+  chunks = list(self.iterencode(o))
+File '/usr/lib/python2.6/json/encoder.py', line 309 in _iterencode
+  for chunk in self._iterencode_dict(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 275 in _iterencode_dict
+  for chunk in self._iterencode(value, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 306 in _iterencode
+  for chunk in self._iterencode_list(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 204 in _iterencode_list
+  for chunk in self._iterencode(value, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 309 in _iterencode
+  for chunk in self._iterencode_dict(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 275 in _iterencode_dict
+  for chunk in self._iterencode(value, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 317 in _iterencode
+  for chunk in self._iterencode_default(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 323 in _iterencode_default
+  newobj = self.default(o)
+File '/usr/lib/python2.6/json/encoder.py', line 344 in default
+  raise TypeError(repr(o) + " is not JSON serializable")
+TypeError: ServerError((403, ('forbidden', 'update')),) is not JSON serializable</textarea>
+    </div>
+    <div id="long_xml_version" class="hidden-data">
+    <textarea style="width: 100%" rows=50 cols=60>&lt;?xml version="1.0" ?&gt;&lt;traceback&gt;&lt;sysinfo&gt;&lt;language full_version="2.6.6 (r266:84292, Sep 15 2010, 15:52:39) 
+[GCC 4.4.5]" platform="linux2" version="2.6.6"&gt;Python&lt;/language&gt;&lt;libraries&gt;&lt;library name="mako" version="0.3.4"/&gt;&lt;library name="webhelpers" version="1.0"/&gt;&lt;library name="pylons" version="0.10"/&gt;&lt;library name="simplejson" version="2.1.1"/&gt;&lt;library name="weberror" version="0.10.2"/&gt;&lt;library name="webtest" version="1.2.1"/&gt;&lt;library name="pygments" version="1.3.1"/&gt;&lt;library name="sqlalchemy" version="0.6.3"/&gt;&lt;library name="paste" version="1.7.4"/&gt;&lt;library name="decorator" version="3.2.0"/&gt;&lt;library name="beaker" version="1.5.4"/&gt;&lt;library name="formencode" version="1.2.2"/&gt;&lt;library name="pastedeploy" version="1.3.3"/&gt;&lt;library name="tempita" version="0.4"/&gt;&lt;library name="nose" version="0.11.1"/&gt;&lt;library name="routes" version="1.12.3"/&gt;&lt;library name="webob" version="0.9.8"/&gt;&lt;library name="pastescript" version="1.7.3"/&gt;&lt;/libraries&gt;&lt;/sysinfo&gt;&lt;stack&gt;&lt;frame&gt;&lt;module&gt;weberror.evalexception&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/weberror/evalexception.py&lt;/filename&gt;&lt;line&gt;431&lt;/line&gt;&lt;function&gt;respond&lt;/function&gt;&lt;operation&gt;app_iter = self.application(environ, detect_start_response)&lt;/operation&gt;&lt;operation_context&gt;        try:
+            __traceback_supplement__ = errormiddleware.Supplement, self, environ
+            app_iter = self.application(environ, detect_start_response)
+            
+            # Don't create a list from a paste.fileapp object 
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;beaker.middleware&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/beaker/middleware.py&lt;/filename&gt;&lt;line&gt;152&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.wrap_app(environ, session_start_response)&lt;/operation&gt;&lt;operation_context&gt;                        headers.append(('Set-cookie', cookie))
+            return start_response(status, headers, exc_info)
+        return self.wrap_app(environ, session_start_response)
+    
+    def _get_session(self):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;routes.middleware&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/routes/middleware.py&lt;/filename&gt;&lt;line&gt;131&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;response = self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;                                             r'\1', oldpath)
+        
+        response = self.app(environ, start_response)
+        
+        # Wrapped in try as in rare cases the attribute will be gone already
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.wsgiapp&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/pylons/wsgiapp.py&lt;/filename&gt;&lt;line&gt;124&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;response = self.dispatch(controller, environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;        
+        controller = self.resolve(environ, start_response)
+        response = self.dispatch(controller, environ, start_response)
+        
+        if 'paste.testing_variables' in environ and hasattr(response,
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.wsgiapp&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/pylons/wsgiapp.py&lt;/filename&gt;&lt;line&gt;327&lt;/line&gt;&lt;function&gt;dispatch&lt;/function&gt;&lt;operation&gt;return controller(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;        if log_debug:
+            log.debug(&amp;quot;Calling controller class with WSGI interface&amp;quot;)
+        return controller(environ, start_response)
+    
+    def load_test_env(self, environ):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;lr.lib.base&lt;/module&gt;&lt;filename&gt;/home/wegrata/LearningRegistry/LR/lr/lib/base.py&lt;/filename&gt;&lt;line&gt;15&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return WSGIController.__call__(self, environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;        # the request is routed to. This routing information is
+        # available in environ['pylons.routes_dict']
+        return WSGIController.__call__(self, environ, start_response)
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;225&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;response = self._dispatch_call()&lt;/operation&gt;&lt;operation_context&gt;                return response(environ, self.start_response)
+        
+        response = self._dispatch_call()
+        if not start_response_called:
+            self.start_response = start_response
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;176&lt;/line&gt;&lt;function&gt;_dispatch_call&lt;/function&gt;&lt;operation&gt;response = self._inspect_call(func)&lt;/operation&gt;&lt;operation_context&gt;            req.environ['pylons.action_method'] = func
+            
+            response = self._inspect_call(func)
+        else:
+            if log_debug:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;108&lt;/line&gt;&lt;function&gt;_inspect_call&lt;/function&gt;&lt;operation&gt;result = self._perform_call(func, args)&lt;/operation&gt;&lt;operation_context&gt;                      func.__name__, args)
+        try:
+            result = self._perform_call(func, args)
+        except HTTPException, httpe:
+            if log_debug:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/pymodules/python2.6/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;60&lt;/line&gt;&lt;function&gt;_perform_call&lt;/function&gt;&lt;operation&gt;return func(**args)&lt;/operation&gt;&lt;operation_context&gt;        &amp;quot;&amp;quot;&amp;quot;Hide the traceback for everything above this method&amp;quot;&amp;quot;&amp;quot;
+        __traceback_hide__ = 'before_and_this'
+        return func(**args)
+    
+    def _inspect_call(self, func):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;lr.controllers.publish&lt;/module&gt;&lt;filename&gt;/home/wegrata/LearningRegistry/LR/lr/controllers/publish.py&lt;/filename&gt;&lt;line&gt;45&lt;/line&gt;&lt;function&gt;create&lt;/function&gt;&lt;operation&gt;return json.dumps({'OK':True, 'document_results':results})&lt;/operation&gt;&lt;operation_context&gt;        data = json.loads(request.body)
+        results = map(publish_func,data['documents'])
+        return json.dumps({'OK':True, 'document_results':results})
+        &amp;quot;&amp;quot;&amp;quot;POST /publisher: Create a new item&amp;quot;&amp;quot;&amp;quot;
+        # url('publisher')
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/__init__.py&lt;/filename&gt;&lt;line&gt;230&lt;/line&gt;&lt;function&gt;dumps&lt;/function&gt;&lt;operation&gt;return _default_encoder.encode(obj)&lt;/operation&gt;&lt;operation_context&gt;        cls is None and indent is None and separators is None and
+        encoding == 'utf-8' and default is None and not kw):
+        return _default_encoder.encode(obj)
+    if cls is None:
+        cls = JSONEncoder
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;367&lt;/line&gt;&lt;function&gt;encode&lt;/function&gt;&lt;operation&gt;chunks = list(self.iterencode(o))&lt;/operation&gt;&lt;operation_context&gt;        # exceptions aren't as detailed.  The list call should be roughly
+        # equivalent to the PySequence_Fast that ''.join() would do.
+        chunks = list(self.iterencode(o))
+        return ''.join(chunks)
+
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;309&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_dict(o, markers):&lt;/operation&gt;&lt;operation_context&gt;                yield chunk
+        elif isinstance(o, dict):
+            for chunk in self._iterencode_dict(o, markers):
+                yield chunk
+        else:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;275&lt;/line&gt;&lt;function&gt;_iterencode_dict&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode(value, markers):&lt;/operation&gt;&lt;operation_context&gt;            yield encoder(key)
+            yield key_separator
+            for chunk in self._iterencode(value, markers):
+                yield chunk
+        if newline_indent is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;306&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_list(o, markers):&lt;/operation&gt;&lt;operation_context&gt;            yield floatstr(o, self.allow_nan)
+        elif isinstance(o, (list, tuple)):
+            for chunk in self._iterencode_list(o, markers):
+                yield chunk
+        elif isinstance(o, dict):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;204&lt;/line&gt;&lt;function&gt;_iterencode_list&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode(value, markers):&lt;/operation&gt;&lt;operation_context&gt;            else:
+                yield separator
+            for chunk in self._iterencode(value, markers):
+                yield chunk
+        if newline_indent is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;309&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_dict(o, markers):&lt;/operation&gt;&lt;operation_context&gt;                yield chunk
+        elif isinstance(o, dict):
+            for chunk in self._iterencode_dict(o, markers):
+                yield chunk
+        else:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;275&lt;/line&gt;&lt;function&gt;_iterencode_dict&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode(value, markers):&lt;/operation&gt;&lt;operation_context&gt;            yield encoder(key)
+            yield key_separator
+            for chunk in self._iterencode(value, markers):
+                yield chunk
+        if newline_indent is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;317&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_default(o, markers):&lt;/operation&gt;&lt;operation_context&gt;                    raise ValueError(&amp;quot;Circular reference detected&amp;quot;)
+                markers[markerid] = o
+            for chunk in self._iterencode_default(o, markers):
+                yield chunk
+            if markers is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;323&lt;/line&gt;&lt;function&gt;_iterencode_default&lt;/function&gt;&lt;operation&gt;newobj = self.default(o)&lt;/operation&gt;&lt;operation_context&gt;
+    def _iterencode_default(self, o, markers=None):
+        newobj = self.default(o)
+        return self._iterencode(newobj, markers)
+
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;344&lt;/line&gt;&lt;function&gt;default&lt;/function&gt;&lt;operation&gt;raise TypeError(repr(o) + &amp;quot; is not JSON serializable&amp;quot;)&lt;/operation&gt;&lt;operation_context&gt;
+        &amp;quot;&amp;quot;&amp;quot;
+        raise TypeError(repr(o) + &amp;quot; is not JSON serializable&amp;quot;)
+
+    def encode(self, o):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;/stack&gt;&lt;exception&gt;&lt;type&gt;TypeError&lt;/type&gt;&lt;value&gt;ServerError((403, ('forbidden', 'update')),) is not JSON serializable&lt;/value&gt;&lt;/exception&gt;&lt;/traceback&gt;</textarea>
+    </div>
+    <div id="short_xml_version" class="hidden-data">
+    <textarea style="width: 100%" rows=50 cols=60>&lt;?xml version="1.0" ?&gt;&lt;traceback&gt;&lt;sysinfo&gt;&lt;language full_version="2.6.6 (r266:84292, Sep 15 2010, 15:52:39) 
+[GCC 4.4.5]" platform="linux2" version="2.6.6"&gt;Python&lt;/language&gt;&lt;libraries&gt;&lt;library name="mako" version="0.3.4"/&gt;&lt;library name="webhelpers" version="1.0"/&gt;&lt;library name="pylons" version="0.10"/&gt;&lt;library name="simplejson" version="2.1.1"/&gt;&lt;library name="weberror" version="0.10.2"/&gt;&lt;library name="webtest" version="1.2.1"/&gt;&lt;library name="pygments" version="1.3.1"/&gt;&lt;library name="sqlalchemy" version="0.6.3"/&gt;&lt;library name="paste" version="1.7.4"/&gt;&lt;library name="decorator" version="3.2.0"/&gt;&lt;library name="beaker" version="1.5.4"/&gt;&lt;library name="formencode" version="1.2.2"/&gt;&lt;library name="pastedeploy" version="1.3.3"/&gt;&lt;library name="tempita" version="0.4"/&gt;&lt;library name="nose" version="0.11.1"/&gt;&lt;library name="routes" version="1.12.3"/&gt;&lt;library name="webob" version="0.9.8"/&gt;&lt;library name="pastescript" version="1.7.3"/&gt;&lt;/libraries&gt;&lt;/sysinfo&gt;&lt;stack&gt;&lt;frame&gt;&lt;module&gt;lr.controllers.publish&lt;/module&gt;&lt;filename&gt;/home/wegrata/LearningRegistry/LR/lr/controllers/publish.py&lt;/filename&gt;&lt;line&gt;45&lt;/line&gt;&lt;function&gt;create&lt;/function&gt;&lt;operation&gt;return json.dumps({'OK':True, 'document_results':results})&lt;/operation&gt;&lt;operation_context&gt;        data = json.loads(request.body)
+        results = map(publish_func,data['documents'])
+        return json.dumps({'OK':True, 'document_results':results})
+        &amp;quot;&amp;quot;&amp;quot;POST /publisher: Create a new item&amp;quot;&amp;quot;&amp;quot;
+        # url('publisher')
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/__init__.py&lt;/filename&gt;&lt;line&gt;230&lt;/line&gt;&lt;function&gt;dumps&lt;/function&gt;&lt;operation&gt;return _default_encoder.encode(obj)&lt;/operation&gt;&lt;operation_context&gt;        cls is None and indent is None and separators is None and
+        encoding == 'utf-8' and default is None and not kw):
+        return _default_encoder.encode(obj)
+    if cls is None:
+        cls = JSONEncoder
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;367&lt;/line&gt;&lt;function&gt;encode&lt;/function&gt;&lt;operation&gt;chunks = list(self.iterencode(o))&lt;/operation&gt;&lt;operation_context&gt;        # exceptions aren't as detailed.  The list call should be roughly
+        # equivalent to the PySequence_Fast that ''.join() would do.
+        chunks = list(self.iterencode(o))
+        return ''.join(chunks)
+
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;309&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_dict(o, markers):&lt;/operation&gt;&lt;operation_context&gt;                yield chunk
+        elif isinstance(o, dict):
+            for chunk in self._iterencode_dict(o, markers):
+                yield chunk
+        else:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;275&lt;/line&gt;&lt;function&gt;_iterencode_dict&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode(value, markers):&lt;/operation&gt;&lt;operation_context&gt;            yield encoder(key)
+            yield key_separator
+            for chunk in self._iterencode(value, markers):
+                yield chunk
+        if newline_indent is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;306&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_list(o, markers):&lt;/operation&gt;&lt;operation_context&gt;            yield floatstr(o, self.allow_nan)
+        elif isinstance(o, (list, tuple)):
+            for chunk in self._iterencode_list(o, markers):
+                yield chunk
+        elif isinstance(o, dict):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;204&lt;/line&gt;&lt;function&gt;_iterencode_list&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode(value, markers):&lt;/operation&gt;&lt;operation_context&gt;            else:
+                yield separator
+            for chunk in self._iterencode(value, markers):
+                yield chunk
+        if newline_indent is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;309&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_dict(o, markers):&lt;/operation&gt;&lt;operation_context&gt;                yield chunk
+        elif isinstance(o, dict):
+            for chunk in self._iterencode_dict(o, markers):
+                yield chunk
+        else:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;275&lt;/line&gt;&lt;function&gt;_iterencode_dict&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode(value, markers):&lt;/operation&gt;&lt;operation_context&gt;            yield encoder(key)
+            yield key_separator
+            for chunk in self._iterencode(value, markers):
+                yield chunk
+        if newline_indent is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;317&lt;/line&gt;&lt;function&gt;_iterencode&lt;/function&gt;&lt;operation&gt;for chunk in self._iterencode_default(o, markers):&lt;/operation&gt;&lt;operation_context&gt;                    raise ValueError(&amp;quot;Circular reference detected&amp;quot;)
+                markers[markerid] = o
+            for chunk in self._iterencode_default(o, markers):
+                yield chunk
+            if markers is not None:
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;323&lt;/line&gt;&lt;function&gt;_iterencode_default&lt;/function&gt;&lt;operation&gt;newobj = self.default(o)&lt;/operation&gt;&lt;operation_context&gt;
+    def _iterencode_default(self, o, markers=None):
+        newobj = self.default(o)
+        return self._iterencode(newobj, markers)
+
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;json.encoder&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.6/json/encoder.py&lt;/filename&gt;&lt;line&gt;344&lt;/line&gt;&lt;function&gt;default&lt;/function&gt;&lt;operation&gt;raise TypeError(repr(o) + &amp;quot; is not JSON serializable&amp;quot;)&lt;/operation&gt;&lt;operation_context&gt;
+        &amp;quot;&amp;quot;&amp;quot;
+        raise TypeError(repr(o) + &amp;quot; is not JSON serializable&amp;quot;)
+
+    def encode(self, o):
+&lt;/operation_context&gt;&lt;/frame&gt;&lt;/stack&gt;&lt;exception&gt;&lt;type&gt;TypeError&lt;/type&gt;&lt;value&gt;ServerError((403, ('forbidden', 'update')),) is not JSON serializable&lt;/value&gt;&lt;/exception&gt;&lt;/traceback&gt;</textarea>
+    </div>
+    
+        <div id="full_traceback" class="hidden-data">
+        URL: <a href="http://localhost/publish">http://localhost/publish</a><br>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/weberror/evalexception.py">weberror.evalexception</span>:<b>431</b> in <code>respond</code>  <a href="#" class="show_locals" tbid="162042780" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="weberror.evalexception:431" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">try</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">__traceback_supplement__</span> <span class="o">=</span> <span class="n">errormiddleware</span><span class="o">.</span><span class="n">Supplement</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">app_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">detect_start_response</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># Don&#39;t create a list from a paste.fileapp object </span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">app_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">detect_start_response</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/beaker/middleware.py">beaker.middleware</span>:<b>152</b> in <code>__call__</code>  <a href="#" class="show_locals" tbid="162042740" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="beaker.middleware:152" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;Set-cookie&#39;</span><span class="p">,</span> <span class="n">cookie</span><span class="p">))</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">)</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">session_start_response</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">def</span> <span class="nf">_get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrap_app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">session_start_response</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/routes/middleware.py">routes.middleware</span>:<b>131</b> in <code>__call__</code>  <a href="#" class="show_locals" tbid="162042700" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="routes.middleware:131" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">r&#39;\1&#39;</span><span class="p">,</span> <span class="n">oldpath</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># Wrapped in try as in rare cases the attribute will be gone already</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/pylons/wsgiapp.py">pylons.wsgiapp</span>:<b>124</b> in <code>__call__</code>  <a href="#" class="show_locals" tbid="162042660" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="pylons.wsgiapp:124" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="s">&#39;paste.testing_variables&#39;</span> <span class="ow">in</span> <span class="n">environ</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/pylons/wsgiapp.py">pylons.wsgiapp</span>:<b>327</b> in <code>dispatch</code>  <a href="#" class="show_locals" tbid="162042620" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="pylons.wsgiapp:327" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">log_debug</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Calling controller class with WSGI interface&quot;</span><span class="p">)</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">controller</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">def</span> <span class="nf">load_test_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">controller</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/home/wegrata/LearningRegistry/LR/lr/lib/base.py">lr.lib.base</span>:<b>15</b> in <code>__call__</code>  <a href="#" class="show_locals" tbid="162042580" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="lr.lib.base:15" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># the request is routed to. This routing information is</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># available in environ[&#39;pylons.routes_dict&#39;]</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">WSGIController</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">WSGIController</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/pylons/controllers/core.py">pylons.controllers.core</span>:<b>225</b> in <code>__call__</code>  <a href="#" class="show_locals" tbid="162042540" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="pylons.controllers.core:225" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">response</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_response</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_call</span><span class="p">()</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="ow">not</span> <span class="n">start_response_called</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="bp">self</span><span class="o">.</span><span class="n">start_response</span> <span class="o">=</span> <span class="n">start_response</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_call</span><span class="p">()</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/pylons/controllers/core.py">pylons.controllers.core</span>:<b>176</b> in <code>_dispatch_call</code>  <a href="#" class="show_locals" tbid="161644908" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="pylons.controllers.core:176" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">req</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;pylons.action_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inspect_call</span><span class="p">(</span><span class="n">func</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">log_debug</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inspect_call</span><span class="p">(</span><span class="n">func</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/pylons/controllers/core.py">pylons.controllers.core</span>:<b>108</b> in <code>_inspect_call</code>  <a href="#" class="show_locals" tbid="162042500" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="pylons.controllers.core:108" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">try</span><span class="p">:</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perform_call</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">except</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">httpe</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">log_debug</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perform_call</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/pymodules/python2.6/pylons/controllers/core.py">pylons.controllers.core</span>:<b>60</b> in <code>_perform_call</code>  <a href="#" class="show_locals" tbid="162042460" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="pylons.controllers.core:60" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="sd">&quot;&quot;&quot;Hide the traceback for everything above this method&quot;&quot;&quot;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">__traceback_hide__</span> <span class="o">=</span> <span class="s">&#39;before_and_this&#39;</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">def</span> <span class="nf">_inspect_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/home/wegrata/LearningRegistry/LR/lr/controllers/publish.py">lr.controllers.publish</span>:<b>45</b> in <code>create</code>  <a href="#" class="show_locals" tbid="162042420" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="lr.controllers.publish:45" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">results</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">publish_func</span><span class="p">,</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;documents&#39;</span><span class="p">])</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;OK&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;document_results&#39;</span><span class="p">:</span><span class="n">results</span><span class="p">})</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="sd">&quot;&quot;&quot;POST /publisher: Create a new item&quot;&quot;&quot;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># url(&#39;publisher&#39;)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;OK&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;document_results&#39;</span><span class="p">:</span><span class="n">results</span><span class="p">})</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/__init__.py">json</span>:<b>230</b> in <code>dumps</code>  <a href="#" class="show_locals" tbid="162042060" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json:230" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">cls</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">indent</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">separators</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">encoding</span> <span class="o">==</span> <span class="s">&#39;utf-8&#39;</span> <span class="ow">and</span> <span class="n">default</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kw</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="n">_default_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">cls</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">cls</span> <span class="o">=</span> <span class="n">JSONEncoder</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">return</span> <span class="n">_default_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>367</b> in <code>encode</code>  <a href="#" class="show_locals" tbid="162042100" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:367" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># exceptions aren&#39;t as detailed.&nbsp; The list call should be roughly</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="c"># equivalent to the PySequence_Fast that &#39;&#39;.join() would do.</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterencode</span><span class="p">(</span><span class="n">o</span><span class="p">))</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterencode</span><span class="p">(</span><span class="n">o</span><span class="p">))</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>309</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162041980" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:309" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>275</b> in <code>_iterencode_dict</code>  <a href="#" class="show_locals" tbid="162041940" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:275" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">encoder</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">key_separator</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">newline_indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>306</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162041900" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:306" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">floatstr</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_nan</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_list</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_list</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>204</b> in <code>_iterencode_list</code>  <a href="#" class="show_locals" tbid="162042140" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:204" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">separator</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">newline_indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>309</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162042220" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:309" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">else</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_dict</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>275</b> in <code>_iterencode_dict</code>  <a href="#" class="show_locals" tbid="162042380" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:275" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">encoder</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">key_separator</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">newline_indent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>317</b> in <code>_iterencode</code>  <a href="#" class="show_locals" tbid="162042340" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:317" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Circular reference detected&quot;</span><span class="p">)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">markers</span><span class="p">[</span><span class="n">markerid</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_default</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">yield</span> <span class="n">chunk</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">if</span> <span class="n">markers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode_default</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="p">):</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>323</b> in <code>_iterencode_default</code>  <a href="#" class="show_locals" tbid="162042260" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:323" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp; <span class="k">def</span> <span class="nf">_iterencode_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="n">newobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterencode</span><span class="p">(</span><span class="n">newobj</span><span class="p">,</span> <span class="n">markers</span><span class="p">)</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="n">newobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">o</span><span class="p">)</span></div>
+</div>
+<div class="frame">
+Module <span class="module" title="/usr/lib/python2.6/json/encoder.py">json.encoder</span>:<b>344</b> in <code>default</code>  <a href="#" class="show_locals" tbid="162042300" onClick="return showFrame(this)">&nbsp; &nbsp; <img src="http://localhost/_debug/media/plus.jpg" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href="#" class="" location="json.encoder:344" onClick="return showSource(this)">view</a><br>
+<div style="display: none" class="source highlight" source-type="long"><a class="switch_source" onclick="return switch_source(this, 'long')" href="#">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">&quot;&quot;&quot;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; raise TypeError(repr(o) + &quot; is not JSON serializable&quot;)</span><br>
+<span class="source-highlight">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="s">&nbsp;&nbsp;&nbsp; def encode(self, o):</span></div><div class="source highlight" source-type="short"><a onclick="return switch_source(this, 'short')" class="switch_source" href="#">&gt;&gt;&nbsp; </a><span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; is not JSON serializable&quot;</span><span class="p">)</span></div>
+</div>
+<b>TypeError: ServerError((403, ('forbidden', 'update')),) is not JSON serializable</b><br>
+        </div>
+        <div id="long_text_version" class="hidden-data">
+        <textarea style="width: 100%" rows=46 cols=60>URL: http://localhost/publish
+File '/usr/lib/pymodules/python2.6/weberror/evalexception.py', line 431 in respond
+  app_iter = self.application(environ, detect_start_response)
+File '/usr/lib/pymodules/python2.6/beaker/middleware.py', line 152 in __call__
+  return self.wrap_app(environ, session_start_response)
+File '/usr/lib/pymodules/python2.6/routes/middleware.py', line 131 in __call__
+  response = self.app(environ, start_response)
+File '/usr/lib/pymodules/python2.6/pylons/wsgiapp.py', line 124 in __call__
+  response = self.dispatch(controller, environ, start_response)
+File '/usr/lib/pymodules/python2.6/pylons/wsgiapp.py', line 327 in dispatch
+  return controller(environ, start_response)
+File '/home/wegrata/LearningRegistry/LR/lr/lib/base.py', line 15 in __call__
+  return WSGIController.__call__(self, environ, start_response)
+File '/usr/lib/pymodules/python2.6/pylons/controllers/core.py', line 225 in __call__
+  response = self._dispatch_call()
+File '/usr/lib/pymodules/python2.6/pylons/controllers/core.py', line 176 in _dispatch_call
+  response = self._inspect_call(func)
+File '/usr/lib/pymodules/python2.6/pylons/controllers/core.py', line 108 in _inspect_call
+  result = self._perform_call(func, args)
+File '/usr/lib/pymodules/python2.6/pylons/controllers/core.py', line 60 in _perform_call
+  return func(**args)
+File '/home/wegrata/LearningRegistry/LR/lr/controllers/publish.py', line 45 in create
+  return json.dumps({'OK':True, 'document_results':results})
+File '/usr/lib/python2.6/json/__init__.py', line 230 in dumps
+  return _default_encoder.encode(obj)
+File '/usr/lib/python2.6/json/encoder.py', line 367 in encode
+  chunks = list(self.iterencode(o))
+File '/usr/lib/python2.6/json/encoder.py', line 309 in _iterencode
+  for chunk in self._iterencode_dict(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 275 in _iterencode_dict
+  for chunk in self._iterencode(value, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 306 in _iterencode
+  for chunk in self._iterencode_list(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 204 in _iterencode_list
+  for chunk in self._iterencode(value, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 309 in _iterencode
+  for chunk in self._iterencode_dict(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 275 in _iterencode_dict
+  for chunk in self._iterencode(value, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 317 in _iterencode
+  for chunk in self._iterencode_default(o, markers):
+File '/usr/lib/python2.6/json/encoder.py', line 323 in _iterencode_default
+  newobj = self.default(o)
+File '/usr/lib/python2.6/json/encoder.py', line 344 in default
+  raise TypeError(repr(o) + " is not JSON serializable")
+TypeError: ServerError((403, ('forbidden', 'update')),) is not JSON serializable</textarea>
+        </div>
+        
+    
+<div class="feature-highlight">
+<b>Extra Features</b>
+<table border="0">
+<tr><td><a href="#" onclick="return false" class="switch_source" style="cursor: default">&gt;&gt;</a></td><td>Display the lines of code near each part of the traceback</td></tr>
+<tr><td><img src="http://localhost/_debug/media/plus.jpg" /></td><td>Show a debug prompt to allow you to directly debug the code at the traceback</td></tr>
+</table>
+</div>
+
+            </div>
+        </div>
+        <br class="clear" />
+        <div class="hr"><hr class="clear" /></div>
+    </div>
+    <!-- Footer -->
+    <script type="text/javascript" src="http://localhost/_debug/media/jquery-1.2.3.pack.js"></script>
+    <script type="text/javascript" src="http://localhost/_debug/media/debug.js"></script>
+    <div id="footer"><script src="http://localhost/_debug/media/pylons/javascripts/traceback.js"></script>
+<script>
+var TRACEBACK = {
+    uri: "http://localhost/_debug",
+    host: "pylonshq.com",
+    traceback: "/tracebacks"
+}
+</script>
+<div id="service_widget">
+<h2 class="assistance">Online Assistance</h2>
+<div id="nv">
+<ul id="supportnav">
+    <li class="nav active"><a class="overview" href="#">Overview</a></li>
+    <li class="nav"><a class="search" href="#">Search Mail Lists</a></li>
+    <li class="nav"><a class="posttraceback" href="#">Post Traceback</a></li>
+</ul>
+</div>
+<div class="clearfix">&nbsp;</div>
+<div class="overviewtab">
+<b>Looking for help?</b>
+
+<p>Here are a few tips for troubleshooting if the above traceback isn't
+helping out.</p>
+
+<ol>
+<li>Search the mail list</li>
+<li>Post the traceback, and ask for help on IRC</li>
+<li>Post a message to the mail list, referring to the posted traceback</li>
+
+</div>
+<div class="posttracebacktab">
+<p><b>Note:</b> Clicking this button will post your traceback to the PylonsHQ website.
+The traceback includes the module names, Python version, and lines of code that you
+can see above. All tracebacks are posted anonymously unless you're logged into the
+PylonsHQ website in this browser.</p>
+<input type="button" href="#" class="submit_traceback" value="Send TraceBack to PylonsHQ" style="text-align: center;"/>
+</div>
+
+<div class="searchtab">
+<p>The following mail lists will be searched:<br />
+<input type="checkbox" name="lists" value="pylons" checked="checked" /> Pylons<br />
+<input type="checkbox" name="lists" value="python" /> Python<br />
+<input type="checkbox" name="lists" value="mako" /> Mako<br />
+<input type="checkbox" name="lists" value="sqlalchemy" /> SQLAlchemy</p>
+<p class="query">for: <input type="text" name="query" class="query" /></p>
+
+<p><input type="submit" value="Search" /></p>
+<div class="searchresults">
+
+</div>
+</div>
+
+</div>
+<div id="pylons_logo"><img src="http://localhost/_debug/media/pylons/img/pylons-powered-02.png" /></div>
+<div class="credits">Pylons version 0.10</div></div>
+</body>
+</html>

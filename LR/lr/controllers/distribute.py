@@ -1,4 +1,4 @@
-#   Copyright [2011] [name of copyright owner]
+#   Copyright 2011 Department of Defence
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import logging, couchdb
+import logging, couchdb, urlparse
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -33,9 +33,15 @@ class DistributeController(BaseController):
     def create(self):
         db_to_replicate = request.params['resource_documents_database']
         server = couchdb.Server()
-        db = server['community']       
-        for doc in db:            
-            server.replicate(db_to_replicate,db[doc]['location'])
+        network_id = 'network_id'
+        community_id = 'community_id'
+        db = server['community']
+        source_description =       json.load(urllib2.urlopen('http://localhost/description')
+        for doc in db:           
+            base_location = db[doc]['location']
+            description = json.load(urllib2.urlopen(urlparse.unparse(base_location,'description'))
+            if description['gateway_node'] or source_description[network_id] = description[network_id] or source_description[community_id] = description[community_id]:            
+                server.replicate(db_to_replicate,urlparse.unparse(base_location,'replication_data'))
         # url('distribute')
 
     def new(self, format='html'):
