@@ -1,0 +1,20 @@
+Metadata-Version: 1.0
+Name: python-fastcgi
+Version: 1.1
+Summary: Python wrapper for the Open Market FastCGI library
+Home-page: UNKNOWN
+Author: Cody Pisto
+Author-email: cody@hpcs.com
+License: MIT-style
+Download-URL: http://nebula.hpcs.com/python-fastcgi-1.1.tar.gz
+Description: python-fastcgi is a lightweight wrapper around the Open Market FastCGI C Library/SDK. It includes threaded and forking WSGI 1.0 server implementations.
+Platform: Posix
+Platform: MacOS X
+Platform: Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: C
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

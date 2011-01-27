@@ -1,0 +1,12 @@
+AUTHORS
+LICENSE
+MANIFEST
+MANIFEST.in
+README
+ez_setup.py
+setup.py
+example/test.fcgi
+fastcgi/Server.py
+fastcgi/WSGI.py
+fastcgi/__init__.py
+fastcgi/pyfcgi.c

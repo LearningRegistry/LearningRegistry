@@ -1,0 +1,17 @@
+AUTHORS
+LICENSE
+MANIFEST
+MANIFEST.in
+README
+ez_setup.py
+setup.py
+example/test.fcgi
+fastcgi/Server.py
+fastcgi/WSGI.py
+fastcgi/__init__.py
+fastcgi/pyfcgi.c
+pip-egg-info/python_fastcgi.egg-info/PKG-INFO
+pip-egg-info/python_fastcgi.egg-info/SOURCES.txt
+pip-egg-info/python_fastcgi.egg-info/dependency_links.txt
+pip-egg-info/python_fastcgi.egg-info/not-zip-safe
+pip-egg-info/python_fastcgi.egg-info/top_level.txt

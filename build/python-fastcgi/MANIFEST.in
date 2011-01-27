@@ -1,0 +1,13 @@
+include README
+include AUTHORS
+include LICENSE
+include MANIFEST
+include MANIFEST.in
+
+include ez_setup.py
+include setup.py
+
+include fastcgi/*.c
+include fastcgi/*.py
+
+include example/*.fcgi
