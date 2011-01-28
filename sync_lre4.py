@@ -9,7 +9,7 @@ def format(doc):
     value = {'title':''.join(doc.getField('title')),'identifier':''.join(doc.getField('identifier')), 'location': ''.join(doc.getField('location'))}
     return value
 if __name__ == '__main__':
-    main_url = 'http://wegrata:g15t15@wegrata.couchone.com/'    
+    main_url = 'http://localhost:5984/'    
     oai_url = 'http://lrecoreprod.eun.org:6080/oaitarget/OAIHandler'
     database_name = 'testoai'
     oai_lre4_reader = MetadataReader(
