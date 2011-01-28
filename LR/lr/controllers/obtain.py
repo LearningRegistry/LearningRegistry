@@ -33,13 +33,18 @@ class ObtainController(BaseController):
         return response.read()
         # url('obtain')
     def create(self):
-        def document_map_func(doc_info):
-            doc_id = doc_info["doc_ID"]        
-            return {"doc_ID": doc_id, "resource_data_description" :json.loads(self.show(doc_id))}
         """POST /obtain: Create a new item"""
         data = json.loads(request.body)
-        return_data = map(document_map_func,data['request_IDs'])
-        return json.dumps({'documents': return_data})
+        def get_key(key):
+           return key['doc_ID']
+        keys = map(get_key,data['request_IDs'])
+        return_data = urllib2.urlopen('http://localhost:5984/resource_data/_all_docs?include_docs=true',json.dumps({'keys': keys}))
+        return_data = json.load(return_data)
+        def format(doc):
+           return doc['doc']
+        print return_data
+	return_data = {'documents' : map(format,return_data['rows'])}
+        return return_data
         # url('obtain')
 
     def new(self, format='html'):

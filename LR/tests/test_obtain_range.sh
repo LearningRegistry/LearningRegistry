@@ -1,1 +1,1 @@
-curl -v -H "Content-Type: application/json" -X POST  -d '{"request_IDs" : [{"doc_ID":"16a158dce1baf4903872f11450004431"},{"doc_ID":"16a158dce1baf4903872f114500037c4"},{"doc_ID":"16a158dce1baf4903872f11450003550"}]}' http://localhost/obtain > range.htm && firefox range.htm
+curl -v -H "Content-Type: application/json" -X POST  -d '{"request_IDs" : [{"doc_ID":"16a158dce1baf4903872f11450004431"},{"doc_ID":"16a158dce1baf4903872f114500037c4"},{"doc_ID":"16a158dce1baf4903872f11450003550"}]}' http://localhost/obtain > range.htm && firefox range.htm &
