@@ -19,6 +19,7 @@ def create_database(url,name):
         couch = couchdb.Server(url)
         db = couch.create(name)
     return db
+
 def get_documents(main_url, database_name, url, reader, prefix, format):
     registry = MetadataRegistry()
     registry.registerReader(prefix, reader)
@@ -33,6 +34,7 @@ def get_documents(main_url, database_name, url, reader, prefix, format):
             sync_files(main_url, database_name, return_stuff)     
             return_stuff = []
     sync_files(main_url, database_name, return_stuff)                 
+
 def save_file(db, id, data):
     try:    
         doc = db[id]
@@ -44,13 +46,13 @@ def save_file(db, id, data):
         doc['identifier'] = data['identifier']        
         doc['title']= data['title']
         db[id] = doc
+
 def sync_files(main_url, database_name, files_to_replicate):
     db = get_database(main_url,database_name)
     if db == None:
         db = create_database(main_url,database_name)
     db.update(files_to_replicate)    
-def index_documents(oai_url,main_url,database_name, reader, prefix, format):
-   
+
+def index_documents(oai_url,main_url,database_name, reader, prefix, format):   
     get_documents(main_url, database_name, oai_url, reader,prefix, format)
-    #sync_files(main_url, database_name, files_to_replicate)
 
