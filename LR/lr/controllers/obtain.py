@@ -41,7 +41,6 @@ class ObtainController(BaseController):
         return_data = urllib2.urlopen('http://localhost:5984/resource_data/_all_docs?include_docs=true',json.dumps({'keys': keys}))
         return_data = json.load(return_data)
         def format(doc):
-           print doc
            return doc['doc']
 	return_data = {'documents' : map(format,return_data['rows'])}
         return json.dumps(return_data)
