@@ -1,6 +1,15 @@
 #!/usr/bin/python
 import couchdb, time
 server = couchdb.Server()
+def create(name):
+    try:
+        server.create(name)
+    except:
+        print 'DB already exists'
+create('node')
+create('resource_data')
+create('community')
+create('network')
 db = server['node']
 def publish_doc(name, doc_data):
     try:
