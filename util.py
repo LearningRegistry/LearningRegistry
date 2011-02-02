@@ -20,7 +20,7 @@ def create_database(url,name):
         db = couch.create(name)
     return db
 
-def get_documents(main_url, database_name, url, reader, prefix, format):
+def index_documents(main_url, database_name, url, reader, prefix, format):
     registry = MetadataRegistry()
     registry.registerReader(prefix, reader)
     client = Client(url, registry)
@@ -53,6 +53,4 @@ def sync_files(main_url, database_name, files_to_replicate):
         db = create_database(main_url,database_name)
     db.update(files_to_replicate)    
 
-def index_documents(oai_url,main_url,database_name, reader, prefix, format):   
-    get_documents(main_url, database_name, oai_url, reader,prefix, format)
 
