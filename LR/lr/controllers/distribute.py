@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import logging, couchdb, urlparse
+import logging, couchdb, urlparse, json, urllib2
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -31,17 +31,32 @@ class DistributeController(BaseController):
         # url('distribute')
 
     def create(self):
-        db_to_replicate = request.params['resource_documents_database']
-        server = couchdb.Server()
         network_id = 'network_id'
+        gateway_connection = 'gateway_connection'
+        gateway_node = 'gateway_node'
         community_id = 'community_id'
-        db = server['community']
-        source_description =       json.load(urllib2.urlopen('http://localhost/description')
-        for doc in db:           
-            base_location = db[doc]['location']
-            description = json.load(urllib2.urlopen(urlparse.unparse(base_location,'description'))
-            if description['gateway_node'] or source_description[network_id] = description[network_id] or source_description[community_id] = description[community_id]:            
-                server.replicate(db_to_replicate,urlparse.unparse(base_location,'replication_data'))
+        social_community = 'social_community'
+        server = couchdb.Server()
+        db = server['node']
+        rows = db.view('_design/node/_view/connections').rows
+        source_description = json.load(urllib2.urlopen('http://localhost/description'))       
+        for doc in rows:           
+            connection_info = doc.value
+            base_location = connection_info['destination_node_url']
+            parts = urlparse.urlparse(base_location)
+            description_url = base_location.replace(parts.path,'/description')
+            description = json.load(urllib2.urlopen(description_url))
+            db_to_replicate = connection_info['source_node_url']
+#not  and description['gateway_node']
+            if (source_description[community_id] != description[community_id]) and ((not source_description[social_community]) or (not source_description[social_community])):
+                continue         
+            if (not connection_info[gateway_connection]) and (source_description[network_id] != description[network_id]):
+                continue
+            if (connection_info[gateway_connection]) and (source_description[network_id] == description[network_id]):
+                continue
+            if connection_info[gateway_connection] and source_description[gateway_node] and description[gateway_node]:
+                continue
+            server.replicate(db_to_replicate,base_location)
         # url('distribute')
 
     def new(self, format='html'):
