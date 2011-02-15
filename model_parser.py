@@ -4,8 +4,8 @@ import re
 import codecs
 
 
-def GeFileString(filename):
-    
+def getFileString(filename):
+
     #Use codecs to open the files as unicode encoding to deals with googledocs
     #file that using unicode for open and close string.
     file = codecs.open(filename, encoding='utf-8')
@@ -14,6 +14,9 @@ def GeFileString(filename):
 
     #Remove the optional X_xxx enxtesion variable from the file string.Formatter    
     fileString = re.sub(r'\s+"X_xxx.*', '', fileString)
+    
+    #replace the unicode quotation marks with plain one.
+    fileString = re.sub(u"\u201c|\u201d", '"', fileString)
     return fileString
 
 def getString(originalText, location, tokens):
@@ -21,20 +24,25 @@ def getString(originalText, location, tokens):
 
 class ModelParser(object):
     
+    
     #Define some string constants
-    _KEY_COMMENT = 'key_comment'
-    _VALUE_COMMENT = 'value_comment'
-    _PROPERTY = 'property'
+    _KEY_COMMENT = 'keyCcomment'
+    _VALUE_COMMENT = 'valueComment'
+    _PROPERTY = '_Me_property'
     _KEY = 'key'
     _VALUE = 'value'
-    _VALUE_DEFAULT = 'value_default'
-    _VALUE_TYPE = 'value_type'
-    _VALUE_TYPE_ARRAY = 'value_type_array'
-    _VALUE_TYPE_INLINE = 'value_type_inline'
-    _OBJECT = 'object'
+    _VALUE_DEFAULT = 'valueDefault'
+    _VALUE_TYPE = 'valueType'
+    _VALUE_RANGE = 'valueRange'
+    _VALUE_TYPE_ARRAY = 'valueTypeArray'
+    _VALUE_TYPE_INLINE = 'valueTypeInline'
+    _IS_REQUIRED = 'isRequired'
+    _IS_IMMUTABLE = 'isImmutable'
+    _OBJECT = '_Me_object'
+    
+    JSON_TYPES =  ['string', 'boolean', 'number', 'array', 'object']
     
     #Define pyparsing variables.
-                
     VAR = Regex('[A-Za-z0-9_.]+')
     INGORE_SPACE = Suppress(ZeroOrMore(White()))
     
@@ -46,7 +54,7 @@ class ModelParser(object):
     NAME = INGORE_SPACE+Suppress(QUOTE)+VAR+Suppress(QUOTE)+INGORE_SPACE
     NAME.setParseAction(getString)
     
-    TYPES =  oneOf(['string', 'boolean', 'number', 'array', 'object'])
+    TYPES =  oneOf(JSON_TYPES)
     TYPES.setParseAction(getString)
         
     JSON_TYPES = (Suppress(QUOTE)+TYPES+Suppress(QUOTE))|TYPES
@@ -60,7 +68,7 @@ class ModelParser(object):
     COMMENT_START= '//'
     
     KEY = NAME+Suppress(':')
-   
+    KEY.setParseAction(getString)
     
     #Forward define of object since a value can be an object.
     OBJECT = Forward()
@@ -68,17 +76,49 @@ class ModelParser(object):
     #inline value are just string inside of a backet.
     INLINE_VALUE = OBJECT_START + \
                 originalTextFor(OneOrMore(Word(alphanums)))+OBJECT_END
+    INLINE_VALUE.setParseAction(getString)
                 
-    VALUE = (JSON_TYPES.setResultsName(_VALUE_TYPE)
-             |NAME.setResultsName(_VALUE_DEFAULT) \
+    VALUE = (INLINE_VALUE.setResultsName(_VALUE_TYPE_INLINE)
+             |OBJECT.setResultsName(_OBJECT)
              |ARRAY.setResultsName(_VALUE_TYPE_ARRAY)
-             |INLINE_VALUE.setResultsName(_VALUE_TYPE_INLINE)
-             |OBJECT.setResultsName(_OBJECT)) + \
+             |JSON_TYPES.setResultsName(_VALUE_TYPE)
+             |NAME.setResultsName(_VALUE_DEFAULT)
+            )+ \
              Suppress(','|FollowedBy(OBJECT_END))
+    
+     # This parser will look string fixed vocabulary which signal the
+    # property has defined range of values that are in value_range
+    VALUE_RANGE = Combine(Suppress(Regex(u'fixed\s+vocabulary\s+'))+\
+              Regex(r'\[[^]]+\]')).setResultsName(_VALUE_RANGE)
+
+    
+    IS_REQUIRED = Keyword('required')
+    IS_REQUIRED.setParseAction(lambda s, p, t: True)
+    
+    IS_IMMUTABLE = Keyword('immutable')
+    IS_IMMUTABLE.setParseAction(lambda s, p, t: True)
+    
+    #Parser to extract any useful information from the comments.
+    COMMENT_INFO = ~(KEY|OBJECT_END)+(Optional(SkipTo(VALUE_RANGE)+
+                            VALUE_RANGE.setResultsName(_VALUE_RANGE))+\
+                   Optional(SkipTo(IS_REQUIRED)+
+                            IS_REQUIRED.setResultsName(_IS_REQUIRED))+\
+                   Optional(SkipTo(IS_IMMUTABLE)+
+                           IS_IMMUTABLE.setResultsName(_IS_IMMUTABLE))
+                    ).setResultsName(_VALUE)
+                    
     
     COMMENT_KEY = originalTextFor(COMMENT_START+SkipTo(VALUE))
     COMMENT_VALUE = originalTextFor(COMMENT_START+SkipTo(KEY|OBJECT_END))
     
+##    def parseComment(string, position, tokens):
+##        print("-----------------------\n\n"+tokens)
+##        print("-----------------------\n\n")
+##        #return ModelParser.COMMENT_INFO.parseString("")
+##        return tokens
+        
+        
+    #COMMENT_VALUE.setParseAction(parseComment)
     
     PROPERTY =Group((KEY.setResultsName(_KEY)+
                      COMMENT_KEY.setResultsName(_KEY_COMMENT)+
@@ -95,12 +135,16 @@ class ModelParser(object):
                     )    
     PROPERTY.setResultsName(_PROPERTY)
     
+
     OBJECT << (OBJECT_START+
-                ZeroOrMore(PROPERTY.setResultsName(_PROPERTY))+
+                ZeroOrMore(Dict(PROPERTY.setResultsName(_PROPERTY)))+
                 OBJECT_END
                ).setResultsName(_OBJECT)
     
-    def __init__(self, string, filePath=None):
+   
+            
+    
+    def __init__(self, string=None, filePath=None):
         """Class that parse data models from the spec for object validation.
           string: String represention of model based on Dan Rehak JSON like
                   format.
@@ -108,82 +152,31 @@ class ModelParser(object):
           filePath: Full path of a file that contains Dan Rehak JSON like
                    data model"""
                 
-        self._fileString = ''
+        self._fileString = None
+        self._modelName = None
         self._parseResult = None
-        #List spec the keys in the objects
-        self._keys = []
+        self._propertyDict = {}
         
-        #List of keys that are required for a valid object.
-        self._requiredKeys = []
-        
-        #List of keys are immutable.
-        self._immutableKeys = []
-        
-        # Dictionary of keys that have defualt values and their 
-        # defaults values
-        self._keyDefaultValues = {}
-        
-        # Dictionary of keys that has range of values and their list of
-        # values
-        self._keyValueRange = {}
-        
-        #Self key comments
-        self._keyComment = {}
-        
-        #comments on the value
-        self._valueComment = {}
-        
-        if filename is not None:
-            self._fileString = GetFileString(filename)
         if string is not None:
             self._fileString = string
             
+        if filePath is not None:
+            self._fileString = getFileString(filePath)
+      
         #parse the models
-        _extractData()
+        if self._fileString is not None:
+            self._extractData()
         
-    
-    def _extractCommentInfo(key, comment):
-            
-        if re.search('required', comment) is not None :
-            self._requiredKeys.append(key)
-        
-        if re.search('immutable', comment) is not None:
-            self._immutableKeys.append(key)
-        
-        if re.search(r'fixed\s+vocabulary', comment) is not None:
-            self._keyDefaultValues[key] = commentInfo.defaultValue
-            
         
     def _extractData(self):
         if self._parseResult is not None:
             return
-        
-        for p in parseResult:
-            property = p.asDict()
-            key = property[_KEY]
-            self._keys.append(key)
-            
-            if _VALUE_COMMENT in poperty.keys():
-                value_comment = property[_VALUE_COMMENT]
-                self._valueComment[key] = value_comment
-                _extractCommentInfo(key, value_comment)
-                
-            if _KEY_COMMENT in property.keys():
-                self._keyComment[key] = poperty[_KEY_COMMENT]
-
-            
-            
-    def _getParseResult(self):
-        if self._parseResult is None:
-            self._parseResult = OBJECT.parseString(self._fileString)
-        return _parseResult
+        self._parseResult =  ModelParser.OBJECT.parseString(self._fileString)
+        self._modelName = self._parseResult.doc_type.value.valueDefault
+        #For some reason pyparsing parseAction does no like to return
+        #a list. So look for all valueRange string and eval to a list.
     
-    def _getKeys(self):
-        if self._keys is None:
-            self._keys =[]
-            self._extract_data()
     
-    parseResult = property(_getParseResult, None, None, None)
-    keys = property(_getKeys, None, None, 
-                    "List the object keys specified in the spec")
+    model = property(lambda self:self._parseResult, None, None, None)
+  
     
