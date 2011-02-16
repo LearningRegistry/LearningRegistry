@@ -27,7 +27,7 @@ def index_documents(main_url, database_name, url, reader, prefix, format):
     return_stuff = []
     for record in client.listRecords(metadataPrefix=prefix):
         r = record[1]
-        value = format(r)
+        value = format(r,record[0].identifier())
         if value != None:
             return_stuff.append(value)
         if len(return_stuff) >= 10000:
