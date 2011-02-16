@@ -99,7 +99,7 @@ class ModelParser(object):
     IS_IMMUTABLE.setParseAction(lambda s, p, t: True)
     
     #Parser to extract any useful information from the comments.
-    COMMENT_INFO = ~(KEY|OBJECT_END)+(Optional(SkipTo(VALUE_RANGE)+
+    COMMENT_INFO = (Optional(SkipTo(VALUE_RANGE)+
                             VALUE_RANGE.setResultsName(_VALUE_RANGE))+\
                    Optional(SkipTo(IS_REQUIRED)+
                             IS_REQUIRED.setResultsName(_IS_REQUIRED))+\
@@ -111,14 +111,16 @@ class ModelParser(object):
     COMMENT_KEY = originalTextFor(COMMENT_START+SkipTo(VALUE))
     COMMENT_VALUE = originalTextFor(COMMENT_START+SkipTo(KEY|OBJECT_END))
     
-##    def parseComment(string, position, tokens):
-##        print("-----------------------\n\n"+tokens)
+##    def parseComments(string, position, tokens):
+##        comments = re.search(r"[^:}]+", string[position:-1], re.DOTALL).group()
+##                            
+##        print("-----------------------\n\n"+comments)
 ##        print("-----------------------\n\n")
-##        #return ModelParser.COMMENT_INFO.parseString("")
-##        return tokens
-        
-        
-    #COMMENT_VALUE.setParseAction(parseComment)
+##        result = ModelParser.COMMENT_INFO.parseString(comments)
+##        return result
+##        
+##        
+##    COMMENT_VALUE.setParseAction(parseComments)
     
     PROPERTY =Group((KEY.setResultsName(_KEY)+
                      COMMENT_KEY.setResultsName(_KEY_COMMENT)+
@@ -175,7 +177,25 @@ class ModelParser(object):
         self._modelName = self._parseResult.doc_type.value.valueDefault
         #For some reason pyparsing parseAction does no like to return
         #a list. So look for all valueRange string and eval to a list.
-    
+        for property in self._parseResult:
+            commentInfo = ModelParser.COMMENT_INFO.parseString(
+                    property[ModelParser._VALUE_COMMENT])
+            print("---------------\n")
+            print property.asDict()
+            print("+++++++++++++++++++++\n") 
+            print commentInfo.asDict()
+          
+            #replace any value range string with a tubple
+            if self._VALUE_RANGE in commentInfo.asDict().keys():
+                rangeString = commentInfo[self._VALUE_RANGE]
+                print (":::::::::::\n"+rangeString)
+                rangeString = re.sub(r"\s+|/", '', rangeString)                     
+                commentInfo[self._VALUE_RANGE] = tuple(eval(rangeString))
+
+            self._parseResult[property[self._KEY]] = property+commentInfo
+               
+            print("******\n\n") 
+            print property.asDict()
     
     model = property(lambda self:self._parseResult, None, None, None)
   
