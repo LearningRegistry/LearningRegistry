@@ -2,7 +2,7 @@
 from pyparsing import *
 import re
 import codecs
-
+import json
 
 def getFileString(filename):
 
@@ -23,14 +23,14 @@ def getString(originalText, location, tokens):
     return "".join(tokens)
 
 class ModelParser(object):
-    
+        
     
     #Define some string constants
     _KEY_COMMENT = 'keyCcomment'
     _VALUE_COMMENT = 'valueComment'
     _PROPERTY = '_Me_property'
-    _KEY = 'key'
-    _VALUE = 'value'
+    _KEY = '_Me_key'
+    _VALUE = '_Me_value'
     _VALUE_DEFAULT = 'valueDefault'
     _VALUE_TYPE = 'valueType'
     _VALUE_RANGE = 'valueRange'
@@ -56,12 +56,11 @@ class ModelParser(object):
     
     TYPES =  oneOf(JSON_TYPES)
     TYPES.setParseAction(getString)
-        
-    JSON_TYPES = (Suppress(QUOTE)+TYPES+Suppress(QUOTE))|TYPES
+    QUOTED_TYPES = (Suppress(QUOTE)+TYPES+Suppress(QUOTE)) 
+       
+    JSON_TYPES = QUOTED_TYPES|TYPES
     JSON_TYPES.setParseAction(getString)
     
-    ARRAY = '['+Suppress(QUOTE)+TYPES+Suppress(QUOTE)+']'
-    ARRAY.setParseAction(getString)
     
     OBJECT_START = Suppress('{')
     OBJECT_END = Suppress('}')
@@ -73,18 +72,23 @@ class ModelParser(object):
     #Forward define of object since a value can be an object.
     OBJECT = Forward()
     
+    ARRAY = '['+(QUOTED_TYPES.setParseAction(getString)|\
+                (Optional(COMMENT_START+FollowedBy(OBJECT)).setResultsName(_VALUE_COMMENT)
+                +OBJECT))+']'
+    
+    
     #inline value are just string inside of a backet.
     INLINE_VALUE = OBJECT_START + \
                 originalTextFor(OneOrMore(Word(alphanums)))+OBJECT_END
     INLINE_VALUE.setParseAction(getString)
                 
-    VALUE = (INLINE_VALUE.setResultsName(_VALUE_TYPE_INLINE)
-             |OBJECT.setResultsName(_OBJECT)
-             |ARRAY.setResultsName(_VALUE_TYPE_ARRAY)
-             |JSON_TYPES.setResultsName(_VALUE_TYPE)
+    VALUE = (JSON_TYPES.setResultsName(_VALUE_TYPE)
              |NAME.setResultsName(_VALUE_DEFAULT)
+             |ARRAY.setResultsName(_VALUE_TYPE_ARRAY)
+             |INLINE_VALUE.setResultsName(_VALUE_TYPE_INLINE)
+             |OBJECT.setResultsName(_OBJECT)
             )+ \
-             Suppress(','|FollowedBy(OBJECT_END))
+             Suppress(','|FollowedBy(COMMENT_START|OBJECT_END))
     
      # This parser will look string fixed vocabulary which signal the
     # property has defined range of values that are in value_range
@@ -107,29 +111,19 @@ class ModelParser(object):
                            IS_IMMUTABLE.setResultsName(_IS_IMMUTABLE))
                     ).setResultsName(_VALUE)
                     
-    
-    COMMENT_KEY = originalTextFor(COMMENT_START+SkipTo(VALUE))
-    COMMENT_VALUE = originalTextFor(COMMENT_START+SkipTo(KEY|OBJECT_END))
-    
-##    def parseComments(string, position, tokens):
-##        comments = re.search(r"[^:}]+", string[position:-1], re.DOTALL).group()
-##                            
-##        print("-----------------------\n\n"+comments)
-##        print("-----------------------\n\n")
-##        result = ModelParser.COMMENT_INFO.parseString(comments)
-##        return result
-##        
-##        
-##    COMMENT_VALUE.setParseAction(parseComments)
+    COMMENT = Combine(OneOrMore(White()+COMMENT_START+SkipTo(LineEnd())))
+    #COMMENT_KEY = originalTextFor(COMMENT_START+SkipTo(LineEnd()))
+    #COMMENT_VALUE = originalTextFor(COMMENT_START+SkipTo(KEY|ARRAY|OBJECT_END))
+
     
     PROPERTY =Group((KEY.setResultsName(_KEY)+
-                     COMMENT_KEY.setResultsName(_KEY_COMMENT)+
+                     COMMENT.setResultsName(_KEY_COMMENT)+
                      VALUE.setResultsName(_VALUE)+
-                     COMMENT_VALUE.setResultsName(_VALUE_COMMENT)
+                     COMMENT.setResultsName(_VALUE_COMMENT)
                      )|
                     (KEY.setResultsName(_KEY)+
                      VALUE.setResultsName(_VALUE)+
-                     COMMENT_VALUE.setResultsName(_VALUE_COMMENT)
+                     COMMENT.setResultsName(_VALUE_COMMENT)
                      )|
                      (KEY.setResultsName(_KEY)+
                       VALUE.setResultsName(_VALUE)
@@ -153,11 +147,14 @@ class ModelParser(object):
                 
           filePath: Full path of a file that contains Dan Rehak JSON like
                    data model"""
-                
+        
         self._fileString = None
         self._modelName = None
-        self._parseResult = None
-        self._propertyDict = {}
+        self._parseResults = None
+        # The model info is a copy of the parseResults where some duplicate
+        # information has been remove. And some other cleaned up, like the
+        # range of valid values.
+        self._modelInfo = None
         
         if string is not None:
             self._fileString = string
@@ -169,34 +166,134 @@ class ModelParser(object):
         if self._fileString is not None:
             self._extractData()
         
+    def _cleanup(self, results):
+        """ Go through all the keys and remove some duplicate infomation
+            in key, value, and added parsing generated keys like _Me_object, 
+            and _Me_property.
+        """
+        for key in results.asDict().keys():
+            if key in [self._KEY, self._VALUE, self._OBJECT, self._PROPERTY]:
+                results.pop(key)
+                continue
+            if isinstance(results[key], ParseResults):
+                self._cleanup(results[key])
+            
+    def _extractCommentInfo(self, results):
+        """Extracts any additional info from the comments"""
+        
+        for key in results.keys():
+            #See if there is any comment to extract info from.
+            if self._VALUE_COMMENT in results[key].keys():
+                commentString = results[key][self._VALUE_COMMENT]
+                commentInfo = self.COMMENT_INFO.parseString(commentString)
+                
+                # For some reason pyparsing parseAction does no like to return
+                # a list. So look for any valueRange string and eval to a list,
+                # and save the list as a tuple
+                if self._VALUE_RANGE in commentInfo.keys():
+                    rangeString = commentInfo[self._VALUE_RANGE]
+                    #Clean the range string, remove extra space and errand char.
+                    rangeString = re.sub(r"\s+|/", '', rangeString)                     
+                    commentInfo[self._VALUE_RANGE] = tuple(eval(rangeString))
+                
+                #Cleanup comment before merging
+                self._cleanup(commentInfo)
+                    
+                #Merge any info extracted from the comment.
+                results[key] = results[key] + commentInfo
+        return results
         
     def _extractData(self):
-        if self._parseResult is not None:
+        """Parses the spec data model"""
+        
+        #Don't do anything if the data is already parsed.
+        if self._parseResults is not None and self._modelInfo is not None:
             return
-        self._parseResult =  ModelParser.OBJECT.parseString(self._fileString)
-        self._modelName = self._parseResult.doc_type.value.valueDefault
-        #For some reason pyparsing parseAction does no like to return
-        #a list. So look for all valueRange string and eval to a list.
-        for property in self._parseResult:
-            commentInfo = ModelParser.COMMENT_INFO.parseString(
-                    property[ModelParser._VALUE_COMMENT])
-            print("---------------\n")
-            print property.asDict()
-            print("+++++++++++++++++++++\n") 
-            print commentInfo.asDict()
-          
-            #replace any value range string with a tubple
-            if self._VALUE_RANGE in commentInfo.asDict().keys():
-                rangeString = commentInfo[self._VALUE_RANGE]
-                print (":::::::::::\n"+rangeString)
-                rangeString = re.sub(r"\s+|/", '', rangeString)                     
-                commentInfo[self._VALUE_RANGE] = tuple(eval(rangeString))
+        
+        self._parseResults =  ModelParser.OBJECT.parseString(self._fileString)
+        #Get the name of the model.    
+        if 'doc_type' in self._parseResults.keys():
+            self._modelName = self._parseResults.doc_type.valueDefault
+        
+        self._modelInfo = self._parseResults.copy()
+        
+        
+        self._cleanup(self._modelInfo)
+        self._extractCommentInfo(self._modelInfo)
+       
 
-            self._parseResult[property[self._KEY]] = property+commentInfo
-               
-            print("******\n\n") 
-            print property.asDict()
+    def _getModelInfo(self):
+        self._extractData()
+        return self._modelInfo
     
-    model = property(lambda self:self._parseResult, None, None, None)
+    modelInfo = property(_getModelInfo, None, None, None)
+    
+    def asJSON(self):
+        """Transforms the parsed model to a valid JSON representation."""
+        
+        def parseResultsToDict(results):
+            if(results is None or (isinstance(results, ParseResults)== False)):
+                return results
+            
+            dictionary = results.asDict()
+            #Go down to each value and convert them to dictionary.
+            for key in dictionary.keys():
+                dictionary[key] = parseResultsToDict(dictionary[key]) 
+            
+            return dictionary
+        
+        return json.dumps(parseResultsToDict(self._modelInfo), indent=4)
+    
+    def asXML(self):
+        return self._modelInfo.asXML(doctag=self._modelName,namedItemsOnly=True)
+    
   
+def extractModels():
+    for s in models:
+        rese= re.search('"doc_type"\s*:\s*"(?P<name>[^"]+)', s)
+        if rese == None:
+            continue
+        file = codecs.open('./models/'+rese.group('name'), encoding='utf-8', mode='w')               
+        file.write(s)
+        file.close()
+
+if __name__== "__main__":
+    from optparse import OptionParser
+    
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="filepath", 
+                      help="The full path of the data model spec definition.",
+                      metavar="FILE")
+                    
+    parser.add_option("-s", "--string", dest="string",
+                      help="String representation of the data model spec definition")
+                
+    parser.add_option("-j", "--json", dest="json", action = "store_true", 
+                      default=False,
+                      help="Show a json representation of data model spec.")
+                    
+    parser.add_option("-v", "--validate", dest="source",
+                      help="""Validates a JSON object against the spec data model
+                            The source JSON object can be a file or a string 
+                            representation of the JSON object.
+                            """
+                        )
+    
+    (options, args) = parser.parse_args()
+    
+    model = None
+    
+    if options.filepath is not None:
+        model = ModelParser(filePath=options.filepath)
+        
+    elif options.string is not None:
+        model = ModelParser(string = options.string)
+        
+    if model == None:
+        print("Failed to parse data model spec.")
+        exit()
+    
+    if options.json == True:
+        print model.asJSON()
+    
     
