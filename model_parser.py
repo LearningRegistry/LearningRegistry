@@ -326,9 +326,9 @@ class ModelParser(object):
         # the model, the should follow the format of extended.
         if verifyExtendedKey == True:
             for key in objectKeySet-modelKeySet:
-                if self.EXTENSION_VARS.match(key) is None:
+                if self.EXTENSION_VAR.match(key) is None:
                     raise ObjectModelParseException(
-                             "Key'"+key+"'not present in model spec.")
+                             "Key '"+key+"' not present in model spec.")
         
         # Check for key that not in object but in the model and make sure t
         # that they are not required value.
