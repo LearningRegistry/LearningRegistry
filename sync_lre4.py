@@ -7,19 +7,30 @@ from oaipmh.metadata import MetadataRegistry, oai_dc_reader , MetadataReader
 from util import *
 def format(doc, identifier):
     value = {
-               'envelope_type': 'learning resource',
-               'resource_title':''.join(doc.getField('title')),
+               'doc_type': 'resource_data',
+               'doc_version':'0.10.0',
+               'resource_data_type':'',
+               'frbr_level':'work',
+               'submitter_type':'anonymous',
+               'submitter':'',
+               'submitter_timestamp':'',
+               'submitter_TTL':'',
+               'publishing_node':'',
+               'update_timestamp',
+               'node_timestamp':'',
+               'create_timestamp':'',
+               'submission_TOS':'',
+               'filtering_keys':[''.join(doc.getField('title'))],
                'resource_locator': ''.join(doc.getField('location')),
-               'resource_metadata-locator':'http://lrecoreprod.eun.org:6080/oaitarget/OAIHandler?verb=GetRecord&metadataPrefix=oai_lre4&identifier='.join(identifier),
-               'envelope_date-created':'',
-               'envelope_date-received':'',
-               'envelope_creator':'github@learningregistry.org',
-               'resource_usage_rights_hint':'FreeToUseOrShare',
-               'set':'commercial',
-               'resource_license_url':'',
-               'resource_descriptor':'',
-               'envelope_resource_subject-area_hints':'',
-               'accept_terms_of_service':True,
+               'resource_owner':'',
+               'resource_data_owner':'',
+               'resource_TTL':'',
+               'resource_subject':'',
+               'resource_title':''.join(doc.getField('title')),
+               'resource_desctiption':''.join(doc.getField('title')),
+               'payload_placement':'linked',
+               'payload_schema':'lre4',
+               'payload_locator':'http://lrecoreprod.eun.org:6080/oaitarget/OAIHandler?verb=GetRecord&metadataPrefix=oai_lre4&identifier='.join(identifier)
             }
     return value
 if __name__ == '__main__':
