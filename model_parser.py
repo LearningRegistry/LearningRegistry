@@ -1,6 +1,6 @@
 #!/usr/bin/python
-from pyparsing import *
 import re
+from pyparsing import *
 import codecs
 import json
 
@@ -41,6 +41,8 @@ def isOfJSONType(object, type):
     elif type == 'object':
         return isinstance(object, dict)
     
+    return False
+    
         
 class ModelParser(object):
         
@@ -59,6 +61,7 @@ class ModelParser(object):
     _IS_REQUIRED = 'isRequired'
     _IS_IMMUTABLE = 'isImmutable'
     _OBJECT = '_Me_object'
+    _IS_REQUIRED_IF = 'isRequiredIf'
     _DESCRIPTION = 'description'
     
     JSON_TYPES =  ['string', 'boolean', 'number', 'array', 'object']
@@ -119,9 +122,15 @@ class ModelParser(object):
     VALUE_RANGE = Combine(Suppress(Regex(u'fixed\s+vocabulary\s+'))+\
               Regex(r'\[[^]]+\]')).setResultsName(_VALUE_RANGE)
 
-    
-    IS_REQUIRED = Keyword('required')
+    REQUIRED = Keyword('required')
+    IF = Keyword('if')
+    #The field is really required if not followed by if.
+    IS_REQUIRED = REQUIRED+~FollowedBy(IF)
     IS_REQUIRED.setParseAction(lambda s, p, t: True)
+    
+    IS_REQUIRED_IF = Suppress(REQUIRED+IF)+NAME
+    
+    IS_REQUIRED_IF.setParseAction(getString)
     
     IS_IMMUTABLE = Keyword('immutable')
     IS_IMMUTABLE.setParseAction(lambda s, p, t: True)
@@ -129,9 +138,11 @@ class ModelParser(object):
     #Parser to extract any useful information from the comments.
     COMMENT_INFO = (Optional(SkipTo(VALUE_RANGE)+
                             VALUE_RANGE.setResultsName(_VALUE_RANGE))+\
-                   Optional(SkipTo(IS_REQUIRED)+
+                    Optional(SkipTo(IS_REQUIRED_IF)+
+                             IS_REQUIRED_IF.setResultsName(_IS_REQUIRED_IF))+\
+                    Optional(SkipTo(IS_REQUIRED)+
                             IS_REQUIRED.setResultsName(_IS_REQUIRED))+\
-                   Optional(SkipTo(IS_IMMUTABLE)+
+                    Optional(SkipTo(IS_IMMUTABLE)+
                            IS_IMMUTABLE.setResultsName(_IS_IMMUTABLE))
                     ).setResultsName(_VALUE)
                     
@@ -222,11 +233,10 @@ class ModelParser(object):
         parseResults[self._DESCRIPTION] = commentString
             
     
-    
     def _extractCommentInfo(self, parseResults):
     
         """Extracts any additional info from the comments"""
-        
+                
         for key in parseResults.keys():
             if isinstance(parseResults[key], ParseResults) == True:
                 self._extractCommentInfo(parseResults[key])
@@ -247,7 +257,8 @@ class ModelParser(object):
                     #Clean the range string, remove extra space and errand char.
                     rangeString = re.sub(r"\s+|/", ' ', rangeString)                     
                     commentInfo[self._VALUE_RANGE] = tuple(eval(rangeString))
-
+                
+                
                 #Cleanup comment info before merging
                 self._cleanup(commentInfo)
 
@@ -297,6 +308,51 @@ class ModelParser(object):
                 self._extractArrayType(array)
                 #parseResults[key][self._VALUE_DEFINED] = array
                 
+    
+    def _extractIsRequiredIf(self, parseResults):
+        """Looks for the required value key for conditional 
+        required property"""
+        valueRanges = {}
+        
+        # Get all the keys with value rangd and save them for later
+        # required if test.
+        for key in parseResults.keys():
+            if (isinstance(parseResults[key], ParseResults) 
+                and self._VALUE_RANGE in parseResults[key].keys()):
+                valueRanges[key] = parseResults[key][self._VALUE_RANGE]
+                
+        # Deals with required if value. if we have one look for in the
+        # value range and the value that make the property required.
+        for key in parseResults.keys():
+            if isinstance(parseResults[key], ParseResults) == True:
+                self._extractIsRequiredIf(parseResults[key])
+            else:
+                continue
+            
+            if self._IS_REQUIRED_IF in parseResults[key].keys():
+                for k in valueRanges.keys():
+                    if parseResults[key][self._IS_REQUIRED_IF] in valueRanges[k]:
+                        # We should check to see if the value is range of 
+                        # some other key, meaning hte commentInfo is 
+                        # already set to dictionary if so throuh an error.
+                        if isinstance(parseResults[key][self._IS_REQUIRED_IF], 
+                                      dict) == True:
+                            raise(ObjectModelParseException( 
+                                    "Cannot parse comment abou required if: "+
+                                    parseResults[key][self._DESCRIPTION]))
+                                    
+                        parseResults[key][self._IS_REQUIRED_IF] = \
+                                    {k:parseResults[key][self._IS_REQUIRED_IF]}
+                
+                # raise an exception if we could parse required if comment
+                # value.
+                if isinstance(parseResults[key][self._IS_REQUIRED_IF], dict)== False:
+                    raise(ObjectModelParseException( 
+                                "Cannot find key for parsed comment required if: "+
+                                "key: "+key+"\nComment: \n"+
+                                parseResults[key][self._DESCRIPTION]))
+                
+    
     def _extractData(self):
         """Parses the spec data model"""
         
@@ -310,11 +366,18 @@ class ModelParser(object):
             self._modelName = self._parseResults.doc_type.valueDefault
         
         self._modelInfo = self._parseResults.copy()
+        try:
+            self._modelName = self._modelInfo.doc_type.value
+        except Exception as e:
+            print("Cannot get document type: "+str(e))
+            
         
         self._cleanup(self._modelInfo)
         self._extractCommentInfo(self._modelInfo)
+        self._extractIsRequiredIf(self._modelInfo)
         #self._extractObjectType(self._modelInfo)
         self._extractArrayType(self._modelInfo)
+        
        
 
     def _validate(self, parseResults, jsonObject, verifyExtendedKey=False):
@@ -330,13 +393,28 @@ class ModelParser(object):
                     raise ObjectModelParseException(
                              "Key '"+key+"' not present in model spec.")
         
-        # Check for key that not in object but in the model and make sure t
+        # Check for key that not in object but in the model and make sure
         # that they are not required value.
         for key in modelKeySet - objectKeySet:
-            if self._modelInfo[key].isRequired == True:
+            property = self._modelInfo[key]
+            if property.isRequired == True:
                 raise ObjectModelParseException(
                         "Missing required key '"+key+"':\n\n"+
-                        self._modelInfo[key][self._DESCRIPTION]+"\n\n")
+                        property[self._DESCRIPTION]+"\n\n")
+            #Check for conditional required property.
+            if self._IS_REQUIRED_IF in property.keys():
+                condProp = property[self._IS_REQUIRED_IF]
+                # If property is required based on another property value
+                # check to see if that property value is present.
+                for k in condProp.keys():
+                    if ((k in jsonObject.keys()) and 
+                        (jsonObject[k] == condProp[k])):
+                        raise ObjectModelParseException(
+                        "Key '"+key+"' is required if '"+str(k)+
+                        "' is set to'"+str(jsonObject[k])+"' :\n\n"+
+                        property[self._DESCRIPTION]+"\n\n") 
+                        
+                
         
         #Now check the key that are in both for type and value verification.
         for key in modelKeySet.intersection(objectKeySet):
@@ -355,8 +433,6 @@ class ModelParser(object):
                     "Value for '"+key+"' is of wrong type, spec defines '"+key+
                     "' of type "+self._modelInfo[key][self._VALUE_TYPE]+"\n"+
                     description+"\n\n")
-            
-            
             #Check for matching default value
             if (self._VALUE_DEFINED in self._modelInfo[key].keys() and
                 self._modelInfo[key][self._VALUE_DEFINED] != jsonObject[key]):
@@ -373,9 +449,10 @@ class ModelParser(object):
                     str(self._modelInfo[key][self._VALUE_RANGE])+
                     "'\n\n:"+description+"\n\n")
             
-            if (self._modelInfo[key].type == 'array' or 
-                self._modelInfo[key].type == 'object'):
-                self._validate(self._modelInfo[key], jsonObject[key]+"\n\n")
+            
+            
+            if (self._modelInfo[key].type == 'object'):
+                self._validate(self._modelInfo[key], jsonObject[key])
     
     def _getModelInfo(self):
         self._extractData()
@@ -384,6 +461,7 @@ class ModelParser(object):
     
     
     modelInfo = property(_getModelInfo, None, None, None)
+    modelName = property(lambda self: self._modelName, None, None, None)
     
     def asJSON(self):
         """Transforms the parsed model to a valid JSON representation."""
@@ -406,19 +484,38 @@ class ModelParser(object):
         """Validates a JSON object string against the data model"""
         jsonObject = json.loads(jsonObjectString)
         self._validate(self._modelInfo, jsonObject, verifyExtendedKey=True)
-        
-def extractModels():
-    for s in models:
-        rese= re.search('"doc_type"\s*:\s*"(?P<name>[^"]+)', s)
-        if rese == None:
+        return jsonObject
+ 
+#Parser that extracts object models for a spec file.       
+SPEC = OneOrMore(Suppress(SkipTo(ModelParser.OBJECT))+
+                originalTextFor(ModelParser.OBJECT))
+                
+def extractModelsFromSpec(specFile, destDir='./models/'):
+    """Extract all models from the spec file """
+    #add the trailing slash to the directory name.
+    print("Destination directory: "+destDir)
+    if path.exists(destDir) == False:
+        os.makedirs(destDir)
+    
+    specFileString = getFileString(specFile)
+    dataModels = SPEC.parseString(specFileString)
+    for model in dataModels:
+        # Look for the doc_type. objects string without a doc_type are not
+        # considered as models they are ignored.
+        modelName = re.search('"doc_type"\s*:\s*"(?P<name>[^"]+)"', model)
+        if modelName is None:
             continue
-        file = codecs.open('./models/'+rese.group('name'), encoding='utf-8', mode='w')               
-        file.write(s)
-        file.close()
+        modelFilePath = path.join(destDir,modelName.group('name'))
+        print("Create data model spec file: "+modelFilePath+"\n") 
+        modelFile = codecs.open(modelFilePath, encoding='utf-8', mode='w')               
+        modelFile.write(model)
+        modelFile.close()
+
 
 if __name__== "__main__":
     from optparse import OptionParser
     from os import path
+    import os
     
     parser = OptionParser()
     parser.add_option("-f", "--file", dest="filepath", 
@@ -438,7 +535,15 @@ if __name__== "__main__":
                             representation of the JSON object.
                             """
                         )
+    parser.add_option("-e", "--extract", dest="specFile",
+                      help="extracts data models from the spec file.",
+                      metavar="FILE")
     
+    parser.add_option("-d", "--destination", dest="modelDestination",
+                      help="""Destination path to put data model file specs 
+                            that are extracted from the main spec.""")
+
+
     (options, args) = parser.parse_args()
     
     model = None
@@ -449,7 +554,9 @@ if __name__== "__main__":
     elif options.string is not None:
         model = ModelParser(string = options.string)
         
-    if model == None:
+    if (((options.filepath is not None) or
+         (options.string is not None)) and
+         (model is None)):
         print("Failed to parse data model spec.")
         exit()
     
@@ -465,5 +572,11 @@ if __name__== "__main__":
             sourceString = options.source
             
         model.validate(sourceString)
+        print("\n\n Object conforms to "+model.modelName+" model spec")
+        
+    if options.modelDestination is not None and options.specFile is not None:
+        print("Spec file: "+options.specFile+"\n")
+        print("Data Model spec Destination Dir: "+options.modelDestination+"\n")
+        extractModelsFromSpec(options.specFile, options.modelDestination)        
     
     
