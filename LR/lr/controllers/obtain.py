@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import logging, urllib2, json
+import logging, urllib2, json,urllib
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -67,8 +67,9 @@ class ObtainController(BaseController):
     def show(self, id, format='html'):
         """GET /obtain/id: Show a specific item"""
         url = 'http://localhost:5984/resource_data/'+id
-        response = urllib2.urlopen(url)
-        return response.read()
+        r = urllib2.urlopen(url)
+        data = r.read()
+        return data
         # url('obtain', id=ID)
 
     def edit(self, id, format='html'):

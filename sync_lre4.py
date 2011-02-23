@@ -16,7 +16,7 @@ def format(doc, identifier):
                'submitter_timestamp':'',
                'submitter_TTL':'',
                'publishing_node':'',
-               'update_timestamp',
+               'update_timestamp':'',
                'node_timestamp':'',
                'create_timestamp':'',
                'submission_TOS':'',

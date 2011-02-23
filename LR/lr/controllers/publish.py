@@ -40,7 +40,8 @@ class PublishController(BaseController):
                 return {'doc_ID': doc_id, 'OK': True}
             except Exception as inst:       
                 return{'doc_ID': '', 'OK': False, 'error': inst}            
-        data = json.loads(request.body)
+        input = request.body
+        data = json.loads(input)
         results = map(publish_func,data['documents'])
         return json.dumps({'OK':True, 'document_results':results})
         """POST /publisher: Create a new item"""
