@@ -18,6 +18,7 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
 from lr.lib.base import BaseController, render
+import lr.model as m
 
 log = logging.getLogger(__name__)
 
@@ -32,17 +33,20 @@ class PublishController(BaseController):
         # url('publisher')
 
     def create(self):
-        server = couchdb.Server()
-        db = server['resource_data']        
-        def publish_func(doc):
-            try:
-                doc_id, doc_rev = db.save(doc)
-                return {'doc_ID': doc_id, 'OK': True}
-            except Exception as inst:       
-                return{'doc_ID': '', 'OK': False, 'error': inst}            
-        input = request.body
-        data = json.loads(input)
-        results = map(publish_func,data['documents'])
+##        server = couchdb.Server()
+##        db = server['resource_data']        
+##        def publish_func(doc):
+##            try:
+##                doc_id, doc_rev = db.save(doc)
+##                return {'doc_ID': doc_id, 'OK': True}
+##            except Exception as inst:       
+##                return{'doc_ID': '', 'OK': False, 'error': inst}            
+##        data = json.loads(request.body)
+##        
+##        results = map(publish_func,data['documents'])
+        data = json.loads(request.body)
+        results = m.processObject(data['documents'])
+        print str(results)
         return json.dumps({'OK':True, 'document_results':results})
         """POST /publisher: Create a new item"""
         # url('publisher')

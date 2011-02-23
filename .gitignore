@@ -1,1 +1,3 @@
 *.pyc
+*~
+LR/tests/*.htm
