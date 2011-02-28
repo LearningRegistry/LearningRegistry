@@ -38,12 +38,14 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 3. Then create /etc/ld.so.conf.d/xulrunner.conf. 
 >   a. To check what XULRunner version you have installed use xulrunner -v
+
 >   b. Configure xulrunner
 >       i. Edit the xulrunner.conf
 >           sudo vi /etc/ld.so.conf.d/xulrunner.conf
 >       ii. Add the following edits, replacing the x.x.x.x with your version number.
 >           /usr/lib/xulrunner-x.x.x.x
->           /usr/lib/xulrunner-devel-x.x.x.x   
+>           /usr/lib/xulrunner-devel-x.x.x.x
+   
 >   c. Update ldconfig
 >       sudo /sbin/ldconfig
 
