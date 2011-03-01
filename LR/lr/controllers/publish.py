@@ -41,12 +41,11 @@ class PublishController(BaseController):
 ##                return {'doc_ID': doc_id, 'OK': True}
 ##            except Exception as inst:       
 ##                return{'doc_ID': '', 'OK': False, 'error': inst}            
-##        data = json.loads(request.body)
-##        
-##        results = map(publish_func,data['documents'])
         data = json.loads(request.body)
-        results = m.processObject(data['documents'])
-        print str(results)
+##        
+        results = map(m.processObject,data['documents'])
+##        data = json.loads(request.body)
+#        results = m.processObject(data['documents'])
         return json.dumps({'OK':True, 'document_results':results})
         """POST /publisher: Create a new item"""
         # url('publisher')
