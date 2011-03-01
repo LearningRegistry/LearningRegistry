@@ -168,6 +168,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 >       ./pip install pylons
 >       ./pip install flup
+>       ./pip install pyparsing
 >       ./pip install --upgrade couchdb
 
   
@@ -185,7 +186,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 * From your virtualenv directory start paster where */home/learningregistry/virtualenv/lr* is my path to virtualenv.
 
->       /home/learningregistry/virtualenv/lr/bin/paster server Ðreload  development.ini
+>       /home/learningregistry/virtualenv/lr/bin/paster serve --reload development.ini &
 
 
 
