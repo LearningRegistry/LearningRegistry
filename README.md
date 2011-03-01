@@ -1,3 +1,11 @@
+Learning Registry Installation and Configuration
+================================================
+
+License
+=======
+This project uses the Apache 2.0 license (see file LICENSE)
+
+
 Installation on Turnkey Core (Ubuntu 10.04 LTS)
 ===============================================
 
