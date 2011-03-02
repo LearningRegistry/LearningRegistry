@@ -49,8 +49,10 @@ _REGEX = 'regex'
 nodeFilter = None
 nodeDescription = None
 try:
+    log.info("getting nodefilter and nodedescription")
     nodeFilter = couchServer['node'][_FILTER_DESCRIPTION]
     nodeDescription = couchServer['node']['description']
+    log.info("done getting nodefilter and nodedescription")
 except:
     pass
     
