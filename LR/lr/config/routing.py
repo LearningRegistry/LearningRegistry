@@ -11,7 +11,7 @@ def make_map(config):
     map = Mapper(directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
     map.resource('publish','publish')
-    map.resource('optain','obtain')
+    map.resource('obtain','obtain')
     map.resource('distribute','distribute')
     map.resource('status','status')
     map.resource('description','description')
