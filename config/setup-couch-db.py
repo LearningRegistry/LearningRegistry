@@ -84,4 +84,5 @@ if __name__ == "__main__":
     PublishDoc(_NODE,'policy',default_policy)
     PublishDoc(_NODE,'description',default_description)
     PublishDoc(_NODE,'services',default_services)
+    PublishDoc(_NODE,'filter_description',default_filter_description)
 
