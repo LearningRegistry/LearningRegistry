@@ -1,3 +1,11 @@
+#    Copyright 2011 Lockheed Martin
+
+'''
+Created on Feb 24, 2011
+
+@author: John Poyau
+'''
+
 from lr.lib import ModelParser
 from pylons import *
 from uuid import uuid4
@@ -39,9 +47,10 @@ _INCLUDE_EXCLUDE = 'include_exclude'
 _REGEX = 'regex'
 
 nodeFilter = None
-
+nodeDescription = None
 try:
     nodeFilter = couchServer['node'][_FILTER_DESCRIPTION]
+    nodeDescription = couchServer['node']['description']
 except:
     pass
     
@@ -62,8 +71,14 @@ def isResourceDataFilteredOut(jsonObject):
         return [False, None]
     
     for f in nodeFilter[_FILTER]:
+        # Ckeck if jsonObject object has the key if it has search 
+        # for the regular expression in the filter otherwise keep looking
+        if jsonObject.has_key(f[_KEY]) == False:
+            continue
+        
         matchResult = False
-        if f[_REGEX].search(str(jsonObject[f[_KEY]])) is not None:
+    
+        if(f[_REGEX].search(str(jsonObject[f[_KEY]])) is not None):
             matchResult = True
         #Check if what matching means base on the include_exclude
         # True: the filters describe what documents to accept all others
@@ -86,6 +101,8 @@ def processObject(jsonObject):
     
     if _DOC_TYPE not in jsonObject.keys():
         results[_ERROR] = "Document is missing doc type."
+        log.error("\n"+pprint.pformat(results, indent=4)+"\n"+
+                  rint.pformat(jsonObject, indent=4)+"\n\n")
         return results
     
     #If the document is resource data set the create_timpestap and 
@@ -96,6 +113,8 @@ def processObject(jsonObject):
         jsonObject['update_timestamp'] = timeStamp
         jsonObject['node_timestamp'] = timeStamp
         
+        #set the publishing_node as this node.
+        jsonObject['publishing_node'] = nodeDescription['node_id']
         #Check for document Id if not present generate one.
         if _DOC_ID not in jsonObject.keys() or jsonObject[_DOC_ID] is None:
             jsonObject[_DOC_ID] = uuid4().hex
@@ -106,8 +125,10 @@ def processObject(jsonObject):
         try:
             dataModelsDict[jsonObject[_DOC_TYPE]].validate(jsonObject)
         except Exception as e:
-            results[_ERROR] = str(e)
+            results[_ERROR] = "Validation Error: "+str(e)
             results['OK'] = False
+            log.error("\n"+pprint.pformat(results, indent=4)+"\n"+
+                      pprint.pformat(jsonObject, indent=4)+"\n\n")
             return results
         
         # If the document if of valid format now check to if passes the node
@@ -123,12 +144,14 @@ def processObject(jsonObject):
         try:
             results[_DOC_ID], results[_DOC_REV]= doc_rev = db.save(jsonObject)
         except Exception as e:
-            results[_ERROR] = str(e)
+            results[_ERROR] = "CouchDB save error:  "+str(e)
             results['OK'] = False
+            log.error("\n"+pprint.pformat(results, indent=4)+"\n"+
+                      pprint.pformat(jsonObject, indent=4)+"\n\n")
             return results
     else:
         log.debug("filter out document: "+reason+"\n"+
-                   pprint.pformat(jsonObject, indent=4, width=80)+"\n")
+                   pprint.pformat(jsonObject, indent=4, width=80)+"\n\n")
         
     results['OK']=True    
     return results

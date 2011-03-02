@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+#    Copyright 2011 Lockheed Martin
+
+'''
+Script to parse Learning registry data model and validate JSON objects against
+the parse models.
+
+Created on Feb 15, 2011
+
+@author: John Poyau
+'''
+
 import re, codecs, json
 from pyparsing import *
 
@@ -321,7 +332,7 @@ class ModelParser(object):
                 valueRanges[key] = parseResults[key][self._VALUE_RANGE]
                 
         # Deals with conditionally required value. if we have one look for it
-        # in the value range and record that property that makes required.
+        # in the value range and record the property that makes it required.
         for key in parseResults.keys():
             if isinstance(parseResults[key], ParseResults) == True:
                 self._extractIsRequiredIf(parseResults[key])
@@ -419,40 +430,60 @@ class ModelParser(object):
         # Now check that key that are in both jsonobject and model spec
         # for type and defined value verification.
         for key in modelKeySet.intersection(objectKeySet):
-            if isinstance(self._modelInfo[key], ParseResults) == False:
+           
+            modelProp = self._modelInfo[key]
+            objectProp = jsonObject[key]
+            
+            if isinstance(modelProp, ParseResults) == False:
                 continue
             
             # Get the description if there is any for the property.
             description = ""
-            if self._DESCRIPTION in self._modelInfo[key].keys():
-                description =  self._modelInfo[key][self._DESCRIPTION]
+            if self._DESCRIPTION in modelProp.keys():
+                description =  modelProp[self._DESCRIPTION]
             
             # Check for correct type.
-            if (self._VALUE_TYPE in self._modelInfo[key].keys() and 
-               isOfJSONType(jsonObject[key], self._modelInfo[key].type) == False):
+            if (self._VALUE_TYPE in modelProp.keys() and 
+               isOfJSONType(objectProp, modelProp.type) == False):
                 raise ObjectModelParseException(
                     "Value for '"+key+"' is of wrong type, spec defines '"+key+
-                    "' of type "+self._modelInfo[key][self._VALUE_TYPE]+"\n"+
+                    "' of type "+modelProp[self._VALUE_TYPE]+"\n"+
                     description+"\n\n")
             # Check for matching defined value
-            if (self._VALUE_DEFINED in self._modelInfo[key].keys() and
-                self._modelInfo[key][self._VALUE_DEFINED] != jsonObject[key]):
+            if (self._VALUE_DEFINED in modelProp.keys() and
+                modelProp[self._VALUE_DEFINED] != objectProp):
                 raise ObjectModelParseException(
                     "Mismatch value for '"+key+"' expecting '"+
-                    self._modelInfo[key][self._VALUE_DEFINED]+
+                    modelProp[self._VALUE_DEFINED]+
                     "'\n\n:"+description+"\n\n")
                     
             # Check for value range.
-            if (self._VALUE_RANGE in self._modelInfo[key].keys() and
-               jsonObject[key] not in self._modelInfo[key][self._VALUE_RANGE]):
+            if (self._VALUE_RANGE in modelProp.keys() and
+               objectProp not in modelProp[self._VALUE_RANGE]):
                 raise ObjectModelParseException(
                     "Invalid value for'"+key+"'expecting one of:\n '"+
-                    str(self._modelInfo[key][self._VALUE_RANGE])+
+                    str(modelProp[self._VALUE_RANGE])+
                     "'\n\n:"+description+"\n\n")
-
+                    
+            # Make if conditionally required key is present it matches its 
+            # required condition.
+            if self._IS_REQUIRED_IF in modelProp.keys():
+                conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
+                conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
+                conditionalProp = jsonObject[conditionalKey]
+                if conditionalValue != conditionalProp:
+                    raise ObjectModelParseException(
+                    "Conditionally required property '"+
+                    key +
+                    "' is present without meeting the required condition. '" +
+                    str(conditionalKey)+"' must be '"+
+                    str(conditionalValue)+
+                    "' yet it is set to '"+str(conditionalProp)+
+                    "'\n\n:"+description+"\n\n")
+             
             # Validate any sub object.
-            if (self._modelInfo[key].type == 'object'):
-                self._validate(self._modelInfo[key], jsonObject[key])
+            if (modelProp.type == 'object'):
+                self._validate(modelProp, objectProp)
     
 
     def _getModelInfo(self):
