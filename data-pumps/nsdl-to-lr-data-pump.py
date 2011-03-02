@@ -32,7 +32,7 @@ import logging
 import sys
 from urllib import urlencode
 
-logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
 config = {
@@ -59,6 +59,9 @@ namespaces = {
               "xsi":"http://www.w3.org/2001/XMLSchema-instance"
               }
 # http://hal.archives-ouvertes.fr/oai/oai.php?verb=ListRecords&metadataPrefix=oai_dc
+
+# _LEARNING_REGISTRY_URL = "http://learningregistry.couchdb:5984"
+_LEARNING_REGISTRY_URL = "http://learningregistry.vm"
 
 class Error(Exception):
     pass
@@ -140,13 +143,15 @@ def bulkUpdate(list):
     '''
     if len(list) > 0:
         try:
-            res = Resource("http://learningregistry.couchdb:5984")
+            res = Resource(_LEARNING_REGISTRY_URL)
             body = { "documents":list }
             log.info("request body: %s" % (json.dumps(body),))
             clientResponse = res.post(path="/publish", payload=json.dumps(body), headers={"Content-Type":"application/json"})
-            log.info("status: {0}  message: {1}".format(clientResponse.status_int, clientResponse.body_string))
+            log.info("status: {0}  message: {1}".format(clientResponse.status_int, clientResponse.body_string()))
         except Exception:
             log.exception("Caught Exception When publishing to registry")
+    else:
+        log.info("Nothing is being updated.")
 
 
 def fetchRecords(conf):
@@ -240,7 +245,10 @@ def connect():
         except:
             log.exception("Problem w/ JSON dump")
         bulkUpdate(docList)
+       
     
 
 if __name__ == '__main__':
+    log.info("Update Started.")
     connect()
+    log.info("Done Updating.")
