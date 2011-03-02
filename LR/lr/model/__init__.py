@@ -54,7 +54,7 @@ try:
     nodeDescription = couchServer['node']['description']
     log.info("done getting nodefilter and nodedescription")
 except:
-    pass
+    log.exception("problems getting stuff from couch.")
     
 #Compile the filters regular expression if we not using custom node filter.
 if nodeFilter is not None and  nodeFilter[_CUSTOM_FILTER] == False:
