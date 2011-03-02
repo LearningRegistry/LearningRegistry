@@ -51,8 +51,8 @@ nodeDescription = None
 try:
     nodeFilter = couchServer['node'][_FILTER_DESCRIPTION]
     nodeDescription = couchServer['node']['description']
-except:
-    pass
+except Exception as e:
+    log.error(str(e))
     
 #Compile the filters regular expression if we not using custom node filter.
 if nodeFilter is not None and  nodeFilter[_CUSTOM_FILTER] == False:
