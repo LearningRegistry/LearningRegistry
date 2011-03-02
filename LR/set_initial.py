@@ -6,17 +6,20 @@ def create(name):
         server.create(name)
     except:
         print 'DB already exists'
+        
 create('node')
 create('resource_data')
 create('community')
 create('network')
 db = server['node']
+
 def publish_doc(name, doc_data):
     try:
         del db[name]
-    except couchdb.http.ResourceNotFound as ex:
+    except Exception as ex:
         print ex
     db[name] = doc_data
+    
 default_status = {'timestamp' :'',
                   'active':True, 
                   'node_id': '', 
@@ -72,10 +75,22 @@ default_policy = {'timestamp':        'string',
                   'policy_id':        'string',    
                   'policy_version':    'string',
                   'TTL':            0}
+default_filter_description = {
+                "doc_type": "filter_description",
+                "doc_scope": "node",
+                "active": True,
+                "filter_name": "filter",
+                "custom_filter": False,
+                "include_exclude": True,
+                "filter": [
+                            {"filtering_keys": "test"},
+                            {"doc_version": "0.10.0"}
+                        ]}
+
 publish_doc('status',default_status)
 publish_doc('policy',default_policy)
 publish_doc('description',default_description)
 publish_doc('services',default_services)
-
+publish_doc('filter_description', default_filter_description)
 
 
