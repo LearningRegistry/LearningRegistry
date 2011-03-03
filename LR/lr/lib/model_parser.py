@@ -115,7 +115,7 @@ class ModelParser(object):
                 +OBJECT))+']'
     
     
-    # Inline value are just string inside of a backet.
+    # Inline value are just string inside of a bracket.
     INLINE_VALUE = OBJECT_START + \
                 originalTextFor(OneOrMore(Word(alphanums)))+OBJECT_END
     INLINE_VALUE.setParseAction(getString)
@@ -135,7 +135,7 @@ class ModelParser(object):
 
     REQUIRED = Keyword('required')
     IF = Keyword('if')
-    # The field is really required if not followed by if.
+    # The field is really required if it is not followed by if.
     IS_REQUIRED = REQUIRED+~FollowedBy(IF)
     IS_REQUIRED.setParseAction(lambda s, p, t: True)
     
@@ -358,9 +358,9 @@ class ModelParser(object):
                 # that makes the property required.
                 if isinstance(parseResults[key][self._IS_REQUIRED_IF], dict)== False:
                     raise(ObjectModelParseException( 
-                                "Cannot find key for parsed comment required if: "+
-                                "key: "+key+"\nComment: \n"+
-                                parseResults[key][self._DESCRIPTION]))
+                            "Cannot find key for parsed comment required if: "+
+                            "key: "+key+"\nComment: \n"+
+                            parseResults[key][self._DESCRIPTION]))
                 
     
     def _extractData(self):
@@ -406,26 +406,32 @@ class ModelParser(object):
         # Check for key that not in object but in the model and make sure
         # that they are not required value.
         for key in modelKeySet - objectKeySet:
-            property = self._modelInfo[key]
-            if property.isRequired == True:
+            modelProp = self._modelInfo[key]
+            # Get the description if there is any for the property.
+            description = ""
+            if self._DESCRIPTION in modelProp.keys():
+                description =  modelProp[self._DESCRIPTION]
+                
+            if modelProp.isRequired == True:
                 raise ObjectModelParseException(
                         "Missing required key '"+key+"':\n\n"+
-                        property[self._DESCRIPTION]+"\n\n")
+                        description+"\n\n")
 
             # Check for conditionally required property.
-            if self._IS_REQUIRED_IF in property.keys():
-                condProp = property[self._IS_REQUIRED_IF]
-                # If the property is required based on another property value
-                # check to see if that property value is present.
-                for k in condProp.keys():
-                    if ((k in jsonObject.keys()) and 
-                        (jsonObject[k] == condProp[k])):
-                        raise ObjectModelParseException(
-                        "Key '"+key+"' is required if '"+str(k)+
-                        "' is set to'"+str(jsonObject[k])+"' :\n\n"+
-                        property[self._DESCRIPTION]+"\n\n") 
-                        
-                
+            if self._IS_REQUIRED_IF in modelProp.keys():
+                conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
+                conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
+                conditionalProp = jsonObject[conditionalKey]
+                # If the property is required conditionally based on another 
+                # property value check to see if that property value is present.
+                if (conditionalKey in jsonObject.keys() and 
+                    conditionalProp == conditionalValue):
+                    raise ObjectModelParseException(
+                            "Key '"+key+"' is required if '"+
+                            str(conditionalKey) +
+                            "' is set to '"+
+                            str(conditionalValue)+"' :\n\n"+
+                            description+"\n\n") 
         
         # Now check that key that are in both jsonobject and model spec
         # for type and defined value verification.
@@ -465,9 +471,10 @@ class ModelParser(object):
                     str(modelProp[self._VALUE_RANGE])+
                     "'\n\n:"+description+"\n\n")
                     
-            # Make if conditionally required key is present it matches its 
-            # required condition.
+            # Make sure that if a conditionally required key is present its
+            # condition is met.
             if self._IS_REQUIRED_IF in modelProp.keys():
+                #The dictionary has only one items.
                 conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
                 conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
                 conditionalProp = jsonObject[conditionalKey]
