@@ -12,36 +12,77 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from lrnodetemplate import *
+
 import ConfigParser, os
 import couchdb
 import sys
 import json
 
+
 _config = ConfigParser.ConfigParser()
 _config.read('../LR/development.ini')
 
 _SERVER_URL = _config.get("app:main", "couchdb.url")
-_RESOURCE_DATA = _config.get("app:main", "couchdb.dbname")
+_RESOURCE_DATA = _config.get("app:main", "couchdb.db.resourcedata")
+_NODE = _config.get("app:main", "couchdb.db.node")
+_COMMUNITY = _config.get("app:main", "couchdb.db.community")
+_NETWORK = _config.get("app:main", "couchdb.db.network")
 
 _couchServer = couchdb.Server(url=_SERVER_URL)
 
-def CreateDB():
+def CreateDB(dblist=[]):
     '''Creates a DB in Couch based upon config'''
-    try:
-        _couchServer[_RESOURCE_DATA]
-        stats = _couchServer.stats()
-        s = json.dumps(stats, sort_keys=True, indent=4)
-        prettyStats = '\n'.join([l.rstrip() for l in s.splitlines()])
-        print("DB Exists, Here are some stats: {0}".format(prettyStats))
-    except couchdb.http.ResourceNotFound as rnf:
-        print("DB '{0}' doesn't exist on '{1}', creating\n".format(_RESOURCE_DATA, _SERVER_URL))
+    for db in dblist:
         try:
-            _couchServer.create(_RESOURCE_DATA)
-            print("Created DB '{0}' on '{1}'\n".format(_RESOURCE_DATA, _SERVER_URL))
+            _couchServer[db]
+            stats = _couchServer.stats()
+            s = json.dumps(stats, sort_keys=True, indent=4)
+            prettyStats = '\n'.join([l.rstrip() for l in s.splitlines()])
+            print("DB Exists, Here are some stats: {0}".format(prettyStats))
+        except couchdb.http.ResourceNotFound as rnf:
+            print("DB '{0}' doesn't exist on '{1}', creating\n".format(db, _SERVER_URL))
+            try:
+                _couchServer.create(db)
+                print("Created DB '{0}' on '{1}'\n".format(db, _SERVER_URL))
+        
+            except Exception as e:
+                print("Exception while creating database: {0}\n".format(e) )
+
+
+def PublishDoc(dbname, name, doc_data):
     
-        except Exception as e:
-            print("Exception while creating database: {0}\n".format(e) )
+    try:
+        db = _couchServer[dbname]
+        del db[name]
+    except couchdb.http.ResourceNotFound as ex:
+        print("Exception when deleting existing config document: {0}\n".format(ex))
+    db[name] = doc_data
+    print("Added config document '{0}' to '{1}".format(name, dbname))
+    
+    
+def Prompt(name="", doc_data=None, nest=0):
+    if doc_data == None:
+        return
+    
+    print "###### Configure {0}".format(name)
+   
+    for key in doc_data.keys():
+        if isinstance(doc_data.get(key), basestring):
+            input = raw_input("{2}:Enter a value for '{0}' [{1}]".format(key, doc_data.get(key), name.upper()))
+            # TODO: Should probably validate this more
+            if (input != None and input.strip() != ''):
+                doc_data[key] = input
+        elif isinstance(doc_data.get(key), dict):
+            Prompt(key, doc_data.get(key), nest+1)
+                
 
 if __name__ == "__main__":
-    CreateDB()
+    CreateDB(dblist=[_RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK])
+    Prompt('description', default_description)
+    PublishDoc(_NODE,'status',default_status)
+    PublishDoc(_NODE,'policy',default_policy)
+    PublishDoc(_NODE,'description',default_description)
+    PublishDoc(_NODE,'services',default_services)
+    PublishDoc(_NODE,'filter_description',default_filter_description)
 
