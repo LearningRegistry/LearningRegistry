@@ -49,12 +49,10 @@ _REGEX = 'regex'
 nodeFilter = None
 nodeDescription = None
 try:
-    log.info("getting nodefilter and nodedescription")
     nodeFilter = couchServer['node'][_FILTER_DESCRIPTION]
     nodeDescription = couchServer['node']['description']
-    log.info("done getting nodefilter and nodedescription")
-except:
-    log.exception("problems getting stuff from couch.")
+except Exception as e:
+    log.error(str(e))
     
 #Compile the filters regular expression if we not using custom node filter.
 if nodeFilter is not None and  nodeFilter[_CUSTOM_FILTER] == False:

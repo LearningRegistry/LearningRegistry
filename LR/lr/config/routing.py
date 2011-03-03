@@ -17,6 +17,7 @@ def make_map(config):
     map.resource('description','description')
     map.resource('services','services')
     map.resource('policy','policy')
+    map.resource('harvest','harvest')
     map.minimization = False
     map.explicit = False
 
