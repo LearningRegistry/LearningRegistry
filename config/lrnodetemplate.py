@@ -54,4 +54,15 @@ default_policy = {'timestamp':        'string',
                   'network_description':    'string',
                   'policy_id':        'string',    
                   'policy_version':    'string',
-                  'TTL':            0}    
+                  'TTL':            0} 
+default_filter_description = {
+                "doc_type": "filter_description",
+                "doc_scope": "node",
+                "active": True,
+                "filter_name": "filter",
+                "custom_filter": False,
+                "include_exclude": True,
+                "filter": [
+                            {"filtering_keys": "test"},
+                            {"doc_version": "0.10.0"}
+                        ]}   
