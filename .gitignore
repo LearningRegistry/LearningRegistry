@@ -1,4 +1,6 @@
 *.pyc
 *.DS_Store
 *~
+*paster.log
+*paster.pid
 LR/tests/*.htm
