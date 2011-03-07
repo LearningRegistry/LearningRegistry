@@ -61,9 +61,6 @@ namespaces = {
               }
 # http://hal.archives-ouvertes.fr/oai/oai.php?verb=ListRecords&metadataPrefix=oai_dc
 
-# _LEARNING_REGISTRY_URL = "http://learningregistry.couchdb:5984"
-_LEARNING_REGISTRY_URL_DEFAULT = _LEARNING_REGISTRY_URL = "http://learningregistry.vm"
-
 class Error(Exception):
     pass
 
@@ -138,13 +135,14 @@ def formatNSDLDoc(record):
     
     return doc
     
-def bulkUpdate(list):
+def bulkUpdate(list, opts):
     '''
     Save to Learning Registry
     '''
     if len(list) > 0:
         try:
-            res = Resource(_LEARNING_REGISTRY_URL)
+            log.info("Learning Registry Node URL: '{0}'\n".format(opts.LEARNING_REGISTRY_URL))
+            res = Resource(opts.LEARNING_REGISTRY_URL)
             body = { "documents":list }
             log.info("request body: %s" % (json.dumps(body),))
             clientResponse = res.post(path="/publish", payload=json.dumps(body), headers={"Content-Type":"application/json"})
@@ -233,7 +231,7 @@ def retrieveFromUrlWaiting(request,
     return text            
       
 
-def connect():
+def connect(opts):
     for recset in fetchRecords(config):
         docList = []
         for rec in recset:
@@ -245,16 +243,23 @@ def connect():
             print(json.dumps(docList))
         except:
             log.exception("Problem w/ JSON dump")
-        bulkUpdate(docList)
+        bulkUpdate(docList, opts)
        
-def parseCmdLine():
-    parser = OptionParser()
-    parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=_LEARNING_REGISTRY_URL_DEFAULT)
-    (options, args) = parser.parse_args()
-    _LEARNING_REGISTRY_URL = options.registryUrl    
-    log.info("Learning Registry Node URL: '{0}'\n".format(_LEARNING_REGISTRY_URL))
+
+    
+class Opts:
+    def __init__(self):
+        self.LEARNING_REGISTRY_URL = "http://learningregistry.vm"
+        
+        parser = OptionParser()
+        parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
+        (options, args) = parser.parse_args()
+        self.LEARNING_REGISTRY_URL = options.registryUrl    
+
+       
 
 if __name__ == '__main__':
     log.info("Update Started.")
-    connect()
+    opts = Opts()
+    connect(opts)
     log.info("Done Updating.")
