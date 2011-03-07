@@ -1,4 +1,3 @@
-This is a test for Pivotal Tracker integration
 
 This file is for you to describe the LR application. Typically
 you would include information such as the information below:
