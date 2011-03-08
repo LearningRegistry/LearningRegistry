@@ -29,8 +29,9 @@ class ObtainController(BaseController):
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
         url = 'http://localhost:5984/resource_data/_all_docs'
-        response = urllib2.urlopen(url)
-        return response.read()
+        res = urllib2.urlopen(url)
+        response.headers['content-type'] = 'application/json'
+        return res.read()
         # url('obtain')
     def create(self):
         """POST /obtain: Create a new item"""
@@ -38,7 +39,8 @@ class ObtainController(BaseController):
         keys = map(lambda key: key['doc_ID'],data['request_IDs'])
         return_data = urllib2.urlopen('http://localhost:5984/resource_data/_all_docs?include_docs=true',json.dumps({'keys': keys}))
         return_data = json.load(return_data)
-	return_data = {'documents' : map(lambda doc: doc['doc'],return_data['rows'])}
+        return_data = {'documents' : map(lambda doc: doc['doc'],return_data['rows'])}
+        response.headers['content-type'] = 'application/json'
         return json.dumps(return_data)
         # url('obtain')
 
@@ -69,6 +71,7 @@ class ObtainController(BaseController):
         url = 'http://localhost:5984/resource_data/'+id
         r = urllib2.urlopen(url)
         data = r.read()
+        response.headers['content-type'] = 'application/json'
         return data
         # url('obtain', id=ID)
 

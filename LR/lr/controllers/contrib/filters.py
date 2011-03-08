@@ -19,7 +19,7 @@ class FiltersController(BaseController):
         """GET /contrib/filters: All items in the collection"""
         url = 'http://localhost:5984/resource_data/_design/filter'
         res = urllib2.urlopen(url);
-        response.headers['content-type'] = 'text/javascript'
+        response.headers['content-type'] = 'application/json'
         
         design = json.load(res)
         
@@ -57,7 +57,7 @@ class FiltersController(BaseController):
         """GET /contrib/filters/id: Show a specific item"""
         url = 'http://127.0.0.1:5984/resource_data/_design/filter/_view/'+id
         res = urllib2.urlopen(url);
-        response.headers['content-type'] = 'text/javascript'
+        response.headers['content-type'] = 'application/json'
         return res.read()
         # url('contrib_filter', id=ID)
 
@@ -65,7 +65,7 @@ class FiltersController(BaseController):
         """GET /contrib/filters/id/edit: Form to edit an existing item"""
         url = 'http://localhost:5984/resource_data/_design/filter'
         res = urllib2.urlopen(url);
-        response.headers['content-type'] = 'text/javascript'
+        response.headers['content-type'] = 'application/json'
         
         design = json.load(res)
         
