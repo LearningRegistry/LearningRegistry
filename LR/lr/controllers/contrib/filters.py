@@ -41,6 +41,19 @@ class FiltersController(BaseController):
         """POST /contrib/filters: Create a new item"""
         design = {}
         success = {"status": "OK"}
+        maptemplate = """function(doc) {{      
+            if (doc.doc_type && doc.doc_type == "resource_data" &&
+                doc.doc_version && doc.doc_version == "0.10.0" &&
+                doc.create_timestamp) {{
+                 
+                 var validator = {0};
+                 
+                 if (validator(doc)) {{
+                     emit(doc.create_timestamp, doc.doc_ID);
+                 }}
+            }}
+        }}"""
+        
         try:
             data = json.loads(request.body)
             
@@ -49,11 +62,11 @@ class FiltersController(BaseController):
             if data.has_key("name") and data.has_key("map") and data.has_key("reduce"):
                 jsSha = hashlib.sha1(data["map"]+data["reduce"]).hexdigest()
                 viewName = "{0}-{1}".format(data["name"], jsSha)
-                viewObj = { "map": data["map"], "reduce": data["reduce"] }
+                viewObj = { "map": maptemplate.format(data["map"]), "reduce": data["reduce"] }
             elif data.has_key("name") and data.has_key("map"):
                 jsSha = hashlib.sha1(data["map"]).hexdigest()
                 viewName = "{0}-{1}".format(data["name"], jsSha)
-                viewObj = { "map": data["map"] }
+                viewObj = { "map": maptemplate.format(data["map"]) }
                 
             design = couchServer[_RESOURCE_DATA][_DESIGN_DOC]
             
