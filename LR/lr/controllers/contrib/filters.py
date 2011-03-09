@@ -1,12 +1,22 @@
-import logging, json
+import logging, json, couchdb
+import hashlib
 
-from pylons import request, response, session, tmpl_context as c, url
+from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
+
 
 from lr.lib.base import BaseController, render
 import urllib2
 
+
 log = logging.getLogger(__name__)
+
+_COUCH_SERVER = config['app_conf']['couchdb.url']
+_RESOURCE_DATA = config['app_conf']['couchdb.db.resourcedata']
+_DESIGN_DOC = '_design/filter'
+
+_BASE_PATH = _RESOURCE_DATA + "/" + _DESIGN_DOC
+couchServer = couchdb.Server(_COUCH_SERVER)
 
 class FiltersController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -29,6 +39,42 @@ class FiltersController(BaseController):
 
     def create(self):
         """POST /contrib/filters: Create a new item"""
+        design = {}
+        success = {"status": "OK"}
+        try:
+            data = json.loads(request.body)
+            
+            viewName = None            
+            viewObj = None
+            if data.has_key("name") and data.has_key("map") and data.has_key("reduce"):
+                jsSha = hashlib.sha1(data["map"]+data["reduce"]).hexdigest()
+                viewName = "{0}-{1}".format(data["name"], jsSha)
+                viewObj = { "map": data["map"], "reduce": data["reduce"] }
+            elif data.has_key("name") and data.has_key("map"):
+                jsSha = hashlib.sha1(data["map"]).hexdigest()
+                viewName = "{0}-{1}".format(data["name"], jsSha)
+                viewObj = { "map": data["map"] }
+                
+            design = couchServer[_RESOURCE_DATA][_DESIGN_DOC]
+            
+            if viewName != None and viewObj != None and design.has_key("views") == True and design["views"].has_key(viewName) == True:
+                del design["views"][viewName]
+            
+            if viewName != None and viewObj != None:
+                design["views"][viewName] = viewObj
+                couchServer[_RESOURCE_DATA].save(design)
+                success["filter"] = viewName 
+            
+            if viewName == None or viewObj == None:
+                success["status"] = "ERROR"
+                success["message"] = "Unable to create filter. You must provide a JSON object with required fields name and map, optional field reduce"
+        except:
+            success["status"] = "ERROR"
+            success["message"] = "Internal Error: Could not create filter."
+            log.exception(success["message"])
+        
+        response.headers['content-type'] = 'application/json'
+        return json.dumps(success)
         # url('contrib_filters')
 
     def new(self, format='html'):
@@ -42,6 +88,7 @@ class FiltersController(BaseController):
         # Or using helpers:
         #    h.form(url('contrib_filter', id=ID),
         #           method='put')
+        
         # url('contrib_filter', id=ID)
 
     def delete(self, id):
@@ -51,14 +98,33 @@ class FiltersController(BaseController):
         # Or using helpers:
         #    h.form(url('contrib_filter', id=ID),
         #           method='delete')
+        design = {}
+        success = {"status": "OK"}
+        try:
+            design = couchServer[_RESOURCE_DATA][_DESIGN_DOC]
+            
+            if design.has_key("views") == True and design["views"].has_key(id) == True:
+                del design["views"][id]
+                couchServer[_RESOURCE_DATA].save(design) 
+            
+        except:
+            success["status"] = "ERROR"
+            success["message"] = "Internal Error: Could not locate design document."
+            log.exception(success["message"])
+        
+        response.headers['content-type'] = 'application/json'
+        return json.dumps(success)
         # url('contrib_filter', id=ID)
 
     def show(self, id, format='json'):
         """GET /contrib/filters/id: Show a specific item"""
-        url = 'http://127.0.0.1:5984/resource_data/_design/filter/_view/'+id
+        uri = 'http://127.0.0.1:5984/resource_data/_design/filter/_view/'+id+'?reduce=false'
+        url = urllib2.Request(uri,headers={"Content-Type": "application/json"})
         res = urllib2.urlopen(url);
         response.headers['content-type'] = 'application/json'
-        return res.read()
+
+        rawjson = res.read()
+        return rawjson
         # url('contrib_filter', id=ID)
 
     def edit(self, id, format='json'):
@@ -67,8 +133,14 @@ class FiltersController(BaseController):
         res = urllib2.urlopen(url);
         response.headers['content-type'] = 'application/json'
         
-        design = json.load(res)
+        design = {}
+        filters = {}
+        try:
+            design = json.load(res)
+        except:
+            log.exception("Unable to load design document.")
         
-        filters = { id : design["views"][id] }
+        if design.has_key("views") == True and design["views"].has_key(id) == True:
+            filters = { id : design["views"][id] }
         return json.dumps(filters);
         # url('contrib_edit_filter', id=ID)
