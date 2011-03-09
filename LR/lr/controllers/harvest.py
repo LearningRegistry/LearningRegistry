@@ -117,7 +117,12 @@ class HarvestController(BaseController):
         """GET /harvest/id: Show a specific item"""
         h = harvest()
         def getrecord():
-          return json.dumps(h.get_record(request.params['doc_id']))
+          by_doc_ID =request.params.has_key('by_doc_ID') and request.params['by_doc_ID']
+          request_id = request.params['request_id']
+          if by_doc_ID:
+            return json.dumps(h.get_record(request_id))
+          else:
+            return json.dumps(h.get_records_by_resource(request_id))
         def listidentifiers():
             from_date = datetime.strptime(request.params['from'],time_format)
             until_date = datetime.strptime(request.params['until'],time_format)
