@@ -28,7 +28,7 @@ def load_environment(global_conf, app_conf):
     config['routes.map'] = make_map(config)
     config['pylons.app_globals'] = app_globals.Globals(config)
     config['pylons.h'] = lr.lib.helpers
-    
+    config['pylons.response_options']['content-type'] = 'application/json'
     # Setup cache object as early as possible
     import pylons
     pylons.cache._push_object(config['pylons.app_globals'].cache)
