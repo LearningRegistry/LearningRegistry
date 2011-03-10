@@ -37,12 +37,19 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
 config = {
-    "server": "http://www.dls.ucar.edu",
-    "path": "/dds_se/services/oai2-0",
+    "server": "http://memory.loc.gov",
+    "path": "/cgi-bin/oai2_0",
     "verb": "ListRecords",
-    "metadataPrefix":"nsdl_dc",
-    "set":"ncs-NSDL-COLLECTION-000-003-112-016"
+    "metadataPrefix":"oai_dc",
+    "set":None
 }
+#config = {
+#    "server": "http://www.dls.ucar.edu",
+#    "path": "/dds_se/services/oai2-0",
+#    "verb": "ListRecords",
+#    "metadataPrefix":"nsdl_dc",
+#    "set":"ncs-NSDL-COLLECTION-000-003-112-016"
+#}
 #config = {
 #    "server": "http://hal.archives-ouvertes.fr",
 #    "path": "/oai/oai.php",
@@ -86,6 +93,10 @@ def getDocTemplate():
 def formatOAIDoc(record):
     doc = getDocTemplate()
     resource_locator = record.xpath("oai:metadata/oai_dc:dc/dc:identifier/text()", namespaces=namespaces)
+    
+    if resource_locator == None or len(resource_locator) == 0:
+        return None
+    
     subject = record.xpath("oai:metadata/oai_dc:dc/dc:subject/text()", namespaces=namespaces)
     language = record.xpath("oai:metadata/oai_dc:dc/dc:language/text()", namespaces=namespaces)
     payload = record.xpath("oai:metadata/oai_dc:dc", namespaces=namespaces)
@@ -111,6 +122,10 @@ def formatOAIDoc(record):
 def formatNSDLDoc(record):
     doc = getDocTemplate()
     resource_locator = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dc:identifier/text()", namespaces=namespaces)
+    
+    if resource_locator == None or len(resource_locator) == 0:
+        return None
+    
     subject = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dc:subject/text()", namespaces=namespaces)
     language = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dc:language/text()", namespaces=namespaces)
     edLevel = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dct:educationLevel/text()", namespaces=namespaces)
@@ -236,9 +251,13 @@ def connect(opts):
         docList = []
         for rec in recset:
             if config["metadataPrefix"] == "oai_dc":
-                docList.append(formatOAIDoc(rec))
+                doc = formatOAIDoc(rec)
+                if (doc != None):
+                    docList.append(doc)
             if config["metadataPrefix"] == "nsdl_dc":
-                docList.append(formatNSDLDoc(rec))
+                doc = formatNSDLDoc(rec)
+                if (doc != None):
+                    docList.append()
         try:
             print(json.dumps(docList))
         except:
