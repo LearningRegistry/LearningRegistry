@@ -18,6 +18,10 @@ def make_map(config):
     map.resource('services','services')
     map.resource('policy','policy')
     map.resource('harvest','harvest')
+
+    # Value added services
+    map.resource('OAI-PMH', 'OAI-PMHS')
+    
     map.minimization = False
     map.explicit = False
 
