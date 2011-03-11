@@ -11,9 +11,11 @@ Created on Feb 15, 2011
 @author: John Poyau
 '''
 
-import re, codecs, json
+import re, codecs, json, logging
 from pyparsing import *
+from os import path
 
+log = logging.getLogger(__name__)
 
 def getFileString(filename):
 
@@ -37,19 +39,28 @@ class ObjectModelParseException(Exception):
     """Shell exception class for model spec parsing exception"""
     pass
 
-def isOfJSONType(object, type):
+class SpecValidationException(Exception):
+    """Shell exceptoin class model spec validition errors"""
+    pass
+
+
+def isOfSpecType(object, type):
     if type == 'string':
         return (isinstance(object, str) or
-                isinstance(object, unicode))
+                     isinstance(object, unicode))
+    elif type == 'integer':
+        return (isinstance(object, int) or 
+                     isinstance(object, long))
     elif type == 'number':
         return (isinstance(object, float) or
                 isinstance(object, int) or
                 isinstance(object, long))
     elif type == 'boolean':
         return isinstance(object, bool)
+    
     elif type =='array':
-        return (isinstance(object, list) or
-                isinstance(object, tuple))
+        return (isinstance(object, list) or isinstance(object, tuple))
+    
     elif type == 'object':
         return isinstance(object, dict)
     
@@ -76,14 +87,14 @@ class ModelParser(object):
     _IS_REQUIRED_IF = 'isRequiredIf'
     _DESCRIPTION = 'description'
     
-    JSON_TYPES =  ['string', 'boolean', 'number', 'array', 'object']
+    _SPEC_DATA_TYPES =  ['string', 'boolean', 'number', 'integer',  'array', 'object']
     
     # Define pyparsing variables.
     VAR = Regex('[A-Za-z0-9_.]+')
     INGORE_SPACE = Suppress(ZeroOrMore(White()))
     
     # Format of extension properties.
-    EXTENSION_VAR = re.compile('^X_')
+    EXTENSION_REGEX= re.compile('^X_')
     
     # The quote has to be a regular expression to deal with unicode 
     # open and close quotation marks.
@@ -92,18 +103,20 @@ class ModelParser(object):
     NAME = INGORE_SPACE+Suppress(QUOTE)+VAR+Suppress(QUOTE)+INGORE_SPACE
     NAME.setParseAction(getString)
     
-    TYPES =  oneOf(JSON_TYPES)
+    TYPES =  oneOf(_SPEC_DATA_TYPES)
     TYPES.setParseAction(getString)
     QUOTED_TYPES = (Suppress(QUOTE)+TYPES+Suppress(QUOTE)) 
        
-    JSON_TYPES = QUOTED_TYPES|TYPES
-    JSON_TYPES.setParseAction(getString)
+    SPEC_DATA_TYPES = QUOTED_TYPES|TYPES
+    SPEC_DATA_TYPES.setParseAction(getString)
     
     
     OBJECT_START = Suppress('{')
     OBJECT_END = Suppress('}')
     COMMENT_START= '//'
     
+    COMMENT = Combine(OneOrMore(White()+COMMENT_START+SkipTo(LineEnd())))
+        
     KEY = NAME+Suppress(':')
     KEY.setParseAction(getString)
     
@@ -120,7 +133,7 @@ class ModelParser(object):
                 originalTextFor(OneOrMore(Word(alphanums)))+OBJECT_END
     INLINE_VALUE.setParseAction(getString)
                 
-    VALUE = (JSON_TYPES.setResultsName(_VALUE_TYPE)
+    VALUE = (SPEC_DATA_TYPES.setResultsName(_VALUE_TYPE)
              |NAME.setResultsName(_VALUE_DEFINED)
              |ARRAY.setResultsName(_VALUE_TYPE_ARRAY)
              |INLINE_VALUE.setResultsName(_VALUE_TYPE_INLINE)
@@ -157,21 +170,26 @@ class ModelParser(object):
                            IS_IMMUTABLE.setResultsName(_IS_IMMUTABLE))
                     ).setResultsName(_VALUE)
                     
-    COMMENT = Combine(OneOrMore(White()+COMMENT_START+SkipTo(LineEnd())))
+
     
-    PROPERTY =Group((KEY.setResultsName(_KEY)+
-                     COMMENT.setResultsName(_KEY_COMMENT)+
-                     VALUE.setResultsName(_VALUE)+
-                     COMMENT.setResultsName(_VALUE_COMMENT)
-                     )|
-                    (KEY.setResultsName(_KEY)+
-                     VALUE.setResultsName(_VALUE)+
-                     COMMENT.setResultsName(_VALUE_COMMENT)
-                     )|
-                     (KEY.setResultsName(_KEY)+
-                      VALUE.setResultsName(_VALUE)
-                     )
-                    )    
+    PROPERTY = \
+                Group(
+                            (KEY.setResultsName(_KEY)+
+                            COMMENT.setResultsName(_KEY_COMMENT)+
+                            VALUE.setResultsName(_VALUE)+
+                            COMMENT.setResultsName(_VALUE_COMMENT)
+                            )
+                            |
+                            (KEY.setResultsName(_KEY)+
+                             VALUE.setResultsName(_VALUE)+
+                            COMMENT.setResultsName(_VALUE_COMMENT)
+                            )
+                            |
+                            (KEY.setResultsName(_KEY)+
+                            VALUE.setResultsName(_VALUE)
+                            )
+                        ) 
+                           
     PROPERTY.setResultsName(_PROPERTY)
     
 
@@ -183,12 +201,10 @@ class ModelParser(object):
    
             
     
-    def __init__(self, string=None, filePath=None):
+    def __init__(self, modelSpec):
         """Class that parses data models from the spec for object validation.
-          string: String represention of a model based on Dan Rehak JSON like
-                  format.
-                
-          filePath: Full path of a file that contains Dan Rehak JSON like
+          modelSpec String represention of a model based on Dan Rehak JSON like
+                  format. Or Full path of a file that contains Dan Rehak JSON like
                    data model"""
         
         self._fileString = None
@@ -198,12 +214,10 @@ class ModelParser(object):
         # The _modelInfo is a copy of the _parseResults where some duplicate
         # information has been remove.
         self._modelInfo = None
-        
-        if string is not None:
-            self._fileString = string
+        self._fileString = modelSpec
             
-        if filePath is not None:
-            self._fileString = getFileString(filePath)
+        if path.exists(modelSpec):
+            self._fileString = getFileString(modelSpec)
       
         # Parse the model
         if self._fileString is not None:
@@ -348,7 +362,7 @@ class ModelParser(object):
                         if isinstance(parseResults[key][self._IS_REQUIRED_IF], 
                                       dict) == True:
                             raise(ObjectModelParseException( 
-                                    "Cannot parse comment abou required if: "+
+                                    "Cannot parse comment about required if: "+
                                     parseResults[key][self._DESCRIPTION]))
                                     
                         parseResults[key][self._IS_REQUIRED_IF] = \
@@ -388,106 +402,119 @@ class ModelParser(object):
         #self._extractObjectType(self._modelInfo)
         self._extractArrayType(self._modelInfo)
         
-       
+    def _validateConditionalField(self, fieldName, value, modelProp, jsonObject):
+        """Validates conditionally required property"""
+        
+        if self._IS_REQUIRED_IF not in modelProp.keys():
+                 return
 
-    def _validate(self, parseResults, jsonObject, verifyExtendedKey=False):
+        # Get description for the the file if there is any.
+        description = ''
+        if self._DESCRIPTION in modelProp.keys():
+            description = modelProp[self._DESCRIPTION]+"\n\n"
+
+        #The dictionary has only one item.
+        conditionalKey = modelProp[self._IS_REQUIRED_IF].keys()[0]
+        conditionalValue = modelProp[self._IS_REQUIRED_IF][conditionalKey]
+        conditionalProp = jsonObject.get(conditionalKey)
+        
+        # Make sure that if a conditionally required key is present its
+        # condition is met.
+        if self._IS_REQUIRED_IF in modelProp.keys():
+            #The dictionary has only one items.
+            conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
+            conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
+            conditionalProp = jsonObject[conditionalKey]
+            if conditionalValue != conditionalProp:
+                raise SpecValidationException(
+                "Conditionally required property '"+fieldName +
+                "' is present without meeting the required condition. '" +
+                str(conditionalKey)+"' must be '"+str(conditionalValue)+
+                "' yet it is set to '"+str(conditionalProp)+
+                "'\n\n"+description)
+                
+            # If the propety field is required conditionally based on another 
+            # property value check to see if that property value is present.
+            if (conditionalKey in jsonObject.keys() and 
+                conditionalProp == conditionalValue):
+                raise SpecValidationException(
+                        "Key '"+fieldName+"' is required if '"+str(conditionalKey) +
+                        "' is set to '"+str(conditionalValue)+"' :\n\n"+description)
+
+        
+    def _validateField(self, fieldName, value,  modelProp):
+        """Validates that the field named key conforms to the spec model for the key"""
+    
+        # Get description for the the file if there is any.
+        description = ''
+        if self._DESCRIPTION in modelProp.keys():
+            description = modelProp[self._DESCRIPTION]+"\n\n"
+        
+        # Check for correct type.
+        if (self._VALUE_TYPE in modelProp.keys() and 
+           isOfSpecType(value, modelProp[self._VALUE_TYPE]) == False):
+            raise SpecValidationException(
+                "Value for '"+fieldName+"' is of wrong type, spec defines '"
+                +fieldName+"' of type "+
+                modelProp[self._VALUE_TYPE]+"\n\n"+description)
+                
+         # Check for matching defined value
+        if (self._VALUE_DEFINED in modelProp.keys() and
+            modelProp[self._VALUE_DEFINED] != value):
+            raise SpecValidationException(
+                "Mismatch value for '"+fieldName+"' expecting '"+
+                modelProp[self._VALUE_DEFINED]+"' instead of '"+str(value)+
+                "'\n\n"+description)
+                    
+        # Check for value range.
+        if (self._VALUE_RANGE in modelProp.keys() and
+           value not in modelProp[self._VALUE_RANGE]):
+            raise SpecValidationException(
+                "Invalid value for'"+fieldName+"'expecting one of:\n '"+
+                str(modelProp[self._VALUE_RANGE]) +"' instead of '"+str(value)+
+                "'\n\n:"+description)
+                    
+        
+    def _validate(self, parseResults, jsonObject, validateExtensionField=False):
         """Validates recursively the jsonObject against the spec model"""
         modelKeySet = set(parseResults.keys())
         objectKeySet = set(jsonObject.keys())
-        
+    
         # Check for keys that are extension properties and ensure that they
         # comform to the spec extension variable format.
-        if verifyExtendedKey == True:
+        if validateExtensionField  == True:
             for key in objectKeySet-modelKeySet:
-                if self.EXTENSION_VAR.match(key) is None:
-                    raise ObjectModelParseException(
+                if self.EXTENSION_REGEX.match(key) is None:
+                    raise SpecValidationException(
                              "Key '"+key+"' not present in model spec.")
         
         # Check for key that not in object but in the model and make sure
         # that they are not required value.
         for key in modelKeySet - objectKeySet:
-            modelProp = self._modelInfo[key]
+            modelProp = parseResults[key]
             # Get the description if there is any for the property.
             description = ""
             if self._DESCRIPTION in modelProp.keys():
                 description =  modelProp[self._DESCRIPTION]
                 
             if modelProp.isRequired == True:
-                raise ObjectModelParseException(
+                raise SpecValidationException(
                         "Missing required key '"+key+"':\n\n"+
                         description+"\n\n")
-
-            # Check for conditionally required property.
-            if self._IS_REQUIRED_IF in modelProp.keys():
-                conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
-                conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
-                conditionalProp = jsonObject[conditionalKey]
-                # If the property is required conditionally based on another 
-                # property value check to see if that property value is present.
-                if (conditionalKey in jsonObject.keys() and 
-                    conditionalProp == conditionalValue):
-                    raise ObjectModelParseException(
-                            "Key '"+key+"' is required if '"+
-                            str(conditionalKey) +
-                            "' is set to '"+
-                            str(conditionalValue)+"' :\n\n"+
-                            description+"\n\n") 
+            self._validateConditionalField(key, None, modelProp, jsonObject) 
         
         # Now check that key that are in both jsonobject and model spec
         # for type and defined value verification.
         for key in modelKeySet.intersection(objectKeySet):
-           
-            modelProp = self._modelInfo[key]
-            objectProp = jsonObject[key]
+            
+            modelProp = parseResults[key]
+            value = jsonObject[key]
             
             if isinstance(modelProp, ParseResults) == False:
                 continue
+            self._validateConditionalField(key, value, modelProp, jsonObject)
+            self._validateField(key, value, modelProp)
             
-            # Get the description if there is any for the property.
-            description = ""
-            if self._DESCRIPTION in modelProp.keys():
-                description =  modelProp[self._DESCRIPTION]
-            
-            # Check for correct type.
-            if (self._VALUE_TYPE in modelProp.keys() and 
-               isOfJSONType(objectProp, modelProp.type) == False):
-                raise ObjectModelParseException(
-                    "Value for '"+key+"' is of wrong type, spec defines '"+key+
-                    "' of type "+modelProp[self._VALUE_TYPE]+"\n"+
-                    description+"\n\n")
-            # Check for matching defined value
-            if (self._VALUE_DEFINED in modelProp.keys() and
-                modelProp[self._VALUE_DEFINED] != objectProp):
-                raise ObjectModelParseException(
-                    "Mismatch value for '"+key+"' expecting '"+
-                    modelProp[self._VALUE_DEFINED]+
-                    "'\n\n:"+description+"\n\n")
-                    
-            # Check for value range.
-            if (self._VALUE_RANGE in modelProp.keys() and
-               objectProp not in modelProp[self._VALUE_RANGE]):
-                raise ObjectModelParseException(
-                    "Invalid value for'"+key+"'expecting one of:\n '"+
-                    str(modelProp[self._VALUE_RANGE])+
-                    "'\n\n:"+description+"\n\n")
-                    
-            # Make sure that if a conditionally required key is present its
-            # condition is met.
-            if self._IS_REQUIRED_IF in modelProp.keys():
-                #The dictionary has only one items.
-                conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
-                conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
-                conditionalProp = jsonObject[conditionalKey]
-                if conditionalValue != conditionalProp:
-                    raise ObjectModelParseException(
-                    "Conditionally required property '"+
-                    key +
-                    "' is present without meeting the required condition. '" +
-                    str(conditionalKey)+"' must be '"+
-                    str(conditionalValue)+
-                    "' yet it is set to '"+str(conditionalProp)+
-                    "'\n\n:"+description+"\n\n")
-             
             # Validate any sub object.
             if (modelProp.type == 'object'):
                 self._validate(modelProp, objectProp)
@@ -519,7 +546,23 @@ class ModelParser(object):
     
         return json.dumps(parseResultsToDict(self._modelInfo), indent=4)
     
-   
+    def validateField(self, fieldName, value, jsonObject):
+        """Veryfies that a field conforms the the specs."""
+        
+        # Check for keys that are extension properties and ensure that they
+        # comform to the spec extension variable format.
+        if (fieldName not in  self._modelInfo.keys()  and
+             self.EXTENSION_REGEX.match(fieldName) is None):
+                    raise SpecValidationException(
+                             "Key '"+fieldName+"' not present in model spec.")
+        
+        modelProp = self._modelInfo[fieldName]                    
+        self._validateField(fieldName, value, modelProp)
+        self._validateConditionalField(fieldName, value, modelProp, jsonObject)
+       
+        if modelProp.get(self._VALUE_TYPE)=='object':
+           self._validate(modelProp, value)
+       
     def validate(self, jsonObjectString):
         """Validates a JSON object string against the data model"""
         jsonObject = {}
@@ -527,8 +570,8 @@ class ModelParser(object):
             jsonObject = jsonObjectString
         else:
             jsonObject = json.loads(jsonObjectString)
-            
-        self._validate(self._modelInfo, jsonObject, verifyExtendedKey=True)
+        
+        self._validate(self._modelInfo, jsonObject, validateExtensionField=True)
         return jsonObject
  
 # Parser that extracts object data models from a spec file.       
@@ -561,7 +604,6 @@ def extractModelsFromSpec(specFile, destDir='./models/'):
 
 if __name__== "__main__":
     from optparse import OptionParser
-    from os import path
     import os
     
     parser = OptionParser()
@@ -596,10 +638,10 @@ if __name__== "__main__":
     model = None
     
     if options.filepath is not None:
-        model = ModelParser(filePath=options.filepath)
+        model = ModelParser(options.filepath)
         
     elif options.string is not None:
-        model = ModelParser(string = options.string)
+        model = ModelParser(options.string)
         
     if (((options.filepath is not None) or
          (options.string is not None)) and
