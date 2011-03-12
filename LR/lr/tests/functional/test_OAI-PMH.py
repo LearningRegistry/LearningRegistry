@@ -1,6 +1,6 @@
 from lr.tests import *
 
-class TestOaiPmhsController(TestController):
+class TestOaiPmhController(TestController):
 
     def test_index(self):
         response = self.app.get(url('OAI-PMHS'))
