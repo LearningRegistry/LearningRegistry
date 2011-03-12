@@ -405,7 +405,8 @@ class ModelParser(object):
     def _validateConditionalField(self, fieldName, value, modelProp, jsonObject):
         """Validates conditionally required property"""
         
-        if self._IS_REQUIRED_IF not in modelProp.keys():
+        if self._IS_REQUIRED_IF not in modelProp.keys() or \
+           fieldName not in jsonObject.keys():
                  return
 
         # Get description for the the file if there is any.
@@ -422,8 +423,8 @@ class ModelParser(object):
         # condition is met.
         if self._IS_REQUIRED_IF in modelProp.keys():
             #The dictionary has only one items.
-            conditionalValue =  modelProp[self._IS_REQUIRED_IF].values()[0]
             conditionalKey =  modelProp[self._IS_REQUIRED_IF].keys()[0]
+            conditionalValue =  modelProp[self._IS_REQUIRED_IF][conditionalKey]
             conditionalProp = jsonObject[conditionalKey]
             if conditionalValue != conditionalProp:
                 raise SpecValidationException(
@@ -436,7 +437,8 @@ class ModelParser(object):
             # If the propety field is required conditionally based on another 
             # property value check to see if that property value is present.
             if (conditionalKey in jsonObject.keys() and 
-                conditionalProp == conditionalValue):
+                conditionalProp == conditionalValue and
+                 fieldName not in jsonObject.keys() ):
                 raise SpecValidationException(
                         "Key '"+fieldName+"' is required if '"+str(conditionalKey) +
                         "' is set to '"+str(conditionalValue)+"' :\n\n"+description)
