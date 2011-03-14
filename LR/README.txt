@@ -1,4 +1,3 @@
-Test for PT
 This file is for you to describe the LR application. Typically
 you would include information such as the information below:
 
