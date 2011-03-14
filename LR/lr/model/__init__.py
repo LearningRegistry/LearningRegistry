@@ -102,7 +102,7 @@ def processObject(jsonObject):
     if _DOC_TYPE not in jsonObject.keys():
         results[_ERROR] = "Document is missing doc type."
         log.error("\n"+pprint.pformat(results, indent=4)+"\n"+
-                  rint.pformat(jsonObject, indent=4)+"\n\n")
+                  pprint.pformat(jsonObject, indent=4)+"\n\n")
         return results
     
     #If the document is resource data set the create_timpestap and 
