@@ -1,0 +1,13 @@
+{
+    "doc_type": "filter_description",
+    "doc_version":"0.10.0",
+    "doc_scope": "node",
+    "active": true,
+    "filter_name": "filter",
+    "custom_filter": false,
+    "include_exclude": true,
+    "filter": [
+                {"filter_key": "keys",
+                 "filter_value": "test"}
+            ]
+}

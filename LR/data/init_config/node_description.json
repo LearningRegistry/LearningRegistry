@@ -1,0 +1,19 @@
+{
+    "doc_type" :  "node_description",
+    "doc_version" : "0.10.0",
+    "doc_scope":  "node",
+    "active": true,
+    "node_id":  "LR_TEST_NODE_1",
+    "node_name":  "node_name",
+    "node_description": "description",
+    "node_admin_url" : "string",
+    "network_id": "string",
+    "community_id": "string",
+    "gateway_node": false,
+    "open_connect_source" : false,
+    "open_connect_dest": false,
+    "node_policy":
+        {"sync_frequency" :  1,
+          "delete_data_policy": "no"
+        }
+}

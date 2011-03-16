@@ -31,8 +31,9 @@ import json
 import logging
 import sys
 from urllib import urlencode
+from optparse import OptionParser
 
-logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
 config = {
@@ -60,6 +61,9 @@ namespaces = {
               }
 # http://hal.archives-ouvertes.fr/oai/oai.php?verb=ListRecords&metadataPrefix=oai_dc
 
+# _LEARNING_REGISTRY_URL = "http://learningregistry.couchdb:5984"
+_LEARNING_REGISTRY_URL_DEFAULT = _LEARNING_REGISTRY_URL = "http://learningregistry.vm"
+
 class Error(Exception):
     pass
 
@@ -73,10 +77,10 @@ def getDocTemplate():
             "submitter": "NSDL 2 LR Data Pump",
             "submission_TOS": "Yes",
             "resource_locator": None,
-            "filtering_keys": [],
+            "keys": [],
             "payload_placement": None,
             "payload_schema": [],
-            "payload_schema_locator":[],
+            "payload_schema_locator":None,
             "payload_locator": None,
             "resource_data": None
             }
@@ -89,14 +93,14 @@ def formatOAIDoc(record):
     language = record.xpath("oai:metadata/oai_dc:dc/dc:language/text()", namespaces=namespaces)
     payload = record.xpath("oai:metadata/oai_dc:dc", namespaces=namespaces)
     
-    doc["resource_locator"] = resource_locator
+    doc["resource_locator"] = resource_locator[0]
     
-    doc["filtering_keys"].extend(subject)
-    doc["filtering_keys"].extend(language)
+    doc["keys"].extend(subject)
+    doc["keys"].extend(language)
 
     
     doc["payload_schema"].append("OAI DC 2.0")
-    doc["payload_schema_locator"].append("http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd")
+    doc["payload_schema_locator"] = "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
     
     doc["payload_placement"] = "inline"
     doc["resource_data"] = etree.tostring(payload[0])
@@ -115,15 +119,15 @@ def formatNSDLDoc(record):
     edLevel = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dct:educationLevel/text()", namespaces=namespaces)
     payload = record.xpath("oai:metadata/nsdl_dc:nsdl_dc", namespaces=namespaces)
     
-    doc["resource_locator"] = resource_locator
+    doc["resource_locator"] = resource_locator[0]
     
-    doc["filtering_keys"].extend(subject)
-    doc["filtering_keys"].extend(language)
-    doc["filtering_keys"].extend(edLevel)
+    doc["keys"].extend(subject)
+    doc["keys"].extend(language)
+    doc["keys"].extend(edLevel)
     
     
     doc["payload_schema"].append("NSDL DC 1.02.020")
-    doc["payload_schema_locator"].append("http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd")
+    doc["payload_schema_locator"] = "http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd"
     
     doc["payload_placement"] = "inline"
     doc["resource_data"] = etree.tostring(payload[0])
@@ -140,13 +144,15 @@ def bulkUpdate(list):
     '''
     if len(list) > 0:
         try:
-            res = Resource("http://learningregistry.couchdb:5984")
+            res = Resource(_LEARNING_REGISTRY_URL)
             body = { "documents":list }
             log.info("request body: %s" % (json.dumps(body),))
             clientResponse = res.post(path="/publish", payload=json.dumps(body), headers={"Content-Type":"application/json"})
-            log.info("status: {0}  message: {1}".format(clientResponse.status_int, clientResponse.body_string))
+            log.info("status: {0}  message: {1}".format(clientResponse.status_int, clientResponse.body_string()))
         except Exception:
             log.exception("Caught Exception When publishing to registry")
+    else:
+        log.info("Nothing is being updated.")
 
 
 def fetchRecords(conf):
@@ -240,7 +246,15 @@ def connect():
         except:
             log.exception("Problem w/ JSON dump")
         bulkUpdate(docList)
-    
+       
+def parseCmdLine():
+    parser = OptionParser()
+    parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=_LEARNING_REGISTRY_URL_DEFAULT)
+    (options, args) = parser.parse_args()
+    _LEARNING_REGISTRY_URL = options.registryUrl    
+    log.info("Learning Registry Node URL: '{0}'\n".format(_LEARNING_REGISTRY_URL))
 
 if __name__ == '__main__':
+    log.info("Update Started.")
     connect()
+    log.info("Done Updating.")

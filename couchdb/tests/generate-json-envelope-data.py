@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 '''
-simple generator to build some sample envelopes for testing publish
+simple generator to build some sample envelopes for testing publish (OBSOLETE)
 
 Created on Feb 2, 2011
 
