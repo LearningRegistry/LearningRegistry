@@ -12,41 +12,50 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import logging, urllib2, json,urllib, couchdb
-
+from lr.model.base_model import appConfig
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
 from lr.lib.base import BaseController, render
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(__name__)  
 
 class ObtainController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('obtain', 'obtain')
+    def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[]):
+        s = couchdb.Server(appConfig['couchdb.url'])
+        db = s[appConfig['couchdb.db.resourcedata']]        
+        if len(keys) > 0:
+          view = db.view(view_name, include_docs=True, keys=keys)
+        else:
+          view = db.view(view_name, include_docs=True)          
+        return view
 
+    def format_data(self,full_docs,data):
+        if full_docs:
+          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id,'resource_data_description':doc.doc},data)}
+        else:
+          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id},data)}
+        return return_data
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
-        url = 'http://localhost:5984/resource_data/_all_docs'
-        response = urllib2.urlopen(url)
-        return response.read()
+        data = self.get_view()	
+        return json.dumps(self.format_data(False,data))
         # url('obtain')
+
     def create(self):
         """POST /obtain: Create a new item"""
         data = json.loads(request.body)
         keys = map(lambda key: key['request_ID'],data['request_IDs'])
-        s = couchdb.Server()
-        db = s['resource_data']        
         if data['by_doc_ID']:
-          view = db.view('_all_docs',include_docs=True,keys=keys)
+          view = self.get_view('_all_docs',keys)
         elif data['by_resource_ID']:
-          view = db.view('_design/filter/_view/resource-location',include_docs=True,keys=keys)
+          view = self.get_view('_design/filter/_view/resource-location',keys)
         return_data = view
-        if data['ids_only'] is None or data['ids_only'] == False:
-          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id,'resource_data_description':doc.doc},return_data)}
-        else:
-          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id},return_data)}
+        return_data = self.format_data(data['ids_only'] is None or data['ids_only'] == False,return_data)
         return json.dumps(return_data)
         # url('obtain')
 

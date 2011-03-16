@@ -13,7 +13,7 @@ class harvest:
     view_data = self.db.view('_design/learningregistry/_view/resource-location',include_docs=True,keys=[resource_locator])
     return map(lambda doc: doc.doc, view_data)      
   def list_records(self, from_date, until_date):
-    rows = self.db.view('_all_docs', include_docs=True)
+    rows = self.db.view('_design/learningregistry/_view/resources', include_docs=True)
     return_list = []
     for row in rows:
       #ignore design docs
