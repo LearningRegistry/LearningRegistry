@@ -16,6 +16,6 @@
 	 "policy_version":	“string”,		// version identifier for the policy
 	  “TTL”:			integer,		// minimum time to live for resource data in the network
 					 	// in days, required
-	 “policy_element_x”:	?????,		// placeholder for more policy elements
+	
 "X_xxx":		?????		// placeholder for extensibility, optional
 	}
