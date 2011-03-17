@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import logging, urllib2, json,urllib
+import logging, urllib2, json,urllib, couchdb
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -36,11 +36,18 @@ class ObtainController(BaseController):
     def create(self):
         """POST /obtain: Create a new item"""
         data = json.loads(request.body)
-        keys = map(lambda key: key['doc_ID'],data['request_IDs'])
-        return_data = urllib2.urlopen('http://localhost:5984/resource_data/_all_docs?include_docs=true',json.dumps({'keys': keys}))
-        return_data = json.load(return_data)
-        return_data = {'documents' : map(lambda doc: doc['doc'],return_data['rows'])}
-        response.headers['content-type'] = 'application/json'
+        keys = map(lambda key: key['request_ID'],data['request_IDs'])
+        s = couchdb.Server()
+        db = s['resource_data']        
+        if data['by_doc_ID']:
+          view = db.view('_all_docs',include_docs=True,keys=keys)
+        elif data['by_resource_ID']:
+          view = db.view('_design/filter/_view/resource-location',include_docs=True,keys=keys)
+        return_data = view
+        if data['ids_only'] is None or data['ids_only'] == False:
+          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id,'resource_data_description':doc.doc},return_data)}
+        else:
+          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id},return_data)}
         return json.dumps(return_data)
         # url('obtain')
 
