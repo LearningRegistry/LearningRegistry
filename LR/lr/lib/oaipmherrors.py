@@ -38,6 +38,10 @@ class IdDoesNotExistError(ErrorWithVerb):
     def __init__(self, verb):
         ErrorWithVerb.__init__(self, "idDoesNotExist", "The value of the identifier argument is unknown or illegal in this repository.", verb)
 
+class NoMetadataFormats(ErrorWithVerb):
+    def __init__(self, verb):
+        ErrorWithVerb.__init__(self, "noMetadataFormats", "No metadata formats exist.", verb)
+
 class NoRecordsMatchError(ErrorWithVerb):
     def __init__(self, verb):
         ErrorWithVerb.__init__(self, "noRecordsMatch", "The combination of the values of the from, until, and metadataPrefix arguments results in an empty list.", verb)

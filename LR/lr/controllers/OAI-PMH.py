@@ -77,6 +77,10 @@ class OaiPmhController(BaseController):
         
         if verb in ['ListMetadataFormats', 'GetRecord']  and request.params.has_key('identifier'):
             params['identifier'] = request.params['identifier']
+        elif verb == 'ListMetadataFormats':
+            params['identifier'] = None
+            params['by_doc_ID'] = None
+            params['by_resource_ID'] = None
         
         if verb == 'GetRecord' and params.has_key('identifier') == False:
             raise BadArgumentError('identifier is a required parameter.', verb)
@@ -101,6 +105,8 @@ class OaiPmhController(BaseController):
             c.from_date = params["from"]
         if params.has_key("until"):
             c.until_date = params["until"]
+        if params.has_key("identifier"):
+            c.identifier = params["identifier"]
         
 
     def index(self, format='html'):
@@ -176,6 +182,23 @@ class OaiPmhController(BaseController):
                 raise BadVerbError()
             return self._returnResponse(body)
         
+        def ListMetadataFormats(params):
+            body = ""
+            try:
+                self._initRender(params)
+                
+                fmts = o.list_metadata_formats(identity=params["identifier"], by_doc_ID=params["by_doc_ID"])
+                if len(fmts) == 0:
+                    raise NoMetadataFormats(params["verb"])
+                c.formats = fmts
+                body = render("/oaipmh-ListMetadataFormats.mako")
+                return self._returnResponse(body)
+            except Error as e:
+                raise e
+#            except Exception as e:
+#                raise NoMetadataFormats(params["verb"])
+                
+        
         def ListSets(params=None):
             raise NoSetHierarchyError(verb)
             
@@ -187,7 +210,7 @@ class OaiPmhController(BaseController):
                   'ListRecords': ListRecords,
                   'ListIdentifiers': ListIdentifiers,
                   'Identify': Identify,
-                  'ListMetadataFormats': NotYetSupported,
+                  'ListMetadataFormats': ListMetadataFormats,
                   'ListSets': ListSets
                   }
         try:

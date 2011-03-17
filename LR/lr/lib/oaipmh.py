@@ -21,6 +21,7 @@ import logging, iso8601
 import couchdb
 from lr.lib.base import render
 from lr.lib.harvest import harvest
+from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats
 
 log = logging.getLogger(__name__)
 
@@ -79,6 +80,34 @@ class oaipmh(harvest):
         view_data = self.db.view('oai-pmh/list-identifiers', **opts)
         return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
     
+    def list_metadata_formats(self, identity=None, by_doc_ID=False, verb="ListMetadataFormats"):
+        try:
+            opts = {}
+            if identity != None:
+                if by_doc_ID == True: 
+                    byID = "by_doc_ID" 
+                else: 
+                    byID = "by_resource_ID"
+                opts["key"] = [byID, identity]
+                
+                view_data = self.db.view('oai-pmh/get-records', **opts)
+                if len(view_data) == 0:
+                    raise IdDoesNotExistError(verb)
+                formats = [];
+                for res in view_data:
+                    for schema in res.value["payload_schema"]:
+                        formats.append({"metadataPrefix":schema, "schemas":[res.value["payload_schema_locator"]]})
+                return formats
+            
+            else:
+                opts["group"] = True
+                opts["group_level"] = 1
+                view_data = self.db.view('oai-pmh/list-metadata-formats', **opts)
+                return map(lambda doc: {"metadataPrefix": doc.key[0], "schemas": doc.value}, view_data)
+                
+        except Exception as e:
+            raise e
+        
     def identify(self, database="node"):
         ret = None
         ident = {}
