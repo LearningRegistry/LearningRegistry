@@ -7,6 +7,14 @@
      % if c.no_op:
          <sword:noOp>true</sword:noOp>
      % endif
+     % if c.verbose:
+         <sword:verboseDescription>
+            Does collection exist? True.
+            User authenticates? True.
+            User: ${c.on_belahf_of}
+            User has rights to collection? True. 
+         </sword:verboseDescription>
+     % endif
      <updated>${c.doc['update_timestamp']}</updated>
 
      <author><name>Learning Registry</name></author>
