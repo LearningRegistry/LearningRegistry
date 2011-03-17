@@ -8,6 +8,7 @@
          <sword:noOp>true</sword:noOp>
      % endif
      <updated>${c.doc['update_timestamp']}</updated>
+
      <author><name>Learning Registry</name></author>
      <summary type="text">A summary</summary>
      <sword:userAgent>${c.user_agent}</sword:userAgent>
