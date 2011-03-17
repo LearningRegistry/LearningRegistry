@@ -213,6 +213,8 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 >       ./pip install flup
 >       ./pip install pyparsing
 >       ./pip install --upgrade couchdb
+>       ./pip install restkit
+>       ./pip install lxml
 
   
 ## Configure Nginx - Should be preinstalled on Ubuntu ##

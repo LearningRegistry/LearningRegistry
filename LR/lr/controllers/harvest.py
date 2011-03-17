@@ -8,6 +8,7 @@ from lr.lib.base import BaseController, render
 
 log = logging.getLogger(__name__)
 time_format = '%Y-%m-%d %H:%M:%S.%f'
+
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
