@@ -2,51 +2,46 @@ import logging
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
-
+from pylons.decorators import rest
 from lr.lib.base import BaseController, render
-
+import lr.model as m
+from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
 
+class SwordError(Exception):
+    def __init__(self,value):
+      self.value = value
+    def __str__(self):
+      return repr(self.value)
 class SwordController(BaseController):
-    """REST Controller styled on the Atom Publishing Protocol"""
-    # To properly map this controller, ensure your config/routing.py
-    # file has a resource setup:
-    #     map.resource('sword', 'sword')
 
-    def index(self, format='html'):
-        """GET /sword: All items in the collection"""
-        # url('sword')
-
+    def __init__(self):
+        self.h = harvest()
+    def __before__(self):
+        response.headers['content-type'] = 'application/atom+xml;charset=utf-8'      
+    def index(self): 
+        # Return a rendered template
+        #return render('/sword.mako')
+        # or, return a string
+        return render('sword.mako')
     def create(self):
-        """POST /sword: Create a new item"""
-        # url('sword')
-
-    def new(self, format='html'):
-        """GET /sword/new: Form to create a new item"""
-        # url('new_sword')
-
-    def update(self, id):
-        """PUT /sword/id: Update an existing item"""
-        # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="PUT" />
-        # Or using helpers:
-        #    h.form(url('sword', id=ID),
-        #           method='put')
-        # url('sword', id=ID)
-
-    def delete(self, id):
-        """DELETE /sword/id: Delete an existing item"""
-        # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="DELETE" />
-        # Or using helpers:
-        #    h.form(url('sword', id=ID),
-        #           method='delete')
-        # url('sword', id=ID)
-
-    def show(self, id, format='html'):
-        """GET /sword/id: Show a specific item"""
-        # url('sword', id=ID)
-
-    def edit(self, id, format='html'):
-        """GET /sword/id/edit: Form to edit an existing item"""
-        # url('edit_sword', id=ID)
+        c.user_agent = request.headers['user-agent']
+        c.no_op = False
+        c.verbose = False
+        if request.headers.has_key('X-Verbose'):
+          c.verbose = request.headers.has_key('X-Verbose')
+          log.debug(c.verbose)           
+        if request.headers.has_key('X-No-Op') and request.headers['X-No-Op'] == True:
+          c.no_op = True
+          result = {'OK':True}
+          c.doc = {'doc_ID':12345}
+        else:
+          result = m.publish(request.body)
+          c.content_url = 'http://' + request.host + '/obtain/'+result['doc_ID']
+          c.generator_url = 'http://' + request.host + '/sword'
+          log.debug(request.host)
+          c.doc = self.h.get_record(result['doc_ID'])
+        if result['OK']:
+            return render('sword-publish.mako')    
+        else:
+            raise SwordError(result['error'])

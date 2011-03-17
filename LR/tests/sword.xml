@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+   <entry xmlns="http://www.w3.org/2005/Atom"
+	 xmlns:sword="http://purl.org/net/sword/">
+     <title>53831f7bc4404f168dbdf4c6888374e1</title>
+     <id>53831f7bc4404f168dbdf4c6888374e1</id>
+     <updated>1/12/2011</updated>
+     <author><name>Learning Registry</name></author>
+     <summary type="text">A summary</summary>
+     <sword:userAgent>curl/7.21.0 (i686-pc-linux-gnu) libcurl/7.21.0 OpenSSL/0.9.8o zlib/1.2.3.4 libidn/1.18</sword:userAgent>
+     <generator uri="http://localhost/sword" version="1.0"/>
+     <content type="application/json" src="http://localhost/obtain/53831f7bc4404f168dbdf4c6888374e1"/>	
+     <link rel="edit" href="http://www.myrepository.ac.uk/geography-collection/atom/my_deposit.atom" />
+  </entry>
