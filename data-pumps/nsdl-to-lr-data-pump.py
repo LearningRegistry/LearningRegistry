@@ -36,20 +36,20 @@ from optparse import OptionParser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
-config = {
-    "server": "http://memory.loc.gov",
-    "path": "/cgi-bin/oai2_0",
-    "verb": "ListRecords",
-    "metadataPrefix":"oai_dc",
-    "set":None
-}
 #config = {
-#    "server": "http://www.dls.ucar.edu",
-#    "path": "/dds_se/services/oai2-0",
+#    "server": "http://memory.loc.gov",
+#    "path": "/cgi-bin/oai2_0",
 #    "verb": "ListRecords",
-#    "metadataPrefix":"nsdl_dc",
-#    "set":"ncs-NSDL-COLLECTION-000-003-112-016"
+#    "metadataPrefix":"oai_dc",
+#    "set":None
 #}
+config = {
+    "server": "http://www.dls.ucar.edu",
+    "path": "/dds_se/services/oai2-0",
+    "verb": "ListRecords",
+    "metadataPrefix":"nsdl_dc",
+    "set":"ncs-NSDL-COLLECTION-000-003-112-016"
+}
 #config = {
 #    "server": "http://hal.archives-ouvertes.fr",
 #    "path": "/oai/oai.php",
@@ -107,7 +107,7 @@ def formatOAIDoc(record):
     doc["keys"].extend(language)
 
     
-    doc["payload_schema"].append("OAI DC 2.0")
+    doc["payload_schema"].append("oai_dc")
     doc["payload_schema_locator"] = "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
     
     doc["payload_placement"] = "inline"
@@ -138,7 +138,7 @@ def formatNSDLDoc(record):
     doc["keys"].extend(edLevel)
     
     
-    doc["payload_schema"].append("NSDL DC 1.02.020")
+    doc["payload_schema"].append("nsdl_dc")
     doc["payload_schema_locator"] = "http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd"
     
     doc["payload_placement"] = "inline"
@@ -257,7 +257,7 @@ def connect(opts):
             if config["metadataPrefix"] == "nsdl_dc":
                 doc = formatNSDLDoc(rec)
                 if (doc != None):
-                    docList.append()
+                    docList.append(doc)
         try:
             print(json.dumps(docList))
         except:
