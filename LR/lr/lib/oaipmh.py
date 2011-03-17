@@ -17,25 +17,113 @@ Created on Mar 10, 2011
 
 @author: jklo
 '''
+import logging, iso8601
 import couchdb
 from lr.lib.base import render
 from lr.lib.harvest import harvest
+
+log = logging.getLogger(__name__)
 
 class oaipmh(harvest):
     '''
     Utility class to provide OAI-PMH results from Learning Registy
     '''
-
-
     def __init__(self, server="http://localhost:5984", database="resource_data"):
         '''
         Constructor
         '''
-        server = couchdb.Server(server)
-        self.db = server[database]
-        
+        self.server = couchdb.Server(server)
+        self.db = self.server[database]
+    
+    
+    
+    def list_records(self,metadataPrefix,from_date=None, until_date=None):
+        opts = {};
 
+        if from_date != None:
+            from_date = from_date.replace(tzinfo=None)
+            opts["startkey"] = [metadataPrefix, from_date.isoformat(' ')]
+        else:
+            # empty string should sort before anything else.
+            opts["startkey"] = [metadataPrefix, ""]
+        
+        if until_date != None:
+            until_date = until_date.replace(tzinfo=None)
+            opts["endkey"] = [metadataPrefix, until_date.isoformat(' ')]
+        else:
+            # somewhat of an hack... since I don't know the timestamp, and couch stores things
+            # in alphabetical order, a string sequence with all capital Z's should always sort last.
+            opts["endkey"] = [metadataPrefix, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"];
+        
+        
+        view_data = self.db.view('oai-pmh/list-records', **opts)
+        return map(lambda row: row["value"], view_data)
+    
+    def list_identifiers(self,metadataPrefix,from_date=None, until_date=None ):
+        opts = {};
+
+        if from_date != None:
+            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
+        else:
+            # empty string should sort before anything else.
+            opts["startkey"] = [metadataPrefix, ""]
+        
+        if until_date != None:
+            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
+        else:
+            # somewhat of an hack... since I don't know the timestamp, and couch stores things
+            # in alphabetical order, a string sequence with all capital Z's should always sort last.
+            opts["endkey"] = [metadataPrefix, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"];
+        
+        
+        view_data = self.db.view('oai-pmh/list-identifiers', **opts)
+        return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
+    
+    def identify(self, database="node"):
+        ret = None
+        ident = {}
+        try:
+            db2 = self.server[database]
+            description = db2["description"]
+            
+            ident["repositoryName"] = description["node_description"]
+            ident["adminEmail"] = description["node_admin_url"]
+            # TODO: This should map to the deleted_data_policy from the node_policy from the
+            #       network node description
+            ident["deletedRecord"] = "transient"
+            ident["granularity"] = "YYYY-MM-DDThh:mm:ss.sZ"
+            opts = {
+                    "group": True,
+                    "limit": 1
+                    }
+            
+            view_data = self.db.view('oai-pmh/identify-timestamp', **opts)
+            if len(view_data) > 0:
+                ident["earliestDatestamp"] = iso8601.parse_date(list(view_data)[0].key)
+            else:
+                ident["earliestDatestamp"] = datetime.utcnow()
+            
+            ret = ident
+        except Exception as e:
+            log.exception("Problem determining OAI Identity")
+        
+        return ret
+#    def list_metadata_formats(self,identifier=None, by_doc_ID=False, by_resource_ID=True):
+#        opts = {}
 
     
 if __name__ == "__main__":
+    from datetime import datetime
+    import iso8601
+    o = oaipmh()
+    start = iso8601.parse_date("2011-03-14 13:37:15.096670")
+    start = start.replace(tzinfo=None)
+    end = iso8601.parse_date("2011-03-14 13:37:15.360254")
+    end = end.replace(tzinfo=None)
+    records = o.list_records("nsdl_dc", from_date=start, until_date=end)
+    len(records)
+    
+    records = o.list_identifiers("nsdl_dc", from_date=start, until_date=end)
+    len(records)
+    
     pass

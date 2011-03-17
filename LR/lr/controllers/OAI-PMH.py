@@ -10,49 +10,9 @@ from lr.lib.oaipmh import oaipmh
 from datetime import datetime
 import json, iso8601
 from couchdb.http import ResourceNotFound
+from lr.lib.oaipmherrors import *
 
 log = logging.getLogger(__name__)
-
-class Error(Exception):
-    def __init__(self, code, msg):
-        self.code = code
-        self.msg = msg
-        self.datetime_now = datetime.utcnow().isoformat()
-        self.path_url = request.path_url
-
-class ErrorWithVerb(Error):
-    def __init__(self, code, msg, verb):
-        Error.__init__(self, code, msg)
-        self.verb = verb
-
-class BadVerbError(Error):
-    def __init__(self):
-        Error.__init__(self, "badVerb", "Illegal OAI Verb")
-
-class BadResumptionTokenError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "badResumptionToken", "Resumption tokens not supported.", verb)
-
-class BadArgumentError(ErrorWithVerb):
-    def __init__(self, msg, verb):
-        ErrorWithVerb.__init__(self, "badArgument", msg, verb)
-
-class CannotDisseminateFormatError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "cannotDisseminateFormat", "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.", verb)
-
-class IdDoesNotExistError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "idDoesNotExist", "The value of the identifier argument is unknown or illegal in this repository.", verb)
-
-class NoRecordsMatchError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "noRecordsMatch", "The combination of the values of the from, until, and metadataPrefix arguments results in an empty list.", verb)
-
-class NoSetHierarchyError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "noSetHierarchy", "The repository does not support sets.", verb)
-        
 
 class OaiPmhController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -72,31 +32,32 @@ class OaiPmhController(BaseController):
         if verb not in ["GetRecord", "ListRecords", "ListIdentifiers", "Identify", "ListMetadataFormats", "ListSets"]:
             raise BadVerbError()
         
-        if verb == 'GetRecord' or verb == 'ListRecords' or verb == 'ListIdentifers':        
+        if verb == 'GetRecord' or verb == 'ListRecords' or verb == 'ListIdentifiers':        
             if request.params.has_key('metadataPrefix') == False:
                 raise BadArgumentError('metadataPrefix is a required parameter.', verb)
             params["metadataPrefix"] = metadataPrefix = request.params['metadataPrefix']
         
         if verb == 'GetRecord' or verb == 'ListMetadataFormats':
             if request.params.has_key('by_doc_ID') and request.params.has_key('by_resource_ID'):
-                if _isTrue(request.params['by_doc_ID']) == _isTrue(request.params['by_resource_ID']):
+                if self._isTrue(request.params['by_doc_ID']) == self._isTrue(request.params['by_resource_ID']):
                     raise BadArgumentError('by_doc_ID and by_resource_ID have conflicting values.', verb)
                 
             if request.params.has_key('by_doc_ID'):
-                params['by_doc_ID'] = _isTrue(request.params['by_doc_ID'])
+                params['by_doc_ID'] = self._isTrue(request.params['by_doc_ID'])
                 params['by_resource_ID'] = not params['by_doc_ID']
             else:
                 params['by_doc_ID'] = False
                 params['by_resource_ID'] = not params['by_doc_ID']
             
             if request.params.has_key('by_resource_ID'):
-                params['by_resource_ID'] = _isTrue(request.param['by_doc_ID'])
+                params['by_resource_ID'] = self._isTrue(request.param['by_doc_ID'])
                 params['by_doc_ID'] = not params['by_resource_ID']
         
         if verb == 'ListRecords' or verb == 'ListIdentifiers':
             if request.params.has_key('from'):
                 try:
-                    params['from'] = iso8601.parse_date(request.params['from'])
+                    from_date = iso8601.parse_date(request.params['from'])
+                    params['from'] = h.convertToISO8601UTC(from_date)
                 except:
                     raise BadArgumentError('from does not parse to ISO 8601.', verb)
             else:
@@ -104,7 +65,8 @@ class OaiPmhController(BaseController):
             
             if request.params.has_key('until'):
                 try:
-                    params['until'] = iso8601.parse_date(request.params['until'])
+                    until_date = iso8601.parse_date(request.params['until'])
+                    params['until'] = h.convertToISO8601UTC(until_date)
                 except:
                     raise BadArgumentError('until does not parse to ISO 8601.', verb)
             else:
@@ -125,6 +87,21 @@ class OaiPmhController(BaseController):
         response.headers["Content-Type"] = "text/xml; charset=utf-8"
         return body
                                  
+    
+    def _initRender(self,params):
+        c.datetime_now = datetime.utcnow().isoformat()
+        c.path_url = request.path_url
+        if params.has_key("by_doc_ID"):
+            c.by_doc_ID = params["by_doc_ID"]
+        if params.has_key("by_resource_ID"):
+            c.by_resource_ID = params["by_resource_ID"]
+        if params.has_key("metadataPrefix"):
+            c.metadataPrefix = params["metadataPrefix"]
+        if params.has_key("from"):
+            c.from_date = params["from"]
+        if params.has_key("until"):
+            c.until_date = params["until"]
+        
 
     def index(self, format='html'):
         """GET /OAI-PMH: All items in the collection"""
@@ -132,17 +109,22 @@ class OaiPmhController(BaseController):
         
         def GetRecord(params):
             try:
-                c.doc = o.get_record(params["identifier"])
-                log.info(json.dumps(c.doc))
+                c.identifier = params["identifier"]
+                if params["by_doc_ID"]  == True:
+                    c.docList = [o.get_record(params["identifier"])]
+                else:
+                    c.docList = o.get_records_by_resource(params["identifier"])
+                    if len(c.docList) == 0:
+                        raise IdDoesNotExistError(params['verb'])
             except ResourceNotFound:
                 raise IdDoesNotExistError(params['verb'])
             
-            c.metadataPrefix = params["metadataPrefix"]
-            if c.metadataPrefix not in c.doc["payload_schema"]:
-                raise CannotDisseminateFormatError(params['verb'])
+            self._initRender(params)
             
-            c.datetime_now = datetime.utcnow().isoformat()
-            c.path_url = request.path_url
+            if c.docList != None:
+                for doc in c.docList:
+                    if c.metadataPrefix not in doc["payload_schema"]:
+                        raise CannotDisseminateFormatError(params['verb'])
 
             body = "<error/>"
             try:
@@ -151,29 +133,68 @@ class OaiPmhController(BaseController):
                 log.exception("Unable to render template")
             return self._returnResponse(body)
         
+        
+        def ListIdentifiers(params):
+            body = ""
+            try:
+                c.identifiers = o.list_identifiers(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] )
+                
+                if len(c.identifiers) == 0:
+                    raise NoRecordsMatchError(params['verb'])
+                
+                self._initRender(params)
+                body = render("/oaipmh-ListIdentifiers.mako")
+            except NoRecordsMatchError as e:
+                raise e
+            except:
+                log.exception("Unable to render template")
+            return self._returnResponse(body)
+        
+        def ListRecords(params):
+            body = ""
+            try:
+                c.records = o.list_records(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] )
+                
+                if len(c.records) == 0:
+                    raise NoRecordsMatchError(params['verb'])
+                
+                self._initRender(params)
+                body = render("/oaipmh-ListRecords.mako")
+            except NoRecordsMatchError as e:
+                raise e
+            except:
+                log.exception("Unable to render template")
+            return self._returnResponse(body)
+        
+        def Identify(params=None):
+            body = ""
+            try:
+                self._initRender(params)
+                c.identify = o.identify()
+                body = render("/oaipmh-Identify.mako")
+            except:
+                raise BadVerbError()
+            return self._returnResponse(body)
+        
         def ListSets(params=None):
-            c.doc = NoSetHierarchyError(verb)
+            raise NoSetHierarchyError(verb)
             
         def NotYetSupported(params=None):
-            c.doc = BadVerbError()
+            raise BadVerbError()
             
         switch = {
                   'GetRecord': GetRecord,
-                  'ListRecords': NotYetSupported,
-                  'ListIdentifers': NotYetSupported,
-                  'Identify': NotYetSupported,
+                  'ListRecords': ListRecords,
+                  'ListIdentifiers': ListIdentifiers,
+                  'Identify': Identify,
                   'ListMetadataFormats': NotYetSupported,
                   'ListSets': ListSets
                   }
         try:
             params = self._parseParams()
-        except Error as e:
-            c.error = e
-            return self._returnResponse(render('oaipmh-Error.mako'))
         
-        verb = params['verb']
-        
-        try:
+            verb = params['verb']
+            
             return switch[verb](params)
         except Error as e:
             c.error = e
