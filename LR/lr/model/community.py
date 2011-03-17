@@ -11,7 +11,7 @@ Base model class for learning registry data model
 '''
 
 
-from base_model import BaseModel, ModelParser, defaultCouchServer, appConfig
+from base_model import createBaseModel, ModelParser, defaultCouchServer, appConfig
 from pylons import *
 import datetime, logging
 
@@ -20,10 +20,8 @@ log = logging.getLogger(__name__)
 SPEC_COMMUNITY_DESCRIPTION= appConfig['spec.models.community_description']
 DB_COMMUNITY = appConfig['couchdb.db.community']
 
-class CommunityModel(BaseModel):
-    _modelParser = ModelParser(SPEC_COMMUNITY_DESCRIPTION)
-    _defaultDB = BaseModel.createDB(DB_COMMUNITY)
-    
+class CommunityModel(createBaseModel(SPEC_COMMUNITY_DESCRIPTION,
+                                                                    DB_COMMUNITY)):
     def __init__(self, data=None):
-        BaseModel.__init__(self, data)
+        super(CommunityModel, self).__init__(data)
         
