@@ -10,7 +10,7 @@ Base model class for learning registry data model
 @author: jpoyau
 '''
 
-from base_model import uuid4, BaseModel, ModelParser, defaultCouchServer, \
+from base_model import uuid4, createBaseModel, ModelParser, defaultCouchServer, \
 appConfig, couchdb
 from pylons import *
 import datetime, logging
@@ -32,7 +32,9 @@ filterFunction = """
         design_doc = "_design/";
         
         // Don't send the design document.
-        if (doc_id && doc._id.substr(0, design_doc.length) == design_doc){
+        if ((doc.doc_id && doc._id.substr(0, design_doc.length) == design_doc) ||
+            (!doc.doc_type || doc.doc_type != 'resource_data'))
+         {
             return false;
         }
         // If there is no query parameters return send the document.
@@ -106,29 +108,27 @@ def updateDesignFilters(db, filtersUpdate):
         designUpdate.update(designDoc)
         if _DESIGN_DOC_FILTERS in designDoc:
             designUpdate[_DESIGN_DOC_FILTERS].update(filtersUpdate)
-        else:
-            designUpdate[_DESIGN_DOC_FILTERS]=filtersUpdate
+    else:
+        designUpdate[_DESIGN_DOC_FILTERS]=filtersUpdate
             
     db[designId] = designUpdate
-    
+
+BaseModel = createBaseModel(SPEC_RESOURCE_DATA, DB_RESOURCE_DATA)
 class ResourceDataModel(BaseModel):
     _TIME_STAMPS = ['create_timestamp', 'update_timestamp', 'node_timestamp']
     _DOC_ID = 'doc_ID'
+   
+   #Make the filter is updated in the design document.    
     DEFAULT_FILTER = 'defaultFilter'
-    
-    _modelParser = ModelParser(SPEC_RESOURCE_DATA)
-    _defaultDB = BaseModel.createDB(DB_RESOURCE_DATA)   
-    
     # Add Filter function the design document that will be used to filter on replication.
     designFilter = {DEFAULT_FILTER: str(filterFunction)}
-    updateDesignFilters(_defaultDB, designFilter) 
-
+    updateDesignFilters(BaseModel._defaultDB, designFilter) 
     def __init__(self,  data=None):
         
-        BaseModel.__init__(self,  data)
+        super(ResourceDataModel, self).__init__(data)
         
-        # Set the timestamps by default on creation.
-        timeStamp = str(datetime.datetime.now())
+        # Set the timestamps by default on creation use utc.
+        timeStamp = str(datetime.datetime.utcnow())
         
         # Set the timestap on creation if they are not set.
         for stamp in self._TIME_STAMPS:
@@ -142,7 +142,8 @@ class ResourceDataModel(BaseModel):
             
     def save(self, doc_id=None, db=None):
         return BaseModel.save(self, doc_id=self.doc_ID, db=db)
-    
-    
+
+
+
 
 

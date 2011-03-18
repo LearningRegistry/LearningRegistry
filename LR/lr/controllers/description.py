@@ -13,11 +13,12 @@
 #   limitations under the License.
 
 import logging
-
+from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
-
+import json
 from lr.lib.base import BaseController, render
+from lr.model import LRNode as sourceLRNode, NodeServiceModel
 
 log = logging.getLogger(__name__)
 
@@ -29,11 +30,13 @@ class DescriptionController(BaseController):
 
     def index(self, format='html'):
         """GET /description: All items in the collection"""
-        import urllib2, json, time, os
-        url = 'http://localhost:5984/node/description'
-        response = urllib2.urlopen(url)
-        data = json.load(response)
-        data['timestamp'] = time.asctime()
+        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+            return "Administrative service not availble"
+            
+        data = {}
+        data['timestamp'] = str(datetime.utcnow())
+        data.update(sourceLRNode.config)
+            
         return json.dumps(data)
         # url('description')
 

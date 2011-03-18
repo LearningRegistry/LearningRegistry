@@ -3,7 +3,7 @@
 #    Copyright 2011 Lockheed Martin
 
 '''
-Created on Mar 10, 2011
+Created on Mar 17, 2011
 
 Base model class for learning registry data model
 
@@ -17,12 +17,11 @@ import datetime, logging
 
 log = logging.getLogger(__name__)
 
-SPEC_FILTER_DESCRIPTION= appConfig['spec.models.filter_description']
+SPEC_NODE_CONNECTIVITY_DESCRIPTION= appConfig['spec.models.node_connectivity_description']
 DB_NODE = appConfig['couchdb.db.node']
 
-
-class NodeFilterModel(createBaseModel(SPEC_FILTER_DESCRIPTION, DB_NODE)):
+class NodeConnectivityModel(createBaseModel(SPEC_NODE_CONNECTIVITY_DESCRIPTION, 
+                                                            DB_NODE)):
     
     def __init__(self, data=None):
-        super(NodeFilterModel,self).__init__(data)
-        
+        super(NodeConnectivityModel, self).__init__(data)

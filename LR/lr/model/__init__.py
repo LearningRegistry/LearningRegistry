@@ -7,22 +7,29 @@ Created on Feb 24, 2011
 '''
 
 from pylons import *
-from lr.lib import ModelParser
+from lr.lib import ModelParser, helpers as h
 from uuid import uuid4
 import couchdb, os, logging, datetime, re, pprint 
 log = logging.getLogger(__name__)
 
-from resource_data import ResourceDataModel
+from resource_data import ResourceDataModel, appConfig
 from node import NodeModel
 from node_filter import NodeFilterModel
 from community import CommunityModel
 from network import NetworkModel
+from node_connectivity import NodeConnectivityModel
+from node_service import NodeServiceModel
+from network_policy import NetworkPolicyModel
+from  node_config import LRNodeModel
+from base_model import defaultCouchServer
 
-import node_config 
+LR_NODE_CONFIG = appConfig['init.LRNode.config']
+
+lrconfig = h.importModuleFromFile(LR_NODE_CONFIG)
 
 _ERROR = 'error'
 _OK = "OK"
-LRNode = node_config.LRNode()
+LRNode = LRNodeModel(lrconfig)
 
 def isResourceDataFilteredOut(resourceData):
     
@@ -71,7 +78,7 @@ def isResourceDataFilteredOut(resourceData):
     return [False, None]
     
 def publish(envelopData):
-    result={_OK: False}
+    result={_OK: True}
     resourceData = None
     try:
         resourceData = ResourceDataModel(envelopData)
@@ -80,14 +87,15 @@ def publish(envelopData):
             log.debug("filter out document: "+reason+"\n"+
                             pprint.pformat(envelopData, indent=4, width=80)+"\n\n")
             return result
+        resourceData.publishing_node = LRNode.nodeDescription.node_id
         resourceData.save()
     except Exception as ex:
         error_message = "\n"+pprint.pformat(str(ex), indent=4)+"\n"+\
                                      pprint.pformat(envelopData, indent=4)+"\n\n"
         log.exception(ex)
+        result[_OK]= False
         result[_ERROR] = error_message
         return result
     
-    result[_OK] = True   
     result[resourceData._DOC_ID] = resourceData.doc_ID    
     return result
