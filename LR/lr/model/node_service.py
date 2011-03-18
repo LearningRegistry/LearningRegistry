@@ -25,6 +25,7 @@ class NodeServiceModel(createBaseModel(SPEC_SERVICE_DESCRIPTION, DB_NODE)):
     PUBLISH='publish'
     ACCESS = 'access'
     BROKER = 'broker'
+    DISTRIBUTE = 'distribute'
     ADMINISTRATIVE='administrative'
     
     def __init__(self, data=None):
