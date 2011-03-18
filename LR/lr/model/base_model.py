@@ -67,8 +67,8 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             self.__dict__[self._SPEC_DATA] = {}
             self.__dict__[self._ID] = None
             self.__dict__[self._REV] = None
-            
-            spec_data = data
+        
+            spec_data = None
             if data is not None:
                 if isinstance(data, str) or isinstance(data, unicode):
                     # Check to see if the data is a file path. if so load the the file
@@ -76,6 +76,15 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
                         spec_data = json.loads(getFileString(data))
                     else:
                         spec_data = json.loads(data)
+                spec_data = {}
+                spec_data.update(data)        
+                # Remove _id an _rev in data if t there are present so that we can have
+                # a clean specData for validation
+                for key in [self._ID, self._REV]:
+                    if key in spec_data.keys():
+                        self.__dict__[key] = spec_data[key]
+                        spec_data.pop(key)
+                        
                 self.__setattr__(self._SPEC_DATA, spec_data)
                 
         def __setattr__(self, name, value):
@@ -125,22 +134,24 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             self._validate()
             self._postValidation()
             
-        def save(self,  doc_id= None, db = None):
+        def save(self,  doc_id= None, database = None):
             
-            # Make sure the spec data conforms to the spec before save it to the database
+            # Make sure the spec data conforms to the spec before saving
+            # it to the database
             self.validate()
             
-            # Check if we need to genarate an id for the document if none is provided.
+            # Check if we need to generate an id for the document if none is provided.
             if doc_id is None:
                 doc_id = uuid4().hex
-            
+                
+            db = database
             # If no database is provided use the default one.
             if db == None:
                 db = self._defaultDB
             
             result = {'OK':True}   
             
-            # Use a temporary variable to hold the document the be save. The coudb
+            # Use a temporary variable to hold the document the be saved. The coudb
             # client code updates the dictionary with the id and revision.  We want to 
             # keep the specData clean and conforming the the spec all the time.
             document = {self._ID: doc_id}
@@ -157,11 +168,27 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
                 result['ERROR'] = "CouchDB save error:  "+str(e)
                 log.exception("\n"+pprint.pformat(result, indent=4)+"\n"+
                           pprint.pformat(document, indent=4)+"\n\n")
-                          
+                        
             return result
             
-        #property that return the dictionary of the spec data.
-        specData = property(lambda self:self._specData, None, None,  None)
+        def update(self, database=None):
+            db = database
+            # If no database is provided use the default one.
+            if db == None:
+                db = self._defaultDB
+            
+            self.validate()
+            document = self.specData
+            try:
+                db.update([document])
+            except Exception as ex:
+                log.exception(ex)
+                return
+            self.__dict__[self._ID]   = document[self._ID] 
+            self.__dict__[self._REV] = document[self._REV]
+    
+        # Property that return the dictionary of the spec data.
+        specData = property(lambda self: dict(self._specData), None, None,  None)
          
     return BaseModel
 
