@@ -15,7 +15,7 @@ from lr.lib.oaipmherrors import *
 
 log = logging.getLogger(__name__)
 
-class OaiPmhController(BaseController):
+class OaiPmhController(HarvestController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
@@ -224,6 +224,7 @@ class OaiPmhController(BaseController):
             
         def NotYetSupported(params=None):
             raise BadVerbError()
+        
             
         switch = {
                   'GetRecord': GetRecord,
@@ -235,6 +236,13 @@ class OaiPmhController(BaseController):
                   }
         try:
             params = self._parseParams()
+            
+            # If this is a special case where we are actually using OAI interface to serve basic harvest
+            if params.has_key("metadataPrefix") and params["metadataPrefix"] == "LR_JSON_0.10.0":
+                if params.has_key("identifier") == True:
+                    params["request_id"] = params["identifier"]
+                
+                return HarvestController.harvest(self, params, request.body, params['verb'].lower())
         
             verb = params['verb']
             
