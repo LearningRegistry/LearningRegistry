@@ -11,19 +11,19 @@ Base model class for learning registry data model
 '''
 
 
-from base_model import BaseModel, ModelParser, defaultCouchServer, appConfig
+from base_model import createBaseModel, ModelParser, \
+                            defaultCouchServer, appConfig
 from pylons import *
 import datetime, logging
+
 
 log = logging.getLogger(__name__)
 
 SPEC_STATUS_DESCRIPTION= appConfig['spec.models.status_description']
 DB_NODE = appConfig['couchdb.db.node']
 
-class NodeStatusModel(BaseModel):
-    
-    _modelParser = ModelParser(SPEC_STATUS_DESCRIPTION)
-    _defaultDB = BaseModel.createDB(DB_NODE)
+class NodeStatusModel(createBaseModel(SPEC_STATUS_DESCRIPTION, DB_NODE)):
     
     def __init__(self, data=None):
-        BaseModel.__init__(self, data)
+        super(NodeStatusModel, self).__init__(data)
+        

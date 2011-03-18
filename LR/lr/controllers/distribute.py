@@ -12,10 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import logging, couchdb, urlparse, json, urllib2
+import threading
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
-
+from lr.model import LRNode as sourceLRNode, \
+            NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer
+            
 from lr.lib.base import BaseController, render
 
 log = logging.getLogger(__name__)
@@ -29,35 +32,79 @@ class DistributeController(BaseController):
     def index(self, format='html'):
         """GET /distribute: All items in the collection"""
         # url('distribute')
-
+        distributeInfo = {'OK': True}
+        
+        if sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False:
+            distributeInfo['OK'] = False
+        else:
+            distributeInfo['node_config'] = sourceLRNode.config
+            distributeInfo['distribute_sink_url'] = ResourceDataModel._defaultDB.resource.url
+        return json.dumps(distributeInfo)
+    
+    
     def create(self):
-        network_id = 'network_id'
-        gateway_connection = 'gateway_connection'
-        gateway_node = 'gateway_node'
-        community_id = 'community_id'
-        social_community = 'social_community'
-        server = couchdb.Server()
-        db = server['node']
-        rows = db.view('_design/node/_view/connections').rows
-        source_description = json.load(urllib2.urlopen('http://localhost/description'))       
-        for doc in rows:           
-            connection_info = doc.value
-            base_location = connection_info['destination_node_url']
-            parts = urlparse.urlparse(base_location)
-            description_url = base_location.replace(parts.path,'/description')
-            description = json.load(urllib2.urlopen(description_url))
-            db_to_replicate = connection_info['source_node_url']
-#not  and description['gateway_node']
-            if (source_description[community_id] != description[community_id]) and ((not source_description[social_community]) or (not source_description[social_community])):
-                continue         
-            if (not connection_info[gateway_connection]) and (source_description[network_id] != description[network_id]):
+        if ((sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False)
+            or (sourceLRNode.connections is None)):
+            return
+        
+        sourceNodeDBUrl = ResourceDataModel._defaultDB.resource.url
+        
+        def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
+            replicationOptions={'filter':ResourceDataModel.DEFAULT_FILTER,  
+                                        'query_params': None}
+            
+            if ((destinationNode.filterDescription is not None) and 
+                 (destinationNode.filterDescription.custom_filter == True)):
+                try:
+                    destinationResource = couchdb.Database(destinationUrl)
+                except Exception as ex:
+                    log.exception(ex)
+                    return
+                 # Post everything directly to couchdb if the target is doing custom filter
+                 # for now we are assuming that target sink is couchdb   
+                for doc in ResourceDataModel.getAll():
+                    try:
+                                destinationDB[doc._id] = doc
+                    except:
+                        pass
+            else:
+                replicationOptions['query_params'] = destinationNode.filterDescription.specData
+                server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+    
+
+        for connection in sourceLRNode.connections:
+            # Call a get on the distribute url of the connection node 
+            if connection.active == False:
                 continue
-            if (connection_info[gateway_connection]) and (source_description[network_id] == description[network_id]):
+            destinationLRNode = None
+            try:
+                distributeInfo = json.load(
+                        urllib2.urlopen(connection.destination_node_url.strip()+"/distribute"))
+                destinationLRNode = LRNodeModel(distributeInfo['node_config'])
+            except Exception as ex:
+                log.exception(ex)
                 continue
-            if connection_info[gateway_connection] and source_description[gateway_node] and description[gateway_node]:
-                continue
-            server.replicate(db_to_replicate,base_location)
-        # url('distribute')
+        
+            if ((sourceLRNode.communityDescription.community_id != 
+                 destinationLRNode.communityDescription.community_id) and
+                 ((sourceLRNode.community.social_community == False) or
+                  (destinationLRNode.community.social_community == False))):
+                      continue
+             
+            if ((sourceLRNode.nodeDescription.gateway_node == False) and 
+                  (sourceLRNode.networkDescription.network_id != 
+                  destinationLRNode.networkDescription.network_id)):
+                      continue
+            replicationArgs = (destinationLRNode, 
+                                         defaultCouchServer, 
+                                         sourceNodeDBUrl, 
+                                         distributeInfo['distribute_sink_url'])
+                                         
+            #replicationThread = threading.Thread(target=doDistribution, 
+                                                                        #args=replicationArgs)
+            #replicationThread.start()
+            doDistribution(*args)
+
 
     def new(self, format='html'):
         """GET /distribute/new: Form to create a new item"""

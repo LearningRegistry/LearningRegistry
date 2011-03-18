@@ -15,8 +15,9 @@ import logging
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
-
 from lr.lib.base import BaseController, render
+import urllib2, json, datetime
+from lr.model import LRNode as sourceLRNode, NodeServiceModel
 
 log = logging.getLogger(__name__)
 
@@ -28,11 +29,18 @@ class ServicesController(BaseController):
 
     def index(self, format='html'):
         """GET /services: All items in the collection"""
-        import urllib2, json, time, os
-        url = 'http://localhost:5984/node/services'
-        response = urllib2.urlopen(url)
-        data = json.load(response)
-        data['timestamp'] = time.asctime()
+        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+            return "Administrative service not Available"
+            
+        data = {}
+        data['timestamp'] = str(datetime.datetime.utcnow())
+        data['node_id'] = sourceLRNode.nodeDescription.node_id
+        data['active'] =  sourceLRNode.nodeDescription.active
+        data['node_name'] = sourceLRNode.nodeDescription.node_name
+        data['services'] = []
+        for s in sourceLRNode.nodeServices:
+            data['services'].append(s.specData)
+            
         return json.dumps(data)
         # url('services')
 
