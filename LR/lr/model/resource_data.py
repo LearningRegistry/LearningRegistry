@@ -141,7 +141,7 @@ class ResourceDataModel(BaseModel):
             self.__setattr__(self._DOC_ID, doc_id)
             
     def save(self, doc_id=None, db=None):
-        return BaseModel.save(self, doc_id=self.doc_ID, db=db)
+        return BaseModel.save(self, doc_id=self.doc_ID, database=db)
 
 
 
