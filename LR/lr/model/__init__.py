@@ -99,5 +99,3 @@ def publish(envelopData):
     
     result[resourceData._DOC_ID] = resourceData.doc_ID    
     return result
-    
-

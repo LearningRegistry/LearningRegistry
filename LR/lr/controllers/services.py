@@ -30,7 +30,7 @@ class ServicesController(BaseController):
     def index(self, format='html'):
         """GET /services: All items in the collection"""
         if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
-            return "Administrative service not Available"
+            return "Administrative service is not available"
             
         data = {}
         data['timestamp'] = str(datetime.datetime.utcnow())
