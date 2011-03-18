@@ -15,9 +15,9 @@ import logging
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
-
+from lr.model import LRNode as sourceLRNode, NodeServiceModel
 from lr.lib.base import BaseController, render
-
+import json
 log = logging.getLogger(__name__)
 
 class PolicyController(BaseController):
@@ -28,12 +28,10 @@ class PolicyController(BaseController):
 
     def index(self, format='html'):
         """GET /policy: All items in the collection"""
-        import urllib2, json, time, os
-        url = 'http://localhost:5984/node/policy'
-        response = urllib2.urlopen(url)
-        data = json.load(response)
-        data['timestamp'] = time.asctime()
-        return json.dumps(data)
+        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+            return "Administrative service is not available"
+            
+        return json.dumps(sourceLRNode.networkPolicyDescription.specData)
         # url('policy')
 
     def create(self):
