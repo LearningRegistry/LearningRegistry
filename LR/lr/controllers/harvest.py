@@ -145,6 +145,8 @@ class HarvestController(BaseController):
     def edit(self, id, format='html'):
         """GET /harvest/id/edit: Form to edit an existing item"""
         # url('edit_harvest', id=ID)
+    #code below is to allow posting to /harvest/VERB
+    #as REST uses POST only for creating, posting to an existing doc isn't allowed
     @rest.dispatch_on(POST='create_getrecord')
     def getrecord(self):
        """getrecord"""
