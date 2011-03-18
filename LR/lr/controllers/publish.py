@@ -33,22 +33,10 @@ class PublishController(BaseController):
         # url('publisher')
 
     def create(self):
-##        server = couchdb.Server()
-##        db = server['resource_data']        
-##        def publish_func(doc):
-##            try:
-##                doc_id, doc_rev = db.save(doc)
-##                return {'doc_ID': doc_id, 'OK': True}
-##            except Exception as inst:       
-##                return{'doc_ID': '', 'OK': False, 'error': inst}            
         data = json.loads(request.body)
-##        
-        results = map(m.processObject,data['documents'])
-##        data = json.loads(request.body)
-#        results = m.processObject(data['documents'])
+        results = map(m.publish,data['documents'])
         return json.dumps({'OK':True, 'document_results':results})
         """POST /publisher: Create a new item"""
-        # url('publisher')
 
     def new(self, format='html'):
         return 'new'
