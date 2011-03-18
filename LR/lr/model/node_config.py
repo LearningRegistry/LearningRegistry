@@ -21,43 +21,88 @@ from datetime import datetime
 
 from node_filter import NodeFilterModel, defaultCouchServer, appConfig
 
-class LRNode(object):
+def dictToObject(dictionary):
+    class DictToObject(object):
+        def __init__(self, data):
+            self.data = data
+        def __getattr__(self, name):
+            if  isinstance(self.data, dict) and name in self.data.keys():
+                return self.data[name]
+            else:
+                raise AttributeError()
+    return DictToObject(dictionary)
+    
+class LRNodeModel(object):
     """Class that models a learning registry node"""
-    def __init__(self, config):
+    def __init__(self, data):
         
+        self._config = {}
         self._communityDescription = None
         self._networkDescription = None
         self._filterDescription = None
         
+        config = data
+        
+        if isinstance(data, dict):
+            config = dictToObject(data)
+            
         # Check first if node description is set. if not look for in the DB if not in the db
         # create it from the config and save the db.
+        
         self._communityDescription = self._initModel(CommunityModel, 
                                         config.community_description['community_id'],
                                         config.community_description)
+        self._config['community_description'] = config.community_description
         
         self._networkDescription = self._initModel(NetworkModel, 
                                                                 config.network_description['network_id'],
                                                                 config.network_description)
+        self._config['network_description'] = config.network_description
         
         self._nodeDescription = self._initModel(NodeModel, 
                                                                       config.node_description['node_id'],
                                                                       config.node_description)
-                                                                      
+        self._config['node_description'] = config.node_description
+        
         self._networkDistributionPolicy = self._initModel(NetworkPolicyModel, 
                                                                     config.network_policy_description['policy_id'],
                                                                     config.network_policy_description)
-                                                                    
-        filterDescriptionId = self._nodeDescription.node_id+"_filter"
-        self._filterDescription = self._initModel(NodeFilterModel, 
-                                                                     filterDescriptionId,
-                                                                    config.node_filter_description)
+        self._config['network_policy_description'] = config.network_policy_description
         
         self._nodeServices = []
+        self._config['node_services'] =   config.node_services
+    
         for service in config.node_services:
             self._nodeServices.append(self._initModel(NodeServiceModel,
                                                                      service['service_id'],
                                                                      service))
-     
+        
+        filterDescriptionId = self._nodeDescription.node_id+"_filter"
+        filters = None
+        try:
+            filters = config.node_filter_description
+            self._config['node_filter_description'] =filters
+        except AttributeError:
+            #There no filter for the node
+            pass
+        if filters is not None:
+            self._filterDescription = self._initModel(NodeFilterModel, 
+                                                                     filterDescriptionId,
+                                                                    config.node_filter_description)
+        
+        self._connections = []
+        connections = None
+        try:
+            connections = config.node_connectivity
+        except AttributeError:
+            # The node does not have any connections
+            pass
+        if connections is not None:
+            for connection in connections:
+                self._connections.append(self._initModel(NodeConnectivityModel,
+                                                                                connection['connection_id'],
+                                                                                connection))
+        
     def _initModel(self, modelClass, modelId, modelConf):
         modelDoc = modelClass.get(modelId)
         if modelDoc is None:
@@ -70,18 +115,22 @@ class LRNode(object):
     def _getStatusDescription(self):
         pass
         
-    def IsServiceAvailable(self, serviceType):
+    def isServiceAvailable(self, serviceType):
         """Method to test if serviceType is available """
         for service in self._nodeServices:
             if service.active == True and serviceType == service.service_type:
                 return True
         return False
-    
+  
+        
     nodeDescription = property(lambda self: self._nodeDescription, None, None, None)
     networkDescription = property(lambda self: self._networkDescription, None, None, None)
     communityDescription = property(lambda self: self._communityDescription, None, None, None)
     filterDescription = property(lambda self: self._filterDescription, None, None, None)
     networkPolicyDescription = property(lambda self: self._networkPolicyt, None, None, None)
+    config = property(lambda self: dict(self._config), None, None, None)
+    connections = property(lambda self: self._connections[:], None, None, None)
+    
     status = property(_getStatusDescription, None, None, None)
 
 
