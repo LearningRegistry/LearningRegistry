@@ -17,6 +17,8 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
 from lr.lib.base import BaseController, render
+from lr.model import LRNode as sourceLRNode, NodeServiceModel
+import json
 
 log = logging.getLogger(__name__)
 
@@ -28,13 +30,10 @@ class StatusController(BaseController):
 
     def index(self, format='html'):
         """GET /status: All items in the collection"""
-        import urllib2, json, time, os
-        url = 'http://localhost:5984/node/status'
-        response = urllib2.urlopen(url)
-        data = json.load(response)
-        data['timestamp'] = time.asctime()
-        data['start_time'] = os.system('who -b')
-        return json.dumps(data)
+        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+            return "Administrative service not available"
+            
+        return json.dumps(sourceLRNode.status)
         # url('status')
 
     def create(self):
