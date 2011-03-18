@@ -18,7 +18,7 @@ from network_policy import NetworkPolicyModel
 from node_connectivity import NodeConnectivityModel
 from node_service import NodeServiceModel
 from datetime import datetime
-
+from resource_data import ResourceDataModel
 from node_filter import NodeFilterModel, defaultCouchServer, appConfig
 
 def dictToObject(dictionary):
@@ -40,7 +40,7 @@ class LRNodeModel(object):
         self._communityDescription = None
         self._networkDescription = None
         self._filterDescription = None
-        
+        self._nodeStatus = None
         config = data
         
         if isinstance(data, dict):
@@ -102,6 +102,7 @@ class LRNodeModel(object):
                 self._connections.append(self._initModel(NodeConnectivityModel,
                                                                                 connection['connection_id'],
                                                                                 connection))
+        self._setNodeStatus() 
         
     def _initModel(self, modelClass, modelId, modelConf):
         modelDoc = modelClass.get(modelId)
@@ -111,9 +112,31 @@ class LRNodeModel(object):
             return model
         else:
             return modelClass(modelDoc)
-            
+     
+    def _setNodeStatus(self):
+        nodeStatus = None
+        nodeStatusId = "status_"+self._nodeDescription.node_id
+        nodeStatus = NodeStatusModel.get(nodeStatusId)
+        if nodeStatus is None:
+            statusData = NodeStatusModel()
+            statusData.active = self.nodeDescription.active
+            statusData.node_id = self.nodeDescription.node_id
+            statusData.node_name = self.nodeDescription.node_name
+            statusData.start_time = str(datetime.utcnow())
+            statusData.install_time = statusData.start_time
+            statusData.save(doc_id = nodeStatusId)
+        else:
+            nodeStatus = NodeStatusModel(nodeStatus)
+            nodeStatus.start_time = str(datetime.utcnow())
+            nodeStatus.update()
+        self._nodeStatus = nodeStatus
+          
     def _getStatusDescription(self):
-        pass
+        statusData = {'doc_count': ResourceDataModel._defaultDB.info()['doc_count'],
+                                'timestamp': str(datetime.utcnow())}
+        statusData.update(self._nodeStatus.specData)
+        return statusData
+        
         
     def isServiceAvailable(self, serviceType):
         """Method to test if serviceType is available """
@@ -130,6 +153,7 @@ class LRNodeModel(object):
     networkPolicyDescription = property(lambda self: self._networkPolicyt, None, None, None)
     config = property(lambda self: dict(self._config), None, None, None)
     connections = property(lambda self: self._connections[:], None, None, None)
+    nodeServices = property(lambda self: self._nodeServices[:], None, None, None)
     
     status = property(_getStatusDescription, None, None, None)
 
