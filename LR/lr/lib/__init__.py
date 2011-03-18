@@ -1,3 +1,3 @@
-from model_parser import ModelParser
+from model_parser import ModelParser, getFileString
 
-__all__=[ModelParser]
+__all__=['ModelParser', 'getFileString']
