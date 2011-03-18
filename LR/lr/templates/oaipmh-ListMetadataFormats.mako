@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 <?xml version="1.0" encoding="UTF-8"?>
-<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+<OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
+         xmlns:oai="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
-         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd">
   <responseDate>${c.datetime_now | x}</responseDate>
   % if c.identifier == None:
   <request verb="ListMetadataFormats">${c.path_url | x}</request>
