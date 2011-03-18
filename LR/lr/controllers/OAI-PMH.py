@@ -12,6 +12,7 @@ import json, iso8601
 from couchdb.http import ResourceNotFound
 from lr.lib.oaipmherrors import *
 
+
 log = logging.getLogger(__name__)
 
 class OaiPmhController(BaseController):
@@ -22,28 +23,49 @@ class OaiPmhController(BaseController):
     def _isTrue(self, value):
         return str(value).lower() in ['true', 't', '1', 'y', 'yes']
     
+    def _getParams(self):
+        req_params = {}
+        
+        if request.method == "POST":
+            req_params = dict(request.params.copy(), **self._parameterizePOSTBody())
+        else:
+            req_params = request.params.copy()
+        return req_params
+    
+    def _parameterizePOSTBody(self):
+        from urlparse import parse_qs
+        req_params = {}
+        try:
+            params = parse_qs(qs=request.body)
+            for key in params.keys():
+                req_params[key] = params[key][0]
+        except:
+            log.exception("Unable to parse POST.")
+        return req_params
+    
     def _parseParams(self):
         params = {}
-        if (request.params.has_key('verb') == False) :
+        req_params = self._getParams()
+        if (req_params.has_key('verb') == False) :
             raise BadVerbError()
         
-        verb = params["verb"] = request.params['verb']
+        verb = params["verb"] = req_params['verb']
         
         if verb not in ["GetRecord", "ListRecords", "ListIdentifiers", "Identify", "ListMetadataFormats", "ListSets"]:
             raise BadVerbError()
         
         if verb == 'GetRecord' or verb == 'ListRecords' or verb == 'ListIdentifiers':        
-            if request.params.has_key('metadataPrefix') == False:
+            if req_params.has_key('metadataPrefix') == False:
                 raise BadArgumentError('metadataPrefix is a required parameter.', verb)
-            params["metadataPrefix"] = metadataPrefix = request.params['metadataPrefix']
+            params["metadataPrefix"] = metadataPrefix = req_params['metadataPrefix']
         
         if verb == 'GetRecord' or verb == 'ListMetadataFormats':
-            if request.params.has_key('by_doc_ID') and request.params.has_key('by_resource_ID'):
-                if self._isTrue(request.params['by_doc_ID']) == self._isTrue(request.params['by_resource_ID']):
+            if req_params.has_key('by_doc_ID') and req_params.has_key('by_resource_ID'):
+                if self._isTrue(request.params['by_doc_ID']) == self._isTrue(req_params['by_resource_ID']):
                     raise BadArgumentError('by_doc_ID and by_resource_ID have conflicting values.', verb)
                 
-            if request.params.has_key('by_doc_ID'):
-                params['by_doc_ID'] = self._isTrue(request.params['by_doc_ID'])
+            if req_params.has_key('by_doc_ID'):
+                params['by_doc_ID'] = self._isTrue(req_params['by_doc_ID'])
                 params['by_resource_ID'] = not params['by_doc_ID']
             else:
                 params['by_doc_ID'] = False
@@ -54,7 +76,7 @@ class OaiPmhController(BaseController):
                 params['by_doc_ID'] = not params['by_resource_ID']
         
         if verb == 'ListRecords' or verb == 'ListIdentifiers':
-            if request.params.has_key('from'):
+            if req_params.has_key('from'):
                 try:
                     from_date = iso8601.parse_date(request.params['from'])
                     params['from'] = h.convertToISO8601UTC(from_date)
@@ -63,9 +85,9 @@ class OaiPmhController(BaseController):
             else:
                 params['from'] = None
             
-            if request.params.has_key('until'):
+            if req_params.has_key('until'):
                 try:
-                    until_date = iso8601.parse_date(request.params['until'])
+                    until_date = iso8601.parse_date(req_params['until'])
                     params['until'] = h.convertToISO8601UTC(until_date)
                 except:
                     raise BadArgumentError('until does not parse to ISO 8601.', verb)
@@ -75,14 +97,14 @@ class OaiPmhController(BaseController):
             if params['from'] != None and params['until'] != None and params['from'] > params['until']:
                 raise BadArgumentError('until cannot preceed from.', verb)
         
-        if verb in ['ListMetadataFormats', 'GetRecord']  and request.params.has_key('identifier'):
-            params['identifier'] = request.params['identifier']
+        if verb in ['ListMetadataFormats', 'GetRecord']  and req_params.has_key('identifier'):
+            params['identifier'] = req_params['identifier']
         elif verb == 'ListMetadataFormats':
             params['identifier'] = None
             params['by_doc_ID'] = None
             params['by_resource_ID'] = None
         
-        if verb == 'GetRecord' and params.has_key('identifier') == False:
+        if verb == 'GetRecord' and req_params.has_key('identifier') == False:
             raise BadArgumentError('identifier is a required parameter.', verb)
         
         return params
@@ -108,9 +130,7 @@ class OaiPmhController(BaseController):
         if params.has_key("identifier"):
             c.identifier = params["identifier"]
         
-
-    def index(self, format='html'):
-        """GET /OAI-PMH: All items in the collection"""
+    def _handleOAIRequest(self, format='html'):
         o = oaipmh()
         
         def GetRecord(params):
@@ -222,10 +242,16 @@ class OaiPmhController(BaseController):
         except Error as e:
             c.error = e
             return self._returnResponse(render('oaipmh-Error.mako'))
+
+        
+    def index(self, format='xml'):
+        """GET /OAI-PMH: All items in the collection"""
+        return self._handleOAIRequest(format)
         # url('OAI-PMH')
 
     def create(self):
         """POST /OAI-PMH: Create a new item"""
+        return self._handleOAIRequest()
         # url('OAI-PMH')
 
     def new(self, format='html'):
@@ -257,3 +283,4 @@ class OaiPmhController(BaseController):
     def edit(self, id, format='html'):
         """GET /OAI-PMH/id/edit: Form to edit an existing item"""
         # url('edit_OAI-PMH', id=ID)
+
