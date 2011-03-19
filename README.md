@@ -215,6 +215,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 >       ./pip install --upgrade couchdb
 >       ./pip install restkit
 >       ./pip install lxml
+>       ./pip install iso8601
 
   
 ## Configure Nginx - Should be preinstalled on Ubuntu ##
