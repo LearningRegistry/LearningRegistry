@@ -31,7 +31,7 @@ class DescriptionController(BaseController):
     def index(self, format='html'):
         """GET /description: All items in the collection"""
         if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
-            return "Administrative service not availble"
+            return "Administrative service is not available"
             
         data = {}
         data['timestamp'] = str(datetime.utcnow())

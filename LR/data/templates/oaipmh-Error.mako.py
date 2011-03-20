@@ -4,8 +4,8 @@ UNDEFINED = runtime.UNDEFINED
 __M_dict_builtin = dict
 __M_locals_builtin = locals
 _magic_number = 6
-_modified_time = 1299891833.078925
-_template_filename='/Users/jklo/Git/LearningRegistry-STEM-fork/LR/lr/templates/oaipmh-Error.mako'
+_modified_time = 1300418322.830195
+_template_filename='/home/wegrata/LearningRegistry/LR/lr/templates/oaipmh-Error.mako'
 _template_uri='oaipmh-Error.mako'
 _template_cache=cache.Cache(__name__, _modified_time)
 _source_encoding='utf-8'
@@ -21,7 +21,7 @@ def render_body(context,**pageargs):
         hasattr = context.get('hasattr', UNDEFINED)
         __M_writer = context.writer()
         # SOURCE LINE 2
-        __M_writer(u'<?xml version="1.0" encoding="UTF-8"?>\n<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" \n         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/\n         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">\n  <responseDate>')
+        __M_writer(u'<?xml version="1.0" encoding="UTF-8"?>\n<OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"\n         xmlns:oai="http://www.openarchives.org/OAI/2.0/"\n         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd" >\n  <responseDate>')
         # SOURCE LINE 7
         __M_writer(filters.xml_escape(escape(c.error.datetime_now )))
         __M_writer(u'</responseDate>\n')
