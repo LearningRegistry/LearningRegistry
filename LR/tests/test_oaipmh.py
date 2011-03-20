@@ -8,13 +8,7 @@ import logging
 import unittest
 from lxml import etree
 import urllib2
-json_headers = {
-                "Content-Type" : "application/json"
-                }
-xml_headers = {
-                "Content-Type" : "text/xml"
-                }
-
+from tests import xml_headers
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
