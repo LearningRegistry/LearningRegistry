@@ -14,85 +14,7 @@ class HarvestController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')
-
-    def index(self, format='html'):
-        """GET /harvest: All items in the collection"""
-        # url('harvest')
-
-    def create(self):
-        """POST /harvest: Create a new item"""
-        # url('harvest')
-
-    def new(self, format='html'):
-        """GET /harvest/new: Form to create a new item"""
-        # url('new_harvest')
-
-    def update(self, id):
-        """PUT /harvest/id: Update an existing item"""
-        # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="PUT" />
-        # Or using helpers:
-        #    h.form(url('harvest', id=ID),
-        #           method='put')
-        # url('harvest', id=ID)
-        post_data = json.loads(request.body)      
-        if post_data.has_key('from'):        
-            from_date = datetime.strptime(post_data['from'],time_format)
-        else:
-            from_date = datetime.datetime(1,1,datetime.MINYEAR)
-        if post_data.has_key('until'):
-            until_date = datetime.strptime(post_data['until'],time_format)
-        else:
-            until_date = datetime.datetime(1,1,datetime.MAXYEAR)
-        if from_date > until_date:
-            raise Exception('Bad argument: from must come before until')
-        def listidentifiers():
-            return self.list_identifiers(from_date,until_date,'POST')            
-        def listrecords():
-            return self.list_records(from_date,until_date,'POST')
-        switch = {
-                    'listrecords':listrecords,
-                    'listidentifiers':listidentifiers,
-                 }
-        return switch[id]()
-    def delete(self, id):
-        """DELETE /harvest/id: Delete an existing item"""
-        # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="DELETE" />
-        # Or using helpers:
-        #    h.form(url('harvest', id=ID),
-        #           method='delete')
-        # url('harvest', id=ID)
-    def list_records(self,from_date, until_date, h , body , params, verb = 'GET' ):
-        data = self.get_base_response(verb,body)
-        data['request']['from'] = params['from']
-        data['request']['until'] = params['until']
-        data['listrecords'] =   map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},h.list_records(from_date,until_date))
-        return json.dumps(data)
-
-    def list_identifiers(self,from_date, until_date,h,body ,params, verb = 'GET'):
-        data = self.get_base_response(verb,body)
-        data['request']['from'] = params['from']
-        data['request']['until'] = params['until']
-        data['listidentifiers'] =  map(lambda doc: {"header":{'identifier':doc, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},h.list_identifiers(from_date,until_date))
-        return json.dumps(data)
-
-    def get_base_response(self, verb, body):
-      return {
-               'OK':True,
-               'error':'',
-               'responseDate':datetime.today().strftime(time_format),
-               'request':{
-                 'verb':verb,
-                 'HTTP_request': body
-                 }    
-              }
-
-    def show(self, id, format='html'):
-      return self.harvest(request.params,request.body,id)
-
     def harvest(self, params, body,verb):
-        """GET /harvest/id: Show a specific item"""
         h = harvest()
         def getrecord():
           by_doc_ID =params.has_key('by_doc_ID') and params['by_doc_ID']
@@ -141,10 +63,58 @@ class HarvestController(BaseController):
                     'listsets': listsets
                  }
         return switch[verb]()
-        # url('harvest', id=ID)
+    def list_records(self,from_date, until_date, h , body , params, verb = 'GET' ):
+        data = self.get_base_response(verb,body)
+        data['request']['from'] = params['from']
+        data['request']['until'] = params['until']
+        data['listrecords'] =   map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},h.list_records(from_date,until_date))
+        return json.dumps(data)
+
+    def list_identifiers(self,from_date, until_date,h,body ,params, verb = 'GET'):
+        data = self.get_base_response(verb,body)
+        data['request']['from'] = params['from']
+        data['request']['until'] = params['until']
+        data['listidentifiers'] =  map(lambda doc: {"header":{'identifier':doc, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},h.list_identifiers(from_date,until_date))
+        return json.dumps(data)
+
+    def get_base_response(self, verb, body):
+      return {
+               'OK':True,
+               'error':'',
+               'responseDate':datetime.today().strftime(time_format),
+               'request':{
+                 'verb':verb,
+                 'HTTP_request': body
+                 }    
+              }
+
+
+    def index(self, format='html'):
+        """GET /harvest: All items in the collection"""
+        abort(405,'Method not allowed')
+
+    def create(self):
+        """POST /harvest: Create a new item"""
+        abort(405,'Method not allowed')
+
+    def new(self, format='html'):
+        """GET /harvest/new: Form to create a new item"""
+        abort(405,'Method not allowed')
+        # url('new_harvest')
+
+    def update(self, id):
+        """PUT /harvest/id: Update an existing item"""
+        abort(405,'Method not allowed')
+    def delete(self, id):
+        """DELETE /harvest/id: Delete an existing item"""
+        abort(405,'Method not allowed')
+    def show(self, id, format='html'):
+        """GET /harvest/id: Show a specific item"""
+        return self.harvest(request.params,request.body,id)
     def edit(self, id, format='html'):
         """GET /harvest/id/edit: Form to edit an existing item"""
-        # url('edit_harvest', id=ID)
+        abort(405,'Method not allowed')
+
     #code below is to allow posting to /harvest/VERB
     #as REST uses POST only for creating, posting to an existing doc isn't allowed
     @rest.dispatch_on(POST='create_getrecord')
