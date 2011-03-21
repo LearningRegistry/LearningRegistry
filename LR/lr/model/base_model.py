@@ -57,8 +57,14 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             sourceDB = db
             if db is None:
                 sourceDB = cls._defaultDB
+                
             view = sourceDB.view('_all_docs', include_docs=True)
-    
+            # filter out any design design document.
+            designDocId = "_design/"+sourceDB.name
+            filteredView = filter(lambda row, key=designDocId: row.key != key, view)
+            
+            return [sourceDB[row.key] for row in filteredView]
+            
         def __init__(self, data=None):
             
             # Use a static string for to set the spec data property to make easy to 
