@@ -115,16 +115,16 @@ class LRNodeModel(object):
      
     def _setNodeStatus(self):
         nodeStatus = None
-        nodeStatusId = "status_"+self._nodeDescription.node_id
+        nodeStatusId = self._nodeDescription.node_id+"_node_status"
         nodeStatus = NodeStatusModel.get(nodeStatusId)
         if nodeStatus is None:
-            statusData = NodeStatusModel()
-            statusData.active = self.nodeDescription.active
-            statusData.node_id = self.nodeDescription.node_id
-            statusData.node_name = self.nodeDescription.node_name
-            statusData.start_time = str(datetime.utcnow())
-            statusData.install_time = statusData.start_time
-            statusData.save(doc_id = nodeStatusId)
+            nodeStatus = NodeStatusModel()
+            nodeStatus.active = self.nodeDescription.active
+            nodeStatus.node_id = self._nodeDescription.node_id
+            nodeStatus.node_name = self.nodeDescription.node_name
+            nodeStatus.start_time = str(datetime.utcnow())
+            nodeStatus.install_time = nodeStatus.start_time
+            nodeStatus.save(doc_id = nodeStatusId)
         else:
             nodeStatus = NodeStatusModel(nodeStatus)
             nodeStatus.start_time = str(datetime.utcnow())
