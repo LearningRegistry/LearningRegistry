@@ -36,6 +36,13 @@ from optparse import OptionParser
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
+#config = {
+#    "server": "http://memory.loc.gov",
+#    "path": "/cgi-bin/oai2_0",
+#    "verb": "ListRecords",
+#    "metadataPrefix":"oai_dc",
+#    "set":None
+#}
 config = {
     "server": "http://www.dls.ucar.edu",
     "path": "/dds_se/services/oai2-0",
@@ -60,9 +67,6 @@ namespaces = {
               "xsi":"http://www.w3.org/2001/XMLSchema-instance"
               }
 # http://hal.archives-ouvertes.fr/oai/oai.php?verb=ListRecords&metadataPrefix=oai_dc
-
-# _LEARNING_REGISTRY_URL = "http://learningregistry.couchdb:5984"
-_LEARNING_REGISTRY_URL_DEFAULT = _LEARNING_REGISTRY_URL = "http://learningregistry.vm"
 
 class Error(Exception):
     pass
@@ -89,6 +93,10 @@ def getDocTemplate():
 def formatOAIDoc(record):
     doc = getDocTemplate()
     resource_locator = record.xpath("oai:metadata/oai_dc:dc/dc:identifier/text()", namespaces=namespaces)
+    
+    if resource_locator == None or len(resource_locator) == 0:
+        return None
+    
     subject = record.xpath("oai:metadata/oai_dc:dc/dc:subject/text()", namespaces=namespaces)
     language = record.xpath("oai:metadata/oai_dc:dc/dc:language/text()", namespaces=namespaces)
     payload = record.xpath("oai:metadata/oai_dc:dc", namespaces=namespaces)
@@ -99,7 +107,7 @@ def formatOAIDoc(record):
     doc["keys"].extend(language)
 
     
-    doc["payload_schema"].append("OAI DC 2.0")
+    doc["payload_schema"].append("oai_dc")
     doc["payload_schema_locator"] = "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
     
     doc["payload_placement"] = "inline"
@@ -114,6 +122,10 @@ def formatOAIDoc(record):
 def formatNSDLDoc(record):
     doc = getDocTemplate()
     resource_locator = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dc:identifier/text()", namespaces=namespaces)
+    
+    if resource_locator == None or len(resource_locator) == 0:
+        return None
+    
     subject = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dc:subject/text()", namespaces=namespaces)
     language = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dc:language/text()", namespaces=namespaces)
     edLevel = record.xpath("oai:metadata/nsdl_dc:nsdl_dc/dct:educationLevel/text()", namespaces=namespaces)
@@ -126,7 +138,7 @@ def formatNSDLDoc(record):
     doc["keys"].extend(edLevel)
     
     
-    doc["payload_schema"].append("NSDL DC 1.02.020")
+    doc["payload_schema"].append("nsdl_dc")
     doc["payload_schema_locator"] = "http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd"
     
     doc["payload_placement"] = "inline"
@@ -138,13 +150,14 @@ def formatNSDLDoc(record):
     
     return doc
     
-def bulkUpdate(list):
+def bulkUpdate(list, opts):
     '''
     Save to Learning Registry
     '''
     if len(list) > 0:
         try:
-            res = Resource(_LEARNING_REGISTRY_URL)
+            log.info("Learning Registry Node URL: '{0}'\n".format(opts.LEARNING_REGISTRY_URL))
+            res = Resource(opts.LEARNING_REGISTRY_URL)
             body = { "documents":list }
             log.info("request body: %s" % (json.dumps(body),))
             clientResponse = res.post(path="/publish", payload=json.dumps(body), headers={"Content-Type":"application/json"})
@@ -233,28 +246,39 @@ def retrieveFromUrlWaiting(request,
     return text            
       
 
-def connect():
+def connect(opts):
     for recset in fetchRecords(config):
         docList = []
         for rec in recset:
             if config["metadataPrefix"] == "oai_dc":
-                docList.append(formatOAIDoc(rec))
+                doc = formatOAIDoc(rec)
+                if (doc != None):
+                    docList.append(doc)
             if config["metadataPrefix"] == "nsdl_dc":
-                docList.append(formatNSDLDoc(rec))
+                doc = formatNSDLDoc(rec)
+                if (doc != None):
+                    docList.append(doc)
         try:
             print(json.dumps(docList))
         except:
             log.exception("Problem w/ JSON dump")
-        bulkUpdate(docList)
+        bulkUpdate(docList, opts)
        
-def parseCmdLine():
-    parser = OptionParser()
-    parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=_LEARNING_REGISTRY_URL_DEFAULT)
-    (options, args) = parser.parse_args()
-    _LEARNING_REGISTRY_URL = options.registryUrl    
-    log.info("Learning Registry Node URL: '{0}'\n".format(_LEARNING_REGISTRY_URL))
+
+    
+class Opts:
+    def __init__(self):
+        self.LEARNING_REGISTRY_URL = "http://learningregistry.vm"
+        
+        parser = OptionParser()
+        parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
+        (options, args) = parser.parse_args()
+        self.LEARNING_REGISTRY_URL = options.registryUrl    
+
+       
 
 if __name__ == '__main__':
     log.info("Update Started.")
-    connect()
+    opts = Opts()
+    connect(opts)
     log.info("Done Updating.")

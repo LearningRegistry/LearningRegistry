@@ -84,8 +84,11 @@ def publish(envelopData):
         resourceData = ResourceDataModel(envelopData)
         isFilteredOut, reason = isResourceDataFilteredOut(resourceData)
         if isFilteredOut:
-            log.debug("filter out document: "+reason+"\n"+
+            output_message = "filter out document: "+reason+"\n"
+            log.debug(output_message +
                             pprint.pformat(envelopData, indent=4, width=80)+"\n\n")
+            result[_OK] = False
+            result['error'] = output_message
             return result
         resourceData.publishing_node = LRNode.nodeDescription.node_id
         resourceData.save()

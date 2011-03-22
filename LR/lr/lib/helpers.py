@@ -24,3 +24,13 @@ def importModuleFromFile(fullpath):
     finally:
         del sys.path[-1]
         return module
+
+def convertToISO8601UTC(datetime=None):
+    if datetime != None:
+        return (datetime - datetime.utcoffset()).replace(tzinfo=None)
+    return datetime
+        
+def convertToISO8601Zformat(datetime=None):
+    if datetime != None:
+        return ((datetime - datetime.utcoffset()).replace(tzinfo=None)).isoformat() + "Z" 
+    return datetime

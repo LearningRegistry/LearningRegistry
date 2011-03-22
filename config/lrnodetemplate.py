@@ -35,7 +35,24 @@ default_services = {'timestamp':        'string',
                     'active':        True,    
                     'node_id':        'string',
                     'node_name':        'string',
-                    'services':[{'active':        True,  
+                    'services':[{
+                                 "doc_type": "service_description",
+                                 "doc_version": "0.10.0",
+                                 "doc_scope": "node",
+                                 "active": True,
+                                 "service_id": "C47ADC73-987B-4EFE-BE32-77B241025795",
+                                 "service_type": "access",
+                                 "service_name": "OAI-PMH Harvest",
+                                 "service_version": "0.10.0",
+                                 "service_endpoint": "<nodeUrl>/OAI-PMH",
+                                 "service_auth": "xxxx",    # a value that is not public access to the service
+                                 "service_data": {
+                                                  "version": "OAI-PMH 2.0",
+                                                  "schemalocation": "http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd"    # location of the Learning Registry Extended OAI-PMH
+                                                                # XSD used to validate service responses
+                                                }
+                                 },
+                                {'active':        True,  
                                  'service_id':        'string',
                                  'service_type':    'string',        
                                  'service_name':    'string',

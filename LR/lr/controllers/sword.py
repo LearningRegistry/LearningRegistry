@@ -28,6 +28,8 @@ class SwordController(BaseController):
         c.user_agent = request.headers['user-agent']
         c.no_op = False
         c.verbose = False
+        if request.headear.has_key('X-On-Behalf-Of'):
+          c.on_behalf_of = request.headers['X-On-Behalf-Of']
         if request.headers.has_key('X-Verbose'):
           c.verbose = request.headers.has_key('X-Verbose')
           log.debug(c.verbose)           
