@@ -1,7 +1,8 @@
 #!/usr/bin/python
 import couchdb, json
 from datetime import datetime
-
+import logging
+log = logging.getLogger(__name__)
 class harvest:
   def __init__(self, server='http://localhost:5984', database='resource_data'):
     server = couchdb.Server(server)
