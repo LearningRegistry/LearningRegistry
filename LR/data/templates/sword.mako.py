@@ -3,8 +3,8 @@ from mako import runtime, filters, cache
 UNDEFINED = runtime.UNDEFINED
 __M_dict_builtin = dict
 __M_locals_builtin = locals
-_magic_number = 5
-_modified_time = 1300301263.0150139
+_magic_number = 6
+_modified_time = 1300658002.209965
 _template_filename='/home/wegrata/LearningRegistry/LR/lr/templates/sword.mako'
 _template_uri='sword.mako'
 _template_cache=cache.Cache(__name__, _modified_time)

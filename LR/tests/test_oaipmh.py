@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 Created on Mar 15, 2011
 
@@ -8,6 +9,7 @@ import unittest
 from lxml import etree
 import urllib2
 from headers import xml_headers
+
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -29,6 +31,7 @@ class Test(unittest.TestCase):
         schema_doc = etree.parse(schema_file)
         self._lrschema = etree.XMLSchema(schema_doc)
         
+
     #@unittest.skip("Skip, can't validate nested schemas quite yet")
     def testGetRecordByDocID(self):
         query = self._queryServiceUrl.format("verb=GetRecord&by_doc_ID=true&metadataPrefix=nsdl_dc&identifier=5c1070a1c5cb4eda8d460cf9b004c22a")
@@ -62,6 +65,7 @@ class Test(unittest.TestCase):
                 print "{0}\t{1}".format(line, i)
                 line += 1
             self.fail(query+'\n'+e.message)
+
 
     #@unittest.skip("Skip, can't validate nested schemas quite yet")
     def testListIdentifiers(self):
