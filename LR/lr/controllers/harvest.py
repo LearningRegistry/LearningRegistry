@@ -5,34 +5,48 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
 from lr.lib.base import BaseController, render
-
 log = logging.getLogger(__name__)
 time_format = '%Y-%m-%d %H:%M:%S.%f'
-
+import ast
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')
-    def harvest(self, params, body,verb):
+    def harvest(self, params, body, verb):
         h = harvest()
         def getrecord():
-          by_doc_ID =params.has_key('by_doc_ID') and params['by_doc_ID']
-          request_id = params['request_id']
+          data = self.get_base_response(verb,body)
+          by_doc_ID = params.has_key('by_doc_ID') and ast.literal_eval(str(params['by_doc_ID']))
+          by_resource_ID = params.has_key('by_resource_ID') and ast.literal_eval(str(params['by_resource_ID']))
+          if not params.has_key('request_id'):
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            return json.dumps(data)
+          if by_doc_ID and by_resource_ID:
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            return json.dumps(data)
+
+          request_id = params['request_id']          
           if by_doc_ID:
-            return json.dumps(h.get_record(request_id))
+            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},[h.get_record(request_id)])
           else:
-            return json.dumps(h.get_records_by_resource(request_id))
+            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+          data['getrecord'] ={
+            'record': records
+            }
+          return json.dumps(data)
         def listidentifiers():
             from_date = datetime.strptime(params['from'],time_format)
             until_date = datetime.strptime(params['until'],time_format)
-            return self.list_identifiers(from_date,until_date,h,body,params)            
+            return self.list_identifiers(from_date,until_date,h,body,params,verb)            
         def listrecords():
             from_date = datetime.strptime(params['from'],time_format)
             until_date = datetime.strptime(params['until'],time_format)
-            return self.list_records(from_date,until_date,h,body,params)
+            return self.list_records(from_date,until_date,h,body,params,verb)
         def identify():
-            data = self.get_base_response("GET",body)
+            data = self.get_base_response(verb,body)
             data['identify']={
                                     'node_id':        'string',
                                     'repositoryName':    'string',
@@ -46,11 +60,11 @@ class HarvestController(BaseController):
                                  }
             return json.dumps(data)
         def listmetadataformats():
-            data = self.get_base_response("GET",body)
+            data = self.get_base_response(verb,body)
             data['metadataFormat']=h.list_metadata_formats()
             return json.dumps(data)
         def listsets():
-            data = self.get_base_response("GET",body)
+            data = self.get_base_response(verb,body)
             data['OK']=False
             data['error']='noSetHierarchy'
             return json.dumps(data)
@@ -67,7 +81,14 @@ class HarvestController(BaseController):
         data = self.get_base_response(verb,body)
         data['request']['from'] = params['from']
         data['request']['until'] = params['until']
-        data['listrecords'] =   map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},h.list_records(from_date,until_date))
+        def debug_map(doc):
+            data ={'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'},'resource_data':doc}}
+            return data
+        if from_date > until_date:
+          data['OK'] = False
+          data['error'] = 'badArgument'
+        else:
+          data['listrecords'] =   map(debug_map,h.list_records(from_date,until_date))
         return json.dumps(data)
 
     def list_identifiers(self,from_date, until_date,h,body ,params, verb = 'GET'):
@@ -144,21 +165,18 @@ class HarvestController(BaseController):
     def identify(self):
        """identify"""
        log.debug('test')
-    def create_identify(self):
-       params = json.loads(request.body)       
-       return self.harvest(params,request.body,'identify')
+    def create_identify(self):       
+       return self.harvest(None,request.body,'identify')
 
     @rest.dispatch_on(POST='create_listmetadataformats')
     def listmetadataformats(self):
        """listmetadataformats"""
-    def create_listmetadataformats(self):
-       params = json.loads(request.body)       
-       return self.harvest(params,request.body,'listmetadataformats')
+    def create_listmetadataformats(self):      
+       return self.harvest(None,request.body,'listmetadataformats')
 
     @rest.dispatch_on(POST='create_listsets')
     def listsets(self):
         """listsets"""
     def create_listsets(self):
-       params = json.loads(request.body)       
-       return self.harvest(params,request.body,'listsets')
+       return self.harvest(None,request.body,'listsets')
 

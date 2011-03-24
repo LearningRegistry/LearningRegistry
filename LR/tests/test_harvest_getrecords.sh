@@ -1,1 +1,1 @@
-curl -v -H "Content-Type: application/json" -X POST  -d '{ "request_id":"0000117177e842abb5e954a9d03cf464","by_doc_ID":true,"by_resource_ID":true }' http://localhost/harvest/getrecord > harvest.htm && firefox harvest.htm
+curl -v -H "Content-Type: application/json" -X POST  -d '{ "request_id":"http://www.scholaris.pl/cms/index.php/resources/8640.html","by_doc_ID":false,"by_resource_ID":true }' http://localhost/harvest/getrecord > harvest.htm && firefox harvest.htm

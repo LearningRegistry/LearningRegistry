@@ -14,11 +14,12 @@ from paste.script.appinstall import SetupCommand
 from pylons import url
 from routes.util import URLGenerator
 from webtest import TestApp
-
+from datetime import datetime
 import pylons.test
-
+import logging
+log = logging.getLogger(__name__)
 __all__ = ['environ', 'url', 'TestController']
-
+time_format = '%Y-%m-%d %H:%M:%S.%f'
 # Invoke websetup with the current config file
 SetupCommand('setup-app').run([pylons.test.pylonsapp.config['__file__']])
 
@@ -32,3 +33,5 @@ class TestController(TestCase):
         self.app = TestApp(wsgiapp)
         url._push_object(URLGenerator(config['routes.map'], environ))
         TestCase.__init__(self, *args, **kwargs)
+        self.from_date = datetime(1900,1,1).strftime(time_format)
+        self.until_date = datetime.today().strftime(time_format)
