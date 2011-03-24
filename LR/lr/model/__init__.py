@@ -41,6 +41,7 @@ def isResourceDataFilteredOut(resourceData):
         return [False, None]
     
     matchResult = False
+    envelopFilter = ""
     for f in LRNode.filterDescription.filter:
         log.info("\n"+str(f)+"\n")
         # Ckeck if jsonObject object has the key if it has search 
@@ -50,16 +51,18 @@ def isResourceDataFilteredOut(resourceData):
         
         for k in resourceData._specData.keys():
             if re.search(key, k) is not None:
-                resourceValue = resourceData.__getattr__(k)
+                resourceValue = str(resourceData.__getattr__(k))
                 break
 
         if  resourceValue is None:
             continue
             
         value = f['filter_value']
-        log.info("\n"+str(key)+", "+str(value)+", "+str(resourceValue)+"\n")
-        if(re.search(value, str(resourceValue)) is not None):
+        log.info("\n"+str(key)+", "+str(value)+", "+ resourceValue+"\n")
+        if(re.search(value,  resourceValue) is not None):
             matchResult = True
+            envelopFilter = "Filter '"+str(f)+"' for key '"+str(key)+\
+                                      "' matches '"+resourceValue+"'"
             break
     
     #Check if what matching means base on the include_exclude
@@ -70,10 +73,11 @@ def isResourceDataFilteredOut(resourceData):
     if LRNode.filterDescription.include_exclude is None or \
         LRNode.filterDescription.include_exclude == True:
         if matchResult == False:
-            return True, "+excluded by filter: "+str(f)
+            return True, "\nDocument failed to match filter: \n"+\
+                           pprint.pformat(LRNode.filterDescription.specData, indent=4)+"\n"
     else:
         if matchResult == True:
-           return True, "-excluded by filter: "+str(f)
+           return True, "\nExcluded by filter: \n"+envelopFilter
          
     return [False, None]
     
@@ -88,16 +92,16 @@ def publish(envelopData):
             log.debug(output_message +
                             pprint.pformat(envelopData, indent=4, width=80)+"\n\n")
             result[_OK] = False
-            result['error'] = output_message
+            result['error'] = output_message.replace("\n", "<br />")
             return result
         resourceData.publishing_node = LRNode.nodeDescription.node_id
         resourceData.save()
     except Exception as ex:
         error_message = "\n"+pprint.pformat(str(ex), indent=4)+"\n"+\
-                                     pprint.pformat(envelopData, indent=4)+"\n\n"
+                                     pprint.pformat(envelopData, indent=4)+"\n"
         log.exception(ex)
         result[_OK]= False
-        result[_ERROR] = error_message
+        result[_ERROR] = error_message.replace("\n", "<br />")
         return result
     
     result[resourceData._DOC_ID] = resourceData.doc_ID    

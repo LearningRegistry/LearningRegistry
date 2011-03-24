@@ -62,11 +62,8 @@ node_filter_description= {
                     "active": True,
                     "filter_name": node_description['node_id']+"node_filter",
                     "custom_filter": False,
-                    "include_exclude": True,
-                    "filter": [
-                                {"filter_key": "keys",
-                                 "filter_value": "test"}
-                            ]
+                    "include_exclude":  False,
+                    "filter": [] 
                 }
 
 node_services=[ 
