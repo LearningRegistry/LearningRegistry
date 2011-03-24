@@ -185,6 +185,8 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             
             self.validate()
             document = self.specData
+            document[self._ID] = self.__dict__[self._ID]
+            document[self._REV] = self.__dict__[self._REV]
             try:
                 db.update([document])
             except Exception as ex:
