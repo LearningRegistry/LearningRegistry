@@ -24,7 +24,7 @@ class harvest:
           return_list.append(row.doc)
     return return_list
   def list_metadata_formats(self):
-     return [{'metadataPrefix':'dc'}]
+     return [{'metadataFormat':{'metadataPrefix':'dc'}}]
 
   def list_identifiers(self, from_date, until_date):
     rows = self.db.view('_all_docs', include_docs=True)

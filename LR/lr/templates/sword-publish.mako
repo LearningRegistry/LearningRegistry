@@ -22,5 +22,4 @@
      <sword:userAgent>${c.user_agent}</sword:userAgent>
      <generator uri="${c.generator_url}" version="1.0"/>
      <content type="application/json" src="${c.content_url}"/>	
-     <link rel="edit" href="http://www.myrepository.ac.uk/geography-collection/atom/my_deposit.atom" />
   </entry>

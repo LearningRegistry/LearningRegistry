@@ -23,6 +23,7 @@ class SwordController(BaseController):
         # Return a rendered template
         #return render('/sword.mako')
         # or, return a string
+        c.collectino_url = 'http://' + request.host + '/obtain/'
         return render('sword.mako')
     def create(self):
         c.user_agent = request.headers['user-agent']

@@ -61,7 +61,7 @@ class HarvestController(BaseController):
             return json.dumps(data)
         def listmetadataformats():
             data = self.get_base_response(verb,body)
-            data['metadataFormat']=h.list_metadata_formats()
+            data['listmetadataformats']=h.list_metadata_formats()
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
