@@ -61,7 +61,7 @@ class OaiPmhController(HarvestController):
         
         if verb == 'GetRecord' or verb == 'ListMetadataFormats':
             if req_params.has_key('by_doc_ID') and req_params.has_key('by_resource_ID'):
-                if self._isTrue(request.params['by_doc_ID']) == self._isTrue(req_params['by_resource_ID']):
+                if self._isTrue(req_params['by_doc_ID']) == self._isTrue(req_params['by_resource_ID']):
                     raise BadArgumentError('by_doc_ID and by_resource_ID have conflicting values.', verb)
                 
             if req_params.has_key('by_doc_ID'):
@@ -71,14 +71,14 @@ class OaiPmhController(HarvestController):
                 params['by_doc_ID'] = False
                 params['by_resource_ID'] = not params['by_doc_ID']
             
-            if request.params.has_key('by_resource_ID'):
-                params['by_resource_ID'] = self._isTrue(request.param['by_doc_ID'])
+            if req_params.has_key('by_resource_ID'):
+                params['by_resource_ID'] = self._isTrue(req_params['by_resource_ID'])
                 params['by_doc_ID'] = not params['by_resource_ID']
         
         if verb == 'ListRecords' or verb == 'ListIdentifiers':
             if req_params.has_key('from'):
                 try:
-                    from_date = iso8601.parse_date(request.params['from'])
+                    from_date = iso8601.parse_date(req_params['from'])
                     params['from'] = h.convertToISO8601UTC(from_date)
                 except:
                     raise BadArgumentError('from does not parse to ISO 8601.', verb)

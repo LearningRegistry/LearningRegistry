@@ -11,6 +11,7 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+import os
 '''
 Reads OAI-PMH data and publishes to specific LR Node with envelopes that contain inline payloads.
 
@@ -154,7 +155,7 @@ def bulkUpdate(list, opts):
     '''
     Save to Learning Registry
     '''
-    if len(list) > 0:
+    if len(list) > 0 and opts.OUTPUT == None:
         try:
             log.info("Learning Registry Node URL: '{0}'\n".format(opts.LEARNING_REGISTRY_URL))
             res = Resource(opts.LEARNING_REGISTRY_URL)
@@ -167,6 +168,39 @@ def bulkUpdate(list, opts):
     else:
         log.info("Nothing is being updated.")
 
+
+def filenum(start=0):
+    i = start
+    while 1:
+        yield i
+        i += 1
+
+count = filenum(0)
+        
+def outputFile(list, opts):
+    '''
+    Save to file
+    '''
+    if len(list) > 0 and opts.OUTPUT != None:
+        if not os.path.exists(opts.OUTPUT):
+            os.makedirs(opts.OUTPUT)
+        
+        slice_idx = 0
+        slice_chunksize = 100
+        try:
+            while len(list[slice_idx:slice_chunksize]) > 0:
+                slice = list[slice_idx:slice_chunksize]
+                
+                filepath = "{0}/data-{1}.json".format(opts.OUTPUT, count.next())
+                with open(filepath, "a") as out:
+                    out.write(json.dumps({"documents":slice}))
+                    log.info("wrote: {0}".format(out.name))
+                
+                slice_idx += 1
+        except Exception:
+            log.exception("Unable to write file.")
+
+    
 
 def fetchRecords(conf):
     '''
@@ -263,6 +297,7 @@ def connect(opts):
         except:
             log.exception("Problem w/ JSON dump")
         bulkUpdate(docList, opts)
+        outputFile(docList, opts)
        
 
     
@@ -272,8 +307,10 @@ class Opts:
         
         parser = OptionParser()
         parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
+        parser.add_option('-o', '--output', dest="output", help='Output file instead of publish', default=None)
         (options, args) = parser.parse_args()
         self.LEARNING_REGISTRY_URL = options.registryUrl    
+        self.OUTPUT = options.output
 
        
 
