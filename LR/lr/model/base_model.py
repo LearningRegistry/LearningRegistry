@@ -82,8 +82,8 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
                         spec_data = json.loads(getFileString(data))
                     else:
                         spec_data = json.loads(data)
-                spec_data = {}
-                spec_data.update(data)        
+                spec_data = {}                
+                spec_data.update(data)
                 # Remove _id an _rev in data if t there are present so that we can have
                 # a clean specData for validation
                 for key in [self._ID, self._REV]:

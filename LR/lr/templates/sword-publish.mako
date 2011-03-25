@@ -11,7 +11,7 @@
          <sword:verboseDescription>
             Does collection exist? True.
             User authenticates? True.
-            User: ${c.on_belahf_of}
+            User: ${c.on_behalf_of}
             User has rights to collection? True. 
          </sword:verboseDescription>
      % endif
