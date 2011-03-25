@@ -32,7 +32,7 @@ filterFunction = """
         design_doc = "_design/";
         
         // Don't send the design document.
-        if ((doc.doc_id && doc._id.substr(0, design_doc.length) == design_doc) ||
+        if ( !doc || (doc.doc_ID && doc.doc_ID.indexOf(design_doc) != -1) ||
             (!doc.doc_type || doc.doc_type != 'resource_data'))
          {
             return false;
@@ -46,7 +46,7 @@ filterFunction = """
 
         // Check to see the query parameter is valid  node filter description. if not
         // we can filter anything out so send it.
-        if((custom_filter in req) && req.custom_filter == True){
+        if(("custom_filter" in req) && req.custom_filter == true){
             return true
         }
         // If there is no filter in the parameter just send the document.
@@ -71,7 +71,7 @@ filterFunction = """
                     continue;
             }
             regex_value = new RegExp(filter_value);
-            if (doc[filter_key].match(regex_value)){
+            if (JSON.stringify(doc[filter_key]).match(regex_value)){
                 match = true;
                 break;
             }
@@ -121,7 +121,7 @@ class ResourceDataModel(BaseModel):
    #Make the filter is updated in the design document.    
     DEFAULT_FILTER = 'defaultFilter'
     # Add Filter function the design document that will be used to filter on replication.
-    designFilter = {DEFAULT_FILTER: str(filterFunction)}
+    designFilter = {DEFAULT_FILTER: filterFunction}
     updateDesignFilters(BaseModel._defaultDB, designFilter) 
     def __init__(self,  data=None):
         

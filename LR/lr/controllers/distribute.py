@@ -13,6 +13,7 @@
 #   limitations under the License.
 import logging, couchdb, urlparse, json, urllib2
 import threading
+import re
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -39,6 +40,7 @@ class DistributeController(BaseController):
         else:
             distributeInfo['node_config'] = sourceLRNode.config
             distributeInfo['distribute_sink_url'] = ResourceDataModel._defaultDB.resource.url
+        log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
         return json.dumps(distributeInfo)
     
     
@@ -50,13 +52,12 @@ class DistributeController(BaseController):
         sourceNodeDBUrl = ResourceDataModel._defaultDB.resource.url
         
         def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
-            replicationOptions={'filter':ResourceDataModel.DEFAULT_FILTER,  
-                                        'query_params': None}
-            
+      
             if ((destinationNode.filterDescription is not None) and 
                  (destinationNode.filterDescription.custom_filter == True)):
+                destinationDB =None
                 try:
-                    destinationResource = couchdb.Database(destinationUrl)
+                    destinationDB = couchdb.Database(destinationUrl)
                 except Exception as ex:
                     log.exception(ex)
                     return
@@ -64,10 +65,15 @@ class DistributeController(BaseController):
                  # for now we are assuming that target sink is couchdb   
                 for doc in ResourceDataModel.getAll():
                     try:
-                                destinationDB[doc._id] = doc
-                    except:
-                        pass
+                                destinationDB[doc['_id']] = doc
+                    except Exception as e:
+                        log.exception(e)
             else:
+                filterFunction = (ResourceDataModel._defaultDB.name+"/" + 
+                                          ResourceDataModel.DEFAULT_FILTER)
+                                          
+                replicationOptions={'filter':filterFunction,  
+                                        'query_params': None}
                 replicationOptions['query_params'] = destinationNode.filterDescription.specData
                 server.replicate(sourceUrl, destinationUrl, **replicationOptions)
     
@@ -78,8 +84,11 @@ class DistributeController(BaseController):
                 continue
             destinationLRNode = None
             try:
-                distributeInfo = json.load(
-                        urllib2.urlopen(connection.destination_node_url.strip()+"/distribute"))
+                # Make sure we only have one slash in the url path. More than one 
+                #confuses pylons routing libary.
+                destinationURL = urlparse.urljoin(connection.destination_node_url.strip(), "distribute")
+                log.info("\nAccess destination node at: "+destinationURL)
+                distributeInfo = json.load(urllib2.urlopen(destinationURL))
                 destinationLRNode = LRNodeModel(distributeInfo['node_config'])
             except Exception as ex:
                 log.exception(ex)
@@ -100,10 +109,10 @@ class DistributeController(BaseController):
                                          sourceNodeDBUrl, 
                                          distributeInfo['distribute_sink_url'])
                                          
-            #replicationThread = threading.Thread(target=doDistribution, 
-                                                                        #args=replicationArgs)
-            #replicationThread.start()
-            doDistribution(*args)
+            # Use a thread to do the actual replication.                             
+            replicationThread = threading.Thread(target=doDistribution, 
+                                                                        args=replicationArgs)
+            replicationThread.start()
 
 
     def new(self, format='html'):

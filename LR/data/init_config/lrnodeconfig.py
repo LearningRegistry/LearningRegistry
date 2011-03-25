@@ -30,7 +30,7 @@ network_policy_description = {
             "doc_scope": "network",
             "active":  True,
             "network_id": network_description['network_id'],
-            "policy_id": network_description['network_id']+"_policy",
+            "policy_id": network_description['network_id']+"_network_policy",
             "policy_version": "0.1",
             "TTL": 100  
             }
@@ -60,13 +60,10 @@ node_filter_description= {
                     "doc_version":"0.10.0",
                     "doc_scope": "node",
                     "active": True,
-                    "filter_name": "filter",
+                    "filter_name": node_description['node_id']+"node_filter",
                     "custom_filter": False,
-                    "include_exclude": False,
-                    "filter": [
-                                {"filter_key": "keys",
-                                 "filter_value": "test"}
-                            ]
+                    "include_exclude":  False,
+                    "filter": [] 
                 }
 
 node_services=[ 
@@ -75,7 +72,7 @@ node_services=[
                     "doc_version": _DOC_VERSION,
                     "doc_scope": "node", 
                     "active": True,
-                    "service_id": "publish_"+node_description['node_id'],
+                    "service_id": node_description['node_id']+"_publish_service",
                     "service_type": "publish",
                     "service_name": "Name of publish service",
                     "service_description": "Publish service description", 
@@ -89,7 +86,7 @@ node_services=[
                     "doc_version": _DOC_VERSION,
                     "doc_scope": "node", 
                     "active": True,
-                    "service_id": "access_"+node_description['node_id'],
+                    "service_id": node_description['node_id']+"_access_service",
                     "service_type": "access",
                     "service_name": "access service name",
                     "service_description": "access service description", 
@@ -103,7 +100,7 @@ node_services=[
                     "doc_version": _DOC_VERSION,
                     "doc_scope": "node", 
                     "active": True,
-                    "service_id": "broker_"+node_description['node_id'],
+                    "service_id": node_description['node_id']+"_broker_service",
                     "service_type": "broker",
                     "service_name": "broker service name",
                     "service_description": "broker service description", 
@@ -117,7 +114,7 @@ node_services=[
                     "doc_version": _DOC_VERSION,
                     "doc_scope": "node", 
                     "active": True,
-                    "service_id": "administrative_"+node_description['node_id'],
+                    "service_id": node_description['node_id']+"_administrative_service",
                     "service_type": "administrative",
                     "service_name": "administrative service name",
                     "service_description": "broker service description", 
@@ -131,7 +128,7 @@ node_services=[
                     "doc_version": _DOC_VERSION,
                     "doc_scope": "node", 
                     "active": True,
-                    "service_id": "distribute_"+node_description['node_id'],
+                    "service_id": node_description['node_id']+"_distribute_service",
                     "service_type": "distribute",
                     "service_name": "distribute service name",
                     "service_description": "distribute service description", 
@@ -151,7 +148,7 @@ node_connectivity= [
            "active": True,
            "connection_id": "API_Test_Node3_1",
            "source_node_url": "http://localhost/",
-           "destination_node_url": "http://localhost/",
+           "destination_node_url": "http://localhost:5001/",
            "gateway_connection": False
     },
 ]
