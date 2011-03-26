@@ -127,6 +127,36 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listMetadataFormats_post: pass")
     
+    def test_namespaceDeclarations(self):
+        # according to the spec, all namespace used in the metadata
+        # element should be declared on the metadata element,
+        # and not on root or ancestor elements (big sigh..)
+        # this works, except for the xsi namespace which is allready declared
+        # on the root element, which means lxml will not declare it again on
+        # the metadata element
+        randomDoc = choice(dc_data["documents"])
+        response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
+        tree = etree.fromstring(response.body)
+        
+        # ugly xml manipulation, this is probably why the requirement is in
+        # the spec (yuck!)
+        xml = etree.tostring(tree)
+        xml = xml.split('<oai:metadata>')[-1].split('</oai:metadata>')[0]
+        first_el = xml.split('>')[0]
+        try:
+            self.assertTrue(first_el.startswith('<oai_dc:dc'))
+            self.assertTrue(
+                'xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"'
+                in first_el) 
+            self.assertTrue(
+                'xmlns:dc="http://purl.org/dc/elements/1.1/"'
+                in first_el)
+        except Exception as e:
+            log.error("test_namespaceDeclarations: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_namespaceDeclarations: pass")
 
     def test_getRecord_by_doc_ID_get(self):
         global nsdl_data, dc_data
