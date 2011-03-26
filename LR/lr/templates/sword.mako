@@ -6,18 +6,14 @@
 
  <sword:version>1.3</sword:version>
  <workspace>
-
-   <atom:title>Main Site</atom:title>
+   <atom:title>Learning Registry</atom:title>
    <collection
-       href="http://www.myrepository.ac.uk/atom/geography-collection" >
-     <atom:title>My Repository : Geography Collection</atom:title>
-     <accept>application/zip</accept>
+       href="{$c.content_url}" >
+     <atom:title>Learning Registry</atom:title>
+     <accept>application/json</accept>
      <sword:collectionPolicy>Collection Policy</sword:collectionPolicy>
-     <dcterms:abstract>Collection description</dcterms:abstract>
-     <sword:acceptPackaging q="1.0">http://purl.org/net/sword-types/METSDSpaceSIP</sword:acceptPackaging>
-     <sword:acceptPackaging q="0.8">http://purl.org/net/sword-types/bagit</sword:acceptPackaging>
+     <dcterms:abstract>Learning Registry</dcterms:abstract>
    </collection>
-
  </workspace>
 </service>
 

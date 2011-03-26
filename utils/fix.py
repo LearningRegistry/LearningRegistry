@@ -1,7 +1,7 @@
 import os, json
 import ConfigParser
 
-base_path = 'C:\\Documents and Settings\\admin\\Desktop\\json\\20110228_eun_MDlre4_LR_0_10_0_180000'
+base_path = '/home/wegrata/Downloads/test_data'
 
 _config = ConfigParser.ConfigParser()
 _config.read('testconfig.ini')
