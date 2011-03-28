@@ -11,8 +11,20 @@ import uuid
 import datetime
 import re
 from lr.lib.oaipmh import oaipmh
+import pprint
 
 json_headers={'content-type': 'application/json'}
+
+namespaces = {
+              "oai" : "http://www.openarchives.org/OAI/2.0/",
+              "oai_dc" : "http://www.openarchives.org/OAI/2.0/oai_dc/",
+              "oai_lr" : "http://www.learningregistry.org/OAI/2.0/oai_dc/",
+              "dc":"http://purl.org/dc/elements/1.1/",
+              "dct":"http://purl.org/dc/terms/",
+              "nsdl_dc":"http://ns.nsdl.org/nsdl_dc_v1.02/",
+              "ieee":"http://www.ieee.org/xsd/LOMv1p0",
+              "xsi":"http://www.w3.org/2001/XMLSchema-instance"
+              }
 
 time_format = '%Y-%m-%d %H:%M:%S.%f'
 log = logging.getLogger(__name__)
@@ -23,6 +35,7 @@ test_data_delete = True
 nsdl_data = { "documents" : [] }
 dc_data = { "documents" : [] }
 class TestOaiPmhController(TestController):
+
     def setUp(self):
 
         schema_file = file("lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd", "r")
@@ -67,9 +80,20 @@ class TestOaiPmhController(TestController):
             for doc in dc_data["documents"]:
                 del self.db[doc["_id"]]
     
-    def validate_lr_oai_response(self, response):
+    def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False):
         xmlcontent = etree.fromstring(response.body)
-        self.oailrschema.assertValid(xmlcontent)
+        
+        error = xmlcontent.xpath("oai:error", namespaces=namespaces)
+        if errorExists == False:
+            if len(error) > 0:
+                self.assertEqual(0, len(error), "validate_lr_oai_response FAIL: Error code:{0} mesg:{1}".format(error[0].xpath("@code", namespaces=namespaces), error[0].xpath("text()", namespaces=namespaces)))
+        else:
+            self.assertEqual(1, len(error), "validate_lr_oai_response FAIL: Expected error, none found.")
+        
+        if checkSchema == True:
+            self.oailrschema.assertValid(xmlcontent)
+        else:
+            log.info("validate_lr_oai_response: Not validating response against schema.")
         
 
     def test_get_oai_lr_schema(self):
@@ -110,7 +134,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_listMetadataFormats_get: fail")
+#            log.error("test_listMetadataFormats_get: fail")
+            log.exception("test_listMetadataFormats_get: fail")
             global test_data_delete
             test_data_delete = False
             raise e
@@ -121,7 +146,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_listMetadataFormats_post: fail")
+#            log.error("test_listMetadataFormats_post: fail")
+            log.exception("test_listMetadataFormats_post: fail")
             global test_data_delete
             test_data_delete = False
             raise e
@@ -138,25 +164,17 @@ class TestOaiPmhController(TestController):
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         tree = etree.fromstring(response.body)
         
-        # ugly xml manipulation, this is probably why the requirement is in
-        # the spec (yuck!)
-        xml = etree.tostring(tree)
-        xml = xml.split('<oai:metadata>')[-1].split('</oai:metadata>')[0]
-        first_el = xml.split('>')[0]
-        try:
-            self.assertTrue(first_el.startswith('<oai_dc:dc'))
-            self.assertTrue(
-                'xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"'
-                in first_el) 
-            self.assertTrue(
-                'xmlns:dc="http://purl.org/dc/elements/1.1/"'
-                in first_el)
-        except Exception as e:
-            log.error("test_namespaceDeclarations: fail - identifier: {0}".format(randomDoc["doc_ID"]))
-            global test_data_delete
-            test_data_delete = False
-            raise e
-        log.info("test_namespaceDeclarations: pass")
+        metadata = tree.xpath("//oai_dc:dc", namespaces=namespaces)
+        
+        if len(metadata) != 1:
+            self.fail("test_namespaceDeclarations: fail - Missing Metadata")
+        else:
+            for meta in metadata:
+                log.info("test_namespaceDeclarations medatdada: prefix:{0} name:{1}".format(meta.prefix, meta.tag))
+                pat = "<oai_dc:dc[^>]*\sxmlns:{0}=".format(meta.prefix)
+                self.assertTrue(str(re.match(pat, etree.tostring(meta), flags=re.MULTILINE)!=None), "test_namespaceDeclarations: fail - namespace declaration not present")
+        
+
 
     def test_getRecord_by_doc_ID_get(self):
         global nsdl_data, dc_data
@@ -165,7 +183,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+#            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            log.exception("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -178,7 +197,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+#            log.error("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            log.exception("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -191,7 +211,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
+#            log.error("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
+            log.exception("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -204,7 +225,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
+#            log.error("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
+            log.exception("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -227,7 +249,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
+#            log.error("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -249,7 +272,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
+#            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -273,7 +297,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
+#            log.error("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
             global test_data_delete
             test_data_delete = False
             raise e
@@ -296,7 +321,8 @@ class TestOaiPmhController(TestController):
         try:
             self.validate_lr_oai_response(response)
         except Exception as e:
-            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+#            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
             global test_data_delete
             test_data_delete = False
             raise e
