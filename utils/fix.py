@@ -1,7 +1,6 @@
+#!/usr/bin/python
 import os, json
 import ConfigParser
-
-base_path = '/home/wegrata/Downloads/test_data'
 
 _config = ConfigParser.ConfigParser()
 _config.read('testconfig.ini')
@@ -18,7 +17,12 @@ for file in os.listdir(base_path):
         del data['filtering_keys']
         data['keys'] = saved_data
         changed = True
-
+    if data.has_key('submission_TOS'):
+        del data['submission_TOS']
+    if not data.has_key('TOS'):
+        data['TOS'] = {
+            'submission_TOS':'http://www.learningregistry.org/tos/cc0/v0-5/'
+        }
     if data.has_key('payload_schema'):
         saved_data = data['payload_schema']
         del data['payload_schema']
