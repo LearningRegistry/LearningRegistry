@@ -42,14 +42,19 @@ log = logging.getLogger("main")
 #    "path": "/cgi-bin/oai2_0",
 #    "verb": "ListRecords",
 #    "metadataPrefix":"oai_dc",
-#    "set":None
+#    "set":None,
+#    "tos": "http://www.learningregistry.org/tos/cc-by-3-0/v0-5/",
+#    "attribution": "The Library of Congress"
 #}
+
 config = {
     "server": "http://www.dls.ucar.edu",
     "path": "/dds_se/services/oai2-0",
     "verb": "ListRecords",
     "metadataPrefix":"nsdl_dc",
-    "set":"ncs-NSDL-COLLECTION-000-003-112-016"
+    "set":"ncs-NSDL-COLLECTION-000-003-112-016",
+    "tos": "http://www.learningregistry.org/tos/cc-by-3-0/v0-5/",
+    "attribution": "The National Science Digital Library"
 }
 #config = {
 #    "server": "http://hal.archives-ouvertes.fr",
@@ -75,12 +80,15 @@ class Error(Exception):
 def getDocTemplate():
     return { 
             "doc_type": "resource_data", 
-            "doc_version": "0.10.0", 
+            "doc_version": "0.11.0", 
             "resource_data_type" : "metadata",
             "active" : True,
             "submitter_type": "agent",
             "submitter": "NSDL 2 LR Data Pump",
-            "submission_TOS": "Yes",
+            "TOS": {
+                    "submission_TOS":    config["tos"],
+                    "submission_attribution":  config["attribution"]
+            },
             "resource_locator": None,
             "keys": [],
             "payload_placement": None,
@@ -192,7 +200,7 @@ def outputFile(list, opts):
                 slice = list[slice_idx:slice_chunksize]
                 
                 filepath = "{0}/data-{1}.json".format(opts.OUTPUT, count.next())
-                with open(filepath, "a") as out:
+                with open(filepath, "w") as out:
                     out.write(json.dumps({"documents":slice}))
                     log.info("wrote: {0}".format(out.name))
                 

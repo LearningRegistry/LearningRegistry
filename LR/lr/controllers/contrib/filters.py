@@ -43,7 +43,7 @@ class FiltersController(BaseController):
         success = {"status": "OK"}
         maptemplate = """function(doc) {{      
             if (doc.doc_type && doc.doc_type == "resource_data" &&
-                doc.doc_version && doc.doc_version == "0.10.0" &&
+                doc.doc_version && doc.doc_version == "0.11.0" &&
                 doc.create_timestamp) {{
                  
                  var validator = {0};
@@ -131,7 +131,14 @@ class FiltersController(BaseController):
 
     def show(self, id, format='json'):
         """GET /contrib/filters/id: Show a specific item"""
-        uri = 'http://127.0.0.1:5984/resource_data/_design/filter/_view/'+id+'?reduce=false'
+        
+        design = couchServer[_RESOURCE_DATA][_DESIGN_DOC]
+        
+        reduceParam = ""
+        if design.has_key("views") == True and design["views"].has_key(id) == True and design["views"][id].has_key("reduce"):
+            reduceParam = "?reduce=false"
+
+        uri = 'http://127.0.0.1:5984/resource_data/_design/filter/_view/'+id+reduceParam
         url = urllib2.Request(uri,headers={"Content-Type": "application/json"})
         res = urllib2.urlopen(url);
         response.headers['content-type'] = 'application/json'
