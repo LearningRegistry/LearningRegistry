@@ -20,7 +20,7 @@ class SwordController(BaseController):
         response.headers['content-type'] = 'application/atom+xml;charset=utf-8'      
         self.parse_params()
     def index(self): 
-        c.collectino_url = 'http://' + request.host + '/obtain/'
+        c.collection_url = 'http://' + request.host + '/obtain/'
         return render('sword.mako')	
     def parse_params(self):
         c.user_agent = request.headers['user-agent']
@@ -32,7 +32,8 @@ class SwordController(BaseController):
             c.verbose = request.headers['X-Verbose']
         if request.headers.has_key('X-No-Op'):
             c.no_op = request.headers['X-No-Op']
-                                    		
+        c.tos_url = m.base_model.appConfig['tos.url']
+        c.generator_url = 'http://' + request.host + '/sword'
     def create(self):		
         if c.no_op:
             result = {'OK':True}
@@ -41,7 +42,6 @@ class SwordController(BaseController):
             result = m.publish(json.loads(request.body))
         if result['OK']:
             c.content_url = 'http://' + request.host + '/obtain/'+result['doc_ID']
-            c.generator_url = 'http://' + request.host + '/sword'
             c.doc = self.h.get_record(result['doc_ID'])			
             return render('sword-publish.mako')    
         else:
