@@ -8,7 +8,7 @@
  <workspace>
    <atom:title>Learning Registry</atom:title>
    <collection
-       href="${c.collectino_url}" >
+       href="${c.collection_url}" >
      <atom:title>Learning Registry</atom:title>
      <accept>application/json</accept>
      <sword:collectionPolicy>${c.tos_url}</sword:collectionPolicy>

@@ -20,7 +20,7 @@ class SwordController(BaseController):
         response.headers['content-type'] = 'application/atom+xml;charset=utf-8'      
         self.parse_params()
     def index(self): 
-        c.collectino_url = 'http://' + request.host + '/obtain/'
+        c.collection_url = 'http://' + request.host + '/obtain/'
         return render('sword.mako')	
     def parse_params(self):
         c.user_agent = request.headers['user-agent']
