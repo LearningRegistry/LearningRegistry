@@ -23,6 +23,10 @@ for file in os.listdir(base_path):
         data['TOS'] = {
             'submission_TOS':'http://www.learningregistry.org/tos/cc0/v0-5/'
         }
+    if data.has_key('created_timestamp'):
+        del data['created_timestamp']
+    if data.has_key('update_timestamp'):
+        del data['update_timestamp']        
     if data.has_key('payload_schema'):
         saved_data = data['payload_schema']
         del data['payload_schema']

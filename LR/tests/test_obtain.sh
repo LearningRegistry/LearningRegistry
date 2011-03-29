@@ -1,2 +1,2 @@
 #curl http://localhost/obtain
-curl http://localhost/obtain/16a158dce1baf4903872f11450004431 > obtain.htm && firefox obtain.htm
+curl http://lrdev1.learningregistry.org/obtain/02c47771b4244c7fa47bf06e5f84b62a > obtain.htm && firefox obtain.htm

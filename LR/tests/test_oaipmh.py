@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
         
         self._parser = etree.XMLParser(resolve_entities=True)
         
-        self._postServiceUrl = "http://localhost/OAI-PMH"
+        self._postServiceUrl = "http://lrdev1.learningregistry.org/OAI-PMH"
         self._queryServiceUrl = self._postServiceUrl+"?{0}"
         
         schema_file = file("../schemas/OAI/2.0/OAI-PMH.xsd", "r")

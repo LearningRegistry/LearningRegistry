@@ -19,7 +19,7 @@ class harvest:
     for row in rows:
       #ignore design docs
       if not row.id.startswith('_design'):
-        last_update = datetime.strptime(row.doc['update_timestamp'],'%Y-%m-%d %H:%M:%S.%f')
+        last_update = datetime.strptime(row.doc['node_timestamp'],'%Y-%m-%d %H:%M:%S.%f')
         if last_update >=from_date or last_update <= until_date:
           return_list.append(row.doc)
     return return_list
@@ -32,7 +32,7 @@ class harvest:
     for row in rows:
       #ignore design docs
       if not row.id.startswith('_design'):
-        last_update = datetime.strptime(row.doc['update_timestamp'],'%Y-%m-%d %H:%M:%S.%f')
+        last_update = datetime.strptime(row.doc['node_timestamp'],'%Y-%m-%d %H:%M:%S.%f')
         if last_update >=from_date or last_update <= until_date:
           return_list.append(row.id)
     return return_list

@@ -1,13 +1,12 @@
+#!/usr/bin/python
 import urllib2,os,json
 import ConfigParser
-root_path = 'C:\\Documents and Settings\\admin\\Desktop\\json\\20110228_eun_MDlre4_LR_0_10_0_180000'
-publish_url = 'http://192.168.153.130/publish'
-
+from random import choice
 _config = ConfigParser.ConfigParser()
 _config.read('testconfig.ini')
 root_path = _config.get("upload", "root_path")
 publish_url = _config.get("upload", "publish_url")
-
+publish_urls = ['http://lrdev1.learningregistry.org/publish','http://lrdev2.learningregistry.org/publish','http://lrdev3.learningregistry.org/publish']
 documents=[]
 
 def upload_files(docs):
@@ -21,9 +20,10 @@ def upload_files(docs):
   except urllib2.HTTPError as er:
     with open('error.html','a') as out:
       out.write(er.read())
-    print 'error'
+    print 'error'choice
     
 for file in os.listdir(root_path):
+  publish_url = choice(publish_urls)
   file_path = os.path.join(root_path,file)
   with open(file_path,'r+') as f:
     data = json.load(f)
