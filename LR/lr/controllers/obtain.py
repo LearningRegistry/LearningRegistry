@@ -83,10 +83,9 @@ class ObtainController(BaseController):
 
     def show(self, id, format='html'):
         """GET /obtain/id: Show a specific item"""
-        url = 'http://localhost:5984/resource_data/'+id
+        url = 'http://localhost/resource_data/'+id
         r = urllib2.urlopen(url)
         data = r.read()
-        response.headers['content-type'] = 'application/json'
         return data
         # url('obtain', id=ID)
 
