@@ -53,7 +53,7 @@ config = {
     "verb": "ListRecords",
     "metadataPrefix":"nsdl_dc",
     "set":"ncs-NSDL-COLLECTION-000-003-112-016",
-    "tos": "http://www.learningregistry.org/tos/cc-by-3-0/v0-5/",
+    "tos": "http://nsdl.org/help/?pager=termsofuse",
     "attribution": "The National Science Digital Library"
 }
 #config = {
