@@ -7,8 +7,7 @@
  <sword:version>1.3</sword:version>
  <workspace>
    <atom:title>Learning Registry</atom:title>
-   <collection
-       href="${c.collection_url}" >
+   <collection href="${c.collection_url}" >
      <atom:title>Learning Registry</atom:title>
      <accept>application/json</accept>
      <sword:collectionPolicy>${c.tos_url}</sword:collectionPolicy>

@@ -311,7 +311,7 @@ def connect(opts):
     
 class Opts:
     def __init__(self):
-        self.LEARNING_REGISTRY_URL = "http://learningregistry.vm"
+        self.LEARNING_REGISTRY_URL = "http://localhost"
         
         parser = OptionParser()
         parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)

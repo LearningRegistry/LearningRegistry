@@ -74,8 +74,11 @@ class DistributeController(BaseController):
                                           
                 replicationOptions={'filter':filterFunction,  
                                         'query_params': None}
-                replicationOptions['query_params'] = destinationNode.filterDescription.specData
-                server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+                if destinationNode.filterDescription in not None:
+                    replicationOptions['query_params'] = destinationNode.filterDescription.specData
+                    server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+                else:
+                    server.replicate(sourceUrl,destinationUrl)
     
 
         for connection in sourceLRNode.connections:

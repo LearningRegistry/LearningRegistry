@@ -27,7 +27,7 @@ class harvest:
      return [{'metadataFormat':{'metadataPrefix':'dc'}}]
 
   def list_identifiers(self, from_date, until_date):
-    rows = self.db.view('_all_docs', include_docs=True)
+    rows = self.db.view('_design/learningregistry/_view/resources', include_docs=True)
     return_list = []
     for row in rows:
       #ignore design docs

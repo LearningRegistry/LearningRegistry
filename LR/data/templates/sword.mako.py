@@ -4,7 +4,7 @@ UNDEFINED = runtime.UNDEFINED
 __M_dict_builtin = dict
 __M_locals_builtin = locals
 _magic_number = 6
-_modified_time = 1301318467.582325
+_modified_time = 1301488764.3602359
 _template_filename='/home/wegrata/LearningRegistry/LR/lr/templates/sword.mako'
 _template_uri='sword.mako'
 _template_cache=cache.Cache(__name__, _modified_time)
@@ -22,7 +22,7 @@ def render_body(context,**pageargs):
         # SOURCE LINE 1
         __M_writer(u'<?xml version="1.0" encoding=\'utf-8\'?>\n<service xmlns="http://www.w3.org/2007/app"\n         xmlns:atom="http://www.w3.org/2005/Atom"\n\t xmlns:sword="http://purl.org/net/sword/"\n\t xmlns:dcterms="http://purl.org/dc/terms/">\n\n <sword:version>1.3</sword:version>\n <workspace>\n   <atom:title>Learning Registry</atom:title>\n   <collection\n       href="')
         # SOURCE LINE 11
-        __M_writer(escape(c.collectino_url))
+        __M_writer(escape(c.collection_url))
         __M_writer(u'" >\n     <atom:title>Learning Registry</atom:title>\n     <accept>application/json</accept>\n     <sword:collectionPolicy>')
         # SOURCE LINE 14
         __M_writer(escape(c.tos_url))

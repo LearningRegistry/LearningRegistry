@@ -7,7 +7,7 @@ curl -v -H "Content-Type: application/json" -X POST  -d '{
 "resource_data_type": "metadata",
 "submitter_type": "anonymous",
 "submitter": "nsdl",
-"submission_TOS": "http://www.learningregistry.org/tos-v1-0.html",
+"TOS":{"submission_TOS": "http://www.learningregistry.org/tos-v1-0.html"},
 "resource_locator": "http://www.instructorweb.com/docs/pdf/convdistance.pdf",
 "publishing_node": "nsdl",
 "keys": ["xml", "test", "nsdl", "DC"],
