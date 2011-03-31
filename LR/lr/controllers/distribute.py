@@ -74,13 +74,13 @@ class DistributeController(BaseController):
                                           
                 replicationOptions={'filter':filterFunction,  
                                         'query_params': None}
-                if destinationNode.filterDescription in not None:
+                if destinationNode.filterDescription is not None:
                     replicationOptions['query_params'] = destinationNode.filterDescription.specData
                     server.replicate(sourceUrl, destinationUrl, **replicationOptions)
                 else:
                     server.replicate(sourceUrl,destinationUrl)
     
-
+        
         for connection in sourceLRNode.connections:
             # Call a get on the distribute url of the connection node 
             if connection.active == False:
