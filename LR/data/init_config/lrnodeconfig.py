@@ -148,7 +148,7 @@ node_connectivity= [
            "active": True,
            "connection_id": "API_Test_Node3_1",
            "source_node_url": "http://localhost/",
-           "destination_node_url": "http://localhost:5001/",
+           "destination_node_url": "http://localhost/",
            "gateway_connection": False
     },
 ]

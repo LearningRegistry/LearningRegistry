@@ -1,3 +1,5 @@
 function(doc) {
-  emit(doc.id,null);  
+  if (doc.doc_type){
+      emit(doc.id,null);
+  }  
 }
