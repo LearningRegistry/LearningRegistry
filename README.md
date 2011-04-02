@@ -193,6 +193,10 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 >       sudo easy_install virtualenv
 
+* Install required library dependencies
+
+>       sudo apt-get install python-dev python-libxml2 python-libxslt1 libxml2-dev libxslt1-dev
+
 * Create a user for learningregistry and su to user
 
 >       su learningregistry
@@ -214,6 +218,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 >       ./pip install pyparsing
 >       ./pip install --upgrade couchdb
 >       ./pip install restkit
+>       ./pip install cython
 >       ./pip install lxml
 >       ./pip install iso8601
 
