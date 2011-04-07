@@ -1,4 +1,5 @@
 import logging
+import urlparse
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
@@ -41,7 +42,7 @@ class SwordController(BaseController):
         else:
             result = m.publish(json.loads(request.body))
         if result['OK']:
-            c.content_url = 'http://' + request.host + '/obtain/'+result['doc_ID']
+            c.content_url = urlparse.urljoin(request.url, 'obtain/') +result['doc_ID']
             c.doc = self.h.get_record(result['doc_ID'])			
             return render('sword-publish.mako')    
         else:
