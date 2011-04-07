@@ -18,7 +18,7 @@ import re
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.model import LRNode as sourceLRNode, \
-            NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
+            NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer
             
 from lr.lib.base import BaseController, render
 
@@ -39,7 +39,7 @@ class DistributeController(BaseController):
             distributeInfo['OK'] = False
         else:
             distributeInfo['node_config'] = sourceLRNode.config
-            distributeInfo['distribute_sink_url'] = urlparse.urljoin(request.url, appConfig['couchdb.db.resourcedata'])
+            distributeInfo['distribute_sink_url'] = ResourceDataModel._defaultDB.resource.url
         log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
         return json.dumps(distributeInfo)
     

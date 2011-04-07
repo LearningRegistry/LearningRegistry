@@ -20,7 +20,7 @@ def upload_files(docs):
   except urllib2.HTTPError as er:
     with open('error.html','a') as out:
       out.write(er.read())
-    print 'error'choice
+    print 'error'
     
 for file in os.listdir(root_path):
   publish_url = choice(publish_urls)
