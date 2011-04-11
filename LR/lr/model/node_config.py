@@ -47,7 +47,7 @@ class LRNodeModel(object):
             config = dictToObject(data)
             
         # Check first if node description is set. if not look for in the DB if not in the db
-        # create it from the config and save the db.
+        # create it from the config data.
         
         self._communityDescription = self._initModel(CommunityModel, 
                                         config.community_description['community_id'],
@@ -105,10 +105,11 @@ class LRNodeModel(object):
         self._setNodeStatus() 
         
     def _initModel(self, modelClass, modelId, modelConf):
+        #Try to get the model data from the database.
         modelDoc = modelClass.get(modelId)
         if modelDoc is None:
             model = modelClass(modelConf)
-            model.save(doc_id=modelId)
+            #model.save(doc_id=modelId)
             return model
         else:
             return modelClass(modelDoc)
@@ -144,7 +145,90 @@ class LRNodeModel(object):
             if service.active == True and serviceType == service.service_type:
                 return True
         return False
-  
+    
+    def _saveConfig(self, model, modeDB=None):
+        pass
+    
+    def save(self):
+        """ Save the node configuration the couchdb database.  The documents will
+        be saved to the models default dabase. A document is saved only if 
+        it is not already in the database."""
+
+        #Save the model only if it is not already in the database.  It's not in the
+        # database if it doesn't have a id.
+        if self._nodeDescription is not None and self._nodeDescription.id is None:
+            self._nodeDescription.save(doc_id=self._nodeDescription.node_id)
+            
+        if (self._networkDescription is not None and 
+              self._networkDescription.id is None):
+            self._networkDescription.save(doc_id=self._networkDescription.network_id)
+        
+        if (self._communityDescription is not None and 
+                self._communityDescription.id is None):
+            self._communityDescription.save(
+                    doc_id=self._communityDescription.community_id)
+        
+        if (self._networkPolicyDescription is not None and 
+                self._networkPolicyDescription.id is None):
+            self._networkPolicyDescription.save(
+                            doc_id=self._networkPolicyDescription.policy_id)
+        
+        if self._connections is not None:
+            for c in self._connections:
+                if c.id is None:
+                    c.save(doc_id=c.connection_id)
+       
+        if self._nodeServices is not None:
+            for s in self._nodeServices:
+                if s.id is None:
+                    s.save(doc_id=s.service_id)
+    
+    def saveOrUpdate(self):
+        """ Save the node configuration the couchdb database.  The documents will
+        be saved to the models default dabase. A document will be updated if 
+        it is already in the database."""
+
+        #Save the model only if it is not already in the database.  It's not in the
+        # database if it doesn't have a id.
+        if self._nodeDescription is not None: 
+            if self._nodeDescription.id is None:
+                self._nodeDescription.save(doc_id=self._nodeDescription.node_id)
+            else:
+                self._nodeDescription.update()
+                
+        if self._networkDescription is not None:
+            if self._networkDescription.id is None:
+                self._networkDescription.save(doc_id=self._networkDescription.network_id)
+            else:
+                self._networkDescription.update()
+                
+        if self._communityDescription is not None: 
+                if self._communityDescription.id is None:
+                    self._communityDescription.save(
+                        doc_id=self._communityDescription.community_id)
+                else:
+                    self._communityDescription.update()
+                    
+        if self._networkPolicyDescription is not None:
+            if self._networkPolicyDescription.id is None:
+                self._networkPolicyDescription.save(
+                            doc_id=self._networkPolicyDescription.policy_id)
+            else:
+                self._networkPolicyDescription.update()
+        
+        if self._connections is not None:
+            for c in self._connections:
+                if c.id is None:
+                    c.save(doc_id=c.connection_id)
+                else:
+                    c.update()
+       
+        if self._nodeServices is not None:
+            for s in self._nodeServices:
+                if s.id is None:
+                    s.save(doc_id=s.service_id)
+                else:
+                    s.update()
         
     nodeDescription = property(lambda self: self._nodeDescription, None, None, None)
     networkDescription = property(lambda self: self._networkDescription, None, None, None)

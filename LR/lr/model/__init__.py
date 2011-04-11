@@ -30,6 +30,7 @@ lrconfig = h.importModuleFromFile(LR_NODE_CONFIG)
 _ERROR = 'error'
 _OK = "OK"
 LRNode = LRNodeModel(lrconfig)
+LRNode.save()
 
 def isResourceDataFilteredOut(resourceData):
     
