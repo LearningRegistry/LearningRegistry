@@ -197,7 +197,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
     
         # Property that return the dictionary of the spec data.
         specData = property(lambda self: dict(self._specData), None, None,  None)
-        id = property(lambda self: self._ID, None, None, None)
+        id = property(lambda self: self.__getattr__(self._ID), None, None, None)
          
     return BaseModel
 
