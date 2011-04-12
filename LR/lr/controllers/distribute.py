@@ -61,13 +61,16 @@ class DistributeController(BaseController):
                 except Exception as ex:
                     log.exception(ex)
                     return
-                 # Post everything directly to couchdb if the target is doing custom filter
-                 # for now we are assuming that target sink is couchdb   
-                for doc in ResourceDataModel.getAll():
-                    try:
-                                destinationDB[doc['_id']] = doc
-                    except Exception as e:
-                        log.exception(e)
+                 ## Post everything directly to couchdb if the target is doing custom filter
+                 ## for now we are assuming that target sink is couchdb   
+                #for doc in ResourceDataModel.getAll():
+                    #try:
+                                #destinationDB[doc['_id']] = doc
+                    #except Exception as e:
+                        #log.exception(e)
+                        
+                #Do a straight replication for custom filter
+                 server.replicate(sourceUrl, destinationUrl
             else:
                 filterFunction = (ResourceDataModel._defaultDB.name+"/" + 
                                           ResourceDataModel.DEFAULT_FILTER)
