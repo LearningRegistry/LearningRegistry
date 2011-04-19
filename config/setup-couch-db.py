@@ -18,8 +18,10 @@ import ConfigParser, os
 import couchdb
 import sys
 import json
+import logging
 
-
+log = logging.getLogger(__name__)
+   
 _config = ConfigParser.ConfigParser()
 _config.read('../LR/development.ini')
 
@@ -30,24 +32,25 @@ _COMMUNITY = _config.get("app:main", "couchdb.db.community")
 _NETWORK = _config.get("app:main", "couchdb.db.network")
 
 _couchServer = couchdb.Server(url=_SERVER_URL)
-
-def CreateDB(dblist=[]):
+stats = _couchServer.stats()
+s = json.dumps(stats, sort_keys=True, indent=4)
+prettyStats = '\n'.join([l.rstrip() for l in s.splitlines()])
+print("Server Exists, Here are some stats: {0}".format(prettyStats))
+            
+def CreateDB(couchServer =_couchServer,  dblist=[], deleteDB=False):
     '''Creates a DB in Couch based upon config'''
     for db in dblist:
-        try:
-            _couchServer[db]
-            stats = _couchServer.stats()
-            s = json.dumps(stats, sort_keys=True, indent=4)
-            prettyStats = '\n'.join([l.rstrip() for l in s.splitlines()])
-            print("DB Exists, Here are some stats: {0}".format(prettyStats))
-        except couchdb.http.ResourceNotFound as rnf:
-            print("DB '{0}' doesn't exist on '{1}', creating\n".format(db, _SERVER_URL))
+        if deleteDB:
             try:
-                _couchServer.create(db)
-                print("Created DB '{0}' on '{1}'\n".format(db, _SERVER_URL))
-        
-            except Exception as e:
-                print("Exception while creating database: {0}\n".format(e) )
+                del couchServer[db]
+            except couchdb.http.ResourceNotFound as rnf:
+                print("DB '{0}' doesn't exist on '{1}', creating".format(db, _SERVER_URL))
+        try:
+            couchServer.create(db)
+            print("Created DB '{0}' on '{1}'\n".format(db, _SERVER_URL))
+    
+        except Exception as e:
+            print("Exception while creating database: {0}\n".format(e) )
 
 
 def PublishDoc(dbname, name, doc_data):
@@ -56,7 +59,7 @@ def PublishDoc(dbname, name, doc_data):
         db = _couchServer[dbname]
         del db[name]
     except couchdb.http.ResourceNotFound as ex:
-        print("Exception when deleting existing config document: {0}\n".format(ex))
+        log.exception("Exception when deleting existing config document: {0}\n".format(ex))
     db[name] = doc_data
     print("Added config document '{0}' to '{1}".format(name, dbname))
     
@@ -79,7 +82,7 @@ def Prompt(name="", doc_data=None, nest=0):
 
 if __name__ == "__main__":
     CreateDB(dblist=[_RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK])
-    Prompt('description', default_description)
+    Prompt('Node Setup', default_node)
     PublishDoc(_NODE,'status',default_status)
     PublishDoc(_NODE,'policy',default_policy)
     PublishDoc(_NODE,'description',default_description)

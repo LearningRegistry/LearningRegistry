@@ -12,13 +12,11 @@ def make_map(config):
     """Create, configure and return the routes Mapper"""
     from pylons import config as c    
     c.update(config)
-    from lr.model.node_config import LRNodeModel
-    LR_NODE_CONFIG = config['init.LRNode.config']
+    from lr.model import LRNode
 
-    lrconfig = h.importModuleFromFile(LR_NODE_CONFIG)
-    LRNode = LRNodeModel(lrconfig)  
     map = Mapper(directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
+
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
     

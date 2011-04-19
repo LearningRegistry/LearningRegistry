@@ -45,6 +45,7 @@ class DistributeController(BaseController):
     
     
     def create(self):
+        
         if ((sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False)
             or (sourceLRNode.connections is None)):
             return
@@ -52,37 +53,22 @@ class DistributeController(BaseController):
         sourceNodeDBUrl = ResourceDataModel._defaultDB.resource.url
         
         def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
-      
-            if ((destinationNode.filterDescription is not None) and 
-                 (destinationNode.filterDescription.custom_filter == True)):
-                destinationDB =None
-                try:
-                    destinationDB = couchdb.Database(destinationUrl)
-                except Exception as ex:
-                    log.exception(ex)
-                    return
-                 ## Post everything directly to couchdb if the target is doing custom filter
-                 ## for now we are assuming that target sink is couchdb   
-                #for doc in ResourceDataModel.getAll():
-                    #try:
-                                #destinationDB[doc['_id']] = doc
-                    #except Exception as e:
-                        #log.exception(e)
-                        
-                #Do a straight replication for custom filter
-                server.replicate(sourceUrl, destinationUrl)
-            else:
-                filterFunction = (ResourceDataModel._defaultDB.name+"/" + 
+            
+            filterFunction = (ResourceDataModel._defaultDB.name+"/" + 
                                           ResourceDataModel.DEFAULT_FILTER)
-                                          
-                replicationOptions={'filter':filterFunction,  
-                                        'query_params': None}
-                if destinationNode.filterDescription is not None:
-                    replicationOptions['query_params'] = destinationNode.filterDescription.specData
-                    server.replicate(sourceUrl, destinationUrl, **replicationOptions)
-                else:
-                    server.replicate(sourceUrl,destinationUrl)
-    
+            # We want to always use the default filter function to filter
+            # out design document on replication. But we don't have any
+            # query arguments until we test if there is any filter.
+            replicationOptions={'filter':filterFunction, 
+                                             'query_params': None}
+            # If the destination node is using an filter and is not custom use it
+            # as the query params for the filter function
+            if ((destinationNode.filterDescription is not None) and 
+                 (destinationNode.filterDescription.custom_filter == False)):
+                     replicationOptions['query_params']:None
+        
+            server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+            
         
         for connection in sourceLRNode.connections:
             # Call a get on the distribute url of the connection node 
@@ -102,8 +88,8 @@ class DistributeController(BaseController):
         
             if ((sourceLRNode.communityDescription.community_id != 
                  destinationLRNode.communityDescription.community_id) and
-                 ((sourceLRNode.community.social_community == False) or
-                  (destinationLRNode.community.social_community == False))):
+                 ((sourceLRNode.communityDescription.social_community == False) or
+                  (destinationLRNode.communityDescription.social_community == False))):
                       continue
              
             if ((sourceLRNode.nodeDescription.gateway_node == False) and 
@@ -120,33 +106,3 @@ class DistributeController(BaseController):
                                                                         args=replicationArgs)
             replicationThread.start()
 
-
-    def new(self, format='html'):
-        """GET /distribute/new: Form to create a new item"""
-        # url('new_distribute')
-
-    def update(self, id):
-        """PUT /distribute/id: Update an existing item"""
-        # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="PUT" />
-        # Or using helpers:
-        #    h.form(url('distribute', id=ID),
-        #           method='put')
-        # url('distribute', id=ID)
-
-    def delete(self, id):
-        """DELETE /distribute/id: Delete an existing item"""
-        # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="DELETE" />
-        # Or using helpers:
-        #    h.form(url('distribute', id=ID),
-        #           method='delete')
-        # url('distribute', id=ID)
-
-    def show(self, id, format='html'):
-        """GET /distribute/id: Show a specific item"""
-        # url('distribute', id=ID)
-
-    def edit(self, id, format='html'):
-        """GET /distribute/id/edit: Form to edit an existing item"""
-        # url('edit_distribute', id=ID)
