@@ -41,7 +41,7 @@ def _getNodeDocument(docModel, docType, numType=None, isRequired=True):
     if numType is not None and isRequired and numModelDocs != numType:
             raise(Exception("Error {0} of type '{1}' is required in database '{2}'".
                     format(numType, docType, docModel._defaultDB.name)))
-    elif numModelDocs == 1:
+    elif numModelDocs == 1 and numType is not None:
         model= docModel(docModels[0])
         model.validate()
         return model.specData
@@ -74,7 +74,7 @@ def getNodeConfig():
                                                                                 "filter_description", 1, False)
     nodeConfig['node_services'] =_getNodeDocument(NodeServiceModel, 
                                                                                     "service_description",None)
-    nodeConfig['connection_description'] = _getNodeDocument(NodeConnectivityModel,
+    nodeConfig['node_connectivity'] = _getNodeDocument(NodeConnectivityModel,
                                                                                 "connection_description", None)
     return nodeConfig
     
