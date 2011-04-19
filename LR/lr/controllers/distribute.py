@@ -45,12 +45,15 @@ class DistributeController(BaseController):
     
     
     def create(self):
-        
+        """POST /obtain: Create a new item"""
+        log.info("Distribute.......\n")
         if ((sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False)
             or (sourceLRNode.connections is None)):
+            log.info("Distribute not available on node")
             return
         
         sourceNodeDBUrl = ResourceDataModel._defaultDB.resource.url
+        log.info("Source url: "+sourceNodeDBUrl)
         
         def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
             
@@ -65,11 +68,14 @@ class DistributeController(BaseController):
             # as the query params for the filter function
             if ((destinationNode.filterDescription is not None) and 
                  (destinationNode.filterDescription.custom_filter == False)):
-                     replicationOptions['query_params']:None
-        
-            server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+                     replicationOptions['query_params'] = destinationNode.filterDescription.specData
             
+            log.info("Replication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
+                            sourceUrl, destinationUrl, str(replicationOptions)))
+                            
+            server.replicate(sourceUrl, destinationUrl, **replicationOptions)
         
+        log.info("Connections: "+str(sourceLRNode.connections)+"\n")
         for connection in sourceLRNode.connections:
             # Call a get on the distribute url of the connection node 
             if connection.active == False:
@@ -90,12 +96,15 @@ class DistributeController(BaseController):
                  destinationLRNode.communityDescription.community_id) and
                  ((sourceLRNode.communityDescription.social_community == False) or
                   (destinationLRNode.communityDescription.social_community == False))):
+                      print("Distribute failed community test")
                       continue
              
             if ((sourceLRNode.nodeDescription.gateway_node == False) and 
                   (sourceLRNode.networkDescription.network_id != 
                   destinationLRNode.networkDescription.network_id)):
+                      print("Distribute failed network test")
                       continue
+                      
             replicationArgs = (destinationLRNode, 
                                          defaultCouchServer, 
                                          sourceNodeDBUrl, 
