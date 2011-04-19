@@ -50,8 +50,8 @@ class TestHarvestController(TestController):
           record = doc['record']          
           assert record.has_key('resource_data')            
           resource = record['resource_data']
-          assert resource['create_timestamp'] >= self.from_date
-          assert resource['create_timestamp'] <= self.until_date
+          assert resource['node_timestamp'] >= self.from_date
+          assert resource['node_timestamp'] <= self.until_date
 
     def test_listrecords_get(self):
         response = self.app.get(url('harvest', id='listrecords'),params={'from':self.from_date,'until':self.until_date})

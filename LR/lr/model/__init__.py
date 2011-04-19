@@ -22,7 +22,6 @@ from node_service import NodeServiceModel
 from network_policy import NetworkPolicyModel
 from  node_config import LRNodeModel
 from base_model import defaultCouchServer
-
 LR_NODE_CONFIG = appConfig['init.LRNode.config']
 
 lrconfig = h.importModuleFromFile(LR_NODE_CONFIG)

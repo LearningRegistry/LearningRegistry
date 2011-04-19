@@ -19,7 +19,7 @@ _BASE_PATH = _RESOURCE_DATA + "/" + _DESIGN_DOC
 couchServer = couchdb.Server(_COUCH_SERVER)
 
 class FiltersController(BaseController):
-    """REST Controller styled on the Atom Publishing Protocol"""
+    """REST Controller styled on the Atom Publishing Protocol"""cd
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('filter', 'filters', controller='contrib/filters', 

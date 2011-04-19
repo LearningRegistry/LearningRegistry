@@ -1,5 +1,7 @@
 import logging, json
 from lr.lib.harvest import harvest
+import lr.lib.helpers as helpers
+import iso8601
 from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -13,6 +15,10 @@ class HarvestController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')
+    def __parse_date(self,date):
+        last_update_date = iso8601.parse_date(date)
+        last_update = helpers.convertToISO8601UTC(last_update_date)    
+        return last_update    
     def harvest(self, params, body, verb):
         h = harvest()
         def getrecord():
@@ -38,12 +44,12 @@ class HarvestController(BaseController):
             }
           return json.dumps(data)
         def listidentifiers():
-            from_date = datetime.strptime(params['from'],time_format)
-            until_date = datetime.strptime(params['until'],time_format)
+            from_date = self.__parse_date(params['from'])
+            until_date = self.__parse_date(params['until'])
             return self.list_identifiers(from_date,until_date,h,body,params,verb)            
         def listrecords():
-            from_date = datetime.strptime(params['from'],time_format)
-            until_date = datetime.strptime(params['until'],time_format)
+            from_date = self.__parse_date(params['from'])
+            until_date = self.__parse_date(params['until'])
             return self.list_records(from_date,until_date,h,body,params,verb)
         def identify():
             data = self.get_base_response(verb,body)

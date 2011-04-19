@@ -70,7 +70,7 @@ class DistributeController(BaseController):
                         #log.exception(e)
                         
                 #Do a straight replication for custom filter
-                 server.replicate(sourceUrl, destinationUrl
+                server.replicate(sourceUrl, destinationUrl)
             else:
                 filterFunction = (ResourceDataModel._defaultDB.name+"/" + 
                                           ResourceDataModel.DEFAULT_FILTER)

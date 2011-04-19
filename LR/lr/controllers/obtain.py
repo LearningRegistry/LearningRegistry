@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import logging, urllib2, json,urllib, couchdb
+import logging, urllib2, json, couchdb
 from lr.model.base_model import appConfig
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -25,38 +25,46 @@ class ObtainController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('obtain', 'obtain')
-    def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[]):
+    def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
         s = couchdb.Server(appConfig['couchdb.url'])
         db = s[appConfig['couchdb.db.resourcedata']]        
         if len(keys) > 0:
-          view = db.view(view_name, include_docs=True, keys=keys)
+          view = db.view(view_name, include_docs=include_docs, keys=keys)
         else:
-          view = db.view(view_name, include_docs=True)          
+          view = db.view(view_name, include_docs=include_docs)          
         return view
 
     def format_data(self,full_docs,data):
-        if full_docs:
-          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id,'resource_data_description':doc.doc},data)}
-        else:
-          return_data = {'documents' : map(lambda doc: {'doc_ID':doc.id},data)}
-        return return_data
+        yield "{'documents':["
+        num_sent = 1 #account for 0 index
+        for doc in data:
+            if full_docs:
+                return_data = {'doc_ID':doc.id,'resource_data_description':doc.doc}
+            else:
+                return_data = {'doc_ID':doc.id}                
+            num_sent = num_sent + 1
+            if num_sent < len(data):            
+                yield json.dumps(return_data) + ','                                    
+            else:
+                yield json.dumps(return_data)
+        yield "]}"
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
         data = self.get_view()	
-        return json.dumps(self.format_data(False,data))
+        return self.format_data(False,data)
         # url('obtain')
 
     def create(self):
         """POST /obtain: Create a new item"""
         data = json.loads(request.body)
         keys = map(lambda key: key['request_ID'],data['request_IDs'])
+        full_docs = data['ids_only'] is None or data['ids_only'] == False
         if data['by_doc_ID']:
-          view = self.get_view('_all_docs',keys)
+          view = self.get_view('_all_docs',keys, full_docs)
         elif data['by_resource_ID']:
-          view = self.get_view('_design/filter/_view/resource-location',keys)
-        return_data = view
-        return_data = self.format_data(data['ids_only'] is None or data['ids_only'] == False,return_data)
-        return json.dumps(return_data)
+          view = self.get_view('_design/filter/_view/resource-location',keys, full_docs)
+        return_data = view        
+        return self.format_data(full_docs,return_data)
         # url('obtain')
 
     def new(self, format='html'):

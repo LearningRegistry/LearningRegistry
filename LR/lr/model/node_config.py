@@ -35,7 +35,6 @@ def dictToObject(dictionary):
 class LRNodeModel(object):
     """Class that models a learning registry node"""
     def __init__(self, data):
-        
         self._config = {}
         self._communityDescription = None
         self._networkDescription = None

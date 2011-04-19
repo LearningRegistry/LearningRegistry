@@ -25,7 +25,7 @@ def importModuleFromFile(fullpath):
         del sys.path[-1]
         return module
 
-def convertToISO8601UTC(datetime=None):
+def convertToISO8601UTC (datetime=None):
     if datetime != None:
         return (datetime - datetime.utcoffset()).replace(tzinfo=None)
     return datetime

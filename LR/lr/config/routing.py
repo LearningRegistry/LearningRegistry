@@ -5,26 +5,35 @@ may take precedent over the more generic routes. For more information
 refer to the routes manual at http://routes.groovie.org/docs/
 """
 from routes import Mapper
-
+import logging
+from lr.lib import helpers as h
+log = logging.getLogger(__name__)
 def make_map(config):
     """Create, configure and return the routes Mapper"""
+    from pylons import config as c    
+    c.update(config)
+    from lr.model.node_config import LRNodeModel
+    LR_NODE_CONFIG = config['init.LRNode.config']
+
+    lrconfig = h.importModuleFromFile(LR_NODE_CONFIG)
+    LRNode = LRNodeModel(lrconfig)  
     map = Mapper(directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
-
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
-
-    map.resource('publish','publish')
-    map.resource('obtain','obtain')
-    map.resource('distribute','distribute')
-    map.resource('status','status')
-    map.resource('description','description')
-    map.resource('services','services')
-    map.resource('policy','policy')
-    map.resource('harvest','harvest')
-    # Value added services
-    map.resource('OAI-PMH', 'OAI-PMH')
-    map.resource('sword','sword')
+    
+    map.resource('distribute','distribute')    
+    if not LRNode.nodeDescription.gateway_node:
+        map.resource('publish','publish')
+        map.resource('obtain','obtain')    
+        map.resource('status','status')
+        map.resource('description','description')
+        map.resource('services','services')
+        map.resource('policy','policy')
+        map.resource('harvest','harvest')
+        # Value added services
+        map.resource('OAI-PMH', 'OAI-PMH')
+        map.resource('sword','sword')
     
     map.minimization = False
     map.explicit = False

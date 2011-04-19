@@ -2,12 +2,17 @@
 import couchdb, json
 from datetime import datetime
 import logging
+import helpers as h
+import iso8601
 log = logging.getLogger(__name__)
 class harvest:
   def __init__(self, server='http://localhost', database='resource_data'):
     server = couchdb.Server(server)
     self.db = server[database]
-
+  def __parse_date(self,date):
+        last_update_date = iso8601.parse_date(date)
+        last_update = h.convertToISO8601UTC(last_update_date)    
+        return last_update
   def get_record(self,id):
     return self.db[id]
   def get_records_by_resource(self,resource_locator):
@@ -19,7 +24,7 @@ class harvest:
     for row in rows:
       #ignore design docs
       if not row.id.startswith('_design'):
-        last_update = datetime.strptime(row.doc['node_timestamp'],'%Y-%m-%d %H:%M:%S.%f')
+        last_update = self.__parse_date(row.doc['node_timestamp'])
         if last_update >=from_date or last_update <= until_date:
           return_list.append(row.doc)
     return return_list
@@ -32,7 +37,7 @@ class harvest:
     for row in rows:
       #ignore design docs
       if not row.id.startswith('_design'):
-        last_update = datetime.strptime(row.doc['node_timestamp'],'%Y-%m-%d %H:%M:%S.%f')
+        last_update = self.__parse_date(row.doc['node_timestamp'])
         if last_update >=from_date or last_update <= until_date:
           return_list.append(row.id)
     return return_list
