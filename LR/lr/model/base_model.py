@@ -54,14 +54,16 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             
         @classmethod
         def getAll(cls, db= None):
+            """Returns all the documents in the database. Design documents are filtered
+            out"""
             sourceDB = db
             if db is None:
                 sourceDB = cls._defaultDB
                 
             view = sourceDB.view('_all_docs', include_docs=True)
             # filter out any design design document.
-            designDocId = "_design/"+sourceDB.name
-            filteredView = filter(lambda row, key=designDocId: row.key != key, view)
+            designDocId = "_design/"
+            filteredView = filter(lambda row, key=designDocId: not row.key.startswith(key), view)
             
             return [sourceDB[row.key] for row in filteredView]
             
@@ -194,7 +196,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
                 return
             self.__dict__[self._ID]   = document[self._ID] 
             self.__dict__[self._REV] = document[self._REV]
-    
+        
         # Property that return the dictionary of the spec data.
         specData = property(lambda self: dict(self._specData), None, None,  None)
         id = property(lambda self: self.__getattr__(self._ID), None, None, None)
