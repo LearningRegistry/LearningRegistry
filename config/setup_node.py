@@ -43,10 +43,13 @@ def getInput(question, defaultInput=None,  validateFunc=None):
     
     while True:
         userInput = raw_input(ques)
-        
-        if len(userInput.strip()) == 0 and defaultInput is not None:
-            userInput = defaultInput
-            
+        inputLen =  len(userInput.strip())
+        if inputLen == 0:
+            if defaultInput is not None: 
+                userInput = defaultInput
+            else:
+                continue
+                
         if validateFunc is not None and validateFunc(userInput) == False:
             continue
             
@@ -126,7 +129,7 @@ if __name__ == "__main__":
     
     #Create the databases.
     c.CreateDB(server, dblist=[c._RESOURCE_DATA])
-    c.CreateDB(server, dblist=[ c._NODE, c._NETWORK, c._COMMUNITY], True)
+    c.CreateDB(server, dblist=[ c._NODE, c._NETWORK, c._COMMUNITY], deleteDB=True)
     
     #Add the network and community description
     c.PublishDoc(c._COMMUNITY, "community_description", t.community_description)
