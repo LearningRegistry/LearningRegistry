@@ -75,7 +75,7 @@ def getSetupInfo():
     nodeSetup['node_admin_url'] = adminUrl
                                     
     distributeTargets = getInput("Enter the URLs of nodes that you wish to distribute to",
-                                                 None)
+                                                 "")
     nodeSetup['connections'] = distributeTargets.split()
     
     isNodeOpen = getInput('Is the  node "open" (T/F)', 'T')
@@ -122,9 +122,11 @@ if __name__ == "__main__":
         print("{0}:  {1}".format(k, nodeSetup[k]))
         
     #Update pylons config file to use the couchdb url
-    _config.get("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
+    _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
     configfile = open(_PYLONS_CONFIG, 'w')
     _config.write(configfile)
+    configfile.close()
+    
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
     
     #Create the databases.
