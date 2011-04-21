@@ -83,7 +83,8 @@ LRNode = LRNodeModel(getNodeConfig())
     
 def isResourceDataFilteredOut(resourceData):
     
-    if (LRNode.filterDescription is None or 
+    if (LRNode.filterDescription is None or
+        LRNode.filterDescription.filter is None or 
         LRNode.filterDescription.custom_filter == True):
         #Do custom the filter I supposed ... for now just resturn false.
         return [False, None]

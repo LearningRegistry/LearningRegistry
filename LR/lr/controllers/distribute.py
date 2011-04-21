@@ -18,18 +18,19 @@ import re
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.model import LRNode as sourceLRNode, \
-            NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer
+            NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
             
 from lr.lib.base import BaseController, render
 
 log = logging.getLogger(__name__)
 
 class DistributeController(BaseController):
+    def __before__(self):
+        self.resource_data = appConfig['couchdb.db.resourcedata']
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('distribute', 'distribute')
-
     def index(self, format='html'):
         """GET /distribute: All items in the collection"""
         # url('distribute')
@@ -39,7 +40,7 @@ class DistributeController(BaseController):
             distributeInfo['OK'] = False
         else:
             distributeInfo['node_config'] = sourceLRNode.config
-            distributeInfo['distribute_sink_url'] = ResourceDataModel._defaultDB.resource.url
+            distributeInfo['distribute_sink_url'] = urlparse.urljoin(request.url,self.resource_data)
         log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
         return json.dumps(distributeInfo)
     
@@ -104,10 +105,9 @@ class DistributeController(BaseController):
                   destinationLRNode.networkDescription.network_id)):
                       print("Distribute failed network test")
                       continue
-                      
             replicationArgs = (destinationLRNode, 
                                          defaultCouchServer, 
-                                         sourceNodeDBUrl, 
+                                         self.resource_data, 
                                          distributeInfo['distribute_sink_url'])
                                          
             # Use a thread to do the actual replication.                             

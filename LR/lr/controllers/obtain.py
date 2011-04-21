@@ -36,17 +36,18 @@ class ObtainController(BaseController):
 
     def format_data(self,full_docs,data):
         yield "{'documents':["
-        num_sent = 1 #account for 0 index
-        for doc in data:
-            if full_docs:
-                return_data = {'doc_ID':doc.id,'resource_data_description':doc.doc}
-            else:
-                return_data = {'doc_ID':doc.id}                
-            num_sent = num_sent + 1
-            if num_sent < len(data):            
-                yield json.dumps(return_data) + ','                                    
-            else:
-                yield json.dumps(return_data)
+        num_sent = 0
+        if data is not None and len(data) > 0:
+            for doc in data:
+                if full_docs:
+                    return_data = {'doc_ID':doc.id,'resource_data_description':doc.doc}
+                else:
+                    return_data = {'doc_ID':doc.id}                
+                num_sent = num_sent + 1
+                if num_sent < len(data):            
+                    yield json.dumps(return_data) + ','                                    
+                else:
+                    yield json.dumps(return_data)  
         yield "]}"
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
