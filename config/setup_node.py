@@ -147,6 +147,8 @@ if __name__ == "__main__":
     node_description['node_name'] = nodeSetup['node_name']
     node_description['node_description'] = nodeSetup['node_description']
     node_description['node_admin_url'] = nodeSetup['node_admin_url']
+    node_description["open_connect_source"] = nodeSetup["open_connect_source"]
+    node_description["open_connect_dest"] = nodeSetup["open_connect_dest"]
     node_description['node_id'] = uuid4().hex
     c.PublishDoc(c._NODE,'node_description',node_description)
     
