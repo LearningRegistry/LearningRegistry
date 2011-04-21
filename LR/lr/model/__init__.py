@@ -23,14 +23,9 @@ from network_policy import NetworkPolicyModel
 from  node_config import LRNodeModel
 from base_model import defaultCouchServer
 
-#LR_NODE_CONFIG = appConfig['init.LRNode.config']
-
-#lrconfig = h.importModuleFromFile(LR_NODE_CONFIG)
 
 _ERROR = 'error'
 _OK = "OK"
-#LRNode = LRNodeModel(lrconfig)
-#LRNode.save()
 
 def _getNodeDocument(docModel, docType, numType=None, isRequired=True):
     
@@ -79,8 +74,7 @@ def getNodeConfig():
     return nodeConfig
     
 LRNode = LRNodeModel(getNodeConfig())
-#LRNode.save()
-    
+
 def isResourceDataFilteredOut(resourceData):
     
     if (LRNode.filterDescription is None or
