@@ -73,10 +73,9 @@ class DistributeController(BaseController):
             
             log.info("Replication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
                             sourceUrl, destinationUrl, str(replicationOptions)))
-            if replicationOptions['query_params'] is not None:                
-                server.replicate(sourceUrl, destinationUrl, **replicationOptions)
-            else:
-                server.replicate(sourceUrl,destinationUrl)
+            if replicationOptions['query_params'] is  None:                
+                del replicationOptions['query_params']
+            server.replicate(sourceUrl, destinationUrl, **replicationOptions)
         
         log.info("Connections: "+str(sourceLRNode.connections)+"\n")
         for connection in sourceLRNode.connections:
