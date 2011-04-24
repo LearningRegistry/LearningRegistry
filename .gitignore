@@ -5,3 +5,10 @@
 *paster.pid
 LR/tests/*.htm
 geanyproject
+
+# these files are altered when installing the package, so ignore them
+MANIFEST
+*.egg-info
+
+# the locally generated config file
+LR/config.ini
