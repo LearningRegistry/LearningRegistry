@@ -74,12 +74,12 @@ class DistributeController(BaseController):
             isGatewayConnection = (
                         (sourceLRNode.nodeDescription.gateway_node == True) and
                         (destinationLRNode.nodeDescription.gateway_node ==True))
+            # Skip the connection if there is any mismatch between the connection and
+            # the node data.
+            if isGatewayconnection != connection.gateway_connection:
+                log.info("Skip connection. 'gateway_connection' mismatch between node and connection data")
+                continue
         
-            # Catch data mismatch where the connection doc says it not a  gateway 
-            # when in fact the two nodes are gateway nodes.
-            if ((connection.gateway_connection == False) and
-                (isGatewayConnection == True)):
-                gatewayConnectionList.append(connection)
             # Only one gateway  connection is allowed, faulty network description
             if len(gatewayConnectionList) > 1:
                 log.info("***Abort distribution. More than one gateway node connection")
@@ -164,7 +164,7 @@ class DistributeController(BaseController):
             replicationArgs = (connectionInfo['destinationNode'], 
                                          defaultCouchServer, 
                                          self.resource_data, 
-                                         connectionInfo['distributeInfo']['distribute_sink_url'])
+                                         connectionInfo['distributeInfo']['distribute_sink_url'])13
                                          
             # Use a thread to do the actual replication.                             
             replicationThread = threading.Thread(target=doDistribution, 
