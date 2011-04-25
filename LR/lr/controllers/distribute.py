@@ -76,7 +76,7 @@ class DistributeController(BaseController):
                         (destinationLRNode.nodeDescription.gateway_node ==True))
             # Skip the connection if there is any mismatch between the connection and
             # the node data.
-            if isGatewayconnection != connection.gateway_connection:
+            if isGatewayConnection != connection.gateway_connection:
                 log.info("Skip connection. 'gateway_connection' mismatch between node and connection data")
                 continue
         
@@ -164,7 +164,7 @@ class DistributeController(BaseController):
             replicationArgs = (connectionInfo['destinationNode'], 
                                          defaultCouchServer, 
                                          self.resource_data, 
-                                         connectionInfo['distributeInfo']['distribute_sink_url'])13
+                                         connectionInfo['distributeInfo']['distribute_sink_url'])
                                          
             # Use a thread to do the actual replication.                             
             replicationThread = threading.Thread(target=doDistribution, 
