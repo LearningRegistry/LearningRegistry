@@ -81,7 +81,7 @@ def getSetupInfo():
     isNodeOpen = getInput('Is the  node "open" (T/F)', 'T')
     nodeSetup['open_connect_source']  = (isNodeOpen=='T')
     
-    isDistributeDest = getInput("Does tge node want to be the destination for replication (T/F)", 'T')
+    isDistributeDest = getInput("Does the node want to be the destination for replication (T/F)", 'T')
     nodeSetup['open_connect_dest'] =(isDistributeDest =='T')
     return nodeSetup
     
