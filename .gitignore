@@ -8,7 +8,9 @@ geanyproject
 
 # these files are altered when installing the package, so ignore them
 MANIFEST
-*.egg-info
+
+# this is apparently bad ju-ju in some environments (paster won't start)
+#*.egg-info
 
 # the locally generated config file
 LR/config.ini
