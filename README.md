@@ -242,12 +242,19 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 * Copy the ngnix.conf file from repository
 
 >       sudo cp nginx.conf /etc/nginx/nginx.conf
+## Configure Pylons logging level
+
+* Edit the production.ini found at LearningRegistry/LR
+
+* Modify the level value under the logger_lr section
+
+* For production is is set to only log error messages, for more verbose logging it can be set to info
 
 ## Start LR code ##
 
 * From your virtualenv directory start paster where */home/learningregistry/virtualenv/lr* is my path to virtualenv.
+>       /home/learningregistry/virtualenv/lr/bin/paster serve --daemon production.ini start
 
->       /home/learningregistry/virtualenv/lr/bin/paster serve --reload development.ini &
 
 
 
