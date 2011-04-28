@@ -44,17 +44,87 @@ class DistributeController(BaseController):
         log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
         return json.dumps(distributeInfo)
     
-    
-    def create(self):
-        """POST /obtain: Create a new item"""
-        log.info("Distribute.......\n")
-        if ((sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False)
-            or (sourceLRNode.connections is None)):
-            log.info("Distribute not available on node")
-            return
+    def _getDistributeDestinations(self):
+        """"Method to test the connections and returns a list of destionation node
+             if the connections are valid"""
+        nodeDestinationList =[]
+        gatewayConnectionList = []
+        for connection in sourceLRNode.connections:
+            # Make sure that the connection is active 
+            if connection.active == False:
+                continue
+            destinationLRNode = None
+           
+            if connection.gateway_connection == True:
+                gatewayConnectionList.append(connection)
+            try:
+                # Make sure we only have one slash in the url path. More than one 
+                #confuses pylons routing libary.
+                destinationURL = urlparse.urljoin(connection.destination_node_url.strip(),
+                                                                        "distribute")
+                log.info("\n\nAccess destination node at: "+destinationURL)
+                distributeInfo = json.load(urllib2.urlopen(destinationURL))
+                destinationLRNode = LRNodeModel(distributeInfo['node_config'])
+            except Exception as ex:
+                log.exception(ex)
+                continue
+             # Use of local variable to store is the connection is gateway connection. This
+            # done this with the case where the two nodes are actual gateway node 
+            # yet the connection has the wrong data.
+            isGatewayConnection = (
+                        (sourceLRNode.nodeDescription.gateway_node == True) and
+                        (destinationLRNode.nodeDescription.gateway_node ==True))
+            # Skip the connection if there is any mismatch between the connection and
+            # the node data.
+            if isGatewayConnection != connection.gateway_connection:
+                log.info("Skip connection. 'gateway_connection' mismatch between node and connection data")
+                continue
         
-        sourceNodeDBUrl = ResourceDataModel._defaultDB.resource.url
-        log.info("Source url: "+sourceNodeDBUrl)
+            # Only one gateway  connection is allowed, faulty network description
+            if len(gatewayConnectionList) > 1:
+                log.info("***Abort distribution. More than one gateway node connection")
+                #Clear the node destination list no distribution is network description 
+                # is faulty
+                nodeDestinationList = []
+                break
+            #Calcuate if the connection is gatewa
+            #cannot distribute across non social communities
+            if ((sourceLRNode.communityDescription.community_id != 
+                 destinationLRNode.communityDescription.community_id) and
+                 ((sourceLRNode.communityDescription.social_community == False) or
+                  (destinationLRNode.communityDescription.social_community == False))):
+                      log.info("Cannot distribute across non social communities")
+                      continue
+            # Cannot distribute across networks (or communities) unless gateway
+            if((isGatewayConnection == False) and
+                ((sourceLRNode.communityDescription.community_id != 
+                 destinationLRNode.communityDescription.community_id) or
+                (sourceLRNode.networkDescription.network_id != 
+                  destinationLRNode.networkDescription.network_id))):
+                      log.info("Different Network. Cannot distribute across networks (or communities) unless gateway")
+                      continue
+            # Gateway must only distribute across different networks.
+            if((isGatewayConnection ==True) and
+                   (sourceLRNode.networkDescription.network_id == 
+                    destinationLRNode.networkDescription.network_id)):
+                        log.info("Gateway must only distribute across different networks")
+                        continue
+            # Only gateways can distribute on gateway connection. This is really for 
+            # catching mismatch in the data where a connection says it is between 
+            # gateways when the nodes are not both gateways.
+            if((connection.gateway_connection == True) and 
+                ((sourceLRNode.nodeDescription.gateway_node == False) or
+                (destinationLRNode.nodeDescription.gateway_node == False))):
+                    log.info("Only gateways can distribute on gateway connection")
+                    continue
+            nodeInfo = { "distributeInfo": distributeInfo,
+                                  "destinationNode":destinationLRNode}
+            nodeDestinationList.append(nodeInfo)
+            
+        return nodeDestinationList
+        
+    def create(self):
+        """POST / distribute start distribution"""
         
         def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
             
@@ -71,45 +141,30 @@ class DistributeController(BaseController):
                  (destinationNode.filterDescription.custom_filter == False)):
                      replicationOptions['query_params'] = destinationNode.filterDescription.specData
             
-            log.info("Replication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
+            log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
                             sourceUrl, destinationUrl, str(replicationOptions)))
             if replicationOptions['query_params'] is  None:                
                 del replicationOptions['query_params']
-            server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+                
+            results = server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+            log.debug("Replication results: "+str(results))
         
+        log.info("Distribute.......\n")
+        #Check if the distribte service is available on the node.
+        if(sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False):
+            log.info("Distribute not available on node ")
+            return
+        if((sourceLRNode.connections is None) or 
+            (len(sourceLRNode.connections) ==0)):
+            log.info("No connection present for distribution")
+            return
         log.info("Connections: "+str(sourceLRNode.connections)+"\n")
-        for connection in sourceLRNode.connections:
-            # Call a get on the distribute url of the connection node 
-            if connection.active == False:
-                continue
-            destinationLRNode = None
-            try:
-                # Make sure we only have one slash in the url path. More than one 
-                #confuses pylons routing libary.
-                destinationURL = urlparse.urljoin(connection.destination_node_url.strip(), "distribute")
-                log.info("\nAccess destination node at: "+destinationURL)
-                distributeInfo = json.load(urllib2.urlopen(destinationURL))
-                destinationLRNode = LRNodeModel(distributeInfo['node_config'])
-            except Exception as ex:
-                log.exception(ex)
-                continue
-        
-            if ((sourceLRNode.communityDescription.community_id != 
-                 destinationLRNode.communityDescription.community_id) and
-                 ((sourceLRNode.communityDescription.social_community == False) or
-                  (destinationLRNode.communityDescription.social_community == False))):
-                      print("Distribute failed community test")
-                      continue
-             
-            if ((sourceLRNode.nodeDescription.gateway_node == False) and 
-                  (sourceLRNode.networkDescription.network_id != 
-                  destinationLRNode.networkDescription.network_id)):
-                      print("Distribute failed network test")
-                      continue
-            replicationArgs = (destinationLRNode, 
+
+        for connectionInfo in self._getDistributeDestinations():
+            replicationArgs = (connectionInfo['destinationNode'], 
                                          defaultCouchServer, 
                                          self.resource_data, 
-                                         distributeInfo['distribute_sink_url'])
+                                         connectionInfo['distributeInfo']['distribute_sink_url'])
                                          
             # Use a thread to do the actual replication.                             
             replicationThread = threading.Thread(target=doDistribution, 

@@ -105,14 +105,17 @@ class LRNodeModel(object):
         
     def _initModel(self, modelClass, modelId, modelConf):
         #Try to get the model data from the database.
+        model = None
         modelDoc = modelClass.get(modelId)
         if modelDoc is None:
             model = modelClass(modelConf)
-            #model.save(doc_id=modelId)
             return model
         else:
-            return modelClass(modelDoc)
-     
+            model = modelClass(modelDoc)
+        mode.validate()
+        return model
+        
+        
     def _setNodeStatus(self):
         nodeStatus = None
         nodeStatusId = self._nodeDescription.node_id+"_node_status"
