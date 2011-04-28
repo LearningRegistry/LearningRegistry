@@ -186,6 +186,16 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 >       sudo make BUILD_OPT=1 JS_DIST=/usr/local -f Makefile.ref export
 
+## Configure logrotate to rotate and compress CouchDB log files
+
+* These steps are only necessary if you installed from source.
+ 
+* Open logrotate.conf.
+
+* Uncomment the the compress option, this will allow logrotate to compress old log files into a gzip file.
+
+* run ln -s /usr/local/etc/logrotate.d/couch /etc/logrotate.d/couchdb as root or using sudo to create the couchdb entry for logrotate
+ 
 
 ## Install Python virtualenv and Pylons ##
 
