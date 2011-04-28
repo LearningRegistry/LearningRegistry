@@ -23,7 +23,7 @@ Overview of Contents
 ====================
 
 * config
-    * setup-couch-db.py - simple script to configure a couch instance for an lr use.
+    * setup_node.py - simple script to configure a couch instance for an lr use.
 
 * couchdb/apps
     * stemx - NSDL STEM Exchange Demo couch application
