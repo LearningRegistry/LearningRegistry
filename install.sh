@@ -6,3 +6,4 @@ pip install flup
 pip install --upgrade couchdb 
 pip install pyparsing
 cp nginx.conf /etc/nginx/nginx.conf
+    
