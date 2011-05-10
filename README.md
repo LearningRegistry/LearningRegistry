@@ -294,18 +294,19 @@ Learning Registry node.
 
 >       launchctl load -w /usr/local/Cellar/couchdb/1.0.2/Library/LaunchDaemons/org.apache.couchdb.plist
 
-* Navigate to the directory where you have cloned the Learning Registry git repository.
+* Navigate to the `config` directory within your clone of the Learning
+  Registry git repository.
 
->       cd [path to the clone of the git repository]
+>       cd [path to the clone of the git repository]/config
 
 * Load the initial documents for Learning Registry into CouchDB. This
   script will ask a few questions.
 
->       python config/setup_node.py
+>       python setup_node.py
 
 * Install the Learning Registry pylons app.
 
->       cd LR
+>       cd ../LR
 >       pip install -e .
 
 * Edit the development.ini file and replace the line
