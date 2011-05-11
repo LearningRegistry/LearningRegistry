@@ -20,6 +20,13 @@ from node_service import NodeServiceModel
 from datetime import datetime
 from resource_data import ResourceDataModel
 from node_filter import NodeFilterModel, defaultCouchServer, appConfig
+import logging
+import threading
+import pprint
+from lr.lib import helpers as h
+
+
+log = logging.getLogger(__name__)
 
 def dictToObject(dictionary):
     class DictToObject(object):
@@ -40,8 +47,11 @@ class LRNodeModel(object):
         self._networkDescription = None
         self._filterDescription = None
         self._nodeStatus = None
+        self._monitoringChanges = False
+        self._lastChangeSeq = -1
+        self._changeMonintoringThread = None
         config = data
-        
+        self._monitorResourceDataChanges()
         if isinstance(data, dict):
             config = dictToObject(data)
             
@@ -102,7 +112,7 @@ class LRNodeModel(object):
                                                                                 connection['connection_id'],
                                                                                 connection))
         self._setNodeStatus() 
-        
+
     def _initModel(self, modelClass, modelId, modelConf):
         #Try to get the model data from the database.
         model = None
@@ -136,7 +146,7 @@ class LRNodeModel(object):
           
     def _getStatusDescription(self):
         statusData = {'doc_count': ResourceDataModel._defaultDB.info()['doc_count'],
-                                'timestamp': str(datetime.utcnow())}
+                                'timestamp': h.nowToISO8601Zformat()}
         statusData.update(self._nodeStatus.specData)
         return statusData
         
@@ -231,6 +241,78 @@ class LRNodeModel(object):
                     s.save(doc_id=s.service_id)
                 else:
                     s.update()
+        
+        
+    def _monitorResourceDataChanges(self):
+        """Method that tracks the updates, deletes, and additions time of envelops, 
+         resource_data documents in the resource_data database."""
+        # First get get the list sequence id of hte latest change to that we can start
+        # getting the changes for that sequence number.
+        log.info("Start  to log resource_data changes monitoring\n")
+        db = ResourceDataModel._defaultDB
+        currentChanges = db.changes();
+        if self._lastChangeSeq == -1:
+            self._lastChangeSeq = currentChanges['last_seq']
+        log.info("Last change sequence: "+str(self._lastChangeSeq))
+        
+        def recordChanges():
+            if self._monitoringChanges == True:
+                return
+            self._monitoringChanges = True;
+            db = ResourceDataModel._defaultDB
+       
+            while True:
+                # I have to include the doc since the filter does seems to work.  Otherwise
+                # using the same replication filter to get only resource_data document
+                # would work been better.
+                options ={'feed': 'continuous',
+                              'since': self._lastChangeSeq,
+                              'include_docs':True
+                              }
+                changes =  db.changes(**options)
+                for change in changes:
+                    if 'doc' not in change:
+                        continue
+                    timestamp =  h.nowToISO8601Zformat()
+                    # See if the document is of resource_data type if not ignore it.
+                    doc = change['doc']
+                    if  not 'resource_data' in doc:
+                        continue
+                    #get the revision number.
+                    log.info("\n\n"+pprint.pformat(change)+"\n\n")
+                    revNumber = doc['_rev'].split('-')[0]
+                    timestampDoc = {
+                                '_id':doc['_id']+"-timestamp",
+                                'doc_ID': doc['doc_ID'],
+                                'doc_type': 'resource_data_timestamp'
+                        }
+                    log.info("RevNubmber: {0}\nTimestampDoc {1}".format(revNumber,
+                                                pprint.pformat(timestampDoc)))
+                    # Remove the document from list change and add the remaining data
+                    # to the timestampDoc
+                    if  revNumber == '1':
+                        log.info("\nSaving new timestamp:\n")
+                        timestampDoc['node_timestamp'] = timestamp
+                        timestampDoc['update_timestamp'] = timestamp
+                        try:
+                            db[timestampDoc['_id']]  = timestampDoc
+                        except Exception as ex:
+                            log.exception(ex)
+                    else:
+                        log.info("\nupdate existing timestamp\n")
+                        timestampDoc = db.get(timestampDoc['_id'])
+                        timestampDoc['update_timestamp'] = timestamp
+                        try:
+                            db.update(timestampDoc);
+                        except Exception as ex:
+                            log.exception(ex)
+                    # Keep the last sequence number
+                    self._lastChangeSeq = change['seq']
+                    log.info("Time Stamps: "+pprint.pformat(timestampDoc))
+                    self._lastChangeSeq = change['seq']
+        # Use a separate thread to track to the changes in resource_data.
+        self._changeMonitoringThread = threading.Thread(target=recordChanges)
+        self._changeMonitoringThread.start()
         
     nodeDescription = property(lambda self: self._nodeDescription, None, None, None)
     networkDescription = property(lambda self: self._networkDescription, None, None, None)
