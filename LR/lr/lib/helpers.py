@@ -1,3 +1,6 @@
+
+from datetime import datetime
+import time
 """Helper functions
 
 Consists of functions to typically be used within templates, but also
@@ -25,12 +28,15 @@ def importModuleFromFile(fullpath):
         del sys.path[-1]
         return module
 
-def convertToISO8601UTC (datetime=None):
-    if datetime != None:
-        return (datetime - datetime.utcoffset()).replace(tzinfo=None)
-    return datetime
+def convertToISO8601UTC (dateTimeArg=None):
+    if isinstance(dateTimeArg, datetime) == True:
+        return datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
+    return dateTimeArg
         
-def convertToISO8601Zformat(datetime=None):
-    if datetime != None:
-        return ((datetime - datetime.utcoffset()).replace(tzinfo=None)).isoformat() + "Z" 
-    return datetime
+def convertToISO8601Zformat(dateTimeArg=None):
+    if isinstance(dateTimeArg, datetime) ==True:
+        return convertToISO8601UTC (dateTimeArg).isoformat()+ "Z" 
+    return dateTimeArg
+    
+def nowToISO8601Zformat():
+    return convertToISO8601Zformat(datetime.now())
