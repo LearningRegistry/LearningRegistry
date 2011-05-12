@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 """Helper functions
 
@@ -29,8 +29,11 @@ def importModuleFromFile(fullpath):
         return module
 
 def convertToISO8601UTC (dateTimeArg=None):
+    """This method assumes that the datetime is local naive time."""
     if isinstance(dateTimeArg, datetime) == True:
-        return datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
+        dateUTC = datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
+        #Add the macroseconds back since hte mktime conversion loses it
+        return dataUTC + timedelta(0, 0, datetimeArg.microsecond)
     return dateTimeArg
         
 def convertToISO8601Zformat(dateTimeArg=None):
@@ -39,4 +42,4 @@ def convertToISO8601Zformat(dateTimeArg=None):
     return dateTimeArg
     
 def nowToISO8601Zformat():
-    return convertToISO8601Zformat(datetime.now())
+    return convertToISO8601Zformat(datetime.utcnow().isoformat+"Z"
