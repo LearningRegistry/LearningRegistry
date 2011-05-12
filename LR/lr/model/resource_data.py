@@ -146,15 +146,13 @@ class ResourceDataModel(BaseModel):
         """
         if 'node_timestamp' not in self._specData.keys():
             self._specData['node_timestamp'] = self.create_timestamp
-        if 'update_timestamp' not in self._specData.keys():
-            self._specData['update_timestamp'] = self.create_timestamp
     
     def _postValidation(self):
         """Use the post validation to remove update_time and node_time field
         that should not really be part of the document.  They change base on the node
         so that would mess up replication"""
         del self._specData['node_timestamp']
-        del self._specData['update_timestamp']
+    
         
     def save(self, doc_id=None, db=None):
         return BaseModel.save(self, self.doc_ID, db)

@@ -293,19 +293,18 @@ class LRNodeModel(object):
                     if  revNumber == '1':
                         log.info("\nSaving new timestamp:\n")
                         timestampDoc['node_timestamp'] = timestamp
-                        timestampDoc['update_timestamp'] = timestamp
                         try:
                             db[timestampDoc['_id']]  = timestampDoc
                         except Exception as ex:
                             log.exception(ex)
-                    else:
-                        log.info("\nupdate existing timestamp\n")
-                        timestampDoc = db.get(timestampDoc['_id'])
-                        timestampDoc['update_timestamp'] = timestamp
-                        try:
-                            db.update(timestampDoc);
-                        except Exception as ex:
-                            log.exception(ex)
+                    #else:
+                        #log.info("\nupdate existing timestamp\n")
+                        #timestampDoc = db.get(timestampDoc['_id'])
+                        #timestampDoc['update_timestamp'] = timestamp
+                        #try:
+                            #db.update(timestampDoc);
+                        #except Exception as ex:
+                            #log.exception(ex)
                     # Keep the last sequence number
                     self._lastChangeSeq = change['seq']
                     log.info("Time Stamps: "+pprint.pformat(timestampDoc))
