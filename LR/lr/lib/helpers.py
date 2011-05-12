@@ -28,18 +28,18 @@ def importModuleFromFile(fullpath):
         del sys.path[-1]
         return module
 
-def convertToISO8601UTC (dateTimeArg=None):
+def convertToISO8601UTC (dateTimeArg):
     """This method assumes that the datetime is local naive time."""
     if isinstance(dateTimeArg, datetime) == True:
         dateUTC = datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
         #Add the macroseconds back since hte mktime conversion loses it
-        return dataUTC + timedelta(0, 0, datetimeArg.microsecond)
+        return (dataUTC + timedelta(0, 0, datetimeArg.microsecond))
     return dateTimeArg
         
-def convertToISO8601Zformat(dateTimeArg=None):
+def convertToISO8601Zformat(dateTimeArg):
     if isinstance(dateTimeArg, datetime) ==True:
         return convertToISO8601UTC (dateTimeArg).isoformat()+ "Z" 
     return dateTimeArg
     
 def nowToISO8601Zformat():
-    return convertToISO8601Zformat(datetime.utcnow().isoformat+"Z"
+    return datetime.utcnow().isoformat+"Z"
