@@ -17,7 +17,6 @@ from node_status import NodeStatusModel
 from network_policy import NetworkPolicyModel
 from node_connectivity import NodeConnectivityModel
 from node_service import NodeServiceModel
-from datetime import datetime
 from resource_data import ResourceDataModel
 from node_filter import NodeFilterModel, defaultCouchServer, appConfig
 import logging
@@ -135,12 +134,12 @@ class LRNodeModel(object):
             nodeStatus.active = self.nodeDescription.active
             nodeStatus.node_id = self._nodeDescription.node_id
             nodeStatus.node_name = self.nodeDescription.node_name
-            nodeStatus.start_time = str(datetime.utcnow())
+            nodeStatus.start_time = h.nowToISO8601Zformat()
             nodeStatus.install_time = nodeStatus.start_time
             nodeStatus.save(doc_id = nodeStatusId)
         else:
             nodeStatus = NodeStatusModel(nodeStatus)
-            nodeStatus.start_time = str(datetime.utcnow())
+            nodeStatus.start_time = h.nowToISO8601Zformat()
             nodeStatus.update()
         self._nodeStatus = nodeStatus
           
