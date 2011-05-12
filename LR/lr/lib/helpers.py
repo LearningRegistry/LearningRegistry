@@ -42,4 +42,4 @@ def convertToISO8601Zformat(dateTimeArg):
     return dateTimeArg
     
 def nowToISO8601Zformat():
-    return datetime.utcnow().isoformat+"Z"
+    return datetime.utcnow().isoformat()+"Z"
