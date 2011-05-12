@@ -113,7 +113,7 @@ class oaipmh(harvest):
         ident = {}
         try:
             db2 = self.server[database]
-            description = db2["description"]
+            description = db2["node_description"]
             
             ident["repositoryName"] = description["node_description"]
             ident["adminEmail"] = description["node_admin_url"]

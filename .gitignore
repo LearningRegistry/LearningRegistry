@@ -5,3 +5,12 @@
 *paster.pid
 LR/tests/*.htm
 geanyproject
+
+# these files are altered when installing the package, so ignore them
+MANIFEST
+
+# this is apparently bad ju-ju in some environments (paster won't start)
+#*.egg-info
+
+# the locally generated config file
+LR/config.ini
