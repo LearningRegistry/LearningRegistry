@@ -12,28 +12,20 @@ for file in os.listdir(base_path):
     with open(file_path,'r+') as f:
         data = json.load(f)
     
-    if data.has_key('filtering_keys'):
-        saved_data = data['filtering_keys']
-        del data['filtering_keys']
-        data['keys'] = saved_data
-        changed = True
     if data.has_key('submission_TOS'):
+        changed = True
         del data['submission_TOS']
     if not data.has_key('TOS'):
+        changed = True
         data['TOS'] = {
             'submission_TOS':'http://www.learningregistry.org/tos/cc0/v0-5/'
         }
     if data.has_key('created_timestamp'):
+        changed = True
         del data['created_timestamp']
     if data.has_key('update_timestamp'):
-        del data['update_timestamp']        
-    if data.has_key('payload_schema'):
-        saved_data = data['payload_schema']
-        del data['payload_schema']
-        data['payload_schema'] = []
-        for item in saved_data:    
-            data['payload_schema'][len(data['payload_schema']):] = item.split(',')
         changed = True
+        del data['update_timestamp']        
         
     if changed == True:
         data = json.dumps(data)

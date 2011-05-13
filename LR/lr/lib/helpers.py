@@ -33,7 +33,7 @@ def convertToISO8601UTC (dateTimeArg):
     if isinstance(dateTimeArg, datetime) == True:
         dateUTC = datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
         #Add the macroseconds back since hte mktime conversion loses it
-        return (dataUTC + timedelta(0, 0, datetimeArg.microsecond))
+        return (dateUTC + timedelta(0, 0, dateTimeArg.microsecond))
     return dateTimeArg
         
 def convertToISO8601Zformat(dateTimeArg):
