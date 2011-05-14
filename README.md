@@ -275,6 +275,7 @@ Learning Registry node.
 * [virtualenvwrapper](http://www.doughellmann.com/docs/virtualenvwrapper/).
 
 ## Installation ##
+
 * Install CouchDB using Homebrew.
 
 >       brew install couchdb
@@ -287,27 +288,40 @@ Learning Registry node.
   `mkvirtualenv` command will automatically activate the newly created
   virtualenv.
 
->       pip install pylons pyparsing couchdb restkit cython lxml iso8601
+>       pip install pylons pyparsing couchdb restkit lxml iso8601
+
+* Change directory to the root of the cloned Learning Registry git repository.
+
+>       cd [path to clone of the git repository]
+
+* Install the Learning Registry pylons app.
+
+>       cd LR
+>       pip install -e .
 
 ## Setup ##
 * Start up couchdb
 
 >       launchctl load -w /usr/local/Cellar/couchdb/1.0.2/Library/LaunchDaemons/org.apache.couchdb.plist
 
+* Change directory to the root of the cloned Learning Registry git repository.
+
+>       cd [path to clone of the git repository]
+
+* Create a development configuration file. You may copy the original
+  configuration file, in the LR directory.
+
+>       cp LR/development.ini.orig LR/development.ini
+
 * Navigate to the `config` directory within your clone of the Learning
   Registry git repository.
 
->       cd [path to the clone of the git repository]/config
+>       cd config
 
 * Load the initial documents for Learning Registry into CouchDB. This
   script will ask a few questions.
 
->       python setup_node.py
-
-* Install the Learning Registry pylons app.
-
->       cd ../LR
->       pip install -e .
+>       ./setup_node.py
 
 * Edit the development.ini file and replace the line
   `use = egg:Flup#fcgi_thread` with `use = egg:Paste#http`.
