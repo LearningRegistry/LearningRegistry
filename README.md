@@ -36,6 +36,13 @@ Overview of Contents
     * nsdl-to-lr-data-pump.py - OAI-PMH harvester; data pump script from NDSL-DC -> LR RDDDM
     * sample-pump-oaipmh-lib.py - OBSOLETE; here for reference.
 
+* install
+    * setup_lr.bash - a script to set up a development Learning
+      Registry node on Ubuntu 10.04 and MacOS 10.6.x onwards.
+    * install_pydeps.bash - a script to create a virtualenv and
+      install all the python packages required by the Learning
+      Registry Pylons application.
+
 * LR - Pylons LR application that is used to interface w/ CouchDB.
 
 * search - ??? A simple search UI to be installed in a design document.  _TODO: move into a couchapp._
@@ -255,7 +262,93 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 * From your virtualenv directory start paster where */home/learningregistry/virtualenv/lr* is my path to virtualenv.
 >       /home/learningregistry/virtualenv/lr/bin/paster serve --daemon production.ini start
 
-Installation on MacOS 10.6.x (Snow Leopard)
+
+Automated Installation on Ubuntu 10.04 onwards and MacOS 10.6.x (Snow Leopard)
+===========================================
+
+These instructions make use of a provided installation script to
+install nearly all the software required to run a development Learning
+Registry node on Ubuntu 10.04 and MacOS 10.6.x onwards. A node set up
+using this script has not been tested in production. If you are
+feeling intrepid, do share your experiences on the mailing list.
+
+The installation script downloads and installs the
+[CouchBase Server Community Edition](http://www.couchbase.com/downloads)
+http://www.couchbase.com/downloads on Ubuntu since compilation is
+fiddly and this package works beautifully.
+
+## Ubuntu Requirements ##
+* Git, which is not available on 10.04 by default, but is available on
+  newer versions. If you want to have the latest stable version
+  installed you can use the Git stable releases PPA at
+  https://launchpad.net/~git-core/+archive/ppa
+
+## MacOS Requirements ##
+* Xcode developer tools. Downloadable from the Apple Developer site at
+  http://developer.apple.com.
+* [Homebrew](https://github.com/mxcl/homebrew) package manager.
+* Git, which you very likely already have if you have installed
+  Homebrew. But can be installed from Homebrew.
+
+## Installation ##
+* Clone this repository. If you are viewing this page on github, you
+  should see the clone URL near the top of the page.
+
+* Change directory to install directory in the cloned Learning
+  Registry git repository.
+
+>       cd <path to clone of the git repository>/install
+
+* Run the setup_lr.bash script. You may optionally supply the name of
+  the virtualenv in which the python packages will be installed as an
+  argument to the install script. If no argument is supplied, it will
+  create a virtualenv named *lr* in your home directory or in the
+  virtualenvwrapper workspace if
+  [virtualenvwrapper](http://www.doughellmann.com/projects/virtualenvwrapper/)
+  is installed and configured.
+
+>       bash ./setup_lr.bash [optional name of virtualenv]
+
+## Setup ##
+* Activate the virtualenv the script created. It should have printed
+  out instructions on how to do so.
+
+* Start up couchdb. On Ubuntu, the CouchBase server is started up
+  automatically after installation by the CouchBase package. You need
+  *only* do the step below on MacOS.
+
+>       launchctl load -w /usr/local/Cellar/couchdb/1.0.2/Library/LaunchDaemons/org.apache.couchdb.plist
+
+* Create a development configuration file. You may copy the original
+  configuration file in the LR directory.
+
+>       cp LR/development.ini.orig LR/development.ini
+
+* Navigate to the `config` directory within your clone of the Learning
+  Registry git repository.
+
+>       cd config
+
+* Load the initial documents for Learning Registry into CouchDB. This
+  script will ask a few questions.
+
+>       ./setup_node.py
+
+* Edit the development.ini file and replace the line
+  `use = egg:Flup#fcgi_thread` with `use = egg:Paste#http`.
+
+## Start up the node ##
+* Run the development web server.
+
+>       paster serve --reload development.ini
+
+* Check to see if all is well by checking the status of the node we
+  have just set up. You should receive a response if it's working.
+
+>       curl -i http://127.0.0.1:5000/status
+
+
+Manual Installation on MacOS 10.6.x (Snow Leopard)
 ===========================================
 
 These instructions are provided for use by developers who may be
@@ -263,18 +356,21 @@ interested in running LR on MacOS 10.6.x for development
 purposes. MacOS has not been tested for deployment of a production
 Learning Registry node.
 
-
 ## Requirements ##
 * Xcode developer tools. Downloadable from the Apple Developer site at
   http://developer.apple.com.
 * [Homebrew](https://github.com/mxcl/homebrew) package manager.
-* Git (which you very likely already have). But can be installed from Homebrew.
-* A clone of the Learning Registry repository.
+* Git, which you very likely already have if you have installed
+  Homebrew. But can be installed from Homebrew.
 * [pip](http://pypi.python.org/pypi/pip).
 * [virtualenv](http://pypi.python.org/pypi/virtualenv).
 * [virtualenvwrapper](http://www.doughellmann.com/docs/virtualenvwrapper/).
 
 ## Installation ##
+* Clone this repository. If you are viewing this page on github, you
+  should see the clone URL near the top of the page.
+
+>       git clone <repository URL>
 
 * Install CouchDB using Homebrew.
 
@@ -292,7 +388,7 @@ Learning Registry node.
 
 * Change directory to the root of the cloned Learning Registry git repository.
 
->       cd [path to clone of the git repository]
+>       cd <path to clone of the git repository>
 
 * Install the Learning Registry pylons app.
 
@@ -306,10 +402,10 @@ Learning Registry node.
 
 * Change directory to the root of the cloned Learning Registry git repository.
 
->       cd [path to clone of the git repository]
+>       cd <path to clone of the git repository>
 
 * Create a development configuration file. You may copy the original
-  configuration file, in the LR directory.
+  configuration file in the LR directory.
 
 >       cp LR/development.ini.orig LR/development.ini
 
