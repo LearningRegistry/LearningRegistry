@@ -14,3 +14,4 @@ MANIFEST
 
 # the locally generated config file
 LR/config.ini
+LR/development.ini
