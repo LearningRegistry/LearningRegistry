@@ -1,6 +1,6 @@
 function(doc) {
   if (doc.doc_type == 'resource_data_timestamp'){
-      emit(doc.doc_ID, {_id: doc.doc_ID, 
+      emit(doc.resource_doc_id, {_id: doc.resource_doc_id, 
                                     'timestamp':{'node_timestamp':doc.node_timestamp}});
   }  
 }

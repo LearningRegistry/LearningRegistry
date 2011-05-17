@@ -18,7 +18,7 @@ class HarvestController(BaseController):
     def __parse_date(self,date):
         last_update_date = iso8601.parse_date(date)
         last_update = helpers.convertToISO8601UTC(last_update_date)    
-        return last_update    
+        return last_update
     def harvest(self, params, body, verb):
         h = harvest()
         def getrecord():
@@ -34,7 +34,7 @@ class HarvestController(BaseController):
             data['error'] = 'badArgument'
             return json.dumps(data)
 
-          request_id = params['request_id']          
+          request_id = params['request_id']
           if by_doc_ID:
             records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},[h.get_record(request_id)])
           else:

@@ -281,7 +281,8 @@ class LRNodeModel(object):
                     log.debug("\n\n"+pprint.pformat(change)+"\n\n")
                     timestampDoc = {
                                 '_id':doc['_id']+"-timestamp",
-                                'doc_ID': doc['doc_ID'],
+                                'resource_doc_id' : doc['_id'],
+                                'doc_version': '0.20.0',
                                 'doc_type': 'resource_data_timestamp'
                         }
                     log.debug("TimestampDoc {0}".format(pprint.pformat(timestampDoc)))
