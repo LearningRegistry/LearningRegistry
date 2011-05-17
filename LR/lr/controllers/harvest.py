@@ -7,8 +7,8 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
 from lr.lib.base import BaseController, render
+import lr.lib.helpers
 log = logging.getLogger(__name__)
-time_format = '%Y-%m-%d %H:%M:%S.%f'
 import ast
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -36,9 +36,9 @@ class HarvestController(BaseController):
 
           request_id = params['request_id']
           if by_doc_ID:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},[h.get_record(request_id)])
+            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[h.get_record(request_id)])
           else:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
           data['getrecord'] ={
             'record': records
             }
@@ -87,28 +87,46 @@ class HarvestController(BaseController):
         data = self.get_base_response(verb,body)
         data['request']['from'] = params['from']
         data['request']['until'] = params['until']
+        data['listidentifiers'] =  []
+        base_response =  json.dumps(data).split('[')
+        yield base_response[0] +'['
         def debug_map(doc):
-            data ={'record':{"header":{'identifier':doc.id, 'datestamp':datetime.today().strftime(time_format),'status':'active'},'resource_data':doc}}
+            data ={'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
             return data
         if from_date > until_date:
           data['OK'] = False
           data['error'] = 'badArgument'
         else:
-          data['listrecords'] =   map(debug_map,h.list_records(from_date,until_date))
-        return json.dumps(data)
+            first = True
+            for doc in h.list_records(from_date,until_date):                        
+                if not first:
+                    yield ','
+                first = False
+                yield json.dumps(debug_map(doc))
+        yield base_response[1]
 
     def list_identifiers(self,from_date, until_date,h,body ,params, verb = 'GET'):
         data = self.get_base_response(verb,body)
         data['request']['from'] = params['from']
         data['request']['until'] = params['until']
-        data['listidentifiers'] =  map(lambda doc: {"header":{'identifier':doc, 'datestamp':datetime.today().strftime(time_format),'status':'active'}},h.list_identifiers(from_date,until_date))
-        return json.dumps(data)
+        data['listidentifiers'] =  []
+        base_response =  json.dumps(data).split('[')
+        yield base_response[0] +'['
+        first = True;
+        for id in h.list_identifiers(from_date,until_date):
+            if not first:
+                yield ','
+            first = False            
+            return_value = {"header":{'identifier':id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()) ,'status':'active'}}
+            yield json.dumps(return_value)
+        yield base_response[1]
+        
 
     def get_base_response(self, verb, body):
       return {
                'OK':True,
                'error':'',
-               'responseDate':datetime.today().strftime(time_format),
+               'responseDate':helpers.convertToISO8601Zformat(datetime.today()),
                'request':{
                  'verb':verb,
                  'HTTP_request': body
