@@ -120,7 +120,7 @@ BaseModel = createBaseModel(SPEC_RESOURCE_DATA, DB_RESOURCE_DATA)
 class ResourceDataModel(BaseModel):
     _TIME_STAMPS = ['create_timestamp', 'update_timestamp', 'node_timestamp']
     _DOC_ID = 'doc_ID'
-   
+    DEFAULT_FILTER =_DEFAULT_FILTER 
    #Make the filter is updated in the design document.    
     # Add Filter function the design document that will be used to filter on replication.
     designFilter = {_DEFAULT_FILTER: filterFunction}

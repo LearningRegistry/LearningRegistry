@@ -278,19 +278,17 @@ class LRNodeModel(object):
                     if  not 'resource_data' in doc:
                         continue
                     #get the revision number.
-                    log.info("\n\n"+pprint.pformat(change)+"\n\n")
-                    revNumber = doc['_rev'].split('-')[0]
+                    log.debug("\n\n"+pprint.pformat(change)+"\n\n")
                     timestampDoc = {
                                 '_id':doc['_id']+"-timestamp",
                                 'doc_ID': doc['doc_ID'],
                                 'doc_type': 'resource_data_timestamp'
                         }
-                    log.info("RevNubmber: {0}\nTimestampDoc {1}".format(revNumber,
-                                                pprint.pformat(timestampDoc)))
+                    log.debug("TimestampDoc {0}".format(pprint.pformat(timestampDoc)))
                     # Remove the document from list change and add the remaining data
                     # to the timestampDoc
-                    if  revNumber == '1':
-                        log.info("\nSaving new timestamp:\n")
+                    if  timestampDoc['_id'] not in db:
+                        log.debug("\nSaving new timestamp:\n")
                         timestampDoc['node_timestamp'] = timestamp
                         try:
                             db[timestampDoc['_id']]  = timestampDoc

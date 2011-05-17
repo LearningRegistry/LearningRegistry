@@ -27,11 +27,11 @@ class ObtainController(BaseController):
     #     map.resource('obtain', 'obtain')
     def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
         s = couchdb.Server(appConfig['couchdb.url'])
-        db = s[appConfig['couchdb.db.resourcedata']]        
+        db = s[appConfig['couchdb.db.resourcedata']]
         if len(keys) > 0:
           view = db.view(view_name, include_docs=include_docs, keys=keys)
         else:
-          view = db.view(view_name, include_docs=include_docs)          
+          view = db.view(view_name, include_docs=include_docs)
         return view
 
     def format_data(self,full_docs,data):
@@ -40,14 +40,24 @@ class ObtainController(BaseController):
         if data is not None and len(data) > 0:
             for doc in data:
                 if full_docs:
-                    return_data = {'doc_ID':doc.id,'resource_data_description':doc.doc}
+                    # Get the resource data and update  with the node timestamp data
+                    # That the view  has in value['timestamp']
+                    resourceData = {}
+                    if(doc.doc['doc_type'] =='resource_data'):
+                        resourceData = doc.doc
+                        resourceData.update(doc.value['timestamp'])
+                    elif doc.doc['doc_type'] == 'resource_data_timestamp':
+                        resourceData = doc.value['resource_data']
+                        resourceData['node_timestamp'] =doc.doc['node_timestamp']
+                        
+                    return_data = {'doc_ID':doc.id,'resource_data_description':resourceData}
                 else:
-                    return_data = {'doc_ID':doc.id}                
+                    return_data = {'doc_ID':doc.key} 
                 num_sent = num_sent + 1
-                if num_sent < len(data):            
-                    yield json.dumps(return_data) + ','                                    
+                if num_sent < len(data): 
+                    yield json.dumps(return_data) + ','
                 else:
-                    yield json.dumps(return_data)  
+                    yield json.dumps(return_data) 
         yield "]}"
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
@@ -61,10 +71,10 @@ class ObtainController(BaseController):
         keys = map(lambda key: key['request_ID'],data['request_IDs'])
         full_docs = data['ids_only'] is None or data['ids_only'] == False
         if data['by_doc_ID']:
-          view = self.get_view('_all_docs',keys, full_docs)
+          view = self.get_view(keys=keys, full_docs=full_docs)
         elif data['by_resource_ID']:
           view = self.get_view('_design/filter/_view/resource-location',keys, full_docs)
-        return_data = view        
+        return_data = view  
         return self.format_data(full_docs,return_data)
         # url('obtain')
 
@@ -92,10 +102,8 @@ class ObtainController(BaseController):
 
     def show(self, id, format='html'):
         """GET /obtain/id: Show a specific item"""
-        url = 'http://localhost/resource_data/'+id
-        r = urllib2.urlopen(url)
-        data = r.read()
-        return data
+        data =self.get_view(keys=[id], include_docs=True)
+        return self.format_data(True, data)
         # url('obtain', id=ID)
 
     def edit(self, id, format='html'):
