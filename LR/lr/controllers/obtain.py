@@ -27,11 +27,11 @@ class ObtainController(BaseController):
     #     map.resource('obtain', 'obtain')
     def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
         s = couchdb.Server(appConfig['couchdb.url'])
-        db = s[appConfig['couchdb.db.resourcedata']]        
+        db = s[appConfig['couchdb.db.resourcedata']]
         if len(keys) > 0:
           view = db.view(view_name, include_docs=include_docs, keys=keys)
         else:
-          view = db.view(view_name, include_docs=include_docs)          
+          view = db.view(view_name, include_docs=include_docs)
         return view
 
     def format_data(self,full_docs,data):
@@ -42,12 +42,12 @@ class ObtainController(BaseController):
                 if full_docs:
                     return_data = {'doc_ID':doc.id,'resource_data_description':doc.doc}
                 else:
-                    return_data = {'doc_ID':doc.id}                
+                    return_data = {'doc_ID':doc._id} 
                 num_sent = num_sent + 1
-                if num_sent < len(data):            
-                    yield json.dumps(return_data) + ','                                    
+                if num_sent < len(data): 
+                    yield json.dumps(return_data) + ','
                 else:
-                    yield json.dumps(return_data)  
+                    yield json.dumps(return_data) 
         yield "]}"
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
@@ -64,7 +64,7 @@ class ObtainController(BaseController):
           view = self.get_view('_all_docs',keys, full_docs)
         elif data['by_resource_ID']:
           view = self.get_view('_design/filter/_view/resource-location',keys, full_docs)
-        return_data = view        
+        return_data = view  
         return self.format_data(full_docs,return_data)
         # url('obtain')
 

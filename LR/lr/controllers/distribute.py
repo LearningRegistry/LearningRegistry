@@ -143,7 +143,7 @@ class DistributeController(BaseController):
             
             log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
                             sourceUrl, destinationUrl, str(replicationOptions)))
-            if replicationOptions['query_params'] is  None:                
+            if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
                 
             results = server.replicate(sourceUrl, destinationUrl, **replicationOptions)
