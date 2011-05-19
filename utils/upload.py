@@ -21,9 +21,8 @@ def upload_files(docs):
     with open('error.html','a') as out:
       out.write(er.read())
     print 'error'
-    
 for file in os.listdir(root_path):
-  publish_url = choice(publish_urls)
+  #publish_url = choice(publish_urls)
   file_path = os.path.join(root_path,file)
   with open(file_path,'r+') as f:
     data = json.load(f)

@@ -23,7 +23,7 @@ def make_map(config):
     map.resource('distribute','distribute')    
     if not LRNode.nodeDescription.gateway_node:
         map.resource('publish','publish')
-        map.resource('obtain','obtain')    
+        map.resource('obtain','obtain')
         map.resource('status','status')
         map.resource('description','description')
         map.resource('services','services')

@@ -13,4 +13,4 @@ MANIFEST
 #*.egg-info
 
 # the locally generated config file
-LR/config.ini
+LR/*.ini
