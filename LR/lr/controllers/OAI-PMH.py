@@ -5,6 +5,7 @@ from pylons.controllers.util import abort, redirect
 
 from lr.controllers.harvest import HarvestController
 
+from lr.lib import helpers as h
 from lr.lib.base import BaseController, render
 from lr.lib.oaipmh import oaipmh
 from datetime import datetime
@@ -76,10 +77,13 @@ class OaiPmhController(HarvestController):
                 params['by_doc_ID'] = not params['by_resource_ID']
         
         if verb == 'ListRecords' or verb == 'ListIdentifiers':
+            from_date_gran = None
+            until_date_gran = None
             if req_params.has_key('from'):
                 try:
                     from_date = iso8601.parse_date(req_params['from'])
                     params['from'] = h.convertToISO8601UTC(from_date)
+                    from_date_gran = h.getISO8601Granularity(req_params['from'])
                 except:
                     raise BadArgumentError('from does not parse to ISO 8601.', verb)
             else:
@@ -89,13 +93,33 @@ class OaiPmhController(HarvestController):
                 try:
                     until_date = iso8601.parse_date(req_params['until'])
                     params['until'] = h.convertToISO8601UTC(until_date)
+                    until_date_gran = h.getISO8601Granularity(req_params['until'])
                 except:
                     raise BadArgumentError('until does not parse to ISO 8601.', verb)
             else:
                 params['until'] = None
                 
-            if params['from'] != None and params['until'] != None and params['from'] > params['until']:
-                raise BadArgumentError('until cannot preceed from.', verb)
+            if params['from'] != None and params['until'] != None:
+                if params['from'] > params['until']:
+                    raise BadArgumentError('until cannot preceed from.', verb)
+                if from_date_gran != until_date_gran:
+                    raise BadArgumentError('from and until parameters do not use the same granularity.', verb)
+            
+            harvestServiceGranularity = h.getHarvestServiceGranularity()
+            
+            if params['from'] != None and from_date_gran > harvestServiceGranularity:
+                raise BadArgumentError('from is more granular than Harvest service allows')
+        
+            if params['until'] != None and until_date_gran > harvestServiceGranularity:
+                raise BadArgumentError('from is more granular than Harvest service allows')
+            
+            if (from_date_gran != None and from_date_gran.granule != "day" and from_date_gran.granule != "second") or \
+                (until_date_gran != None and until_date_gran.granule != "day" and until_date_gran.granule != "second"):
+                formatSupport = "YYYY-MM-DD"
+                if harvestServiceGranularity.granule == "second":
+                    formatSupport = "YYYY-MM-DD and YYYY-MM-DDThh:mm:ssZ"
+                raise BadArgumentError('from and until support {0} formats' % (formatSupport, ))
+            
         
         if verb in ['ListMetadataFormats', 'GetRecord']  and req_params.has_key('identifier'):
             params['identifier'] = req_params['identifier']

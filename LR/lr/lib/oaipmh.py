@@ -22,6 +22,7 @@ import couchdb
 from lr.lib.base import render
 from lr.lib.harvest import harvest
 from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats
+import lr.lib.helpers as h
 
 log = logging.getLogger(__name__)
 
@@ -120,7 +121,7 @@ class oaipmh(harvest):
             # TODO: This should map to the deleted_data_policy from the node_policy from the
             #       network node description
             ident["deletedRecord"] = "transient"
-            ident["granularity"] = "YYYY-MM-DDThh:mm:ss.sZ"
+            ident["granularity"] = h.getDatetimePrecision()
             opts = {
                     "group": True,
                     "limit": 1
@@ -139,6 +140,8 @@ class oaipmh(harvest):
         return ret
 #    def list_metadata_formats(self,identifier=None, by_doc_ID=False, by_resource_ID=True):
 #        opts = {}
+
+                
 
     
 if __name__ == "__main__":
