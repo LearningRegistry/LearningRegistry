@@ -27,7 +27,7 @@ set -o pipefail # exit if any part of a pipe fails
 
 # The default name for the virtualenv.
 LR_ENV_NAME="lr"
-LR_PY_PACKAGES="pylons pyparsing couchdb restkit lxml iso8601"
+
 echo
 echo "========================================================================"
 echo "This script will install the python packages to a virtualenv."
@@ -119,10 +119,7 @@ fi
 # create the virtualenv and install the python dependencies
 echo "Creating a virtualenv at ${LR_ENV_NAME}."
 virtualenv --no-site-packages --distribute ${LR_ENV_NAME}
-echo "Installing the following python packages: "
-echo "${LR_PY_PACKAGES}"
-pip --environment=${LR_ENV_NAME} install ${LR_PY_PACKAGES}
-echo "Installing LR into ${LR_ENV_NAME} virtualenv as an editable package."
+echo "Installing LR and its dependencies into ${LR_ENV_NAME} virtualenv as an editable package."
 pip --environment=${LR_ENV_NAME} install -e ../LR
 
 # clean up if we downloaded distribute

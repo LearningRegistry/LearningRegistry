@@ -13,9 +13,9 @@ setup(
     author_email='',
     url='',
     install_requires=[
-        "Pylons>=0.10",
+        "Pylons>=0.10", "pyparsing>=1.5.5", "restkit>=3.2.3",
+        "couchdb>=0.8", "lxml>=2.3", "iso8601"
     ],
-    setup_requires=["PasteScript>=1.6.3"],
     packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
     test_suite='nose.collector',

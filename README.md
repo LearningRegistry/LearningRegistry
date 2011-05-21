@@ -40,8 +40,8 @@ Overview of Contents
     * setup_lr.bash - a script to set up a development Learning
       Registry node on Ubuntu 10.04 and MacOS 10.6.x onwards.
     * install_pydeps.bash - a script to create a virtualenv and
-      install all the python packages required by the Learning
-      Registry Pylons application.
+      install the Learning Registry Pylons application in that
+      virtualenv.
 
 * LR - Pylons LR application that is used to interface w/ CouchDB.
 
@@ -379,12 +379,6 @@ Learning Registry node.
 * Create a virtualenv for Learning Registry.
 
 >       mkvirtualenv --no-site-packages --distribute learning-registry
-
-* Install the required python packages into the virtualenv. The
-  `mkvirtualenv` command will automatically activate the newly created
-  virtualenv.
-
->       pip install pylons pyparsing couchdb restkit lxml iso8601
 
 * Change directory to the root of the cloned Learning Registry git repository.
 
