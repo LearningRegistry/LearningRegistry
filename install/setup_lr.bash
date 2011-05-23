@@ -26,7 +26,7 @@
 # set options to keep this script well behaved. Consult the bash
 # manual for more detail.
 set -o errexit # exit if an error is returned outside a loop or conditional.
-set -o nounset # exit if attemptin to access an unset variable
+set -o nounset # exit if attempting to access an unset variable
 set -o pipefail # exit if any part of a pipe fails
 
 THIS_SCRIPT_DIR=${PWD}
@@ -50,10 +50,10 @@ function wait_before_proceeding () {
     echo "Waiting ${i} seconds before proceeding."
     echo "Hit Control-C to exit without installing."
     while [[ $i -gt 0 ]]
-        do
-        echo "Proceeding in $i seconds."
-        sleep 1
-        i=$((${i} - 1))
+    do
+	echo "Proceeding in $i seconds."
+	sleep 1
+	i=$((${i} - 1))
     done
 }
 
@@ -142,6 +142,10 @@ function install_deps_ubuntu () {
 	missing_binary_bail "python"
     }
 
+    (type -P "pip") || {
+	missing_binary_bail "pip"
+    }
+
     (type -P "virtualenv") || {
 	missing_binary_bail "virtualenv"
     }
@@ -164,15 +168,15 @@ function install_deps_osx () {
 	exit 1
     }
 
+    # install pip
+    if !(type -P "pip") ; then
+	echo "Installing pip."
+	easy_install pip
+    fi
+
     # install virtualenv
     if !(type -P "virtualenv") ; then
 	echo "Installing virtualenv."
-
-	if (type -P "pip") ; then
-	    pip install virtualenv
-	else
-	    easy_install virtualenv
-	fi
     else
 	echo "Virtualenv appears to be installed, make sure you have a current version."
     fi

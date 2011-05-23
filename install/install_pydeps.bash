@@ -34,6 +34,7 @@ echo "This script will install the python packages to a virtualenv."
 echo "It requires:"
 echo "C/C++ compilers"
 echo "Python including header files"
+echo "pip"
 echo "virtualenv"
 echo "========================================================================"
 echo
@@ -44,10 +45,10 @@ function wait_before_proceeding () {
     echo "Waiting ${i} seconds before proceeding."
     echo "Hit Control-C to exit without installing."
     while [[ $i -gt 0 ]]
-        do
-        echo "Proceeding in $i seconds."
-        sleep 1
-        i=$((${i} - 1))
+    do
+	echo "Proceeding in $i seconds."
+	sleep 1
+	i=$((${i} - 1))
     done
 }
 
@@ -55,6 +56,7 @@ wait_before_proceeding 3
 
 # Check if required stuff is in our path
 PYTHON_PATH=$(type -P "python")
+PIP_PATH=$(type -P "pip")
 VIRTUALENV_PATH=$(type -P "virtualenv")
 CC_PATH=$(type -P "cc")
 
@@ -82,11 +84,13 @@ LR_ENV_NAME_IS_DIR=$(awk -v env_name="${LR_ENV_NAME}" -v path_sep="/" \
 
 check_if_present CC_PATH "c/c++ compiler"
 check_if_present PYTHON_PATH "python" # how do we check for header files?
+check_if_present PIP_PATH "pip"
 check_if_present VIRTUALENV_PATH "virtualenv"
 
-echo "Found python at: ${PYTHON_PATH}"
-echo "Found virtualenv at: ${VIRTUALENV_PATH}"
 echo "Found c compiler at: ${CC_PATH}"
+echo "Found python at: ${PYTHON_PATH}"
+echo "Found pip at: ${PIP_PATH}"
+echo "Found virtualenv at: ${VIRTUALENV_PATH}"
 
 # If virtualenvwrapper is set up, passing a directory path as the
 # location for the virtualenv is a bad idea since we won't be able to
@@ -134,7 +138,7 @@ echo "Installed the LR python packages."
 echo "You may now activate the newly created virtualenv with the following command:"
 
 if [[ ${WORKON_HOME} ]] ; then
-    echo "workon ${LR_ENV_NAME}"
+    echo "workon ${PIP_ENV}"
 else
     echo "cd ${LR_ENV_NAME} && source bin/activate"
 fi
