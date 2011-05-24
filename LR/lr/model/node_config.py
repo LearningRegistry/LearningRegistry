@@ -24,7 +24,14 @@ import threading
 import pprint
 from lr.lib import helpers as h
 
-
+_COUCHDB_FIELDS =['_id', '_rev', 
+                                    '_attachments', 
+                                    '_deleted', 
+                                    '_revisions', 
+                                    '_revs_info',
+                                    '_conflicts',
+                                    '_deleted_conflicts' ]
+                                    
 log = logging.getLogger(__name__)
 
 def dictToObject(dictionary):
@@ -273,40 +280,109 @@ class LRNodeModel(object):
                     if 'doc' not in change:
                         continue
                     timestamp =  h.nowToISO8601Zformat()
+                    
                     # See if the document is of resource_data type if not ignore it.
                     doc = change['doc']
-                    if  not 'resource_data' in doc:
+                    if  ((not 'resource_data' in doc) and
+                          (not 'resource_data_distributable'  in doc)):
                         continue
-                    #get the revision number.
-                    log.debug("\n\n"+pprint.pformat(change)+"\n\n")
-                    timestampDoc = {
-                                '_id':doc['_id']+"-timestamp",
-                                'resource_doc_id' : doc['_id'],
-                                'doc_version': '0.20.0',
-                                'doc_type': 'resource_data_timestamp'
-                        }
-                    log.debug("TimestampDoc {0}".format(pprint.pformat(timestampDoc)))
-                    # Remove the document from list change and add the remaining data
-                    # to the timestampDoc
-                    if  timestampDoc['_id'] not in db:
-                        log.debug("\nSaving new timestamp:\n")
-                        timestampDoc['node_timestamp'] = timestamp
-                        try:
-                            db[timestampDoc['_id']]  = timestampDoc
-                        except Exception as ex:
-                            log.exception(ex)
-                    #else:
-                        #log.info("\nupdate existing timestamp\n")
-                        #timestampDoc = db.get(timestampDoc['_id'])
-                        #timestampDoc['update_timestamp'] = timestamp
-                        #try:
-                            #db.update(timestampDoc);
-                        #except Exception as ex:
-                            #log.exception(ex)
-                    # Keep the last sequence number
+                    log.info("Change to handle ....")
+                    # Handle resource_data. 
+                    if doc['doc_type'] == 'resource_data':
+                        log.info("\n++++++Changes to resource_document: "+doc['_id'])
+                        distributableID = doc['_id']+"-distributable"
+                        # Use the ResourceDataModel class to create an object that 
+                        # contains only a the resource_data spec data.
+                        distributableDoc = ResourceDataModel(doc)._specData
+                        #remove the node timestamp
+                        del distributableDoc['node_timestamp']
+                        #change thet doc_type 
+                        distributableDoc['doc_type']='resource_data_distributable'
+                        
+                        log.debug("\n\ndistributable doc:\n{0}\n".format(pprint.pformat(distributableDoc)))
+                        
+                        # Check to see if a corresponding distributatable document exist.
+                        # not create a new distribuation document without the 
+                        # node_timestamp and _id+distributable.
+                        if not distributableID in db:
+                            try:
+                                db[distributableID] = distributableDoc
+                            except Exception as e:
+                                log.error("Cannot save distributable document copy\n")
+                                log.exception(e)
+                        else:
+                            # A distributable copy of the document is in the database. See
+                            # if need be updated.
+                            try:
+                                savedDistributableDoc = db[distributableID]
+                            except Exception as e:
+                                log.error("Cannot get existing distributatable document\n")
+                                log.exception(e)
+                                continue
+                            temp = {}
+                            temp.update(savedDistributableDoc);
+                            # Remove the couchdb generated field so that can compare
+                            # the two document and see it there is a need for update.
+                            for k in _COUCHDB_FIELDS:
+                                if k in temp:
+                                    del temp[k]
+                            if distributableDoc != temp:
+                                savedDistributableDoc.update(distributableDoc)
+                                log.info("\n\nUpdate distribuatable doc:\n")
+                                log.debug("\n{0}\n\n".format(pprint.pformat(distributableDoc)))
+                                try:
+                                    db.update([savedDistributableDoc])
+                                except Exception as e:
+                                    log.error("Failed to update existing distributable doc: {0}".format(
+                                                    pprint.pformat(savedDistributableDoc)))
+                                    log.exception(e)
+                              
+                    elif doc['doc_type'] == 'resource_data_distributable':
+                        log.info("\n++++++Changes to distributable resource doc: "+doc['_id'])
+                        #check if the document is alredy in the database.
+                        resourceDataID = doc['_id'].strip("-distributable")
+                        # Create a resource_data object from the distributable data.
+                        # the specData will generate a node_timestamp be default
+                        resourceDataDoc = ResourceDataModel(doc)._specData
+                        if resourceDataID not in db:
+                            try:
+                                db[resourceDataID] = resourceDataDoc
+                            except Exception as e:
+                                log.error("\n\nCannot get current document:  {0}".format(
+                                                pprint.pformat(resourceDataDoc)))
+                                log.exception(e)
+                        else:
+                            # There exist already a resource_data document for the distributable
+                            # get it and see if it needs to be updated.
+                            try:
+                                savedResourceDoc = db[resourceDataID]
+                            except Exception as e:
+                                log.error("\n\nCannot find existing resource_data doc for distributable: \n{0}".format(
+                                                pprint.pformat(doc)))
+                                log.exception(e)
+                                continue
+                                
+                            #Remove the couchdb generated fields.
+                            temp = {}
+                            temp.update(savedResourceDoc)
+                            for k in _COUCHDB_FIELDS:
+                                if k in temp:
+                                    del temp[k]
+                            # Now deleate the node_timestamp field on both document
+                            # before comparing them.
+                            del temp['node_timestamp']
+                            del resourceDataDoc['node_timestamp']
+                            if temp != resourceDataDoc:
+                                savedResourceDoc.update(resourceDataDoc)
+                                try:
+                                    db.update([savedResourceDoc])
+                                except Exception as e:
+                                    log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
+                                                    pprint.pformat(savedResourceDoc)))
+                                    log.exception(e)
+                    # Keep  last change sequence.
                     self._lastChangeSeq = change['seq']
-                    log.info("Time Stamps: "+pprint.pformat(timestampDoc))
-                    self._lastChangeSeq = change['seq']
+                    
         # Use a separate thread to track to the changes in resource_data.
         self._changeMonitoringThread = threading.Thread(target=recordChanges)
         self._changeMonitoringThread.start()
