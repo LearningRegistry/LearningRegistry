@@ -80,7 +80,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 * Install Python easy_setup
 
->       sudo apt-get python-pkg-resources python-setuptools
+>       sudo apt-get install python-pkg-resources python-setuptools
 
 
 ## Install CouchDB ##
