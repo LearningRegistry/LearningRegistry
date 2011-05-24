@@ -2,6 +2,14 @@ MANIFEST.in
 README.txt
 setup.cfg
 setup.py
+LR.egg-info/._PKG-INFO
+LR.egg-info/._SOURCES.txt
+LR.egg-info/._dependency_links.txt
+LR.egg-info/._entry_points.txt
+LR.egg-info/._not-zip-safe
+LR.egg-info/._paster_plugins.txt
+LR.egg-info/._requires.txt
+LR.egg-info/._top_level.txt
 LR.egg-info/PKG-INFO
 LR.egg-info/SOURCES.txt
 LR.egg-info/dependency_links.txt
