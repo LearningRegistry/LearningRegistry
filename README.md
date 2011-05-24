@@ -285,10 +285,18 @@ fiddly and this package works beautifully.
 
 ## MacOS Requirements ##
 * Xcode developer tools. Downloadable from the Apple Developer site at
-  http://developer.apple.com.
-* [Homebrew](https://github.com/mxcl/homebrew) package manager.
+  http://developer.apple.com. Currently Xcode 3 works better than
+  Xcode 4.
+* [Homebrew](https://github.com/mxcl/homebrew) package manager. The
+  brew command should be in your path.
 * Git, which you very likely already have if you have installed
   Homebrew. But can be installed from Homebrew.
+
+**Note:** There is an issue installing lxml with Xcode 4, which is not
+  required to run the Pylons app, but is required to run the tests. If
+  Xcode 4 is installed, the script will not install lxml. See
+  https://gist.github.com/963298 for instructions on manually
+  installing lxml with Xcode 4.
 
 ## Installation ##
 * Clone this repository. If you are viewing this page on github, you
@@ -359,12 +367,18 @@ Learning Registry node.
 ## Requirements ##
 * Xcode developer tools. Downloadable from the Apple Developer site at
   http://developer.apple.com.
-* [Homebrew](https://github.com/mxcl/homebrew) package manager.
+* [Homebrew](https://github.com/mxcl/homebrew) package manager. The
+  brew command should be in your path.
 * Git, which you very likely already have if you have installed
   Homebrew. But can be installed from Homebrew.
 * [pip](http://pypi.python.org/pypi/pip).
 * [virtualenv](http://pypi.python.org/pypi/virtualenv).
 * [virtualenvwrapper](http://www.doughellmann.com/docs/virtualenvwrapper/).
+
+**Note:** There is an issue installing lxml with Xcode 4, which is not
+  required to run the Pylons app, but is required to run the
+  tests. See https://gist.github.com/963298 for instructions on
+  manually installing lxml with Xcode 4.
 
 ## Installation ##
 * Clone this repository. If you are viewing this page on github, you

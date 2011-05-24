@@ -25,6 +25,9 @@ set -o errexit # exit if an error is returned outside a loop or conditional.
 # set -o nounset # exit if attempting to access an unset variable. useful when writing scripts
 set -o pipefail # exit if any part of a pipe fails
 
+# TODO, should we check for distutils configuration files, or is that
+# a spectacularly high level of paranoia/yak shaving?
+
 # The default name for the virtualenv.
 LR_ENV_NAME="lr"
 
@@ -46,9 +49,9 @@ function wait_before_proceeding () {
     echo "Hit Control-C to exit without installing."
     while [[ $i -gt 0 ]]
     do
-	echo "Proceeding in $i seconds."
-	sleep 1
-	i=$((${i} - 1))
+        echo "Proceeding in $i seconds."
+        sleep 1
+        i=$((${i} - 1))
     done
 }
 
@@ -65,13 +68,20 @@ CC_PATH=$(type -P "cc")
 # http://stackoverflow.com/questions/874389/bash-test-for-a-variable-unset-using-a-function
 function check_if_present () {
     if [[ ! "${!1}" ]] ; then
-	echo "${2} was not found, aborting. Please install ${2} before running this script." >&2
-	exit 1
+        echo "${2} was not found, aborting. Please install ${2} before running this script." >&2
+        exit 1
     fi
 }
 
+# parsing xcodebuild -version output largely lifted from
+# http://trac.sagemath.org/sage_trac/attachment/ticket/11280/trac_11280_xcode4unsupported.patch
+function get_xcode_version () {
+    XCODE_VER=$(xcodebuild -version | grep Xcode | sed 's/[A-Za-z]//g;s/^[ \t]*//;s/[ \t]*$//;')
+}
+
 # Set the name of the virtualenv if one is specified. We do no
-# sanitization of the passed value. Fragile stuff here.
+# sanitization of the passed value nor do we do much sanity checking
+# for paths outside the current user's home.
 if [[ $# -gt 0 ]] ; then
     LR_ENV_NAME="${1}"
 fi
@@ -94,8 +104,11 @@ echo "Found virtualenv at: ${VIRTUALENV_PATH}"
 
 # If virtualenvwrapper is set up, passing a directory path as the
 # location for the virtualenv is a bad idea since we won't be able to
-# activate it.
+# activate it. The check for defined variables is from
+# http://stackoverflow.com/questions/228544/how-to-tell-if-a-string-is-not-defined-in-a-bash-shell-script
 if [[ ${LR_ENV_NAME_IS_DIR} -gt 0 ]] && \
+    [[ ! -z "${WORKON_HOME+defined}" ]] && \
+    [[ ! -z "${PIP_VIRTUALENV_BASE+defined}" ]] && \
     [[ "${WORKON_HOME}" == "${PIP_VIRTUALENV_BASE}" ]] ; then
     echo "You've specified a directory path for the virtualenv with virtualenvwrapper configured."
     echo "virtualenvwrapper won't work. Please specify a name without any \"/\" characters." >&2
@@ -103,13 +116,21 @@ if [[ ${LR_ENV_NAME_IS_DIR} -gt 0 ]] && \
 # Take into account if pip is configured to install to a location
 # other than virtualenvwrapper's WORKON_HOME. See Using pip with
 # virtualenvwrapper at http://pypi.python.org/pypi/pip for further details.
-elif  [[ ${PIP_VIRTUALENV_BASE} ]] ; then
+elif  [[ ! -z  "${PIP_VIRTUALENV_BASE+defined}" ]] ; then
+    PIP_ENV="${LR_ENV_NAME}"
     LR_ENV_NAME="${PIP_VIRTUALENV_BASE}/${LR_ENV_NAME}"
-    PIP_ENV=$(basename "${LR_ENV_NAME}")
 # Otherwise create a virtualenv in the user's home.
 else
     LR_ENV_NAME="$HOME/${LR_ENV_NAME}"
     PIP_ENV="${LR_ENV_NAME}"
+fi
+
+# Check to see if we can write to the directory where the virtualenv
+# will be created.
+if [[ ! -w $(dirname "${LR_ENV_NAME}") ]] ; then
+    echo "Can't write to" $(dirname "${LR_ENV_NAME}")
+    echo "Please specify a location to which ${USER} can write. Aborting."
+    exit 1
 fi
 
 # Check to see if we already have something at the specified location
@@ -124,7 +145,7 @@ fi
 echo "Creating a virtualenv at ${LR_ENV_NAME}."
 virtualenv --no-site-packages --distribute ${LR_ENV_NAME}
 echo "Installing LR and its dependencies into ${LR_ENV_NAME} virtualenv as an editable package."
-pip --environment=${LR_ENV_NAME} install -e ../LR
+pip --environment="${LR_ENV_NAME}" install -e ../LR
 
 # clean up if we downloaded distribute
 for i in distribute*tar.gz ; do
@@ -132,12 +153,29 @@ for i in distribute*tar.gz ; do
     rm -f "${i}"
 done
 
+if [[ "${OSTYPE}" == "darwin10.0" ]] ;  then
+    get_xcode_version
+    if [[ ${XCODE_VER%%.*} -gt 3 ]] ; then
+        echo "========================================================================"
+        echo "Xcode 4 detected won't install lxml. Tests won't work without lxml."
+        echo "See https://gist.github.com/963298 or"
+        echo "https://bugs.launchpad.net/lxml/+bug/738500 for instructions on building lxml."
+        echo "========================================================================"
+    else
+        echo "Installing lxml."
+        pip --environment="${LR_ENV_NAME}" install lxml
+    fi
+else
+    echo "Installing lxml."
+    pip --environment="${LR_ENV_NAME}" install lxml
+fi
+
 # Show the user what to do next.
 echo
 echo "Installed the LR python packages."
 echo "You may now activate the newly created virtualenv with the following command:"
 
-if [[ ${WORKON_HOME} ]] ; then
+if [[ ! -z "${WORKON_HOME+defined}" ]] ; then
     echo "workon ${PIP_ENV}"
 else
     echo "cd ${LR_ENV_NAME} && source bin/activate"
