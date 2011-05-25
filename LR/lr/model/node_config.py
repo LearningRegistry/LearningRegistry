@@ -289,7 +289,7 @@ class LRNodeModel(object):
                     log.info("Change to handle ....")
                     # Handle resource_data. 
                     if doc['doc_type'] == 'resource_data':
-                        log.info("\n++++++Changes to resource_document: "+doc['_id'])
+                        log.info("\*******Changes to resource_document: "+doc['_id'])
                         distributableID = doc['_id']+"-distributable"
                         # Use the ResourceDataModel class to create an object that 
                         # contains only a the resource_data spec data.
@@ -306,6 +306,7 @@ class LRNodeModel(object):
                         # node_timestamp and _id+distributable.
                         if not distributableID in db:
                             try:
+                                log.info('Adding distributable doc...\n')
                                 db[distributableID] = distributableDoc
                             except Exception as e:
                                 log.error("Cannot save distributable document copy\n")
@@ -331,6 +332,7 @@ class LRNodeModel(object):
                                 log.info("\n\nUpdate distribuatable doc:\n")
                                 log.debug("\n{0}\n\n".format(pprint.pformat(distributableDoc)))
                                 try:
+
                                     db.update([savedDistributableDoc])
                                 except Exception as e:
                                     log.error("Failed to update existing distributable doc: {0}".format(
@@ -338,14 +340,16 @@ class LRNodeModel(object):
                                     log.exception(e)
                               
                     elif doc['doc_type'] == 'resource_data_distributable':
-                        log.info("\n++++++Changes to distributable resource doc: "+doc['_id'])
+                        log.info("\n-------Changes to distributable resource doc: "+doc['_id'])
                         #check if the document is alredy in the database.
-                        resourceDataID = doc['_id'].strip("-distributable")
+                        resourceDataID = doc['doc_ID']
                         # Create a resource_data object from the distributable data.
                         # the specData will generate a node_timestamp be default
                         resourceDataDoc = ResourceDataModel(doc)._specData
+                        resourceDataDoc['doc_type'] = 'resource_data'
                         if resourceDataID not in db:
                             try:
+                                log.info("Adding new resource_data for distributable")
                                 db[resourceDataID] = resourceDataDoc
                             except Exception as e:
                                 log.error("\n\nCannot get current document:  {0}".format(
@@ -372,9 +376,11 @@ class LRNodeModel(object):
                             # before comparing them.
                             del temp['node_timestamp']
                             del resourceDataDoc['node_timestamp']
+                            
                             if temp != resourceDataDoc:
                                 savedResourceDoc.update(resourceDataDoc)
                                 try:
+                                    log.info("\nUpdate existing resource data from distributable\n")
                                     db.update([savedResourceDoc])
                                 except Exception as e:
                                     log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(

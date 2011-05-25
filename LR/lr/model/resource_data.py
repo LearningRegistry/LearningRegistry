@@ -34,7 +34,7 @@ filterFunction = """
         
         // Don't send the design document.
         if ( !doc || (doc.doc_ID && doc.doc_ID.indexOf(design_doc) != -1) ||
-            (!doc.doc_type || doc.doc_type != 'resource_data'))
+            (!doc.doc_type || doc.doc_type != 'resource_data_distributable'))
          {
             return false;
         }
