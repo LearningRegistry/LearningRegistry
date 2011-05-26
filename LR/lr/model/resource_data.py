@@ -34,7 +34,7 @@ filterFunction = """
         
         // Don't send the design document.
         if ( !doc || (doc.doc_ID && doc.doc_ID.indexOf(design_doc) != -1) ||
-            (!doc.doc_type || doc.doc_type != 'resource_data'))
+            (!doc.doc_type || doc.doc_type != 'resource_data_distributable'))
          {
             return false;
         }
@@ -141,19 +141,7 @@ class ResourceDataModel(BaseModel):
         if self._DOC_ID not in self._specData.keys():
             doc_id = uuid4().hex
             self.__setattr__(self._DOC_ID, doc_id)
-    def _preValidation(self):
-        """Set the node and update  timestamp if there are not set to pas validation.
-        """
-        if 'node_timestamp' not in self._specData.keys():
-            self._specData['node_timestamp'] = self.create_timestamp
-    
-    def _postValidation(self):
-        """Use the post validation to remove update_time and node_time field
-        that should not really be part of the document.  They change base on the node
-        so that would mess up replication"""
-        del self._specData['node_timestamp']
-    
-        
+
     def save(self, doc_id=None, db=None):
         return BaseModel.save(self, self.doc_ID, db)
 

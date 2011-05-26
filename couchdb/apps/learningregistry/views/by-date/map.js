@@ -1,3 +1,6 @@
 function(doc) {
-  emit(doc.update_timestamp, null);
+    if(doc.doc_type == 'resource_data_timestamp')
+    {
+        emit(doc.node_timestamp, null);
+    }
 }

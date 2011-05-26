@@ -43,13 +43,7 @@ class ObtainController(BaseController):
                     # Get the resource data and update  with the node timestamp data
                     # That the view  has in value['timestamp']
                     resourceData = {}
-                    if(doc.doc['doc_type'] =='resource_data'):
-                        resourceData = doc.doc
-                        resourceData.update(doc.value['timestamp'])
-                    elif doc.doc['doc_type'] == 'resource_data_timestamp':
-                        resourceData = doc.value['resource_data']
-                        resourceData['node_timestamp'] =doc.doc['node_timestamp']
-                        
+                    resourceData = doc.doc
                     return_data = {'doc_ID':doc.id,'resource_data_description':resourceData}
                 else:
                     return_data = {'doc_ID':doc.key} 

@@ -80,7 +80,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 * Install Python easy_setup
 
->       sudo apt-get python-pkg-resources python-setuptools
+>       sudo apt-get install python-pkg-resources python-setuptools
 
 
 ## Install CouchDB ##
@@ -144,20 +144,20 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 * change file ownership from root to couchdb user and adjust permissions
 
->       chown -R couchdb: /usr/local/var/{lib,log,run}/couchdb /usr/local/etc/couchdb
->       chmod 0770 /usr/local/var/{lib,log,run}/couchdb/
->       chmod 664 /usr/local/etc/couchdb/*.ini
->       chmod 775 /usr/local/etc/couchdb/*.d
+>       sudo chown -R couchdb: /usr/local/var/{lib,log,run}/couchdb /usr/local/etc/couchdb
+>       sudo chmod 0770 /usr/local/var/{lib,log,run}/couchdb/
+>       sudo chmod 664 /usr/local/etc/couchdb/*.ini
+>       sudo chmod 775 /usr/local/etc/couchdb/*.d
 
 * install init script and start couchdb
 
 >       cd /etc/init.d
->       ln -s /usr/local/etc/init.d/couchdb couchdb
->       /etc/init.d/couchdb start
+>       sudo ln -s /usr/local/etc/init.d/couchdb couchdb
+>       sudo /etc/init.d/couchdb start
 
 * configure couchdb to start on system start
 
->       update-rc.d couchdb defaults
+>       sudo update-rc.d couchdb defaults
 
 * Verify couchdb is running
 
@@ -244,7 +244,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 
 * Backup your original nginx.conf file
 
->       sudo cp /etc/nginx/nginx.conf /etc/nginx.conf.bak
+>       sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
 
 * Copy the ngnix.conf file from repository
 
