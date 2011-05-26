@@ -1,0 +1,28 @@
+{
+ "doc_type":                "filter_description",        // the literal "filter_description"
+                                                // required, immutable
+ "doc_version":                "0.10.0",        // the literal for the current version -- "0.10.0"
+                                        // required, immutable
+ "doc_scope":                "node",                // the literal "node"
+                                        // required, immutable
+ "active":                boolean,        // is the filter active
+                                        // required, mutable from T to F only
+"filter_name":                 "string",                  // name of the filter, optional
+ "custom_filter":                boolean,        // is this a custom filter (implemented in code, not rules)
+                                        // required, if T, filter rules are ignored
+"include_exclude":        boolean,        // T if the filters describe what documents to accept
+                                        // all others are rejected
+                                        // F if the filters describe what documents to reject
+                                        // all others are accepted
+                                        // optional, T if not present
+ "filter":                                       
+ [
+  {"filter_key":                "string",                // REGEX that matches names in the
+                                        // resource data description
+                                        // required
+    "filter_value":                "string"                // REGEX that matches values in the 
+// resource data description
+// optional, if not present, any value matches
+          }
+         ]  // array of filter rules,
+        }
