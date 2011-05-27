@@ -70,9 +70,9 @@ def getSetupInfo():
     nodeDescription = getInput("Enter your node description", nodeName)
     nodeSetup['node_description'] = nodeDescription
 
-    adminUrl = getInput("Enter node admin URL",
+    adminUrl = getInput("Enter node admin indentity",
                                     "{0}.node.admin@learningregistry.org".format(couchDBUrl))
-    nodeSetup['node_admin_url'] = adminUrl
+    nodeSetup['node_admin_identity'] = adminUrl
 
     distributeTargets = getInput("Enter the URLs of nodes that you wish to distribute to",
                                                  "")
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     node_description.update(t.node_description)
     node_description['node_name'] = nodeSetup['node_name']
     node_description['node_description'] = nodeSetup['node_description']
-    node_description['node_admin_url'] = nodeSetup['node_admin_url']
+    node_description['node_admin_identity'] = nodeSetup['node_admin_identity']
     node_description["open_connect_source"] = nodeSetup["open_connect_source"]
     node_description["open_connect_dest"] = nodeSetup["open_connect_dest"]
     node_description['node_id'] = uuid4().hex

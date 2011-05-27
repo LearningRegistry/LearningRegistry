@@ -1,0 +1,58 @@
+{
+ "doc_type":                "node_description",        // the literal "node_description"
+                                                // required, immutable
+ "doc_version":        "0.21.0",        // the literal for the current version -- "0.21.0"
+                                        // required, immutable
+ "doc_scope":                "node",                // the literal "node"
+                                        // required, immutable
+ "active":                boolean,        // is the network node active
+                                        // required, mutable from T to F only
+ "node_id":                "string",                // id of the node, required
+// unique within scope of the LR
+// immutable
+ "node_name":                 "string",                  // name of the node, optional
+ "node_description":        "string",                // description of the node, optional
+ "node_admin_identity":        "string",                // identity of node admin, optional
+ "network_id":                "string",                // id of the network that this node is a part of                 
+// recommended (required for gateway distribution)
+// immutable
+        "community_id":                "string",                // id of the community that this node is a part of
+                                                // recommended (required for gateway distribution)
+                                                // immutable
+        "gateway_node":        boolean,        // T if node is a gateway node
+                                                // recommended, F if not present, immutable
+        "open_connect_source":boolean,        // T if node is willing to be the source to
+// connect to any other node
+                                                // F if node connectivity is restricted
+                                                // recommended; F if not present
+        "open_connect_dest":        boolean,        // T if node is willing to be the destination
+//  to connect to any other node
+                                                // F if node connectivity is restricted
+                                                // recommended; F if not present
+        "node_policy":                                
+         {
+ "sync_frequency":        integer,                // target time between synchronizations in minutes
+// optional
+          "deleted_data_policy":        "string",                // fixed vocabulary ["no", "persistent", "transient"]
+                                                // see resource data persistence
+          "TTL":                        integer,                // minimum time to live for resource data in the node
+                                                 // in days, optional
+                                                // overrides network policy TTL is larger than network TTL
+        "accepted_version":        ["string"],        // list of resource data description document versions
+                                                // that the node can process, optional
+         "accepted_TOS":        ["string"],        // list of ToS that the node will accept, optional
+         "accepts_anon":        boolean,        // T if node is willing to take anonymous submissions
+                                                // F if all submissions must be identified
+                                                // optional, T if not present
+ "accepts_unsigned":        boolean,        // T if node is willing to take unsigned submissions
+                                                // F if all data must be signed
+                                                // optional, T if not present
+ "validates_signature":        boolean        ,        // T if node will validate signatures
+                                                // F if node does not validate signatures
+                                                // optional, F if not present
+ "check_trust":                boolean                // T if node will evaluate trust of submitter
+                                                // F if node does not check trust
+                                                // optional, F if not present
+          },                    // node-specific policies, optional
+         "node_key":                "string",                // node public key, optional
+        }

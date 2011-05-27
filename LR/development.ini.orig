@@ -42,37 +42,39 @@ host = 127.0.0.1
 port = 5000
 
 [app:main]
-spec.models.node_service_description = %(here)s/data/models/node_service_description
-couchdb.db.node = node
-couchdb.db.resourcedata = resource_data
-spec.models.node_description = %(here)s/data/models/node_description
-spec.models.resource_data = %(here)s/data/models/resource_data_description
-models_spec_dir = %(here)s/data/models
 tos.url = http://www.learningregistry.org/tos/
-
-couchdb.url = http://localhost:5984/
-
-spec.models.network_policy_description = %(here)s/data/models/network_distribution_policy_description
 use = egg:LR
-spec.models.status_description = %(here)s/data/models/status_description
-spec.models.filter_description = %(here)s/data/models/node_filter_description
 full_stack = true
 static_files = true
-
-init.lrnode.config = %(here)s/data/init_config/lrnodeconfig.py
 cache_dir = %(here)s/data
-couchdb.db.node.description = description
-
-spec.models.node_connectivity_description = %(here)s/data/models/node_connectivity_description
-spec.models.community_description = %(here)s/data/models/community_description
-spec.models.network_description = %(here)s/data/models/network_description
-couchdb.db.network = network
-couchdb.db.node.filter = filter
 
 beaker.session.key = lr
 beaker.session.secret = somesecre
 couchdb.db.node.description = description
 beaker.session.secret = somesecret
 beaker.session.use_cookies = false
+
+
+couchdb.url = http://localhost:5984/
+couchdb.db.node = node
+couchdb.db.resourcedata = resource_data
+couchdb.db.network = network
 couchdb.db.community = community
+
+
+models_spec_dir = %(here)s/data/models
+spec.models.node_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/node_description
+spec.models.resource_data = %(here)s/data/LR_Tech_Spec_V_0_21/models/resource_data
+spec.models.network_policy_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/policy_description
+spec.models.status_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/status_description
+spec.models.filter_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/filter_description
+spec.models.node_connectivity_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/connection_description
+spec.models.community_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/community_description
+spec.models.network_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/network_description
+spec.models.node_service_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/service_description
+
+
+
+
+
 
