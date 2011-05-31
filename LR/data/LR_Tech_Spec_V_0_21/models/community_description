@@ -13,7 +13,7 @@
  "community_name":         "string",                  // name of the community, optional
  "community_description":"string",        // description of the community, optional
  "community_admin_identity":"string",        // identity of community admin, optional
- "social_community":        boolean        ,        // T if the community is a social community
+ "social_community":        boolean,        // T if the community is a social community
                                         // F if the community is a closed community
                                         // recommended; F if not present (closed community)
                                         // immutable

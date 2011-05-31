@@ -18,15 +18,29 @@
                                         // required, mutable from T to F only
 
 
- // information about the submission and flow, independent of the resource data
- "submitter_type":        "string",                // fixed vocabulary ["anonymous", "user", "agent"]
+ // information about the submission, independent of the resource data
+"identity":   {                             
+  "submitter_type":        "string",                // fixed vocabulary ["anonymous", "user", "agent"]
                                         // required, immutable
                                         // "anonymous" -- submitter is unknown
                                         // "user" -- submitter is a user or has a user identity
                                         // "agent" -- submitter is an agent, e.g., a repository, LMS
- "submitter":                "string",                // identity of the submitter of the resource data
+                                        // or an organization
+  "submitter":                "string",                // identity of the submitter of the resource data
                                         // required, immutable
 // use "anonymous" for type "anonymous"
+  "curator":                "string",                // identity of the curator of the resource data description
+                                                // who manages the resource data description
+                                                // optional
+  "owner":                "string",                // identity of the owner of the resource
+                                                // who owns what is referenced in the resource locator
+                                                // optional
+  "signer":                "string"                // identity of key owner used to sign the submission
+// optional
+        }, // identity and curation
+
+
+        // submission and distribution workflow information
  "submitter_timestamp":        "string",                // submitter-created timestamp
 // time/date encoding
                                         // optional
@@ -57,17 +71,19 @@
   "submission_TOS":        "string",                // agreed terms of service by submitter
                         // required
  "submission_attribution":"string"                // attribution statement from submitter
- }, // terms of service
-"digital_signature": {                         
+                                                  // optional
+ },     // terms of service                               
+"digital_signature": {                        
   "signature":                "string",                // signature string, required
   "key_server":        ["string"],        // array of key server identities, required
   "key_location":        ["string"],        // array of public key locations,, required
-  "key_owner":                "string"                // key owner identity, optional
+  "key_owner":        "string"                // key owner identity, optional
  "signing_method":        "string",                // fixed vocabulary ["LR-PGP.1.0"]
                                         // required
-  }, // digital signature of the submission, optional
+  },  // digital signature of the submission, optional
 
 
+ // information about the resource, independent of the resource data
  "resource_locator":        "string",                // unique locator for the resource described
 // SHALL resolve to a single unique resource
 // required
@@ -97,8 +113,9 @@
         // optional
  "payload_locator":        "string",                // locator if payload_placement value  is "linked"
                 // required if "linked", otherwise ignored
-         "resource_data": {},                        // the actual inline resource data the resource data object,
-                // the resource data itself (resource. metadata, paradata)
+"resource_data": {},                       // the actual inline resource data
+                                            // the resource data object                
+                                            // the resource data itself (resource. metadata, paradata)
                                                 // maybe a JSON object, or
 // a string encoding XML or some other format, or
 // a string encoding binary

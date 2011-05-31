@@ -268,7 +268,7 @@ The data model describing a node document.  Once the data model has been instant
                                                 // immutable
         "gateway_node":        boolean,        // T if node is a gateway node
                                                 // recommended, F if not present, immutable
-        "open_connect_source":boolean,        // T if node is willing to be the source to
+        "open_connect_source": boolean,        // T if node is willing to be the source to
 // connect to any other node
                                                 // F if node connectivity is restricted
                                                 // recommended; F if not present
@@ -294,13 +294,13 @@ The data model describing a node document.  Once the data model has been instant
  “accepts_unsigned”:        boolean,        // T if node is willing to take unsigned submissions
                                                 // F if all data must be signed
                                                 // optional, T if not present
- “validates_signature”:        boolean        ,        // T if node will validate signatures
+ “validates_signature”:        boolean,        // T if node will validate signatures
                                                 // F if node does not validate signatures
                                                 // optional, F if not present
  “check_trust”:                boolean                // T if node will evaluate trust of submitter
                                                 // F if node does not check trust
                                                 // optional, F if not present
-          },                    // node-specific policies, optional
+          }, // node-specific policies, optional
          “node_key”:                “string”,                // node public key, optional
 "X_xxx":                ?????                // placeholder for extensibility, optional
         }
@@ -344,7 +344,7 @@ NB:  Ownership and control of the node description document and of the node serv
                                                 // version is local to the Learning Registry
                                                 // not the version of some underlying spec for the service
         "service_endpoint":        “string”,                // URL of service, required
-        ”service_auth”:                               
+        ”service_auth”:                                
          {
         "service_authz":                [“string”],         // fixed vocabulary
 // [“none”, “basicauth”, “oauth”, “ssh”,  ...]
@@ -353,7 +353,7 @@ NB:  Ownership and control of the node description document and of the node serv
                                                 // optional, immutable, default F
         “service_https”:                boolean                // does service require https
                                                 // optional, immutable, default F
-         },                          // service authentication and authorization descriptions
+         },                         // service authentication and authorization descriptions
         "service_data":                {},                // service-specific name-value pairs
                                                 // optional
 "X_xxx":                ?????                // placeholder for extensibility, optional
@@ -417,7 +417,7 @@ NB:  Ownership and control of the node description document and of the node filt
 // resource data description
 // optional, if not present, any value matches
           }
-         ]  // array of filter rules,
+         ], // array of filter rules
 "X_xxx":                ?????                // placeholder for extensibility, optional
         }
 
@@ -472,7 +472,7 @@ NB:  Ownership and control of the network description document and of the policy
          "policy_version":        “string”,                // version identifier for the policy
           “TTL”:                        integer,                // minimum time to live for resource data in the network
                                                  // in days, required
-         “policy_element_x”:    {more element},                // placeholder for more policy elements
+         “policy_element_x”:       {},                // placeholder for more policy elements
 "X_xxx":                ?????                // placeholder for extensibility, optional
         }
 
@@ -498,7 +498,7 @@ The data model describing a network community document.  Once the data model has
  “community_name”:         “string”,                  // name of the community, optional
  “community_description":“string”,        // description of the community, optional
  “community_admin_identity”:“string”,        // identity of community admin, optional
- “social_community”:        boolean        ,        // T if the community is a social community
+ “social_community”:        boolean,        // T if the community is a social community
                                         // F if the community is a closed community
                                         // recommended; F if not present (closed community)
                                         // immutable
@@ -567,15 +567,29 @@ The data model describing resources, metadata, paradata, etc., that is distribut
                                         // required, mutable from T to F only
 
 
- // information about the submission and flow, independent of the resource data
- “submitter_type”:        “string”,                // fixed vocabulary [“anonymous”, “user”, “agent”]
+ // information about the submission, independent of the resource data
+“identity”:   {                             
+  “submitter_type”:        “string”,                // fixed vocabulary [“anonymous”, “user”, “agent”]
                                         // required, immutable
                                         // “anonymous” -- submitter is unknown
                                         // “user” -- submitter is a user or has a user identity
                                         // “agent” -- submitter is an agent, e.g., a repository, LMS
- “submitter”:                “string”,                // identity of the submitter of the resource data
+                                        // or an organization
+  “submitter”:                “string”,                // identity of the submitter of the resource data
                                         // required, immutable
 // use “anonymous” for type “anonymous”
+  “curator”:                “string”,                // identity of the curator of the resource data description
+                                                // who manages the resource data description
+                                                // optional
+  “owner”:                “string”,                // identity of the owner of the resource
+                                                // who owns what is referenced in the resource locator
+                                                // optional
+  “signer”:                “string”                // identity of key owner used to sign the submission
+// optional
+        }, // identity and curation
+
+
+        // submission and distribution workflow information
  “submitter_timestamp”:        “string”,                // submitter-created timestamp
 // time/date encoding
                                         // optional
@@ -605,18 +619,20 @@ The data model describing resources, metadata, paradata, etc., that is distribut
 “TOS”: {                                
   “submission_TOS”:        “string”,                // agreed terms of service by submitter
                         // required
- “submission_attribution”:”string"                // attribution statement from submitter
- }, // terms of service
-“digital_signature”: {                         
+ “submission_attribution”:”string”                // attribution statement from submitter
+                                                  // optional
+ },     // terms of service                               
+“digital_signature”: {                        
   “signature”:                “string”,                // signature string, required
   “key_server”:        [“string”],        // array of key server identities, required
   “key_location”:        [“string”],        // array of public key locations,, required
-  “key_owner”:                “string”                // key owner identity, optional
+  “key_owner”:        “string”                // key owner identity, optional
  “signing_method”:        “string”,                // fixed vocabulary [“LR-PGP.1.0”]
                                         // required
-  }, // digital signature of the submission, optional
+  },  // digital signature of the submission, optional
 
 
+ // information about the resource, independent of the resource data
  “resource_locator”:        “string”,                // unique locator for the resource described
 // SHALL resolve to a single unique resource
 // required
@@ -646,8 +662,9 @@ The data model describing resources, metadata, paradata, etc., that is distribut
         // optional
  “payload_locator”:        “string”,                // locator if payload_placement value  is “linked”
                 // required if “linked”, otherwise ignored
-         “resource_data”: {},                        // the actual inline resource data the resource data object,
-                // the resource data itself (resource. metadata, paradata)
+“resource_data”: {},                       // the actual inline resource data
+                                            // the resource data object                
+                                            // the resource data itself (resource. metadata, paradata)
                                                 // maybe a JSON object, or
 // a string encoding XML or some other format, or
 // a string encoding binary
@@ -747,7 +764,6 @@ Attached and linked metadata SHALL include appropriate schema definitions and sc
 
 
 NB. There is currently no machine-readable list of schemata.  Such a list could be defined in additional network description documents.
-
 
 
 Inline metadata SHALL be encoded in JSON structure or as a single JSON string wrapping the entire metadata document.
@@ -3584,6 +3600,9 @@ CONTENT-TYPE: application/JSON
 
 
 HTTP responses SHOULD include a CONTENT-TYPE header.   Unless noted, the header SHOULD be CONTENT-TYPE: text/plain; charset=utf=8
+
+
+Unless noted, all APIs that return JSON via an HTTP GET request SHALL support return of JSON-P to enable processing of the results by a ECMA-Script client.  GET requests SHALL support an optional jsonp argument.  If the jsonp argument is present, the API SHALL return the result padded into the function named in the jsonp argument.
 Transactional Behaviors and Data Consistency
 Unless stated in an individual API specification, transactional atomicity SHALL BE document granularity.  
 
@@ -4363,7 +4382,7 @@ Version
 Archived copy.
 	0.21.0
 	201105xx
-	Updated how to sign documents.  Obtain flow control.
+	Updated how to sign documents.  Modified resource document description to restructure identity.  Added JSONP to APIs.  Obtain flow control.
 	Future
 	TBD
 	ToS attribution output to OAI. Harvest flow control.  Flow control to OAI.  Logging/tracking emit as paradata to services.  Assertion (relation/sameas) and trust documents.  Deduplication service.  RESTful APIs.  Details of attachments on publish, obtain, harvest.

@@ -19,7 +19,7 @@
                                                 // version is local to the Learning Registry
                                                 // not the version of some underlying spec for the service
         "service_endpoint":        "string",                // URL of service, required
-        "service_auth":                               
+        "service_auth":                                
          {
         "service_authz":                ["string"],         // fixed vocabulary
 // ["none", "basicauth", "oauth", "ssh",  ...]
@@ -28,7 +28,7 @@
                                                 // optional, immutable, default F
         "service_https":                boolean                // does service require https
                                                 // optional, immutable, default F
-         },                          // service authentication and authorization descriptions
+         },                         // service authentication and authorization descriptions
         "service_data":                {},                // service-specific name-value pairs
                                                 // optional
         }
