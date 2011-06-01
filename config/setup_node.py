@@ -11,18 +11,74 @@ import ConfigParser, os
 import couchdb
 import sys
 import json
+import traceback
 import urlparse
-
+import subprocess
+from pprint import pprint
 import lrnodetemplate as t
 from uuid import uuid4
+import shutil
 
-c = __import__("setup-couch-db")
+scriptPath = os.path.dirname(os.path.abspath(__file__))
 
-_PYLONS_CONFIG = '../LR/development.ini'
+_PYLONS_CONFIG_SRC =  os.path.join(scriptPath, '../LR/development.ini.orig')
+_PYLONS_CONFIG_DEST = os.path.join(scriptPath, '../LR/development.ini')
+_COUCHAPP_PATH = os.path.join(scriptPath, '../couchdb/apps')
+
+print ("\n{0}\n{1}\n{2}".format(
+                _PYLONS_CONFIG_SRC, _PYLONS_CONFIG_DEST, _COUCHAPP_PATH))
+
+#Read the pylons configuration to get the database names.
 _config = ConfigParser.ConfigParser()
-_config.read(_PYLONS_CONFIG)
+_config.read(_PYLONS_CONFIG_SRC)
 
+_RESOURCE_DATA = _config.get("app:main", "couchdb.db.resourcedata")
+_NODE = _config.get("app:main", "couchdb.db.node")
+_COMMUNITY = _config.get("app:main", "couchdb.db.community")
+_NETWORK = _config.get("app:main", "couchdb.db.network")
+
+#Default url to the couchdb server.
 _DEFAULT_COUCHDB_URL =  "http://localhost:5984/"
+
+
+def CreateDB(couchServer = _DEFAULT_COUCHDB_URL,  dblist=[], deleteDB=False):
+    '''Creates a DB in Couch based upon config'''
+    for db in dblist:
+        if deleteDB:
+            try:
+                del couchServer[db]
+            except couchdb.http.ResourceNotFound as rnf:
+                print("DB '{0}' doesn't exist on '{1}', creating".format(db, couchServer))
+        else:
+            try:
+                existingDB = couchServer[db]
+                print("Using existing DB '{0}' on '{1}'\n".format(db, couchServer))
+                continue
+            except:
+                pass
+        try:
+            couchServer.create(db)
+            print("Created DB '{0}' on '{1}'\n".format(db, couchServer))
+        except Exception as e:
+            print("Exception while creating database: {0}\n".format(e) )
+
+
+def PublishDoc(couchServer, dbname, name, doc_data):
+    
+    try:
+        db = couchServer[dbname]
+        #delete existing document.
+        try:
+            del db[name]
+        except:
+            pass
+        db[name] = doc_data
+        print("Added config document '{0}' to '{1}".format(name, dbname))
+    except  Exception as ex:
+        print("Exception when add config document:\n")
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        pprint(traceback.format_exception(exc_type, exc_value, exc_tb))
+   
 
 def testCouchServer(serverURL):
     try:
@@ -121,24 +177,31 @@ if __name__ == "__main__":
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
 
+    #create a copy of the existing config file as to not overide it.
+    if os.path.exists(_PYLONS_CONFIG_DEST):
+        backup = _PYLONS_CONFIG_DEST+".backup"
+        print("\nMove existing {0} to {1}".format(_PYLONS_CONFIG_DEST, backup))
+        shutil.copyfile(_PYLONS_CONFIG_DEST, backup)
+        
     #Update pylons config file to use the couchdb url
     _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
-    configfile = open(_PYLONS_CONFIG, 'w')
-    _config.write(configfile)
-    configfile.close()
+    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
+    _config.write(destConfigfile)
+    destConfigfile.close()
 
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
 
     #Create the databases.
-    c.CreateDB(server, dblist=[c._RESOURCE_DATA])
-    c.CreateDB(server, dblist=[ c._NODE, c._NETWORK, c._COMMUNITY], deleteDB=True)
+    CreateDB(server, dblist=[_RESOURCE_DATA])
+    #Delete the existing databases
+    CreateDB(server, dblist=[ _NODE, _NETWORK, _COMMUNITY], deleteDB=True)
 
     #Add the network and community description
-    c.PublishDoc(c._COMMUNITY, "community_description", t.community_description)
-    c.PublishDoc(c._NETWORK,  "network_description", t.network_description)
+    PublishDoc(server, _COMMUNITY, "community_description", t.community_description)
+    PublishDoc(server, _NETWORK,  "network_description", t.network_description)
     policy = {}
     policy.update(t.network_policy_description)
-    c.PublishDoc(c._NETWORK,'network_policy_description', policy)
+    PublishDoc(server, _NETWORK,'network_policy_description', policy)
 
 
     #Add node description
@@ -150,7 +213,7 @@ if __name__ == "__main__":
     node_description["open_connect_source"] = nodeSetup["open_connect_source"]
     node_description["open_connect_dest"] = nodeSetup["open_connect_dest"]
     node_description['node_id'] = uuid4().hex
-    c.PublishDoc(c._NODE,'node_description',node_description)
+    PublishDoc(server, _NODE, 'node_description', node_description)
 
     for dest_node_url in nodeSetup['connections']:
         connection = {}
@@ -158,7 +221,7 @@ if __name__ == "__main__":
         connection['connection_id'] = uuid4().hex
         connection['source_node_url']=nodeSetup['couchDBUrl']
         connection['destination_node_url'] = dest_node_url
-        c.PublishDoc(c._NODE, "{0}_to_{1}_connection".format(
+        PublishDoc(server, _NODE, "{0}_to_{1}_connection".format(
                                                 nodeSetup['node_name'], dest_node_url), connection)
 
 
@@ -170,6 +233,17 @@ if __name__ == "__main__":
         service['service_id'] = uuid4().hex
         service['service_name'] = service_type + " service"
         service['service_description']= service_type + " service"
-        c.PublishDoc(c._NODE, service_type + " service", service)
-
-
+        PublishDoc(server, _NODE, service_type + " service", service)
+        
+    #Push the couch apps
+    #Commands to go the couchapp directory and push all the apps.
+    print("\n============================\n")
+    print("Pushing couch apps ...")
+    resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
+    for app in os.listdir(_COUCHAPP_PATH):
+        command = "couchapp push {0} {1}".format(
+                            os.path.join(_COUCHAPP_PATH, app), resourceDataUrl)
+        print("\n{0}\n".format(command))
+        p = subprocess.Popen(command, shell=True)
+        p.wait()
+    print("\n\n\n")
