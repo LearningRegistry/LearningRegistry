@@ -117,7 +117,7 @@ class oaipmh(harvest):
             description = db2["node_description"]
             
             ident["repositoryName"] = description["node_description"]
-            ident["adminEmail"] = description["node_admin_url"]
+            ident["adminEmail"] = description["node_admin_identity"]
             # TODO: This should map to the deleted_data_policy from the node_policy from the
             #       network node description
             ident["deletedRecord"] = "transient"
