@@ -108,17 +108,17 @@ class OaiPmhController(HarvestController):
             harvestServiceGranularity = h.getHarvestServiceGranularity()
             
             if params['from'] != None and from_date_gran > harvestServiceGranularity:
-                raise BadArgumentError('from is more granular than Harvest service allows')
+                raise BadArgumentError('from is more granular than Harvest service permits', verb)
         
             if params['until'] != None and until_date_gran > harvestServiceGranularity:
-                raise BadArgumentError('from is more granular than Harvest service allows')
+                raise BadArgumentError('until is more granular than Harvest service permits', verb)
             
             if (from_date_gran != None and from_date_gran.granule != "day" and from_date_gran.granule != "second") or \
                 (until_date_gran != None and until_date_gran.granule != "day" and until_date_gran.granule != "second"):
                 formatSupport = "YYYY-MM-DD"
                 if harvestServiceGranularity.granule == "second":
                     formatSupport = "YYYY-MM-DD and YYYY-MM-DDThh:mm:ssZ"
-                raise BadArgumentError('from and until support {0} formats' % (formatSupport, ))
+                raise BadArgumentError('from and until support {0} formats' % (formatSupport, ), verb)
             
         
         if verb in ['ListMetadataFormats', 'GetRecord']  and req_params.has_key('identifier'):
@@ -222,7 +222,7 @@ class OaiPmhController(HarvestController):
                 self._initRender(params)
                 c.identify = o.identify()
                 body = render("/oaipmh-Identify.mako")
-            except:
+            except Exception as e:
                 raise BadVerbError()
             return self._returnResponse(body)
         

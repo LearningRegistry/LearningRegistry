@@ -46,6 +46,16 @@ def convertToISO8601Zformat(dateTimeArg):
     if isinstance(dateTimeArg, datetime) ==True:
         return convertToISO8601UTC (dateTimeArg).isoformat()+ "Z" 
     return dateTimeArg
+
+def harvestTimeFormat(dateTimeArg):
+    if isinstance(dateTimeArg, datetime) ==True:
+        fmtStr = getHarvestDatetimeFormatString()
+        utcdate = convertToISO8601UTC (dateTimeArg)
+        import logging
+        log = logging.getLogger(__name__)
+        log.exception(utcdate.utctimetuple())
+        return time.strftime(fmtStr,utcdate.utctimetuple())
+    return dateTimeArg
     
 def nowToISO8601Zformat():
     return datetime.utcnow().isoformat()+"Z"
@@ -106,6 +116,16 @@ def getDatetimePrecision():
 #                break
     return granularity
     
+    
+def getHarvestDatetimeFormatString():
+    precision = getDatetimePrecision()
+    precision = re.sub("[Y]{4}", "%Y", precision)
+    precision = re.sub("[M]{2}", "%m", precision)
+    precision = re.sub("[D]{2}", "%d", precision)
+    precision = re.sub("[h]{2}", "%H", precision)
+    precision = re.sub("[m]{2}", "%M", precision)
+    precision = re.sub("(?:)[s]{2}", "%S", precision)
+    return precision
 
 class Granularity(object):
     def __init__(self, granule=None, precision=None, order=0):
@@ -114,8 +134,11 @@ class Granularity(object):
         self.order = order
     
     def __cmp__(self, other):
-        if self.order == other.order:
-            return cmp(self.precision, other.precision)
+        if isinstance(other, Granularity):
+            if self.order == other.order:
+                return cmp(self.precision, other.precision)
+            else:
+                return cmp(self.order, other.order)
         else:
-            return cmp(self.order, other.order)
+            return cmp(str(self), str(other))
         
