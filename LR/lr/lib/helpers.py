@@ -1,3 +1,6 @@
+
+from datetime import datetime, timedelta
+import time
 """Helper functions
 
 Consists of functions to typically be used within templates, but also
@@ -25,12 +28,18 @@ def importModuleFromFile(fullpath):
         del sys.path[-1]
         return module
 
-def convertToISO8601UTC (datetime=None):
-    if datetime != None:
-        return (datetime - datetime.utcoffset()).replace(tzinfo=None)
-    return datetime
+def convertToISO8601UTC (dateTimeArg):
+    """This method assumes that the datetime is local naive time."""
+    if isinstance(dateTimeArg, datetime) == True:
+        dateUTC = datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
+        #Add the macroseconds back since hte mktime conversion loses it
+        return (dateUTC + timedelta(0, 0, dateTimeArg.microsecond))
+    return dateTimeArg
         
-def convertToISO8601Zformat(datetime=None):
-    if datetime != None:
-        return ((datetime - datetime.utcoffset()).replace(tzinfo=None)).isoformat() + "Z" 
-    return datetime
+def convertToISO8601Zformat(dateTimeArg):
+    if isinstance(dateTimeArg, datetime) ==True:
+        return convertToISO8601UTC (dateTimeArg).isoformat()+ "Z" 
+    return dateTimeArg
+    
+def nowToISO8601Zformat():
+    return datetime.utcnow().isoformat()+"Z"

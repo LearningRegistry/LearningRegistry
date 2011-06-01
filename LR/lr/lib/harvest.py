@@ -1,6 +1,5 @@
 #!/usr/bin/python
-import couchdb, json
-from datetime import datetime
+import couchdb
 import logging
 import helpers as h
 import iso8601
@@ -19,28 +18,22 @@ class harvest:
     view_data = self.db.view('_design/learningregistry/_view/resource-location',include_docs=True,keys=[resource_locator])
     return map(lambda doc: doc.doc, view_data)      
   def list_records(self, from_date, until_date):
-    rows = self.db.view('_design/learningregistry/_view/resources', include_docs=True)
-    return_list = []
+    
+    rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), include_docs=True)
     for row in rows:
       #ignore design docs
       if not row.id.startswith('_design'):
-        last_update = self.__parse_date(row.doc['node_timestamp'])
-        if last_update >=from_date or last_update <= until_date:
-          return_list.append(row.doc)
-    return return_list
+          yield row.doc
   def list_metadata_formats(self):
      return [{'metadataFormat':{'metadataPrefix':'dc'}}]
 
   def list_identifiers(self, from_date, until_date):
-    rows = self.db.view('_design/learningregistry/_view/resources', include_docs=True)
+    rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date))
     return_list = []
     for row in rows:
       #ignore design docs
       if not row.id.startswith('_design'):
-        last_update = self.__parse_date(row.doc['node_timestamp'])
-        if last_update >=from_date or last_update <= until_date:
-          return_list.append(row.id)
-    return return_list
+          yield (row.id)
 
 if __name__ == "__main__":
   h = harvest()

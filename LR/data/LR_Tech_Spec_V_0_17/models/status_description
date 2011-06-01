@@ -1,0 +1,18 @@
+{
+"active": boolean, // is the network node active
+“node_id”: “string”, // ID of the network node
+“node_name”: “string”, // name of the network node
+“install_time”: “string”, // time/date of node install
+“start_time”: “string”, // server restart time/date
+// last reboot
+“last_in_sync”: “string”, // time of last inbound sync
+// omit if node has not sync’ed
+“in_sync_node”: “string”, // id of the node from the last inbound sync
+// omit if node has not sync’ed
+“last_out_sync”: “string”, // time of last outbound sync
+// omit if node has not sync’ed
+“out_sync_node”: “string”, // id of the node for the last outbound sync
+// omit if node has not sync’ed
+“earliestDatestamp”: “string” // oldest timestamp for harvest
+// time/date encoding
+}

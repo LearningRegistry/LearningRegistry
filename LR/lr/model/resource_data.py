@@ -13,8 +13,9 @@ Base model class for learning registry data model
 from base_model import uuid4, createBaseModel, ModelParser, defaultCouchServer, \
 appConfig, couchdb
 from pylons import *
+from lr.lib import helpers as h
 import datetime, logging
-
+import pprint
 log = logging.getLogger(__name__)
 
 SPEC_RESOURCE_DATA = appConfig['spec.models.resource_data']
@@ -22,7 +23,7 @@ DB_RESOURCE_DATA = appConfig['couchdb.db.resourcedata']
 
 _DESIGN_DOC = '_design/'
 _DESIGN_DOC_FILTERS = 'filters'
-
+_DEFAULT_FILTER = 'defaultFilter'
 # Javascript filter function code that will be added the design document of the 
 # resource_data database. This function produce the same result that on 
 # pylons filter function does for consistency.
@@ -33,7 +34,7 @@ filterFunction = """
         
         // Don't send the design document.
         if ( !doc || (doc.doc_ID && doc.doc_ID.indexOf(design_doc) != -1) ||
-            (!doc.doc_type || doc.doc_type != 'resource_data'))
+            (!doc.doc_type || doc.doc_type != 'resource_data_distributable'))
          {
             return false;
         }
@@ -104,9 +105,11 @@ def updateDesignFilters(db, filtersUpdate):
     designUpdate = {}
     designDoc = db.get(designId)
     
-    if designDoc is not  None:
+    if designDoc is not  None and designDoc:
         designUpdate.update(designDoc)
-        if _DESIGN_DOC_FILTERS in designDoc:
+        #Make sure the filter is different before trying the update it.
+        if (_DESIGN_DOC_FILTERS in designDoc and 
+            designDoc[_DESIGN_DOC_FILTERS][_DEFAULT_FILTER] != filterFunction):
             designUpdate[_DESIGN_DOC_FILTERS].update(filtersUpdate)
     else:
         designUpdate[_DESIGN_DOC_FILTERS]=filtersUpdate
@@ -117,18 +120,17 @@ BaseModel = createBaseModel(SPEC_RESOURCE_DATA, DB_RESOURCE_DATA)
 class ResourceDataModel(BaseModel):
     _TIME_STAMPS = ['create_timestamp', 'update_timestamp', 'node_timestamp']
     _DOC_ID = 'doc_ID'
-   
+    DEFAULT_FILTER =_DEFAULT_FILTER 
    #Make the filter is updated in the design document.    
-    DEFAULT_FILTER = 'defaultFilter'
     # Add Filter function the design document that will be used to filter on replication.
-    designFilter = {DEFAULT_FILTER: filterFunction}
+    designFilter = {_DEFAULT_FILTER: filterFunction}
     updateDesignFilters(BaseModel._defaultDB, designFilter) 
     def __init__(self,  data=None):
         
         super(ResourceDataModel, self).__init__(data)
         
         # Set the timestamps by default on creation use utc.
-        timeStamp = str(datetime.datetime.utcnow())
+        timeStamp = h. nowToISO8601Zformat()
         
         # Set the timestap on creation if they are not set.
         for stamp in self._TIME_STAMPS:
@@ -139,7 +141,7 @@ class ResourceDataModel(BaseModel):
         if self._DOC_ID not in self._specData.keys():
             doc_id = uuid4().hex
             self.__setattr__(self._DOC_ID, doc_id)
-            
+
     def save(self, doc_id=None, db=None):
         return BaseModel.save(self, self.doc_ID, db)
 
