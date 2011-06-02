@@ -51,9 +51,9 @@ def harvestTimeFormat(dateTimeArg):
     if isinstance(dateTimeArg, datetime) ==True:
         fmtStr = getHarvestDatetimeFormatString()
         utcdate = convertToISO8601UTC (dateTimeArg)
-        import logging
-        log = logging.getLogger(__name__)
-        log.exception(utcdate.utctimetuple())
+#        import logging
+#        log = logging.getLogger(__name__)
+#        log.exception(utcdate.utctimetuple())
         return time.strftime(fmtStr,utcdate.utctimetuple())
     return dateTimeArg
     
