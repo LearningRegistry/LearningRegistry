@@ -1,0 +1,3 @@
+[submodule "utils/LRSignature"]
+	path = utils/LRSignature
+	url = git://github.com/jimklo/LRSignature.git
