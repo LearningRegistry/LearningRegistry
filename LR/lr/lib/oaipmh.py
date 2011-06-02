@@ -44,18 +44,18 @@ class oaipmh(harvest):
 
         if from_date != None:
             from_date = from_date.replace(tzinfo=None)
-            opts["startkey"] = [metadataPrefix, from_date.isoformat(' ')]
+            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
         else:
             # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, ""]
+            opts["startkey"] = [metadataPrefix, None]
         
         if until_date != None:
             until_date = until_date.replace(tzinfo=None)
-            opts["endkey"] = [metadataPrefix, until_date.isoformat(' ')]
+            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
         else:
             # somewhat of an hack... since I don't know the timestamp, and couch stores things
             # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"];
+            opts["endkey"] = [metadataPrefix, {}];
         
         
         view_data = self.db.view('oai-pmh/list-records', **opts)
@@ -63,21 +63,23 @@ class oaipmh(harvest):
     
     def list_identifiers(self,metadataPrefix,from_date=None, until_date=None ):
         opts = {};
+        import logging
+        log = logging.getLogger(__name__)
 
         if from_date != None:
             opts["startkey"] = [metadataPrefix, from_date.isoformat()]
         else:
             # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, ""]
+            opts["startkey"] = [metadataPrefix, None]
         
         if until_date != None:
             opts["endkey"] = [metadataPrefix, until_date.isoformat()]
         else:
             # somewhat of an hack... since I don't know the timestamp, and couch stores things
             # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"];
+            opts["endkey"] = [metadataPrefix, {}];
         
-        
+        log.info("opts: "+ repr(opts))
         view_data = self.db.view('oai-pmh/list-identifiers', **opts)
         return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
     
