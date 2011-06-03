@@ -80,11 +80,13 @@ class Error(Exception):
 def getDocTemplate():
     return { 
             "doc_type": "resource_data", 
-            "doc_version": "0.11.0", 
+            "doc_version": "0.21.0", 
             "resource_data_type" : "metadata",
             "active" : True,
-            "submitter_type": "agent",
-            "submitter": "NSDL 2 LR Data Pump",
+            "identity": {            
+                "submitter_type": "agent",
+                "submitter": "NSDL 2 LR Data Pump"
+            },
             "TOS": {
                     "submission_TOS":    config["tos"],
                     "submission_attribution":  config["attribution"]

@@ -19,7 +19,7 @@
   <record>
     <header>
       <identifier>${doc["doc_ID"] | x}</identifier> 
-      <% tstamp = iso8601.parse_date(doc["node_timestamp"]) %><datestamp>${h.convertToISO8601Zformat(tstamp) | x}</datestamp>
+      <% tstamp = iso8601.parse_date(doc["node_timestamp"]) %><datestamp>${h.harvestTimeFormat(tstamp) | x}</datestamp>
     </header>
     <metadata>
         ${doc["resource_data"] | n} 
@@ -29,7 +29,7 @@
   <record>
     <header status="deleted">
       <identifier>${doc["doc_ID"] | x}</identifier>
-      <% tstamp = iso8601.parse_date(doc["node_timestamp"]) %><datestamp>${h.convertToISO8601Zformat(tstamp) | x}</datestamp>
+      <% tstamp = iso8601.parse_date(doc["node_timestamp"]) %><datestamp>${h.harvestTimeFormat(tstamp) | x}</datestamp>
     </header>
   </record>
         % endif

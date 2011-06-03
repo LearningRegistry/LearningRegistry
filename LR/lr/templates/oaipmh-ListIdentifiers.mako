@@ -10,15 +10,15 @@
          xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd">
   <responseDate>${c.datetime_now | x}</responseDate>
   <request verb="ListIdentifiers" 
-            from="${c.from_date | x}"
-            until="${c.until_date | x}" 
+            from="${h.harvestTimeFormat(c.from_date) | x}"
+            until="${h.harvestTimeFormat(c.until_date) | x}" 
             metadataPrefix="${c.metadataPrefix | x}">${c.path_url | x}</request>
   <ListIdentifiers>
   % if c.identifiers != None and len(c.identifiers) > 0:
     % for ident in c.identifiers:
        <header>  
         <identifier>${ident["doc_ID"] | x}</identifier>
-        <% tstamp = iso8601.parse_date(ident["node_timestamp"]) %><datestamp>${h.convertToISO8601Zformat(tstamp) | x}</datestamp>
+        <% tstamp = iso8601.parse_date(ident["node_timestamp"]) %><datestamp>${h.harvestTimeFormat(tstamp) | x}</datestamp>
        </header>
     % endfor
   % endif

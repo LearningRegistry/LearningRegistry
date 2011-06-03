@@ -15,7 +15,7 @@
     <baseURL>${c.path_url | x}</baseURL>
     <protocolVersion>2.0</protocolVersion>
     <adminEmail>${c.identify["adminEmail"] | x }</adminEmail>
-    <earliestDatestamp>${h.convertToISO8601Zformat(c.identify["earliestDatestamp"]) | x}</earliestDatestamp>
+    <earliestDatestamp>${h.harvestTimeFormat(c.identify["earliestDatestamp"]) | x}</earliestDatestamp>
     <deletedRecord>${c.identify["deletedRecord"] | x}</deletedRecord>
     <granularity>${c.identify["granularity"] | x}</granularity>
  </Identify>

@@ -24,7 +24,7 @@
       <%
         tstamp = iso8601.parse_date(doc["node_timestamp"])
       %>
-      <oai:datestamp>${h.convertToISO8601Zformat(tstamp) | x}</oai:datestamp>
+      <oai:datestamp>${h.harvestTimeFormat(tstamp) | x}</oai:datestamp>
     </oai:header>
     <oai:metadata>
       ${doc["resource_data"] | n}

@@ -22,6 +22,7 @@ import couchdb
 from lr.lib.base import render
 from lr.lib.harvest import harvest
 from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats
+import lr.lib.helpers as h
 
 log = logging.getLogger(__name__)
 
@@ -43,18 +44,18 @@ class oaipmh(harvest):
 
         if from_date != None:
             from_date = from_date.replace(tzinfo=None)
-            opts["startkey"] = [metadataPrefix, from_date.isoformat(' ')]
+            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
         else:
             # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, ""]
+            opts["startkey"] = [metadataPrefix, None]
         
         if until_date != None:
             until_date = until_date.replace(tzinfo=None)
-            opts["endkey"] = [metadataPrefix, until_date.isoformat(' ')]
+            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
         else:
             # somewhat of an hack... since I don't know the timestamp, and couch stores things
             # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"];
+            opts["endkey"] = [metadataPrefix, {}];
         
         
         view_data = self.db.view('oai-pmh/list-records', **opts)
@@ -62,21 +63,23 @@ class oaipmh(harvest):
     
     def list_identifiers(self,metadataPrefix,from_date=None, until_date=None ):
         opts = {};
+        import logging
+        log = logging.getLogger(__name__)
 
         if from_date != None:
             opts["startkey"] = [metadataPrefix, from_date.isoformat()]
         else:
             # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, ""]
+            opts["startkey"] = [metadataPrefix, None]
         
         if until_date != None:
             opts["endkey"] = [metadataPrefix, until_date.isoformat()]
         else:
             # somewhat of an hack... since I don't know the timestamp, and couch stores things
             # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"];
+            opts["endkey"] = [metadataPrefix, {}];
         
-        
+        log.info("opts: "+ repr(opts))
         view_data = self.db.view('oai-pmh/list-identifiers', **opts)
         return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
     
@@ -116,11 +119,11 @@ class oaipmh(harvest):
             description = db2["node_description"]
             
             ident["repositoryName"] = description["node_description"]
-            ident["adminEmail"] = description["node_admin_url"]
+            ident["adminEmail"] = description["node_admin_identity"]
             # TODO: This should map to the deleted_data_policy from the node_policy from the
             #       network node description
             ident["deletedRecord"] = "transient"
-            ident["granularity"] = "YYYY-MM-DDThh:mm:ss.sZ"
+            ident["granularity"] = h.getDatetimePrecision()
             opts = {
                     "group": True,
                     "limit": 1
@@ -139,6 +142,8 @@ class oaipmh(harvest):
         return ret
 #    def list_metadata_formats(self,identifier=None, by_doc_ID=False, by_resource_ID=True):
 #        opts = {}
+
+                
 
     
 if __name__ == "__main__":

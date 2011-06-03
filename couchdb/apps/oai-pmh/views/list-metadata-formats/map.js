@@ -1,5 +1,5 @@
 function(doc) {
-	if (doc.payload_schema) {
+	if (doc.doc_type && doc.doc_type == "resource_data" && doc.payload_schema) {
 		for (var i = 0; i < doc.payload_schema.length; i++) {
 			
 			if (doc.doc_ID) {

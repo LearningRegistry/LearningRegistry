@@ -44,8 +44,7 @@ function format_data_to_sign($rawData){
 	$encoder = new bencoding();
 	$data = utf8_encode($encoder->encode($rawData));
 	$hash = hash('SHA256',$data);
-	echo $hash, "\n";
-	return hash;	
+	return $hash;	
 }
 function verify_file($filedata, $signature){
 	$gpg = new Crypt_GPG();

@@ -21,7 +21,7 @@
                                                 // immutable
         "gateway_node":        boolean,        // T if node is a gateway node
                                                 // recommended, F if not present, immutable
-        "open_connect_source":boolean,        // T if node is willing to be the source to
+        "open_connect_source": boolean,        // T if node is willing to be the source to
 // connect to any other node
                                                 // F if node connectivity is restricted
                                                 // recommended; F if not present
@@ -47,12 +47,12 @@
  "accepts_unsigned":        boolean,        // T if node is willing to take unsigned submissions
                                                 // F if all data must be signed
                                                 // optional, T if not present
- "validates_signature":        boolean        ,        // T if node will validate signatures
+ "validates_signature":        boolean,        // T if node will validate signatures
                                                 // F if node does not validate signatures
                                                 // optional, F if not present
  "check_trust":                boolean                // T if node will evaluate trust of submitter
                                                 // F if node does not check trust
                                                 // optional, F if not present
-          },                    // node-specific policies, optional
+          }, // node-specific policies, optional
          "node_key":                "string",                // node public key, optional
         }
