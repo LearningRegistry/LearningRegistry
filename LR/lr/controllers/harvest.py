@@ -87,7 +87,7 @@ class HarvestController(BaseController):
         data = self.get_base_response(verb,body)
         data['request']['from'] = params['from']
         data['request']['until'] = params['until']
-        data['listidentifiers'] =  []
+        data['listrecords'] =  []
         base_response =  json.dumps(data).split('[')
         yield base_response[0] +'['
         def debug_map(doc):

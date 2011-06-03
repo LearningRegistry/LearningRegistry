@@ -241,7 +241,7 @@ if __name__ == "__main__":
     print("Pushing couch apps ...")
     resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
     for app in os.listdir(_COUCHAPP_PATH):
-        command = "couchapp push {0} {1}".format(
+        command = "/home/wegrata/virtualenv/lr/bin/couchapp push {0} {1}".format(
                             os.path.join(_COUCHAPP_PATH, app), resourceDataUrl)
         print("\n{0}\n".format(command))
         p = subprocess.Popen(command, shell=True)
