@@ -25,24 +25,24 @@ function(doc) {
 
 	//build people indices
 	for each(person in people) {
-		emit(person, doc);
+		emit(person, doc.doc_ID);
 	}
 	
 	//build date indices
-	emit(date_stamp, doc);
+	emit(date_stamp, doc.doc_ID);
 	for each(person in people) {
-		emit([date_stamp, person], doc);
+		emit([date_stamp, person], doc.doc_ID);
 	}
 	
 	//build
 	var emitaAllKeywordIndices = function(value) {
-		emit(value, doc);
+		emit(value, doc.doc_ID);
 		for each(person in people) {
-			emit([person, value], doc);
+			emit([person, value], doc.doc_ID);
 		}
-		emit([date_stamp, value], doc);
+		emit([date_stamp, value], doc.doc_ID);
 		for each(person in people) {
-			emit([date_stamp, person, value], doc);
+			emit([date_stamp, person, value], doc.doc_ID);
 		}
 	}
 
