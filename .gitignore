@@ -16,3 +16,5 @@ MANIFEST
 LR/*.ini
 
 /LR/data/templates
+
+/data-pumps/oai-pmh-data-pump-config.json
