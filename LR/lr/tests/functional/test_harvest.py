@@ -3,7 +3,7 @@ import logging,json
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 test_location = 'http://www.scholaris.pl/cms/index.php/resources/8640.html'
-test_id ='fda7ed3436d849fdbff6b106eb5f8cba'
+test_id ='f4821dde0f154c439468d18f0ff845b9'
 class TestHarvestController(TestController):
 
     def validate_getrecord_response_base(self, response):
