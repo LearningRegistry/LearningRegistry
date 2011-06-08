@@ -1,0 +1,28 @@
+{
+    "config": {
+        "server": "file:///Users/jklo/Downloads/oai2-0.xml",        /* URI to OAI-PMH server */
+        "path": "",                                                 /* path to OAI interface */
+        "verb": "ListRecords",                                      /* OAI verb to use for download, ListRecords is the only one supported */
+        "metadataPrefix":"nsdl_dc",                                 /* OAI metadataPrefix */
+        "set":"ncs-NSDL-COLLECTION-000-003-112-016",                /* OAI set (optional) */
+        "tos": "http://nsdl.org/help/?pager=termsofuse",            /* Terms of Service for metadata */
+        "attribution": "The National Science Digital Library",      /* Attribution for ToS */
+        "sign": false,                                              /* Sign envelope */
+        "keyId": "890B513B01D8F913",                                /* Signing key id */
+        "passphrase": "5uper5ecre7",                                /* Signing key passphrase */
+        "keyLocations": [
+                         "http://pool.sks-keyservers.net:11371/pks/lookup?op=get&search=0x890B513B01D8F913",     /* URI list of Public key for Signing key */
+                         "https://keyserver2.pgp.com/vkd/DownloadKey.event?keyid=0x890B513B01D8F913"
+                         ]
+    },
+    
+    "namespaces": {                                                     /* XML namespace declarations for OAI feed, may be altered here, if needed */
+        "oai" : "http://www.openarchives.org/OAI/2.0/",
+        "oai_dc" : "http://www.openarchives.org/OAI/2.0/oai_dc/",
+        "dc":"http://purl.org/dc/elements/1.1/",
+        "dct":"http://purl.org/dc/terms/",
+        "nsdl_dc":"http://ns.nsdl.org/nsdl_dc_v1.02/",
+        "ieee":"http://www.ieee.org/xsd/LOMv1p0",
+        "xsi":"http://www.w3.org/2001/XMLSchema-instance"
+    }
+}

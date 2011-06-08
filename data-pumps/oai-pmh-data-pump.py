@@ -22,7 +22,7 @@ Created on Feb 11, 2011
 @author: jklo
 '''
 
-
+from LRSignature.sign.Sign  import Sign_0_21
 from restkit.resource import Resource
 import urllib2
 import time
@@ -33,6 +33,7 @@ import logging
 import sys
 from urllib import urlencode
 from optparse import OptionParser
+import os
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
@@ -47,14 +48,30 @@ log = logging.getLogger("main")
 #    "attribution": "The Library of Congress"
 #}
 
+#config = {
+#    "server": "http://www.dls.ucar.edu",
+#    "path": "/dds_se/services/oai2-0",
+#    "verb": "ListRecords",
+#    "metadataPrefix":"nsdl_dc",
+#    "set":"ncs-NSDL-COLLECTION-000-003-112-016",
+#    "tos": "http://nsdl.org/help/?pager=termsofuse",
+#    "attribution": "The National Science Digital Library"
+#}
 config = {
-    "server": "http://www.dls.ucar.edu",
-    "path": "/dds_se/services/oai2-0",
+    "server": "",
+    "path": "",
     "verb": "ListRecords",
     "metadataPrefix":"nsdl_dc",
     "set":"ncs-NSDL-COLLECTION-000-003-112-016",
     "tos": "http://nsdl.org/help/?pager=termsofuse",
-    "attribution": "The National Science Digital Library"
+    "attribution": "The National Science Digital Library",
+    "sign": False,
+    "keyId": "61F314A372C7F855",
+    "passphrase": "",
+    "keyLocations": [
+                     "http://pool.sks-keyservers.net:11371/pks/lookup?op=get&search=0x61F314A372C7F855",
+                     "https://keyserver2.pgp.com/vkd/DownloadKey.event?keyid=0x61F314A372C7F855"
+                     ]
 }
 #config = {
 #    "server": "http://hal.archives-ouvertes.fr",
@@ -73,9 +90,24 @@ namespaces = {
               "xsi":"http://www.w3.org/2001/XMLSchema-instance"
               }
 # http://hal.archives-ouvertes.fr/oai/oai.php?verb=ListRecords&metadataPrefix=oai_dc
+signtool = None
+
 
 class Error(Exception):
     pass
+
+class Opts:
+    def __init__(self):
+        self.LEARNING_REGISTRY_URL = "http://localhost"
+        
+        parser = OptionParser()
+        parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
+        parser.add_option('-o', '--output', dest="output", help='Output file instead of publish', default=None)
+        parser.add_option('-c', '--config', dest="config", help='Configuration file', default=None)
+        (options, args) = parser.parse_args()
+        self.LEARNING_REGISTRY_URL = options.registryUrl    
+        self.OUTPUT = options.output
+        self.CONFIG_FILE = options.config
 
 def getDocTemplate():
     return { 
@@ -160,6 +192,12 @@ def formatNSDLDoc(record):
             del doc[key]
     
     return doc
+
+def signDoc(doc):
+    if doc != None and signtool != None:
+        return signtool.sign(doc)
+    else:
+        return doc
     
 def bulkUpdate(list, opts):
     '''
@@ -290,16 +328,20 @@ def retrieveFromUrlWaiting(request,
     return text            
       
 
+
+
 def connect(opts):
     for recset in fetchRecords(config):
         docList = []
         for rec in recset:
             if config["metadataPrefix"] == "oai_dc":
                 doc = formatOAIDoc(rec)
+                doc = signDoc(doc)
                 if (doc != None):
                     docList.append(doc)
             if config["metadataPrefix"] == "nsdl_dc":
                 doc = formatNSDLDoc(rec)
+                doc = signDoc(doc)
                 if (doc != None):
                     docList.append(doc)
         try:
@@ -309,23 +351,30 @@ def connect(opts):
         bulkUpdate(docList, opts)
         outputFile(docList, opts)
        
+def readConfig(opts=Opts()):
+    if opts.CONFIG_FILE != None and os.path.exists(opts.CONFIG_FILE):
+        global config, namespaces, signtool
+        
+        extConf = json.load(file(opts.CONFIG_FILE))
+        
+        settings = {"config":config, "namespaces":namespaces}
+        for (setting, setObj) in settings.items():
+            if extConf.has_key(setting):
+                for key in extConf[setting].keys():
+                   
+                    setObj[key] = extConf[setting][key]
+    
+    if config.has_key("sign") and config["sign"] == True: 
+        signtool = Sign_0_21(config["keyId"], passphrase=config["passphrase"], publicKeyLocations=config["keyLocations"])
 
     
-class Opts:
-    def __init__(self):
-        self.LEARNING_REGISTRY_URL = "http://localhost"
-        
-        parser = OptionParser()
-        parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
-        parser.add_option('-o', '--output', dest="output", help='Output file instead of publish', default=None)
-        (options, args) = parser.parse_args()
-        self.LEARNING_REGISTRY_URL = options.registryUrl    
-        self.OUTPUT = options.output
+
 
        
 
 if __name__ == '__main__':
     log.info("Update Started.")
     opts = Opts()
+    readConfig(opts)
     connect(opts)
     log.info("Done Updating.")
