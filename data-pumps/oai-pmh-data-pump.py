@@ -73,6 +73,11 @@ config = {
                      "https://keyserver2.pgp.com/vkd/DownloadKey.event?keyid=0x61F314A372C7F855"
                      ]
 }
+
+identity = {            
+    "submitter_type": "agent",
+    "submitter": "NSDL 2 LR Data Pump"
+}
 #config = {
 #    "server": "http://hal.archives-ouvertes.fr",
 #    "path": "/oai/oai.php",
@@ -115,10 +120,7 @@ def getDocTemplate():
             "doc_version": "0.21.0", 
             "resource_data_type" : "metadata",
             "active" : True,
-            "identity": {            
-                "submitter_type": "agent",
-                "submitter": "NSDL 2 LR Data Pump"
-            },
+            "identity": identity,
             "TOS": {
                     "submission_TOS":    config["tos"],
                     "submission_attribution":  config["attribution"]
@@ -159,6 +161,9 @@ def formatOAIDoc(record):
     for key in doc.keys():
         if (doc[key] == None):
             del doc[key]
+            
+    # signer has a problem with encoding descendents of string type
+    doc = eval(repr(doc))
     
     return doc
 
@@ -176,9 +181,9 @@ def formatNSDLDoc(record):
     
     doc["resource_locator"] = resource_locator[0]
     
-    doc["keys"].extend(subject)
-    doc["keys"].extend(language)
-    doc["keys"].extend(edLevel)
+    doc["keys"].extend(map(lambda x: str(x), subject))
+    doc["keys"].extend(map(lambda x: str(x), language))
+    doc["keys"].extend(map(lambda x: str(x), edLevel))
     
     
     doc["payload_schema"].append("nsdl_dc")
@@ -190,6 +195,9 @@ def formatNSDLDoc(record):
     for key in doc.keys():
         if (doc[key] == None):
             del doc[key]
+            
+    # signer has a problem with encoding descendents of string type
+    doc = eval(repr(doc))
     
     return doc
 
@@ -198,21 +206,32 @@ def signDoc(doc):
         return signtool.sign(doc)
     else:
         return doc
+
+def chunkList(fullList = [], chunkSize=10):
+    numElements = len(fullList)
+    for start in range(0, numElements, chunkSize):
+        end = start+chunkSize
+        if end > numElements:
+            end = numElements
+        yield fullList[start:end]
+    
+    
     
 def bulkUpdate(list, opts):
     '''
     Save to Learning Registry
     '''
     if len(list) > 0 and opts.OUTPUT == None:
-        try:
-            log.info("Learning Registry Node URL: '{0}'\n".format(opts.LEARNING_REGISTRY_URL))
-            res = Resource(opts.LEARNING_REGISTRY_URL)
-            body = { "documents":list }
-            log.info("request body: %s" % (json.dumps(body),))
-            clientResponse = res.post(path="/publish", payload=json.dumps(body), headers={"Content-Type":"application/json"})
-            log.info("status: {0}  message: {1}".format(clientResponse.status_int, clientResponse.body_string()))
-        except Exception:
-            log.exception("Caught Exception When publishing to registry")
+        for listChunk in chunkList(list, 10):
+            try:
+                log.info("Learning Registry Node URL: '{0}'\n".format(opts.LEARNING_REGISTRY_URL))
+                res = Resource(opts.LEARNING_REGISTRY_URL)
+                body = { "documents":listChunk }
+                log.info("request body: %s" % (json.dumps(body),))
+                clientResponse = res.post(path="/publish", payload=json.dumps(body), headers={"Content-Type":"application/json; charset=utf-8"})
+                log.info("status: {0}  message: {1}".format(clientResponse.status_int, clientResponse.body_string()))
+            except Exception:
+                log.exception("Caught Exception When publishing to registry")
     else:
         log.info("Nothing is being updated.")
 
@@ -233,18 +252,19 @@ def outputFile(list, opts):
         if not os.path.exists(opts.OUTPUT):
             os.makedirs(opts.OUTPUT)
         
-        slice_idx = 0
+#        slice_idx = 0
         slice_chunksize = 100
         try:
-            while len(list[slice_idx:slice_chunksize]) > 0:
-                slice = list[slice_idx:slice_chunksize]
+            for slice in chunkList(list, slice_chunksize):
+#            while len(list[slice_idx:slice_chunksize]) > 0:
+#                slice = list[slice_idx:slice_chunksize]
                 
                 filepath = "{0}/data-{1}.json".format(opts.OUTPUT, count.next())
                 with open(filepath, "w") as out:
-                    out.write(json.dumps({"documents":slice}))
+                    out.write(json.dumps({"documents":slice}, sort_keys=True, indent=4))
                     log.info("wrote: {0}".format(out.name))
                 
-                slice_idx += 1
+#                slice_idx += 1
         except Exception:
             log.exception("Unable to write file.")
 
@@ -353,15 +373,14 @@ def connect(opts):
        
 def readConfig(opts=Opts()):
     if opts.CONFIG_FILE != None and os.path.exists(opts.CONFIG_FILE):
-        global config, namespaces, signtool
+        global config, namespaces, signtool, identity
         
         extConf = json.load(file(opts.CONFIG_FILE))
         
-        settings = {"config":config, "namespaces":namespaces}
+        settings = {"config":config, "namespaces":namespaces, "identity":identity}
         for (setting, setObj) in settings.items():
             if extConf.has_key(setting):
                 for key in extConf[setting].keys():
-                   
                     setObj[key] = extConf[setting][key]
     
     if config.has_key("sign") and config["sign"] == True: 
