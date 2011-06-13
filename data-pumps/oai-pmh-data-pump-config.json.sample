@@ -7,6 +7,7 @@
         "set":"ncs-NSDL-COLLECTION-000-003-112-016",                /* OAI set (optional) */
         "tos": "http://nsdl.org/help/?pager=termsofuse",            /* Terms of Service for metadata */
         "attribution": "The National Science Digital Library",      /* Attribution for ToS */
+        "lr-test-data": true,                                       /* Envelopes should be tagged as test data true/false */
         "sign": false,                                              /* Sign envelope */
         "keyId": "890B513B01D8F913",                                /* Signing key id */
         "passphrase": "5uper5ecre7",                                /* Signing key passphrase */
@@ -24,5 +25,9 @@
         "nsdl_dc":"http://ns.nsdl.org/nsdl_dc_v1.02/",
         "ieee":"http://www.ieee.org/xsd/LOMv1p0",
         "xsi":"http://www.w3.org/2001/XMLSchema-instance"
+    },
+    
+    "identity": {
+        "submitter": "OAI-PMH Data Pump"                            /* Should be the entity whom is submitting the data */
     }
 }

@@ -66,6 +66,7 @@ config = {
     "tos": "http://nsdl.org/help/?pager=termsofuse",
     "attribution": "The National Science Digital Library",
     "sign": False,
+    "lr-test-data": True,
     "keyId": "61F314A372C7F855",
     "passphrase": "",
     "keyLocations": [
@@ -113,6 +114,7 @@ class Opts:
         self.LEARNING_REGISTRY_URL = options.registryUrl    
         self.OUTPUT = options.output
         self.CONFIG_FILE = options.config
+        self.OPTIONS = options
 
 def getDocTemplate():
     return { 
@@ -348,7 +350,11 @@ def retrieveFromUrlWaiting(request,
     return text            
       
 
-
+def setLRTestData(doc):
+    if config.has_key("lr-test-data") and config["lr-test-data"] == True:
+        doc["keys"].append("lr-test-data")
+    return doc
+    
 
 def connect(opts):
     for recset in fetchRecords(config):
@@ -356,11 +362,13 @@ def connect(opts):
         for rec in recset:
             if config["metadataPrefix"] == "oai_dc":
                 doc = formatOAIDoc(rec)
+                doc = setLRTestData(doc)
                 doc = signDoc(doc)
                 if (doc != None):
                     docList.append(doc)
             if config["metadataPrefix"] == "nsdl_dc":
                 doc = formatNSDLDoc(rec)
+                doc = setLRTestData(doc)
                 doc = signDoc(doc)
                 if (doc != None):
                     docList.append(doc)
