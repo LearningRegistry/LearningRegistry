@@ -7,7 +7,8 @@
 # commit to a specified coudbserver.
 #
 
-import ConfigParser, os
+import ConfigParser
+import os
 import couchdb
 import sys
 import json
@@ -24,6 +25,12 @@ scriptPath = os.path.dirname(os.path.abspath(__file__))
 _PYLONS_CONFIG_SRC =  os.path.join(scriptPath, '../LR/development.ini.orig')
 _PYLONS_CONFIG_DEST = os.path.join(scriptPath, '../LR/development.ini')
 _COUCHAPP_PATH = os.path.join(scriptPath, '../couchdb/apps')
+
+# add path to virtualenv if the environment variable is set
+if os.getenv('VIRTUAL_ENV') is not None:
+    _VIRTUAL_ENV_PATH = os.path.expandvars('${VIRTUAL_ENV}')
+else:
+    _VIRTUAL_ENV_PATH = ''
 
 print ("\n{0}\n{1}\n{2}".format(
                 _PYLONS_CONFIG_SRC, _PYLONS_CONFIG_DEST, _COUCHAPP_PATH))
@@ -64,7 +71,7 @@ def CreateDB(couchServer = _DEFAULT_COUCHDB_URL,  dblist=[], deleteDB=False):
 
 
 def PublishDoc(couchServer, dbname, name, doc_data):
-    
+
     try:
         db = couchServer[dbname]
         #delete existing document.
@@ -78,7 +85,7 @@ def PublishDoc(couchServer, dbname, name, doc_data):
         print("Exception when add config document:\n")
         exc_type, exc_value, exc_tb = sys.exc_info()
         pprint(traceback.format_exception(exc_type, exc_value, exc_tb))
-   
+
 
 def testCouchServer(serverURL):
     try:
@@ -182,7 +189,7 @@ if __name__ == "__main__":
         backup = _PYLONS_CONFIG_DEST+".backup"
         print("\nMove existing {0} to {1}".format(_PYLONS_CONFIG_DEST, backup))
         shutil.copyfile(_PYLONS_CONFIG_DEST, backup)
-        
+
     #Update pylons config file to use the couchdb url
     _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
     destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
@@ -234,15 +241,17 @@ if __name__ == "__main__":
         service['service_name'] = service_type + " service"
         service['service_description']= service_type + " service"
         PublishDoc(server, _NODE, service_type + " service", service)
-        
+
     #Push the couch apps
     #Commands to go the couchapp directory and push all the apps.
     print("\n============================\n")
     print("Pushing couch apps ...")
     resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
     for app in os.listdir(_COUCHAPP_PATH):
-        command = "couchapp push {0} {1}".format(
-                            os.path.join(_COUCHAPP_PATH, app), resourceDataUrl)
+        command = os.path.join(
+            _VIRTUAL_ENV_PATH, 'bin', 'couchapp') + " push {0} {1}".format(
+                os.path.join(_COUCHAPP_PATH, app), resourceDataUrl
+                )
         print("\n{0}\n".format(command))
         p = subprocess.Popen(command, shell=True)
         p.wait()
