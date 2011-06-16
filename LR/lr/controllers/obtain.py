@@ -34,8 +34,8 @@ class ObtainController(BaseController):
           view = db.view(view_name, include_docs=include_docs)
         return view
 
-    def format_data(self,full_docs,data):
-        yield "{'documents':["
+    def format_data(self, full_docs, data):
+        yield '{"documents":['
         num_sent = 0
         if data is not None and len(data) > 0:
             for doc in data:
@@ -46,7 +46,7 @@ class ObtainController(BaseController):
                     resourceData = doc.doc
                     return_data = {'doc_ID':doc.id,'resource_data_description':resourceData}
                 else:
-                    return_data = {'doc_ID':doc.key} 
+                    return_data = {'doc_ID':doc.id} 
                 num_sent = num_sent + 1
                 if num_sent < len(data): 
                     yield json.dumps(return_data) + ','
@@ -65,9 +65,12 @@ class ObtainController(BaseController):
         keys = map(lambda key: key['request_ID'],data['request_IDs'])
         full_docs = data['ids_only'] is None or data['ids_only'] == False
         if data['by_doc_ID']:
-          view = self.get_view(keys=keys, full_docs=full_docs)
+          view = self.get_view(keys=keys, include_docs=full_docs)
         elif data['by_resource_ID']:
-          view = self.get_view('_design/filter/_view/resource-location',keys, full_docs)
+            try:
+                view = self.get_view('_design/learningregistry/_view/resource-location',keys, full_docs)
+            except Exception as ex:
+                print ex
         return_data = view  
         return self.format_data(full_docs,return_data)
         # url('obtain')
