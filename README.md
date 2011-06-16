@@ -237,7 +237,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 >       ./pip install restkit
 >       ./pip install cython
 >       ./pip install lxml
->       ./pip install iso8601
+>       ./pip install iso8601plus
 
 
 ## Configure Nginx - Should be preinstalled on Ubuntu ##
@@ -393,6 +393,12 @@ Learning Registry node.
 * Create a virtualenv for Learning Registry.
 
 >       mkvirtualenv --no-site-packages --distribute learning-registry
+
+* Install the required python packages into the virtualenv. The
+  `mkvirtualenv` command will automatically activate the newly created
+  virtualenv.
+
+>       pip install pylons pyparsing couchdb restkit lxml iso8601plus
 
 * Change directory to the root of the cloned Learning Registry git repository.
 

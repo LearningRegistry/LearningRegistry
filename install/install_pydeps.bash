@@ -157,17 +157,13 @@ if [[ "${OSTYPE}" == "darwin10.0" ]] ;  then
     get_xcode_version
     if [[ ${XCODE_VER%%.*} -gt 3 ]] ; then
         echo "========================================================================"
-        echo "Xcode 4 detected won't install lxml. Tests won't work without lxml."
+        echo "Xcode 4 detected this script will crash when attempting to install install lxml."
+	echo "Tests won't work without lxml."
+	echo "You will have to remove lxml from the 'install_requires' section of setup.py file."
         echo "See https://gist.github.com/963298 or"
         echo "https://bugs.launchpad.net/lxml/+bug/738500 for instructions on building lxml."
         echo "========================================================================"
-    else
-        echo "Installing lxml."
-        pip --environment="${LR_ENV_NAME}" install lxml
     fi
-else
-    echo "Installing lxml."
-    pip --environment="${LR_ENV_NAME}" install lxml
 fi
 
 # Show the user what to do next.
