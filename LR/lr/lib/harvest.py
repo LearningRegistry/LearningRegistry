@@ -14,11 +14,13 @@ class harvest:
         return last_update
   def get_record(self,id):
     return self.db[id]
+
   def get_records_by_resource(self,resource_locator):
     view_data = self.db.view('_design/learningregistry/_view/resource-location',include_docs=True,keys=[resource_locator])
-    return map(lambda doc: doc.doc, view_data)      
-  def list_records(self, from_date, until_date):
+    for do in view_data:
+        yield doc.doc      
     
+  def list_records(self, from_date, until_date):    
     rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), include_docs=True)
     for row in rows:
       #ignore design docs
