@@ -16,6 +16,9 @@
 # ./setup_lr.bash [name of virtualenv]
 # Note: the name of the virtualenv is optional.
 
+# Please DON'T invoke this script as root or sudo. It will prompt you
+# for your password if you need to sudo something.
+
 # This script should work with Ubuntu 10.04 onwards and MacOS 10.6.x
 
 # It requires the Homebrew package manager on MacOS. See
@@ -34,10 +37,23 @@ THIS_SCRIPT_DIR=${PWD}
 UBUNTU_LR_DEPS="build-essential libxml2-dev libxslt1-dev python-dev python-virtualenv curl autotools-dev automake autoconf"
 UBUNTU_MIN_VER="10.04"
 
-COUCHONE_DOWNLOAD_URL="http://c3145442.r42.cf0.rackcdn.com/couchbase-server-community_x86_64_1.1.deb"
+COUCHONE_x86_64_DOWNLOAD_URL="http://c3145442.r42.cf0.rackcdn.com/couchbase-server-community_x86_64_1.1.deb"
+
+COUCHONE_x86_DOWNLOAD_URL="http://c3145442.r42.cf0.rackcdn.com/couchbase-server-community_x86_1.1.deb"
+
 COUCHONE_DOWN_DIR="${HOME}"
 
 COUCH_DEF_PORT=5984
+
+ARCH=$(uname -m)
+
+# check to see if we are running as root or sudo, and stop if you are.
+if [[ $(whoami) == 'root' ]] ; then
+    echo "Please don't run this script as root or using sudo." >&2
+    echo "It's generally not a good idea to create python virtualenvs as root or sudo." >&2
+    echo "You may require sudo privileges but shouldn't run the script as sudo." >&2
+    exit 1
+fi
 
 echo "========================================================================"
 echo "This script will install the software to set up a Learning Registry node"
@@ -107,6 +123,9 @@ function can_sudo () {
 }
 
 function install_couch_ubuntu () {
+
+    local COUCH_DOWN_URL=""
+
     echo "Downloading CouchOne Community Edition to ${HOME}."
     cd "${HOME}" || {
         echo "Couldn't change to ${HOME} directory. This is very odd." >&2
@@ -114,12 +133,25 @@ function install_couch_ubuntu () {
         echo "Exiting."
         exit 1
     }
+
+    # detect architecture and specify download URL correctly
+    if [[ "${ARCH}" == "x86_64" ]] ; then
+	COUCH_DOWN_URL="${COUCHONE_x86_64_DOWNLOAD_URL}"
+    elif [[ "${ARCH}" == "i386" ]] || [[ "${ARCH}" == "i686" ]] ; then
+	COUCH_DOWN_URL="${COUCH_x86_DOWNLOAD_URL}"
+    else
+	# In this case, Couch One isn't available for the current architecture.
+	echo "There is no Couch One installer available for your architecture."
+	exit 1
+    fi
+
     # check return state of all below and quit if they don't complete
-    wget "${COUCHONE_DOWNLOAD_URL}" || {
+    wget "${COUCH_DOWN_URL}" || {
         echo "Could not download CouchDB. Exiting."
         exit 1
     }
-    sudo dpkg --install ${COUCHONE_DOWNLOAD_URL##*/}
+
+    sudo dpkg --install ${COUCHONE_DOWN_URL##*/}
     cd "${THIS_SCRIPT_DIR}"
 }
 
