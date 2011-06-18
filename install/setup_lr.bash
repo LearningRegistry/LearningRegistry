@@ -151,7 +151,7 @@ function install_couch_ubuntu () {
         exit 1
     }
 
-    sudo dpkg --install ${COUCHONE_DOWN_URL##*/}
+    sudo dpkg --install ${COUCH_DOWN_URL##*/}
     cd "${THIS_SCRIPT_DIR}"
 }
 
