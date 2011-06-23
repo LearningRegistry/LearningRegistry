@@ -10,6 +10,7 @@ from lr.lib.base import BaseController, render
 import lr.lib.helpers
 log = logging.getLogger(__name__)
 import ast
+import string
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -19,12 +20,25 @@ class HarvestController(BaseController):
         last_update_date = iso8601.parse_date(date)
         last_update = helpers.convertToISO8601UTC(last_update_date)    
         return last_update
+    def _check_bool_param(self,params,key):
+        if params.has_key(key):
+            raw_value = string.lower(str(params[key]))
+            if len(raw_value) > 1:
+                print string.capitalize(raw_value)
+                return ast.literal_eval(string.capitalize(raw_value))
+            elif len(raw_value) == 1:
+                if raw_value == 't':
+                    return True
+                elif raw_value == 'f':
+                    return False                
+        return False
     def harvest(self, params, body, verb):
         h = harvest()
         def getrecord():
           data = self.get_base_response(verb,body)
-          by_doc_ID = params.has_key('by_doc_ID') and ast.literal_eval(str(params['by_doc_ID']))
-          by_resource_ID = params.has_key('by_resource_ID') and ast.literal_eval(str(params['by_resource_ID']))
+          log.debug(str(params['by_doc_ID']))
+          by_doc_ID = self._check_bool_param(params,'by_doc_ID')
+          by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
           if not params.has_key('request_id'):
             data['OK'] = False
             data['error'] = 'badArgument'
@@ -36,7 +50,11 @@ class HarvestController(BaseController):
 
           request_id = params['request_id']
           if by_doc_ID:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[h.get_record(request_id)])
+            document = h.get_record(request_id)
+            if document is not None:
+                records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+            else:
+                records = []
           else:
             records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
           data['getrecord'] ={
