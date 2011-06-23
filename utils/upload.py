@@ -62,25 +62,25 @@ def set_test_key(data, remove=True):
         
 def process_files():
     documents=[]
-    numfiles = len(os.listdir(root_path))
-    for fname in os.listdir(root_path):
-        file_path = os.path.join(root_path,fname)
-        with codecs.open(file_path,'r+', 'utf-8-sig') as f:
-            data = json.load(f)        
+    for root,dirs, files in os.walk(root_path):
+        for fname in files:
+            print fname
+            file_path = os.path.join(root,fname)
+            with codecs.open(file_path,'r+', 'utf-8-sig') as f:
+                data = json.load(f)        
             
-        if not lr_test_data and data.has_key("keys"):
-            data = set_test_key(data)
-        else:
-            data = set_test_key(data, remove=False)
+            if not lr_test_data and data.has_key("keys"):
+                data = set_test_key(data)
+            else:
+                data = set_test_key(data, remove=False)
             
-        if signer is not None: 
-            print '{1}: signing {0}'.format(fname, numfiles)           
-            data = signer.sign(data)
-            numfiles -= 1
-        documents.append(data)
-        if len(documents) >= 10:
-            upload_files(documents)
-            documents=[]
+            if signer is not None: 
+                print 'signing {0}'.format(fname)           
+                data = signer.sign(data)
+            documents.append(data)
+            if len(documents) >= 10:
+                upload_files(documents)
+                documents=[]
 def main():
     process_files();
 if __name__ == '__main__':
