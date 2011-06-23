@@ -60,7 +60,10 @@ couchdb.db.node = node
 couchdb.db.resourcedata = resource_data
 couchdb.db.network = network
 couchdb.db.community = community
-
+couchdb.db.resourcesview = _design/learningregistry/_view/resources
+couchdb.threshold.distrbutes = 1000
+couchdb.threshold.viewupdate = 100
+lr.distribute.url = http://localhost:5000/distribute
 
 models_spec_dir = %(here)s/data/models
 spec.models.node_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/node_description
