@@ -40,7 +40,6 @@ class ObtainController(BaseController):
         currentID = ""
         if data is not None:
             firstID = True
-            firstDocument = True
             for doc in data:
                 if full_docs: 
                     if doc.key != currentID:                        
@@ -55,6 +54,9 @@ class ObtainController(BaseController):
                 else:
                     if doc.key != currentID:
                         currentID = doc.key
+                        if not firstID:
+                            yield ','
+                        firstID = False
                         yield json.dumps({'doc_ID': doc.key})
     
         if full_docs:             
