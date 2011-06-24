@@ -36,7 +36,6 @@ class HarvestController(BaseController):
         h = harvest()
         def getrecord():
           data = self.get_base_response(verb,body)
-          log.debug(str(params['by_doc_ID']))
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
           if not params.has_key('request_id'):
