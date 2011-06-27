@@ -3,7 +3,6 @@ README.txt
 setup.cfg
 setup.py
 LR.egg-info/._PKG-INFO
-LR.egg-info/._SOURCES.txt
 LR.egg-info/._dependency_links.txt
 LR.egg-info/._entry_points.txt
 LR.egg-info/._not-zip-safe
@@ -35,6 +34,7 @@ lr/controllers/obtain.py
 lr/controllers/policy.py
 lr/controllers/publish.py
 lr/controllers/services.py
+lr/controllers/slices.py
 lr/controllers/status.py
 lr/controllers/sword.py
 lr/controllers/contrib/__init__.py
@@ -91,6 +91,7 @@ lr/tests/functional/test_policy.py
 lr/tests/functional/test_publish.py
 lr/tests/functional/test_services.py
 lr/tests/functional/test_setup.py
+lr/tests/functional/test_slices.py
 lr/tests/functional/test_status.py
 lr/tests/functional/test_sword.py
 tests/__init__.py

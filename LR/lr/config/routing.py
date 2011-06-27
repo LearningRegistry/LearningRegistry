@@ -32,7 +32,7 @@ def make_map(config):
         # Value added services
         map.resource('OAI-PMH', 'OAI-PMH')
         map.resource('sword','sword')
-        map.resource('slice', 'slices')
+        map.resource('slice', 'slice')
     
     map.minimization = False
     map.explicit = False
