@@ -10,6 +10,7 @@ from lr.lib.base import BaseController, render
 import lr.lib.helpers
 log = logging.getLogger(__name__)
 import ast
+import string
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -19,12 +20,24 @@ class HarvestController(BaseController):
         last_update_date = iso8601.parse_date(date)
         last_update = helpers.convertToISO8601UTC(last_update_date)    
         return last_update
+    def _check_bool_param(self,params,key):
+        if params.has_key(key):
+            raw_value = string.lower(str(params[key]))
+            if len(raw_value) > 1:
+                print string.capitalize(raw_value)
+                return ast.literal_eval(string.capitalize(raw_value))
+            elif len(raw_value) == 1:
+                if raw_value == 't':
+                    return True
+                elif raw_value == 'f':
+                    return False                
+        return False
     def harvest(self, params, body, verb):
         h = harvest()
         def getrecord():
           data = self.get_base_response(verb,body)
-          by_doc_ID = params.has_key('by_doc_ID') and ast.literal_eval(str(params['by_doc_ID']))
-          by_resource_ID = params.has_key('by_resource_ID') and ast.literal_eval(str(params['by_resource_ID']))
+          by_doc_ID = self._check_bool_param(params,'by_doc_ID')
+          by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
           if not params.has_key('request_id'):
             data['OK'] = False
             data['error'] = 'badArgument'
@@ -36,7 +49,11 @@ class HarvestController(BaseController):
 
           request_id = params['request_id']
           if by_doc_ID:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[h.get_record(request_id)])
+            document = h.get_record(request_id)
+            if document is not None:
+                records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+            else:
+                records = []
           else:
             records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
           data['getrecord'] ={
@@ -44,13 +61,9 @@ class HarvestController(BaseController):
             }
           return json.dumps(data)
         def listidentifiers():
-            from_date = self.__parse_date(params['from'])
-            until_date = self.__parse_date(params['until'])
-            return self.list_identifiers(from_date,until_date,h,body,params,verb)            
+            return self.list_identifiers(h,body,params,verb)            
         def listrecords():
-            from_date = self.__parse_date(params['from'])
-            until_date = self.__parse_date(params['until'])
-            return self.list_records(from_date,until_date,h,body,params,verb)
+            return self.list_records(h,body,params,verb)
         def identify():
             data = self.get_base_response(verb,body)
             data['identify']={
@@ -83,10 +96,24 @@ class HarvestController(BaseController):
                     'listsets': listsets
                  }
         return switch[verb]()
-    def list_records(self,from_date, until_date, h , body , params, verb = 'GET' ):
+    def _test_time_params(self, params):
+        
+        if not params.has_key('from'):
+            from_date = self.__parse_date('1990-10-10 12:12:12.0Z')
+        else:
+            from_date = self.__parse_date(params['from'])
+        if not params.has_key('until'):
+            until_date = self.__parse_date(datetime.utcnow().isoformat()+ "Z")
+        else:
+            until_date = self.__parse_date(params['until'])
+        return from_date,until_date         
+    def list_records(self, h , body , params, verb = 'GET' ):                
         data = self.get_base_response(verb,body)
-        data['request']['from'] = params['from']
-        data['request']['until'] = params['until']
+        if params.has_key('from'):
+            data['request']['from'] = params['from']
+        if params.has_key('until'):
+            data['request']['until'] = params['until']
+        from_date, until_date = self._test_time_params(params)
         data['listrecords'] =  []
         base_response =  json.dumps(data).split('[')
         yield base_response[0] +'['
@@ -105,10 +132,13 @@ class HarvestController(BaseController):
                 yield json.dumps(debug_map(doc))
         yield base_response[1]
 
-    def list_identifiers(self,from_date, until_date,h,body ,params, verb = 'GET'):
+    def list_identifiers(self,h,body ,params, verb = 'GET'):        
         data = self.get_base_response(verb,body)
-        data['request']['from'] = params['from']
-        data['request']['until'] = params['until']
+        if params.has_key('from'):
+            data['request']['from'] = params['from']
+        if params.has_key('until'):
+            data['request']['until'] = params['until']
+        from_date, until_date = self._test_time_params(params)
         data['listidentifiers'] =  []
         base_response =  json.dumps(data).split('[')
         yield base_response[0] +'['

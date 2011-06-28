@@ -34,24 +34,33 @@ class ObtainController(BaseController):
           view = db.view(view_name, include_docs=include_docs)
         return view
 
-    def format_data(self,full_docs,data):
-        yield "{'documents':["
+    def format_data(self, full_docs, data):
+        yield '{"documents":['
         num_sent = 0
-        if data is not None and len(data) > 0:
+        currentID = ""
+        if data is not None:
+            firstID = True
             for doc in data:
-                if full_docs:
-                    # Get the resource data and update  with the node timestamp data
-                    # That the view  has in value['timestamp']
-                    resourceData = {}
-                    resourceData = doc.doc
-                    return_data = {'doc_ID':doc.id,'resource_data_description':resourceData}
+                if full_docs: 
+                    if doc.key != currentID:                        
+                        currentID = doc.key
+                        byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
+                        if not firstID:
+                            yield ']' + byIDResponseChunks[1] + ','                            
+                        yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
+                        firstID = False
+                    else:                        
+                        yield ',' + json.dumps(doc.doc)
                 else:
-                    return_data = {'doc_ID':doc.key} 
-                num_sent = num_sent + 1
-                if num_sent < len(data): 
-                    yield json.dumps(return_data) + ','
-                else:
-                    yield json.dumps(return_data) 
+                    if doc.key != currentID:
+                        currentID = doc.key
+                        if not firstID:
+                            yield ','
+                        firstID = False
+                        yield json.dumps({'doc_ID': doc.key})
+    
+        if full_docs:             
+            yield ']' + byIDResponseChunks[1]
         yield "]}"
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""
@@ -63,13 +72,24 @@ class ObtainController(BaseController):
         """POST /obtain: Create a new item"""
         data = json.loads(request.body)
         keys = map(lambda key: key['request_ID'],data['request_IDs'])
-        full_docs = data['ids_only'] is None or data['ids_only'] == False
-        if data['by_doc_ID']:
-          view = self.get_view(keys=keys, full_docs=full_docs)
-        elif data['by_resource_ID']:
-          view = self.get_view('_design/filter/_view/resource-location',keys, full_docs)
-        return_data = view  
-        return self.format_data(full_docs,return_data)
+        full_docs = (not data.has_key('ids_only')) or data['ids_only'] == False
+        by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
+        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
+        if by_doc_ID and by_resource_ID:
+            raise Exception("by_doc_ID and by_resource_ID cannot both be True")
+        if not data.has_key('by_resource_ID') and not by_doc_ID:
+            by_resource_ID = True
+        if not by_doc_ID and not by_resource_ID:
+            raise Exception("by_doc_ID and by_resource_ID cannot both be False")
+        if  by_doc_ID:
+          view = self.get_view(keys=keys, include_docs=full_docs)
+        elif by_resource_ID:
+            try:
+                view = self.get_view('_design/learningregistry/_view/resource-location',keys, include_docs=full_docs)
+            except Exception as ex:
+                print ex
+        
+        return self.format_data(full_docs,view)
         # url('obtain')
 
     def new(self, format='html'):

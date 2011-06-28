@@ -65,6 +65,7 @@ lr/public/bg.png
 lr/public/favicon.ico
 lr/public/index.html
 lr/public/pylons-logo.gif
+lr/public/search.html
 lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd
 lr/public/schemas/OAI/2.0/OAI-PMH.xsd
 lr/public/schemas/OAI/2.0/sample-GetRecord-list.xml
