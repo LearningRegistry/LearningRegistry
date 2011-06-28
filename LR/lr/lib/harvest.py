@@ -3,9 +3,11 @@ import couchdb
 import logging
 import helpers as h
 import iso8601
+from lr.model.base_model import appConfig
+
 log = logging.getLogger(__name__)
 class harvest:
-  def __init__(self, server='http://localhost', database='resource_data'):
+  def __init__(self, server=appConfig['couchdb.url'], database='resource_data'):
     server = couchdb.Server(server)
     self.db = server[database]
   def __parse_date(self,date):
