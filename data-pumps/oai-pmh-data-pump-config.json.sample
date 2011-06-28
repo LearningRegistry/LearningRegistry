@@ -1,10 +1,13 @@
+/*****************************************************/
+/* NOTE: ALL COMMENTS MUST REMOVED BEFORE ACTUAL USE */
+/*****************************************************/
 {
     "config": {
         "server": "file:///Users/jklo/Downloads/oai2-0.xml",        /* URI to OAI-PMH server */
         "path": "",                                                 /* path to OAI interface */
         "verb": "ListRecords",                                      /* OAI verb to use for download, ListRecords is the only one supported */
         "metadataPrefix":"nsdl_dc",                                 /* OAI metadataPrefix */
-        "set":"ncs-NSDL-COLLECTION-000-003-112-016",                /* OAI set (optional) */
+        "set":"ncs-NSDL-COLLECTION-000-003-112-016",                /* OAI set, if no set, value should be null */
         "tos": "http://nsdl.org/help/?pager=termsofuse",            /* Terms of Service for metadata */
         "attribution": "The National Science Digital Library",      /* Attribution for ToS */
         "lr-test-data": true,                                       /* Envelopes should be tagged as test data true/false */
