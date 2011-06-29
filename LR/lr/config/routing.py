@@ -19,12 +19,11 @@ def make_map(config):
 
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
-    
+    map.resource('status','status')
     map.resource('distribute','distribute')    
     if not LRNode.nodeDescription.gateway_node:
         map.resource('publish','publish')
-        map.resource('obtain','obtain')
-        map.resource('status','status')
+        map.resource('obtain','obtain')        
         map.resource('description','description')
         map.resource('services','services')
         map.resource('policy','policy')
