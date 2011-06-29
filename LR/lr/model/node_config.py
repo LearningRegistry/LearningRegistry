@@ -265,6 +265,12 @@ class LRNodeModel(object):
             log.debug('start view update %s' % self._resourcesview)
             log.debug(len(db.view(self._resourcesview)))
             log.debug('end view update')
+        def distribute():
+            log.debug('start distribute')
+            data = json.dumps({})
+            request = urllib2.Request(self._distUrl,data,{'Content-Type':'application/json; charset=utf-8'})
+            response = urllib2.urlopen(request)   
+            log.debug('end distribute')            
         def recordChanges():
             if self._monitoringChanges == True:
                 return
@@ -277,6 +283,7 @@ class LRNodeModel(object):
             self._resourcesview = appConfig['couchdb.db.resourcesview']
             self._distUrl = appConfig['lr.distribute.url']
             self._updateThread = None
+            self._distributeThread = None
             while True:
                 # I have to include the doc since the filter does seems to work.  Otherwise
                 # using the same replication filter to get only resource_data document
@@ -297,19 +304,17 @@ class LRNodeModel(object):
                             self._updateThread = threading.Thread(target = updateView)
                             self._updateThread.start()
                         self._seqOfLastViewUpdate = currentSeq
-                        log.debug('update views')
-                    if currentSeq - self._seqOfLastDist > self._distributeThreshold:
-                        log.debug('distrbute')
-                        data = json.dumps({})
-                        request = urllib2.Request(self._distUrl,data,{'Content-Type':'application/json; charset=utf-8'})
-                        response = urllib2.urlopen(request)                        
+                    if currentSeq - self._seqOfLastDist > self._distributeThreshold:                     
+                        if self._distributeThread == None or not self._distributeThread.isAlive():
+                            self._distributeThread = threading.Thread(target = distribute)
+                            self._distributeThread.start()                        
                         self._seqOfLastDist = currentSeq                                    
                     # See if the document is of resource_data type if not ignore it.
                     doc = change['doc']
                     if  ((not 'resource_data' in doc) and
                           (not 'resource_data_distributable'  in doc)):
                         continue
-                    #log.info("Change to handle ....")
+                    log.info("Change to handle ....")
                     # Handle resource_data. 
                     if doc['doc_type'] == 'resource_data':
                         #log.info("\*******Changes to resource_document: "+doc['_id'])
