@@ -38,6 +38,7 @@ class ObtainController(BaseController):
         yield '{"documents":['
         num_sent = 0
         currentID = ""
+        byIDResponseChunks = None
         if data is not None:
             firstID = True
             for doc in data:
@@ -59,7 +60,7 @@ class ObtainController(BaseController):
                         firstID = False
                         yield json.dumps({'doc_ID': doc.key})
     
-        if full_docs:             
+        if full_docs and byIDResponseChunks is not None:             
             yield ']' + byIDResponseChunks[1]
         yield "]}"
     def index(self, format='html'):
