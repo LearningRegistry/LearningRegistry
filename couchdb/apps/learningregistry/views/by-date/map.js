@@ -1,6 +1,8 @@
 function(doc) {
     if(doc.doc_type == 'resource_data')
     {
-        emit(doc.node_timestamp, null);
+    	ts = doc.node_timestamp.replace(/\.[0-9]+Z/gi, "");
+        emit(ts, null);
     }
 }
+	
