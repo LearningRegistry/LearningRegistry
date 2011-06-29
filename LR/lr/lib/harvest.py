@@ -5,7 +5,7 @@ import helpers as h
 import iso8601
 log = logging.getLogger(__name__)
 class harvest:
-  def __init__(self, server='http://localhost', database='resource_data'):
+  def __init__(self, server='http://localhost:5984', database='resource_data'):
     server = couchdb.Server(server)
     self.db = server[database]
   def __parse_date(self,date):
@@ -19,12 +19,12 @@ class harvest:
           return None
 
   def get_records_by_resource(self,resource_locator):
-    view_data = self.db.view('_design/learningregistry/_view/resource-location',include_docs=True,keys=[resource_locator])
+    view_data = self.db.view('_design/learningregistry/_view/resource-location',include_docs=True,keys=[resource_locator], stale='ok')
     for doc in view_data:
         yield doc.doc      
     
   def list_records(self, from_date, until_date):    
-    rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), include_docs=True)
+    rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), include_docs=True, stale='ok')
     for row in rows:
         yield row.doc    
     
@@ -32,7 +32,7 @@ class harvest:
      return [{'metadataFormat':{'metadataPrefix':'dc'}}]
 
   def list_identifiers(self, from_date, until_date):
-    rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date))
+    rows = self.db.view('_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), stale='ok')
     for row in rows:
           yield row.id
 
