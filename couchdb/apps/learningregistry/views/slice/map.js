@@ -25,24 +25,24 @@ function(doc) {
 
 	//build people indices
 	for each(person in people) {
-		emit(person, doc.doc_ID);
+		emit(person.toLowerCase(), doc.doc_ID);
 	}
 	
 	//build date indices
 	emit(date_stamp, doc.doc_ID);
 	for each(person in people) {
-		emit([date_stamp, person], doc.doc_ID);
+		emit([date_stamp, person.toLowerCase()], doc.doc_ID);
 	}
 	
 	//build
 	var emitaAllKeywordIndices = function(value) {
-		emit(value, doc.doc_ID);
+		emit(value.toLowerCase(), doc.doc_ID);
 		for each(person in people) {
-			emit([person, value], doc.doc_ID);
+			emit([person.toLowerCase(), value.toLowerCase()], doc.doc_ID);
 		}
-		emit([date_stamp, value], doc.doc_ID);
+		emit([date_stamp, value.toLowerCase()], doc.doc_ID);
 		for each(person in people) {
-			emit([date_stamp, person, value], doc.doc_ID);
+			emit([date_stamp, person.toLowerCase(), value.toLowerCase()], doc.doc_ID);
 		}
 	}
 
@@ -50,7 +50,7 @@ function(doc) {
 	for each(var key in doc.keys) {
 		//var used = arrayContains(usedKeys, key);
 		if(!arrayContains(usedKeys, key)) {
-			emitaAllKeywordIndices(key);
+			emitaAllKeywordIndices(key.toLowerCase());
 			usedKeys.push(key);
 		}
 		
