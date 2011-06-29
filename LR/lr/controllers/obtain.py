@@ -29,9 +29,9 @@ class ObtainController(BaseController):
         s = couchdb.Server(appConfig['couchdb.url'])
         db = s[appConfig['couchdb.db.resourcedata']]
         if len(keys) > 0:
-          view = db.view(view_name, include_docs=include_docs, keys=keys)
+          view = db.view(view_name, include_docs=include_docs, keys=keys,stale='ok')
         else:
-          view = db.view(view_name, include_docs=include_docs)
+          view = db.view(view_name, include_docs=include_docs,stale='ok')
         return view
 
     def format_data(self, full_docs, data):
