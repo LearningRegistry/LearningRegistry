@@ -43,13 +43,12 @@ class FiltersController(BaseController):
         success = {"status": "OK"}
         maptemplate = """function(doc) {{      
             if (doc.doc_type && doc.doc_type == "resource_data" &&
-                doc.doc_version && doc.doc_version == "0.11.0" &&
-                doc.create_timestamp) {{
+                doc.node_timestamp) {{
                  
                  var validator = {0};
                  
                  if (validator(doc)) {{
-                     emit(doc.create_timestamp, doc.doc_ID);
+                     emit(doc.node_timestamp, doc.doc_ID);
                  }}
             }}
         }}"""
