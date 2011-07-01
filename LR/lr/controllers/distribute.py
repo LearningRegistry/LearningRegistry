@@ -64,7 +64,7 @@ class DistributeController(BaseController):
                                                                         "distribute")
                 log.info("\n\nAccess destination node at: "+destinationURL)
                 distributeInfo = json.load(urllib2.urlopen(destinationURL))
-                destinationLRNode = LRNodeModel(distributeInfo['node_config'])
+                destinationLRNode = LRNodeModel(distributeInfo['node_config'], False)
             except Exception as ex:
                 log.exception(ex)
                 continue
