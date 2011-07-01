@@ -7,5 +7,5 @@ pip install pyparsing
 pip install --upgrade couchdb
 pip install restkit
 pip install lxml
-pip install iso8601
+pip install iso8601plus
 cp nginx.conf /etc/nginx/nginx.conf
