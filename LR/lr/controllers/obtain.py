@@ -44,10 +44,10 @@ class ObtainController(BaseController):
             for doc in data:
                 if full_docs: 
                     if doc.key != currentID:                        
-                        currentID = doc.key
-                        byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
+                        currentID = doc.key                        
                         if not firstID:
                             yield ']' + byIDResponseChunks[1] + ','                            
+                        byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
                         yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
                         firstID = False
                     else:                        
