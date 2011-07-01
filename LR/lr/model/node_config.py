@@ -48,7 +48,7 @@ def dictToObject(dictionary):
     
 class LRNodeModel(object):
     """Class that models a learning registry node"""
-    def __init__(self, data):
+    def __init__(self, data, startMonitor = True):
         self._config = {}
         self._communityDescription = None
         self._networkDescription = None
@@ -58,7 +58,8 @@ class LRNodeModel(object):
         self._lastChangeSeq = -1
         self._changeMonintoringThread = None
         config = data
-        self._monitorResourceDataChanges()
+        if startMonitor:
+            self._monitorResourceDataChanges()
         if isinstance(data, dict):
             config = dictToObject(data)
             
@@ -267,7 +268,8 @@ class LRNodeModel(object):
             log.debug('end view update')
         def distribute():
             log.debug('start distribute')
-            data = json.dumps({})
+            data = json.dumps({"dist":"dist"})
+            log.debug(self._distUrl)
             request = urllib2.Request(self._distUrl,data,{'Content-Type':'application/json; charset=utf-8'})
             response = urllib2.urlopen(request)   
             log.debug('end distribute')            
@@ -317,7 +319,7 @@ class LRNodeModel(object):
                     log.info("Change to handle ....")
                     # Handle resource_data. 
                     if doc['doc_type'] == 'resource_data':
-                        #log.info("\*******Changes to resource_document: "+doc['_id'])
+                        log.info("\*******Changes to resource_document: "+doc['_id'])
                         distributableID = doc['_id']+"-distributable"
                         # Use the ResourceDataModel class to create an object that 
                         # contains only a the resource_data spec data.
@@ -327,17 +329,17 @@ class LRNodeModel(object):
                         #change thet doc_type 
                         distributableDoc['doc_type']='resource_data_distributable'
                         
-                        #log.debug("\n\ndistributable doc:\n{0}\n".format(pprint.pformat(distributableDoc)))
+                        log.debug("\n\ndistributable doc:\n{0}\n".format(pprint.pformat(distributableDoc)))
                         
                         # Check to see if a corresponding distributatable document exist.
                         # not create a new distribuation document without the 
                         # node_timestamp and _id+distributable.
                         if not distributableID in db:
                             try:
-                                #log.info('Adding distributable doc...\n')
+                                log.info('Adding distributable doc %s...\n' % distributableID)
                                 db[distributableID] = distributableDoc
                             except Exception as e:
-                                log.error("Cannot save distributable document copy\n")
+                                log.error("Cannot save distributable document %s\n" % distributableID)
                                 log.exception(e)
                         else:
                             # A distributable copy of the document is in the database. See
@@ -357,8 +359,8 @@ class LRNodeModel(object):
                                     del temp[k]
                             if distributableDoc != temp:
                                 savedDistributableDoc.update(distributableDoc)
-                                #log.info("\n\nUpdate distribuatable doc:\n")
-                               # log.debug("\n{0}\n\n".format(pprint.pformat(distributableDoc)))
+                                log.info("\n\nUpdate distribuatable doc:\n")
+                                log.debug("\n{0}\n\n".format(pprint.pformat(distributableDoc)))
                                 try:
 
                                     db.update([savedDistributableDoc])
@@ -368,7 +370,7 @@ class LRNodeModel(object):
                                     log.exception(e)
                               
                     elif doc['doc_type'] == 'resource_data_distributable':
-                        #log.info("\n-------Changes to distributable resource doc: "+doc['_id'])
+                        log.info("\n-------Changes to distributable resource doc: "+doc['_id'])
                         #check if the document is alredy in the database.
                         resourceDataID = doc['doc_ID']
                         # Create a resource_data object from the distributable data.
@@ -377,7 +379,7 @@ class LRNodeModel(object):
                         resourceDataDoc['doc_type'] = 'resource_data'
                         if resourceDataID not in db:
                             try:
-                                #log.info("Adding new resource_data for distributable")
+                                log.info("Adding new resource_data for distributable")
                                 db[resourceDataID] = resourceDataDoc
                             except Exception as e:
                                 log.error("\n\nCannot get current document:  {0}".format(
@@ -408,7 +410,7 @@ class LRNodeModel(object):
                             if temp != resourceDataDoc:
                                 savedResourceDoc.update(resourceDataDoc)
                                 try:
-                                    #log.info("\nUpdate existing resource data from distributable\n")
+                                    log.info("\nUpdate existing resource data from distributable\n")
                                     db.update([savedResourceDoc])
                                 except Exception as e:
                                     log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
