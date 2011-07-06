@@ -49,13 +49,13 @@ class TestOaiPmhController(TestController):
         
         view_data = self.db.view('oai-pmh/test-data')
         if (len(view_data) == 0):
-            nsdl_data = json.load(file("lr/tests/data/nsdl_dc/data-0.json"))
+            nsdl_data = json.load(file("lr/tests/data/nsdl_dc/data-000000000.json"))
             for doc in nsdl_data["documents"]:
                 doc["doc_ID"] = "NSDL-TEST-DATA-"+str(uuid.uuid1())
             
             self.app.post('/publish', params=json.dumps(nsdl_data), headers=json_headers)
             
-            dc_data = json.load(file("lr/tests/data/oai_dc/data-0.json"))
+            dc_data = json.load(file("lr/tests/data/oai_dc/data-000000000.json"))
             for doc in dc_data["documents"]:
                 doc["doc_ID"] = "OAI-DC-TEST-DATA-"+str(uuid.uuid1())
                 
@@ -65,9 +65,9 @@ class TestOaiPmhController(TestController):
         nsdl_data = { "documents" : [] }
         dc_data = { "documents" : [] }
         for row in view_data:
-            if re.search("^NSDL-TEST-DATA-", row.key) != None:
+            if re.search("^NSDL-TEST-DATA-", row.key) != None and re.search("-distributable$", row.key) == None:
                 nsdl_data["documents"].append(row.value)
-            if re.search("^OAI-DC-TEST-DATA-", row.key) != None:
+            if re.search("^OAI-DC-TEST-DATA-", row.key) != None and re.search("-distributable$", row.key) == None:
                 dc_data["documents"].append(row.value)
         
             
@@ -77,8 +77,16 @@ class TestOaiPmhController(TestController):
         if test_data_delete == True:
             for doc in nsdl_data["documents"]:
                 del self.db[doc["_id"]]
+                try:
+                    del self.db["{0}-distributable".format(doc["_id"])]
+                except:
+                    pass
             for doc in dc_data["documents"]:
                 del self.db[doc["_id"]]
+                try:
+                    del self.db["{0}-distributable".format(doc["_id"])]
+                except:
+                    pass
     
     def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False):
         xmlcontent = etree.fromstring(response.body)

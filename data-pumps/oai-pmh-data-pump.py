@@ -32,7 +32,7 @@ import json
 import logging
 import sys
 from urllib import urlencode
-from optparse import OptionParser
+import argparse
 import os
 
 logging.basicConfig(level=logging.INFO)
@@ -106,16 +106,20 @@ class Opts:
     def __init__(self):
         self.LEARNING_REGISTRY_URL = "http://localhost"
         
-        parser = OptionParser()
-        parser.add_option('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
-        parser.add_option('-o', '--output', dest="output", help='Output file instead of publish', default=None)
-        parser.add_option('-c', '--config', dest="config", help='Configuration file', default=None)
-        (options, args) = parser.parse_args()
+        parser = argparse.ArgumentParser(description="Harvest OAI data from one source and convert to Learning Registry resource data envelope. Write to file or publish to LR Node.")
+        parser.add_argument('-u', '--url', dest="registryUrl", help='URL of the registry to push the data.', default=self.LEARNING_REGISTRY_URL)
+        parser.add_argument('-o', '--output', dest="output", help='Output file instead of publish', default=None)
+        parser.add_argument('-c', '--config', dest="config", help='Configuration file', default=None)
+        parser.add_argument('--cascade', help='Cascade output files into directories', default="false")
+        parser.add_argument('--chunksize', help='Number of envelopes per output file', type=int, default=100)
+        options = parser.parse_args()
         self.LEARNING_REGISTRY_URL = options.registryUrl    
         self.OUTPUT = options.output
         self.CONFIG_FILE = options.config
         self.OPTIONS = options
-
+        self.CASCADE = str(options.cascade).lower() in ["true", "t", "y", "yes"]
+        self.CHUNKSIZE = options.chunksize
+        
 def getDocTemplate():
     return { 
             "doc_type": "resource_data", 
@@ -238,30 +242,43 @@ def bulkUpdate(list, opts):
         log.info("Nothing is being updated.")
 
 
-def filenum(start=0):
+def filenum(start=0, step=1):
     i = start
     while 1:
         yield i
-        i += 1
+        i += step
 
 count = filenum(0)
+cascade = filenum(0, 1000)
+serialcascade = 0
         
 def outputFile(list, opts):
     '''
     Save to file
     '''
+    global serialcascade
+    
     if len(list) > 0 and opts.OUTPUT != None:
         if not os.path.exists(opts.OUTPUT):
             os.makedirs(opts.OUTPUT)
         
 #        slice_idx = 0
-        slice_chunksize = 100
+        slice_chunksize = opts.CHUNKSIZE
         try:
             for slice in chunkList(list, slice_chunksize):
 #            while len(list[slice_idx:slice_chunksize]) > 0:
 #                slice = list[slice_idx:slice_chunksize]
-                
-                filepath = "{0}/data-{1}.json".format(opts.OUTPUT, count.next())
+                serial = count.next()
+                outdir = opts.OUTPUT
+                if opts.CASCADE:
+                    if serial == 0 or serial % 1000 == 0:
+                        serialcascade = cascade.next()
+                    
+                    outdir = os.path.join(outdir, format(serialcascade, "09d"))
+                    
+                    if not os.path.exists(outdir):
+                        os.makedirs(outdir)
+                filepath = os.path.join(outdir,"data-{0:09d}.json".format(serial, "09d"))
                 with open(filepath, "w") as out:
                     out.write(json.dumps({"documents":slice}, sort_keys=True, indent=4))
                     log.info("wrote: {0}".format(out.name))
@@ -351,7 +368,9 @@ def retrieveFromUrlWaiting(request,
       
 
 def setLRTestData(doc):
-    if config.has_key("lr-test-data") and config["lr-test-data"] == True:
+    if doc != None and config.has_key("lr-test-data") and config["lr-test-data"] == True:
+        if not doc.has_key("keys"):
+            doc["keys"] = []
         doc["keys"].append("lr-test-data")
     return doc
     

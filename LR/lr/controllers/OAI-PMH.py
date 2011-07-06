@@ -163,9 +163,15 @@ class OaiPmhController(HarvestController):
                 if params["by_doc_ID"]  == True:
                     c.docList = [o.get_record(params["identifier"])]
                 else:
-                    c.docList = o.get_records_by_resource(params["identifier"])
-                    if len(c.docList) == 0:
-                        raise IdDoesNotExistError(params['verb'])
+                    c.docList = list(o.get_records_by_resource(params["identifier"]))
+
+                for x in c.docList:
+                    if x is None:
+                        c.docList.remove(x)
+                
+                if len(c.docList) == 0:
+                    raise IdDoesNotExistError(params['verb'])
+                
             except ResourceNotFound:
                 raise IdDoesNotExistError(params['verb'])
             
