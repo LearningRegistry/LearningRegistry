@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "./test_oaipmh.py", line 22, in <module>
-    class Test(unittest.TestCase):
-  File "./test_oaipmh.py", line 39, in Test
-    @unittest.skip("Skip, can't validate nested schemas quite yet")
-AttributeError: 'module' object has no attribute 'skip'

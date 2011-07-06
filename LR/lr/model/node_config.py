@@ -153,7 +153,7 @@ class LRNodeModel(object):
         self._nodeStatus = nodeStatus
           
     def _getStatusDescription(self):
-        statusData = {'doc_count': ResourceDataModel._defaultDB.info()['doc_count'],
+        statusData = {'doc_count': ResourceDataModel._defaultDB.view(self._resourcesview,stale='ok').total_rows,
                                 'timestamp': h.nowToISO8601Zformat()}
         statusData.update(self._nodeStatus.specData)
         return statusData
@@ -305,12 +305,12 @@ class LRNodeModel(object):
                         if self._updateThread == None or not self._updateThread.isAlive():
                             self._updateThread = threading.Thread(target = updateView)
                             self._updateThread.start()
-                        self._seqOfLastViewUpdate = currentSeq
+                            self._seqOfLastViewUpdate = currentSeq
                     if currentSeq - self._seqOfLastDist > self._distributeThreshold:                     
                         if self._distributeThread == None or not self._distributeThread.isAlive():
                             self._distributeThread = threading.Thread(target = distribute)
                             self._distributeThread.start()                        
-                        self._seqOfLastDist = currentSeq                                    
+                            self._seqOfLastDist = currentSeq                                    
                     # See if the document is of resource_data type if not ignore it.
                     doc = change['doc']
                     if  ((not 'resource_data' in doc) and
