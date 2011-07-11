@@ -1,0 +1,79 @@
+(lr)learningregistry@domU-12-31-39-04-41-E2:~$ cd ~
+#! /bin/bash
+# /etc/init.d/learningregistry
+#
+
+LR_HOME=/home/learningregistry/gitrepos/LearningRegistry/LR
+LR_USER=learningregistry
+LR_GRP=learningregistry
+LR_VIRTUALENV=/home/learningregistry/virtualenv/lr
+LR_PID_DIR=/var/run/learningregistry
+LR_LOG_DIR=/var/log/learningregistry
+
+LR_PID=$LR_PID_DIR/paster.pid
+LR_LOG=$LR_LOG_DIR/paster.log
+
+# Some things that run always
+if [ ! -e $LR_PID_DIR ]
+then
+    mkdir -p $LR_PID_DIR
+    chown $LR_USER:$LR_GRP $LR_PID_DIR
+fi
+
+if [ ! -e $LR_LOG_DIR ]
+then
+    mkdir -p $LR_LOG_DIR
+    chown $LR_USER:$LR_GRP $LR_LOG_DIR
+fi
+
+lr_start () {
+    if [ -e $LR_PID ]
+    then
+        echo "LR Node is already running"
+        exit 1
+    fi
+
+    su $LR_USER -c "$LR_VIRTUALENV/bin/paster serve --daemon $LR_HOME/development.ini start --pid-file=$LR_PID --log-file=$LR_LOG"
+    echo "LR Node is starting. Log: $LR_LOG   PID: $LR_PID"
+}
+
+lr_stop () {
+    if [ -e $LR_PID ]
+    then
+        su $LR_USER -c "$LR_VIRTUALENV/bin/paster serve --daemon $LR_HOME/development.ini stop --pid-file=$LR_PID --log-file=$LR_LOG"
+        echo "LR Node is stopping. Log: $LR_LOG   PID: $LR_PID"
+    fi
+
+}
+
+lr_restart () {
+    if [ -e $LR_PID ]
+    then
+        su $LR_USER -c "$LR_VIRTUALENV/bin/paster serve --daemon $LR_HOME/development.ini restart --pid-file=$LR_PID --log-file=$LR_LOG"
+        echo "LR Node is restarting. Log: $LR_LOG   PID: $LR_PID"
+    fi
+
+}
+
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+    start)
+        echo "Starting script learningregistry "
+        lr_start
+        ;;
+    stop)
+        echo "Stopping script learningregistry"
+        lr_stop
+        ;;
+    restart)
+        echo "Restarting script learningregistry"
+        lr_restart
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0

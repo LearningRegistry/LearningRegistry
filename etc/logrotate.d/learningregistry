@@ -1,0 +1,15 @@
+/var/log/learningregistry/paster.log {
+        daily
+        missingok
+        rotate 360
+        compress
+        delaycompress
+        notifempty
+        create 640 root adm
+        sharedscripts
+        postrotate
+                if [ -f /var/run/learningregistry/paster.pid]; then
+                        /etc/init.d/learningregistry restart > /dev/null
+                fi
+        endscript
+}
