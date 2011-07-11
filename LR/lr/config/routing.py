@@ -30,7 +30,7 @@ def make_map(config):
         map.resource('harvest','harvest')
         # Value added services
         map.resource('OAI-PMH', 'OAI-PMH')
-        map.resource('sword','sword')
+        map.resource('swordservice','swordservice')
         map.resource('slice', 'slice')
     
     map.minimization = False
