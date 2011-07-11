@@ -1,11 +1,11 @@
 /var/log/learningregistry/paster.log {
         daily
         missingok
-        rotate 360
+        rotate 31
         compress
         delaycompress
         notifempty
-        create 640 root adm
+        create 640 learningregistry learningregistry
         sharedscripts
         postrotate
                 if [ -f /var/run/learningregistry/paster.pid]; then
