@@ -26,10 +26,7 @@ class ResourceDataModel(BaseModel):
     _TIME_STAMPS = ['create_timestamp', 'update_timestamp', 'node_timestamp']
     _DOC_ID = 'doc_ID'
     REPLICATION_FILTER = "filtered-replication/replication_filter"
-   #Make the filter is updated in the design document.    
-    # Add Filter function the design document that will be used to filter on replication.
-    designFilter = {_DEFAULT_FILTER: filterFunction}
-    updateDesignFilters(BaseModel._defaultDB, designFilter) 
+ 
     def __init__(self,  data=None):
         
         super(ResourceDataModel, self).__init__(data)
