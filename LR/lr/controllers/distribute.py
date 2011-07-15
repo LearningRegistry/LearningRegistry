@@ -127,8 +127,6 @@ class DistributeController(BaseController):
         """POST / distribute start distribution"""
         
         def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
-            
-            filterFunction = ResourceDataModel.
             # We want to always use the replication filter function to replicate
             # only distributable doc and filter out any other type of documents.
             # However we don't have any query arguments until we test if there is any filter.
