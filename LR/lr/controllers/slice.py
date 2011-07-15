@@ -10,11 +10,19 @@ from lr.lib.oaipmherrors import *
 
 log = logging.getLogger(__name__)
 
+END_DATE = 'until'
+START_DATE = 'from'
+IDENTITY = 'identity'
+ANY_TAGS = 'any_tags'
+#FULL_DOCS = 'full_docs'
+IDS_ONLY = 'ids_only'
+
 class SliceController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('slice', 'slices')
+
 
     def _get_params(self):
         req_params = {}
@@ -26,7 +34,7 @@ class SliceController(BaseController):
         return req_params
     
     def _validate_params(self, req_params):
-        if req_params.has_key('end_date') and not req_params.has_key('start_date'):
+        if req_params.has_key(END_DATE) and not req_params.has_key(START_DATE):
             raise BadArgumentError('if an end_date is specified a start_date must also be specified')
             return False
         else :
@@ -52,11 +60,11 @@ class SliceController(BaseController):
                 params[paramKey] = False
                 return False
         
-        if _set_string_param('start_date') : param_count += 1
-        if _set_string_param('identity') : param_count += 1
-        if _set_string_param('any_tags') : param_count += 1
-        _set_string_param('end_date')
-        _set_boolean_param('full_docs')
+        if _set_string_param(START_DATE) : param_count += 1
+        if _set_string_param(IDENTITY) : param_count += 1
+        if _set_string_param(ANY_TAGS) : param_count += 1
+        _set_string_param(END_DATE)
+        _set_boolean_param(IDS_ONLY)
         
         params['param_count'] = param_count
         
@@ -66,22 +74,22 @@ class SliceController(BaseController):
         s = couchdb.Server(appConfig['couchdb.url'])
         db = s[appConfig['couchdb.db.resourcedata']]
         if len(keys) > 0:
-            view = db.view(view_name, include_docs=include_docs, keys=keys)
+            view = db.view(view_name, include_docs=include_docs, keys=keys, stale='ok')
         else:
-            view = db.view(view_name, include_docs=include_docs)
+            view = db.view(view_name, include_docs=include_docs, stale='ok')
         return view
     
     def _get_keys(self, params):
         print("gettingslicekeys")
         keys = []
         dates = []
-        if params['end_date'] != "" :
+        if params[END_DATE] != "" :
             dates = self._get_dates(params);
         else :
-            if params['start_date'] != "" :
-                dates = [params['start_date']]
-        identity = params['identity'].lower()
-        any_tags = params['any_tags'].lower()
+            if params[START_DATE] != "" :
+                dates = [params[START_DATE]]
+        identity = params[IDENTITY].lower()
+        any_tags = params[ANY_TAGS].lower()
         param_count = params['param_count']
         
         if any_tags != "" :
@@ -118,8 +126,8 @@ class SliceController(BaseController):
     
         
     def _get_dates(self, params):
-        cur = datetime.strptime(params['start_date'],"%Y-%m-%d")
-        end = datetime.strptime(params['end_date'], "%Y-%m-%d")
+        cur = datetime.strptime(params[START_DATE],"%Y-%m-%d")
+        end = datetime.strptime(params[END_DATE], "%Y-%m-%d")
         day = timedelta(days=1)
     
         dates = []
@@ -131,22 +139,22 @@ class SliceController(BaseController):
         return dates
         
         
-    def format_data(self,full_docs,data, keys, forceUnique):
+    def format_data(self,keys_only,data, keys, forceUnique):
         sentIDs = []
-        yield '{"keyCount":'+str(len(keys)) +', "replyStart":"'+str(datetime.today())+'", "documents":['
+        yield '{"keyCount":'+str(len(keys)) +', "resultCount":"'+str(len(data)) +', "replyStart":"'+str(datetime.today())+'", "documents":['
         num_sent = 0
         if data is not None and len(data) > 0:
             for row in data:
                 if (row.id not in sentIDs) or not forceUnique:
                     sentIDs.append(row.id)
-                    if full_docs:
+                    if keys_only:
+                        return_data = {"doc_ID":row.id} 
+                    else:
                         # Get the resource data and update  with the node timestamp data
                         # That the view  has in value['timestamp']
                         resourceData = {}
                         resourceData = row.doc
                         return_data = {"doc_ID":row.id, "resource_data_description":resourceData}
-                    else:
-                        return_data = {"doc_ID":row.id} 
                     num_sent = num_sent + 1
                     if num_sent < len(data): 
                         yield json.dumps(return_data) + ','
@@ -155,7 +163,7 @@ class SliceController(BaseController):
         yield '], "replyEnd":"'+str(datetime.today())+'"}'    
         
 #        if __name__ == '__main__':
-#            param = {'start_date': "2011-03-10", 'end_date': "2011-05-01", 'identity': "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
+#            param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
 #            keys(param)
 
 
@@ -171,7 +179,7 @@ class SliceController(BaseController):
             keys = self._get_keys(params)
             data = []
             if len(keys) > 0 : data = self._get_view('_design/learningregistry/_view/slice', keys, True)	
-            return self.format_data(params['full_docs'],data,keys,True)
+            return self.format_data(params[IDS_ONLY],data,keys,True)
         
         else :
             return "Bad argument"
