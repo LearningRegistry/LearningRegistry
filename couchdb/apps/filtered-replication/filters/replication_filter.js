@@ -28,6 +28,9 @@ function(doc, req){
         var include_doc =  (!("include_exclude" in filter_doc) ||filter_doc.include_exclude==true);
         //print("Include doc on match: "+include_doc);
         
+        //Keep track the see if the document match all the filters.
+         var match_all_filters = true;
+        
         //Go through all the filters
         for(var i in filter_doc.filter){
             var filter_key = filter_doc.filter[i]["filter_key"];
@@ -64,15 +67,21 @@ function(doc, req){
                 }
                 //Check if there is match
                 filter_match = JSON.stringify(matched_value).match(regex_value);
+                match_all_filters = match_all_filters && filter_match;
+                
                 //print("The match between '"+regex_value+"' and '"+matched_value+" is: "+filter_match+"\n");
                 //Exclude the document if there is a match
-                if((include_doc ==false && filter_match) ||
-                (include_doc == true && !filter_match )){
+                if((include_doc == true && !filter_match )){
                     //print("There is no match rejecting document...");
                     return false;
                 }
             }
         }
+        if( (include_doc == false) &&(match_all_filters == true))
+        {
+            //printf("rejecting document because it matches exclue filter...\n")
+            return false;
+        }
         //print("The document just match everything...\n");
         return true;
-   }
+    }
