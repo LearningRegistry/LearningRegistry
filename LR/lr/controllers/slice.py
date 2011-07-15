@@ -74,9 +74,9 @@ class SliceController(BaseController):
         s = couchdb.Server(appConfig['couchdb.url'])
         db = s[appConfig['couchdb.db.resourcedata']]
         if len(keys) > 0:
-            view = db.view(view_name, include_docs=include_docs, keys=keys, stale='ok')
+            view = db.view(view_name, include_docs=include_docs, keys=keys)#, stale='ok')
         else:
-            view = db.view(view_name, include_docs=include_docs, stale='ok')
+            view = db.view(view_name, include_docs=include_docs)#, stale='ok')
         return view
     
     def _get_keys(self, params):
@@ -141,7 +141,7 @@ class SliceController(BaseController):
         
     def format_data(self,keys_only,data, keys, forceUnique):
         sentIDs = []
-        yield '{"keyCount":'+str(len(keys)) +', "resultCount":"'+str(len(data)) +', "replyStart":"'+str(datetime.today())+'", "documents":['
+        yield '{"keyCount":'+str(len(keys)) +', "resultCount":'+str(len(data)) +', "replyStart":"'+str(datetime.today())+'", "documents":['
         num_sent = 0
         if data is not None and len(data) > 0:
             for row in data:
