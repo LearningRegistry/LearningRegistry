@@ -8,6 +8,13 @@ import json
 #json_headers={'Content-Type':'application/json; charset=utf-8'}
 json_headers={'content-type': 'application/json'}
 
+END_DATE = 'until'
+START_DATE = 'from'
+IDENTITY = 'identity'
+ANY_TAGS = 'any_tags'
+#FULL_DOCS = 'full_docs'
+IDS_ONLY = 'ids_only'
+
 class TestSlicesController(TestController):
 
     testKeys = ['alphaTestKey', 'betaTestKey', 'gammaTestKey']
@@ -89,8 +96,9 @@ class TestSlicesController(TestController):
 
     def removeTestData(self):
         parameters = {}
-        parameters['any_tags'] = [self.testDataKey]
+        parameters[ANY_TAGS] = [self.testDataKey]
         response = self._slice(parameters)
+        print "removeTestData response: " + str(response)
         data = json.loads(response.body) 
         docs = data["documents"]
         
@@ -101,14 +109,14 @@ class TestSlicesController(TestController):
         
     def _checkIdentity(self, doc, identity) :
         
-        if doc['identity'].has_key('submitter') :
-            if doc['identity']['submitter'].lower() == identity.lower() : return True
-        if doc['identity'].has_key('author') :
-            if doc['identity']['author'].lower() == identity.lower() : return True
-        if doc['identity'].has_key('owner') :
-            if doc['identity']['owner'].lower() == identity.lower() : return True
-        if doc['identity'].has_key('signer') :
-            if doc['identity']['signer'].lower() == identity.lower() : return True
+        if doc[IDENTITY].has_key('submitter') :
+            if doc[IDENTITY]['submitter'].lower() == identity.lower() : return True
+        if doc[IDENTITY].has_key('author') :
+            if doc[IDENTITY]['author'].lower() == identity.lower() : return True
+        if doc[IDENTITY].has_key('owner') :
+            if doc[IDENTITY]['owner'].lower() == identity.lower() : return True
+        if doc[IDENTITY].has_key('signer') :
+            if doc[IDENTITY]['signer'].lower() == identity.lower() : return True
             
         return False;
     
@@ -143,8 +151,8 @@ class TestSlicesController(TestController):
         data = json.loads(response.body) 
         self.updateTestDataWithTestDates(data)
         parameters = {}
-        parameters['start_date'] = self.test_start_date_string
-        parameters['full_docs'] = True
+        parameters[START_DATE] = self.test_start_date_string
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -159,8 +167,8 @@ class TestSlicesController(TestController):
     def test_by_identity(self):
         self.writeTestData("test_by_identity")
         parameters = {}
-        parameters['identity'] = self.identities[1]+"test_by_identity"
-        parameters['full_docs'] = True
+        parameters[IDENTITY] = self.identities[1]+"test_by_identity"
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -176,8 +184,8 @@ class TestSlicesController(TestController):
     def test_by_single_key(self):
         self.writeTestData("test_by_single_key")
         parameters = {}
-        parameters['any_tags'] = [self.testKeys[0]+"test_by_single_key"]
-        parameters['full_docs'] = True
+        parameters[ANY_TAGS] = [self.testKeys[0]+"test_by_single_key"]
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -198,8 +206,8 @@ class TestSlicesController(TestController):
     def test_by_multiple_keys(self):
         self.writeMultiKeyTestData("test_by_multiple_keys")
         parameters = {}
-        parameters['any_tags'] = [self.testKeys[0]+"test_by_multiple_keys", self.testKeys[1]+"test_by_multiple_keys", self.testKeys[2]+"test_by_multiple_keys"]
-        parameters['full_docs'] = True
+        parameters[ANY_TAGS] = [self.testKeys[0]+"test_by_multiple_keys", self.testKeys[1]+"test_by_multiple_keys", self.testKeys[2]+"test_by_multiple_keys"]
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -223,9 +231,9 @@ class TestSlicesController(TestController):
         data = json.loads(response.body) 
         self.updateTestDataWithTestDates(data)
         parameters = {}
-        parameters['start_date'] = self.test_start_date_string
-        parameters['any_tags'] = [self.testKeys[0]+"test_by_date_and_key"]
-        parameters['full_docs'] = True
+        parameters[START_DATE] = self.test_start_date_string
+        parameters[ANY_TAGS] = [self.testKeys[0]+"test_by_date_and_key"]
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -249,9 +257,9 @@ class TestSlicesController(TestController):
     def test_by_identity_and_key(self):
         self.writeTestData("test_by_identity_and_key")
         parameters = {}
-        parameters['any_tags'] = [self.testKeys[0]+"test_by_identity_and_key"]
-        parameters['identity'] = self.identities[1]+"test_by_identity_and_key"
-        parameters['full_docs'] = True
+        parameters[ANY_TAGS] = [self.testKeys[0]+"test_by_identity_and_key"]
+        parameters[IDENTITY] = self.identities[1]+"test_by_identity_and_key"
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -273,9 +281,9 @@ class TestSlicesController(TestController):
         data = json.loads(response.body) 
         self.updateTestDataWithTestDates(data)
         parameters = {}
-        parameters['start_date'] = self.test_start_date_string
-        parameters['identity'] = self.identities[1]+"test_by_date_and_identity"
-        parameters['full_docs'] = True
+        parameters[START_DATE] = self.test_start_date_string
+        parameters[IDENTITY] = self.identities[1]+"test_by_date_and_identity"
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
@@ -300,10 +308,10 @@ class TestSlicesController(TestController):
         data = json.loads(response.body) 
         self.updateTestDataWithTestDates(data)
         parameters = {}
-        parameters['start_date'] = self.test_start_date_string
-        parameters['identity'] = self.identities[1]+"test_by_all"
-        parameters['any_tags'] = [self.testKeys[0]+"test_by_all", self.testKeys[1]+"test_by_all", self.testKeys[2]+"test_by_all"]
-        parameters['full_docs'] = True
+        parameters[START_DATE] = self.test_start_date_string
+        parameters[IDENTITY] = self.identities[1]+"test_by_all"
+        parameters[ANY_TAGS] = [self.testKeys[0]+"test_by_all", self.testKeys[1]+"test_by_all", self.testKeys[2]+"test_by_all"]
+        parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
         docs = data["documents"]
