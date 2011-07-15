@@ -6,6 +6,7 @@ from lr.lib.base import BaseController, render
 import lr.model as m
 from lr.lib.harvest import harvest
 import json
+from lr.model import LRNode as sourceLRNode
 log = logging.getLogger(__name__)
 
 class SwordError(Exception):
@@ -13,14 +14,23 @@ class SwordError(Exception):
       self.value = value
     def __str__(self):
       return repr(self.value)
-class SwordController(BaseController):
+class SwordserviceController(BaseController):
     def __init__(self):
         self.h = harvest()
     def __before__(self):
-        response.headers['content-type'] = 'application/atom+xml;charset=utf-8'      
+        response.headers['content-type'] = 'application/atom+xml;charset=utf-8'
         self.parse_params()
     def index(self): 
-        c.collection_url = 'http://' + request.host + '/obtain/'
+        c.collection_url = 'http://' + request.host
+        if sourceLRNode.nodeDescription.node_name is not None:
+            c.node_name = sourceLRNode.nodeDescription.node_name
+        else:
+            c.node_name = sourceLRNode.nodeDescription.node_id
+        c.node_description = sourceLRNode.nodeDescription.node_description
+        if sourceLRNode.communityDescription.community_name is not None:                    
+            c.community_name = sourceLRNode.communityDescription.community_name
+        else:
+            c.community_name = sourceLRNode.communityDescription.community_id
         return render('sword.mako')	
     def parse_params(self):
         c.user_agent = request.headers['user-agent']
