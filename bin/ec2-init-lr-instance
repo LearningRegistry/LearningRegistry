@@ -1,0 +1,94 @@
+#!/bin/bash
+
+LR_COUCHDB_DIR=/mnt/couchdb/1.0.2
+LR_COUCHDB_VIEW_DIR=/mnt/couchdb/1.0.2
+
+LR_COUCHDB_DATA_DIR=/mnt/couchdb
+LR_COUCHDB_OWNER=couchbase
+LR_COUCHDB_GROUP=couchbase
+
+LR_NGINX_CONF=/etc/nginx/sites-available/learningregistry
+
+LR_HOME=/home/learningregistry
+LR_ROOT=$LR_HOME/gitrepos/LearningRegistry
+LR_ENV=$LR_HOME/virtualenv/lr
+
+function create_couch_data_dir () {
+    local d=$1
+    if [ ! -e $d ]
+    then
+        sudo mkdir -p $d
+        sudo chown $LR_COUCHDB_OWNER:$LR_COUCHDB_GROUP $d
+        sudo chmod 0770 $d
+    fi
+}
+
+echo
+echo "========================================================================="
+echo "Stopping Learning Registry, CouchDB, NGINX"
+echo "========================================================================="
+echo
+sudo service learningregistry stop
+sudo service couchbase-server stop
+sudo service nginx stop
+
+
+echo
+echo "========================================================================="
+echo "Deleting existing log files"
+echo "========================================================================="
+echo
+sudo rm -f /var/log/learningregistry/*
+sudo rm -f /var/log/nginx/*
+sudo rm -f /opt/couchbase-server/var/log/couchdb/*
+
+echo
+echo "========================================================================="
+echo "Creating CouchDB data directories"
+echo "========================================================================="
+echo
+create_couch_data_dir $LR_COUCHDB_DIR
+create_couch_data_dir $LR_COUCHDB_VIEW_DIR
+
+sudo chown $LR_COUCHDB_OWNER:$LR_COUCHDB_GROUP $LR_COUCHDB_DIR
+
+
+echo
+echo "========================================================================="
+echo "FIXUP NGINX configuration"
+echo "========================================================================="
+echo
+
+HOSTNAME=`hostname`
+INT_DNS=`ping -c 1 $HOSTNAME | awk '/^PING/ {print $2}'`
+
+cat $LR_NGINX_CONF | awk '{sub(/listen +[^:]+:5984/, "'"listen ${INT_DNS}:5984"'"); print}' > /tmp/learningregistry.nginx
+sudo cp -f $LR_NGINX_CONF $LR_NGINX_CONF.bak
+sudo cp -f /tmp/learningregistry.nginx $LR_NGINX_CONF
+sudo chmod 0644 $LR_NGINX_CONF
+
+echo
+echo "========================================================================="
+echo "Start NGINX CouchDB"
+echo "========================================================================="
+echo
+
+sudo service nginx start
+sudo service couchbase-server start
+
+
+echo
+echo "========================================================================="
+echo "Run LR Node Configuration"
+echo "========================================================================="
+echo
+
+sudo su $LR_USER -c "cd $LR_ROOT/config; source $LR_ENV/bin/activate; $LR_ENV/bin/python ./setup_node.py -d"
+
+echo
+echo "========================================================================="
+echo "Start Learning Registry"
+echo "========================================================================="
+echo
+
+sudo service learningregistry start
