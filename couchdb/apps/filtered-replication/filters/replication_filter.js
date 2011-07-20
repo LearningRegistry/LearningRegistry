@@ -67,7 +67,7 @@ function(doc, req){
                 }
                 //Check if there is match
                 filter_match = JSON.stringify(matched_value).match(regex_value);
-                match_all_filters = match_all_filters && filter_match;
+                match_all_filters = match_all_filters && (filter_match != null);
                 
                 //print("The match between '"+regex_value+"' and '"+matched_value+" is: "+filter_match+"\n");
                 //Exclude the document if there is a match
@@ -79,7 +79,7 @@ function(doc, req){
         }
         if( (include_doc == false) &&(match_all_filters == true))
         {
-            //printf("rejecting document because it matches exclue filter...\n")
+            //print("rejecting document because it matches exclude filter...\n")
             return false;
         }
         //print("The document just match everything...\n");
