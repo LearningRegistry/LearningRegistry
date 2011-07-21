@@ -267,12 +267,21 @@ class LRNodeModel(object):
             log.info("exit")
             self._running = False
         def updateView():
+<<<<<<< HEAD
             log.debug('start view update %s' % )
             designDocs = db.view('_all_docs',include_docs=True,startkey='_design%2F',endkey='_design0')
             for designDoc in designDocs:
                 if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
                     log.debug(len(db.view("{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0]))))
             log.debug('end view update')
+=======
+            designDocs = db.view('_all_docs',include_docs=True,startkey='_design%2F',endkey='_design0')
+            for designDoc in designDocs:
+                if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
+                    viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
+                    log.debug('start view update %s' % viewName)
+                    log.debug(len(db.view(viewName)))        
+>>>>>>> 87c5b3c0d55609977fe0013d8f335d849f6c551c
         def distribute():
             log.debug('start distribute')
             data = json.dumps({"dist":"dist"})

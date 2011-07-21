@@ -14,7 +14,7 @@ MANIFEST
 
 # the locally generated config file
 LR/*.ini
-
+LR/*.backup
 /LR/data/templates
 
 /data-pumps/oai-pmh-data-pump-config.json
