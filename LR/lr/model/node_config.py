@@ -263,9 +263,12 @@ class LRNodeModel(object):
             self._lastChangeSeq = currentChanges['last_seq']
         log.info("Last change sequence: "+str(self._lastChangeSeq))
         def updateView():
-            log.debug('start view update %s' % self._resourcesview)
-            log.debug(len(db.view(self._resourcesview)))
-            log.debug('end view update')
+            designDocs = db.view('_all_docs',include_docs=True,startkey='_design%2F',endkey='_design0')
+            for designDoc in designDocs:
+                if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
+                    viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
+                    log.debug('start view update %s' % viewName)
+                    log.debug(len(db.view(viewName)))        
         def distribute():
             log.debug('start distribute')
             data = json.dumps({"dist":"dist"})
