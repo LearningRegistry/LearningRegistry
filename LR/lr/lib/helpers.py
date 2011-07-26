@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 import time
 import urllib2
 import urllib
+import urlparse
 import json
+import logging
+log = logging.getLogger(__name__)
 """Helper functions
 
 Consists of functions to typically be used within templates, but also
@@ -13,8 +16,20 @@ available to Controllers. This module is available to templates as 'h'.
 #from webhelpers.html.tags import checkbox, password
 from iso8601.iso8601 import ISO8601_REGEX
 import re
+class document:
+    def __init__(self,data):
+        if data.has_key('id'):
+            self.id = data['id']
+        if data.has_key('key'):
+            self.key=data['key']
+        if data.has_key('doc'):
+            self.doc=data['doc']
 def getView(database_url, view_name,**kwargs):    
-    view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(kwargs)])
+    str_param_template= '\"{0}\"'
+    for foo in kwargs:
+        if foo == 'startkey' or foo == 'endkey':
+            kwargs[foo] = str_param_template.format(kwargs[foo])
+    view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(kwargs)])    
     resp = urllib2.urlopen(view_url)
     for data in resp:
         length = data.rfind(',')
@@ -22,7 +37,7 @@ def getView(database_url, view_name,**kwargs):
             data = data[:length]        
         try:
             data = json.loads(data)
-            yield data
+            yield document(data)
         except ValueError:
              pass#skip first and final chunks
 class ParseError(Exception):
@@ -33,8 +48,8 @@ def importModuleFromFile(fullpath):
     not be loaded"""
     import os
     import sys
-    import logging
-    log = logging.getLogger(__name__)
+    
+    
     
     sys.path.append(os.path.dirname(fullpath))
     
