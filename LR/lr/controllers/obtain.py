@@ -15,6 +15,7 @@ import logging
 import json 
 import couchdb
 from lr.model.base_model import appConfig
+import lr.lib.helpers as h
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
@@ -26,13 +27,12 @@ class ObtainController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('obtain', 'obtain')
-    def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
-        s = couchdb.Server(appConfig['couchdb.url'])
-        db = s[appConfig['couchdb.db.resourcedata']]
+    def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):                
+        db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         if len(keys) > 0:
-          view = db.view(view_name, include_docs=include_docs, keys=keys,stale='ok')
+          view = h.getView(database_url=db_url,view_name=view_name,keys=keys,include_docs=include_docs,stale='ok')
         else:
-          view = db.view(view_name, include_docs=include_docs,stale='ok')
+          view = h.getView(database_url=db_url,view_name=view_name,include_docs=include_docs,stale='ok')
         return view
 
     def format_data(self, full_docs, data, currentResumptionToken):
@@ -44,22 +44,22 @@ class ObtainController(BaseController):
             firstID = True
             for doc in data:
                 if full_docs: 
-                    if doc.key != currentID:                        
-                        currentID = doc.key                        
+                    if doc['key'] != currentID:                        
+                        currentID = doc['key']                        
                         if not firstID:
                             yield ']' + byIDResponseChunks[1] + ','                            
-                        byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
-                        yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
+                        byIDResponseChunks = json.dumps({'doc_ID':doc['key'],'document':[]}).split(']')
+                        yield byIDResponseChunks[0] + json.dumps(doc['doc'])                                                                                    
                         firstID = False
                     else:                        
-                        yield ',' + json.dumps(doc.doc)
+                        yield ',' + json.dumps(doc['doc'])
                 else:
                     if doc.key != currentID:
-                        currentID = doc.key
+                        currentID = doc['key']
                         if not firstID:
                             yield ','
                         firstID = False
-                        yield json.dumps({'doc_ID': doc.key})
+                        yield json.dumps({'doc_ID': doc['key']})
     
         if full_docs and byIDResponseChunks is not None:             
             yield ']' + byIDResponseChunks[1]                        
