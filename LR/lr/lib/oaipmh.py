@@ -134,6 +134,7 @@ class oaipmh(harvest):
             if len(view_data) > 0:
                 ident["earliestDatestamp"] = iso8601.parse_date(list(view_data)[0].key)
             else:
+                from datetime import datetime
                 ident["earliestDatestamp"] = datetime.utcnow()
             
             ret = ident
