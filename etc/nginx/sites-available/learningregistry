@@ -1,0 +1,155 @@
+server {
+	listen   80 default;
+	server_name  localhost;
+
+	access_log  /var/log/nginx/learningregistry.access.log;
+
+	location / {
+        fastcgi_pass 127.0.0.1:5000;
+        fastcgi_param PATH_INFO $fastcgi_script_name;
+        fastcgi_param REQUEST_METHOD $request_method;
+        fastcgi_param QUERY_STRING $query_string;
+        fastcgi_param CONTENT_TYPE $content_type;
+        fastcgi_param CONTENT_LENGTH $content_length;
+        fastcgi_param  SERVER_ADDR        $server_addr;
+        fastcgi_param  SERVER_PORT        $server_port;
+        fastcgi_param  SERVER_NAME        $server_name;
+        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+        fastcgi_pass_header Authorization;
+        fastcgi_intercept_errors off;
+
+    }
+
+    location /resource_data {
+        proxy_pass   http://127.0.0.1:5984;
+        proxy_redirect     off;
+
+        proxy_set_header   Host             $host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+        proxy_max_temp_file_size 0;
+
+        client_max_body_size       10m;
+        client_body_buffer_size    128k;
+
+        proxy_connect_timeout      90;
+        proxy_send_timeout         90;
+        proxy_read_timeout         90;
+
+        proxy_buffer_size          4k;
+        proxy_buffers              4 32k;
+        proxy_busy_buffers_size    64k;
+        proxy_temp_file_write_size 64k;
+    }
+
+	#error_page  404  /404.html;
+
+	# redirect server error pages to the static page /50x.html
+	#
+	error_page   500 502 503 504  /50x.html;
+	location = /50x.html {
+		root   html;
+	}
+
+	# proxy the PHP scripts to Apache listening on 127.0.0.1:80
+	#
+	#location ~ \.php$ {
+		#proxy_pass   http://127.0.0.1;
+	#}
+
+	# pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+	#
+	#location ~ \.php$ {
+		#fastcgi_pass   127.0.0.1:9000;
+		#fastcgi_index  index.php;
+		#fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+		#includefastcgi_params;
+	#}
+
+	# deny access to .htaccess files, if Apache's document root
+	# concurs with nginx's one
+	#
+	#location ~ /\.ht {
+		#deny  all;
+	#}
+}
+
+server {
+#	listen domU-12-31-39-04-41-E2.compute-1.internal:5984;
+	listen 10.240.70.16:5984;
+	server_name domU-12-31-39-04-41-E2;
+	
+	location / {
+		auth_basic "CouchDB Admin";
+		auth_basic_user_file  /etc/nginx/passwd;
+		proxy_set_header Authorization "";
+		proxy_pass http://127.0.0.1:5984;
+		proxy_redirect off;
+		proxy_set_header Host $http_host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+
+	location ~ ^/_utils(?!/) {
+		rewrite ^/_utils(?!/)(.*)$ /_utils/$1 break;
+		auth_basic "CouchDB Admin";
+        auth_basic_user_file  /etc/nginx/passwd;
+        proxy_set_header Authorization "";
+		proxy_pass http://127.0.0.1:5984;
+		proxy_redirect off;
+		proxy_set_header Host $http_host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+
+
+	location ~ ^/(.*)/_changes {
+        auth_basic "CouchDB Admin";
+        auth_basic_user_file  /etc/nginx/passwd;
+        proxy_set_header Authorization "";
+		proxy_pass http://127.0.0.1:5984;
+		proxy_redirect off;
+		proxy_buffering off;
+		proxy_set_header Host $http_host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+
+}
+
+
+# another virtual host using mix of IP-, name-, and port-based configuration
+#
+#server {
+#listen   8000;
+#listen   somename:8080;
+#server_name  somename  alias  another.alias;
+
+#location / {
+#root   html;
+#index  index.html index.htm;
+#}
+#}
+
+
+# HTTPS server
+#
+#server {
+#listen   443;
+#server_name  localhost;
+
+#ssl  on;
+#ssl_certificate  cert.pem;
+#ssl_certificate_key  cert.key;
+
+#ssl_session_timeout  5m;
+
+#ssl_protocols  SSLv2 SSLv3 TLSv1;
+#ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+#ssl_prefer_server_ciphers   on;
+
+#location / {
+#root   html;
+#index  index.html index.htm;
+#}
+#}

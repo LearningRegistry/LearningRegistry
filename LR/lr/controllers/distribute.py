@@ -68,9 +68,9 @@ class DistributeController(BaseController):
             except Exception as ex:
                 log.exception(ex)
                 continue
-             # Use of local variable to store is the connection is gateway connection. This
-            # done this with the case where the two nodes are actual gateway node 
-            # yet the connection has the wrong data.
+             # Use of local variable to store if  the connection is gateway connection. It is
+            # done this way to deal with mismatch between node de and connection
+            # description.
             isGatewayConnection = (
                         (sourceLRNode.nodeDescription.gateway_node == True) and
                         (destinationLRNode.nodeDescription.gateway_node ==True))
@@ -87,7 +87,7 @@ class DistributeController(BaseController):
                 # is faulty
                 nodeDestinationList = []
                 break
-            #Calcuate if the connection is gatewa
+            #Calcuate if the connection is gateway one, if so 
             #cannot distribute across non social communities
             if ((sourceLRNode.communityDescription.community_id != 
                  destinationLRNode.communityDescription.community_id) and
@@ -127,13 +127,10 @@ class DistributeController(BaseController):
         """POST / distribute start distribution"""
         
         def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
-            
-            filterFunction = (ResourceDataModel._defaultDB.name+"/" + 
-                                          ResourceDataModel.DEFAULT_FILTER)
-            # We want to always use the default filter function to filter
-            # out design document on replication. But we don't have any
-            # query arguments until we test if there is any filter.
-            replicationOptions={'filter':filterFunction, 
+            # We want to always use the replication filter function to replicate
+            # only distributable doc and filter out any other type of documents.
+            # However we don't have any query arguments until we test if there is any filter.
+            replicationOptions={'filter':ResourceDataModel.REPLICATION_FILTER, 
                                              'query_params': None}
             # If the destination node is using an filter and is not custom use it
             # as the query params for the filter function
@@ -143,6 +140,7 @@ class DistributeController(BaseController):
             
             log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
                             sourceUrl, destinationUrl, str(replicationOptions)))
+        
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
                 
