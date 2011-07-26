@@ -1,6 +1,9 @@
 
 from datetime import datetime, timedelta
 import time
+import urllib2
+import urllib
+import json
 """Helper functions
 
 Consists of functions to typically be used within templates, but also
@@ -10,7 +13,18 @@ available to Controllers. This module is available to templates as 'h'.
 #from webhelpers.html.tags import checkbox, password
 from iso8601.iso8601 import ISO8601_REGEX
 import re
-
+def getView(database_url, view_name,**kwargs):    
+    view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(kwargs)])
+    resp = urllib2.urlopen(view_url)
+    for data in resp:
+        length = data.rfind(',')
+        if length > 0:
+            data = data[:length]        
+        try:
+            data = json.loads(data)
+            yield data
+        except ValueError:
+             pass#skip first and final chunks
 class ParseError(Exception):
     """Raised when there is a problem parsing a date string"""
 
