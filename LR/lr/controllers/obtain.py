@@ -70,6 +70,8 @@ class ObtainController(BaseController):
         return self._performObtain(data)
         # url('obtain')
     def _performObtain(self,data):
+        if data.has_key('callback'):
+            yield "{0}(".format(data['callback'])
         keys = data['request_IDs']
         full_docs = (not data.has_key('ids_only')) or data['ids_only'] == False
         by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
@@ -87,7 +89,10 @@ class ObtainController(BaseController):
             view = self.get_view(keys=keys, include_docs=full_docs)
         elif by_resource_ID:
             view = self.get_view('_design/learningregistry/_view/resource-location',keys, include_docs=full_docs)        
-        return self.format_data(full_docs,view, resumption_token)        
+        for i in  self.format_data(full_docs,view, resumption_token):        
+            yield i
+        if(data.has_key('callback')):
+            yield ')'
     def create(self):
         """POST /obtain: Create a new item"""
         data = json.loads(request.body)
@@ -127,7 +132,7 @@ class ObtainController(BaseController):
             'by_doc_ID':False,
             'by_resource_ID':True,
             'ids_only': False,
-            'request_IDs': []
+            'request_IDs': [],            
         }
         if request.params.has_key('by_doc_ID'):
             data['by_doc_ID'] = request.params['by_doc_ID'] in trues
@@ -138,6 +143,8 @@ class ObtainController(BaseController):
             data['ids_only'] = request.params['ids_only'] in trues
         if request.params.has_key('resumption_token'):
             data['resumption_token'] = request.params['resumption_token']
+        if request.params.has_key('callback'):
+            data['callback'] = request.params['callback']
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""
