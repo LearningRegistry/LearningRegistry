@@ -55,7 +55,7 @@ class HarvestController(BaseController):
             else:
                 records = []
           else:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+            records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
           data['getrecord'] ={
             'record': records
             }
