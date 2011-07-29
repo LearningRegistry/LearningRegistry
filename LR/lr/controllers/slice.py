@@ -18,6 +18,7 @@ IDENTITY = 'identity'
 ANY_TAGS = 'any_tags'
 #FULL_DOCS = 'full_docs'
 IDS_ONLY = 'ids_only'
+CALLBACK = 'callback'
 
 class SliceController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -46,12 +47,14 @@ class SliceController(BaseController):
         params = {}
         param_count = 0
         
-        def _set_string_param(paramKey):
+        def _set_string_param(paramKey, setifempty=True):
             if req_params.has_key(paramKey):
                 params[paramKey] = str(req_params[paramKey])
                 return True
-            else :
+            elif setifempty:
                 params[paramKey] = ""
+                return False
+            else:
                 return False
                 
         def _set_boolean_param(paramKey):
@@ -67,9 +70,10 @@ class SliceController(BaseController):
         if _set_string_param(ANY_TAGS) : param_count += 1
         _set_string_param(END_DATE)
         _set_boolean_param(IDS_ONLY)
+        _set_string_param(CALLBACK, False)
         
         params['param_count'] = param_count
-        
+        log.debug(json.dumps(params))
         return params
 
     def _get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
@@ -181,10 +185,15 @@ class SliceController(BaseController):
         
         
         def getResponse(keys, params):
-            if len(keys) > 0 : 
+            if len(keys) > 0 :
+                 
+                if CALLBACK in params:
+                    yield "{0}(".format(params[CALLBACK])
                 docs = self._get_view('_design/learningregistry/_view/slice', keys, not params[IDS_ONLY]) 
                 for i in  self.format_data(params[IDS_ONLY],docs,keys,True):
                     yield i
+                if CALLBACK in params:
+                    yield ");"
         try:            
             req_params = self._get_params()
             valid = self._validate_params(req_params)
@@ -195,8 +204,11 @@ class SliceController(BaseController):
     
             else :
                 raise BadArgumentError()
-        except:
-            return '{ "error": "Bad argument" }'
+        except BadArgumentError as bae:
+            return '{ "error": "{0}" }'.format(bae.msg)
+        except Exception as e:
+            log.error(e.message)
+            return '{ "error": "Unknown Error, check log." }'
         #return params["start_date"] + " " + params["identity"]  + " " + params["search_key"] + "\n" + str(self.format_data(False,data))
         # url('obtain')
 
