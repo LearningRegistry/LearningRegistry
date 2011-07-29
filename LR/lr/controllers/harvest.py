@@ -51,7 +51,7 @@ class HarvestController(BaseController):
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
-                records = map(lambda doc: {'record':{"header":{'identifier':doc['id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+                records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
             else:
                 records = []
           else:
@@ -118,7 +118,7 @@ class HarvestController(BaseController):
         base_response =  json.dumps(data).split('[')
         yield base_response[0] +'['
         def debug_map(doc):
-            data ={'record':{"header":{'identifier':doc['id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
+            data ={'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
             return data
         if from_date > until_date:
           data['OK'] = False
