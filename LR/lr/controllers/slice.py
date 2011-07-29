@@ -1,5 +1,6 @@
 import logging, urllib2, json, couchdb
 from lr.model.base_model import appConfig
+import lr.lib.helpers as h
 
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -7,6 +8,7 @@ from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 from datetime import datetime, timedelta
 from lr.lib.oaipmherrors import *
+import types
 
 log = logging.getLogger(__name__)
 
@@ -71,16 +73,16 @@ class SliceController(BaseController):
         return params
 
     def _get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
-        s = couchdb.Server(appConfig['couchdb.url'])
-        db = s[appConfig['couchdb.db.resourcedata']]
+        db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         if len(keys) > 0:
-            view = db.view(view_name, include_docs=include_docs, keys=keys)#, stale='ok')
+            view =  h.getView(database_url=db_url, method="POST", view_name=view_name,keys=keys,include_docs=include_docs)#,stale='ok'):
         else:
-            view = db.view(view_name, include_docs=include_docs)#, stale='ok')
+            view = h.getView(database_url=db_url,view_name=view_name,include_docs=include_docs)#,stale='ok'):
         return view
+
     
     def _get_keys(self, params):
-        print("gettingslicekeys")
+        log.debug("gettingslicekeys")
         keys = []
         dates = []
         if params[END_DATE] != "" :
@@ -111,7 +113,7 @@ class SliceController(BaseController):
             elif identity == "" :
                 for tag in any_tag_list:
                     for date in dates:
-                        print("slicegotdateandtag: " + str([date, tag]))
+                        log.debug("slicegotdateandtag: " + str([date, tag]))
                         keys.append([date, tag]) 
             elif any_tags == "" :
                 for date in dates:
@@ -135,32 +137,36 @@ class SliceController(BaseController):
             date = datetime.strftime(cur,"%Y-%m-%d")
             dates.append(date)
             cur += day
-        print repr(dates)
+        log.debug(repr(dates))
         return dates
         
         
-    def format_data(self,keys_only,data, keys, forceUnique):
+    def format_data(self,keys_only,docs, keys, forceUnique):
         sentIDs = []
-        yield '{"keyCount":'+str(len(keys)) +', "resultCount":'+str(len(data)) +', "replyStart":"'+str(datetime.today())+'", "documents":['
+        prefix =  '{"replyStart":"'+str(datetime.today())+'", "keyCount":'+str(len(keys)) +', "documents":[\n'
         num_sent = 0
-        if data is not None and len(data) > 0:
-            for row in data:
-                if (row.id not in sentIDs) or not forceUnique:
-                    sentIDs.append(row.id)
+        doc_count = 0
+        if docs is not None:
+            for doc in docs:
+                doc_count += 1
+                alreadySent = (doc.id in sentIDs)
+                if not alreadySent or not forceUnique:
+                    sentIDs.append(doc.id)
                     if keys_only:
-                        return_data = {"doc_ID":row.id} 
+                        return_data = {"doc_ID":doc.id} 
                     else:
                         # Get the resource data and update  with the node timestamp data
                         # That the view  has in value['timestamp']
                         resourceData = {}
-                        resourceData = row.doc
-                        return_data = {"doc_ID":row.id, "resource_data_description":resourceData}
-                    num_sent = num_sent + 1
-                    if num_sent < len(data): 
-                        yield json.dumps(return_data) + ','
-                    else:
-                        yield json.dumps(return_data) 
-        yield '], "replyEnd":"'+str(datetime.today())+'"}'    
+                        resourceData = doc.doc
+                        return_data = {"doc_ID":doc.id, "resource_data_description":resourceData}
+                    yield prefix + json.dumps(return_data)
+                    num_sent += 1
+                    prefix = ",\n"
+                else:
+                    log.debug("{0} skipping: alreadySent {1} / forceUnique {2}".format(doc_count, repr(alreadySent), forceUnique))
+                    
+        yield '\n], "resultCount":'+str(num_sent) +', "replyEnd":"'+str(datetime.today())+'"}'    
         
 #        if __name__ == '__main__':
 #            param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
@@ -172,17 +178,25 @@ class SliceController(BaseController):
     def index(self, format='html'):
         """GET /slices: All items in the collection"""
         # url('slices')
-        req_params = self._get_params()
-        valid = self._validate_params(req_params)
-        if valid :
-            params = self._parse_params(req_params)
-            keys = self._get_keys(params)
-            data = []
-            if len(keys) > 0 : data = self._get_view('_design/learningregistry/_view/slice', keys, True)	
-            return self.format_data(params[IDS_ONLY],data,keys,True)
         
-        else :
-            return "Bad argument"
+        
+        def getResponse(keys, params):
+            if len(keys) > 0 : 
+                docs = self._get_view('_design/learningregistry/_view/slice', keys, not params[IDS_ONLY]) 
+                for i in  self.format_data(params[IDS_ONLY],docs,keys,True):
+                    yield i
+        try:            
+            req_params = self._get_params()
+            valid = self._validate_params(req_params)
+            if valid :
+                params = self._parse_params(req_params)
+                keys = self._get_keys(params)
+                return getResponse(keys, params)
+    
+            else :
+                raise BadArgumentError()
+        except:
+            return '{ "error": "Bad argument" }'
         #return params["start_date"] + " " + params["identity"]  + " " + params["search_key"] + "\n" + str(self.format_data(False,data))
         # url('obtain')
 
