@@ -7,7 +7,8 @@ from pylons.middleware import error_document_template
 from webhelpers.html.builder import literal
 
 from lr.lib.base import BaseController
-
+import logging
+log = logging.getLogger(__name__)
 class ErrorController(BaseController):
 
     """Generates error documents as and when they are required.
@@ -28,7 +29,8 @@ class ErrorController(BaseController):
             dict(prefix=request.environ.get('SCRIPT_NAME', ''),
                  code=cgi.escape(request.GET.get('code', str(resp.status_int))),
                  message=content)
-        return page
+        import json
+        return json.dumps({'OK':False, 'message':request.environ['pylons.controller.exception'].message})
 
     def img(self, id):
         """Serve Pylons' stock images"""

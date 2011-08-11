@@ -65,8 +65,8 @@ class ObtainController(BaseController):
             yield ']' + byIDResponseChunks[1]                        
         yield "]}"
     def index(self, format='html'):
-        """GET /obtain: All items in the collection"""
-        data = self._parseParams()                      
+        """GET /obtain: All items in the collection"""        
+        data = self._parseParams()                    
         return self._performObtain(data)
         # url('obtain')
     def _performObtain(self,data):
@@ -78,11 +78,11 @@ class ObtainController(BaseController):
         by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
         resumption_token = 0
         if by_doc_ID and by_resource_ID:
-            raise Exception("by_doc_ID and by_resource_ID cannot both be True")
+            raise HTTPException("by_doc_ID and by_resource_ID cannot both be True")
         if not data.has_key('by_resource_ID') and not by_doc_ID:
             by_resource_ID = True
         if not by_doc_ID and not by_resource_ID:
-            raise Exception("by_doc_ID and by_resource_ID cannot both be False")
+            raise HTTPException("by_doc_ID and by_resource_ID cannot both be False")
         if data.has_key('resumption_token'):
             resumption_token = int(data['resumption_token'])            
         if  by_doc_ID:
