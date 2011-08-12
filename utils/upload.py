@@ -5,6 +5,7 @@ from random import choice
 import argparse
 from LRSignature.sign.Sign import Sign_0_21
 signer = None
+import time
 parser = argparse.ArgumentParser(description='Sign files and upload to Learning Registry')
 parser.add_argument('--key', help='PGP Private Key ID')
 parser.add_argument('--key-location', help='Location the PGP Public Key can be downloaded from')
@@ -12,7 +13,7 @@ parser.add_argument('--passphrase', help='Passphrase for PGP Private Key', defau
 parser.add_argument('--gpgbin', help='Path to GPG binary', default="gpg")
 parser.add_argument('--publish-url', help='Learning Registry Node publish url. Overrides publish_url in [upload] from configuration file', default=None)
 parser.add_argument('--data-dir', help='Directory of source LR Data Envelopes. Overrides root_path in [upload] from configuration file"', default=None)
-parser.add_argument('--lr-test-data', help='Publish as lr test data, default is True', default="True")
+parser.add_argument('--lr-test-data', help='Publish as lr test data, default is True', default="False")
 parser.add_argument('--config', help='Configuration file, default is "testconfig.ini"', default="testconfig.ini")
 
 args = parser.parse_args()
@@ -81,6 +82,7 @@ def process_files():
             if len(documents) >= 10:
                 upload_files(documents)
                 documents=[]
+                time.sleep(1)
 def main():
     process_files();
 if __name__ == '__main__':

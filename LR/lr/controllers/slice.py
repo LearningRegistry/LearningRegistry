@@ -24,7 +24,7 @@ class SliceController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
-    #     map.resource('slice', 'slices')
+    # map.resource('slice', 'slices')
 
 
     def _get_params(self):
@@ -79,7 +79,7 @@ class SliceController(BaseController):
     def _get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         if len(keys) > 0:
-            view =  h.getView(database_url=db_url, method="POST", view_name=view_name,keys=keys,include_docs=include_docs)#,stale='ok'):
+            view = h.getView(database_url=db_url, method="POST", view_name=view_name,keys=keys,include_docs=include_docs)#,stale='ok'):
         else:
             view = h.getView(database_url=db_url,view_name=view_name,include_docs=include_docs)#,stale='ok'):
         return view
@@ -104,28 +104,28 @@ class SliceController(BaseController):
         if param_count == 1:
             if len(dates)>0 :
                 for date in dates :
-                    keys.append(date) 
+                    keys.append(date)
             elif identity != "" :
-                keys.append(identity) 
+                keys.append(identity)
             elif any_tags != "" :
                 for tag in any_tag_list:
-                    keys.append(tag) 
+                    keys.append(tag)
         elif param_count == 2:
             if len(dates) == 0 :
                 for tag in any_tag_list:
-                    keys.append([identity, tag]) 
+                    keys.append([identity, tag])
             elif identity == "" :
                 for tag in any_tag_list:
                     for date in dates:
                         log.debug("slicegotdateandtag: " + str([date, tag]))
-                        keys.append([date, tag]) 
+                        keys.append([date, tag])
             elif any_tags == "" :
                 for date in dates:
-                    keys.append([date, identity]) 
+                    keys.append([date, identity])
         elif param_count == 3:
             for tag in any_tag_list:
                 for date in dates:
-                    keys.append([date, identity, tag]) 
+                    keys.append([date, identity, tag])
          
         return keys
     
@@ -147,7 +147,7 @@ class SliceController(BaseController):
         
     def format_data(self,keys_only,docs, keys, forceUnique):
         sentIDs = []
-        prefix =  '{"replyStart":"'+str(datetime.today())+'", "keyCount":'+str(len(keys)) +', "documents":[\n'
+        prefix = '{"replyStart":"'+str(datetime.today())+'", "keyCount":'+str(len(keys)) +', "documents":[\n'
         num_sent = 0
         doc_count = 0
         if docs is not None:
@@ -157,10 +157,10 @@ class SliceController(BaseController):
                 if not alreadySent or not forceUnique:
                     sentIDs.append(doc.id)
                     if keys_only:
-                        return_data = {"doc_ID":doc.id} 
+                        return_data = {"doc_ID":doc.id}
                     else:
-                        # Get the resource data and update  with the node timestamp data
-                        # That the view  has in value['timestamp']
+                        # Get the resource data and update with the node timestamp data
+                        # That the view has in value['timestamp']
                         resourceData = {}
                         resourceData = doc.doc
                         return_data = {"doc_ID":doc.id, "resource_data_description":resourceData}
@@ -170,11 +170,11 @@ class SliceController(BaseController):
                 else:
                     log.debug("{0} skipping: alreadySent {1} / forceUnique {2}".format(doc_count, repr(alreadySent), forceUnique))
                     
-        yield '\n], "resultCount":'+str(num_sent) +', "replyEnd":"'+str(datetime.today())+'"}'    
+        yield '\n], "resultCount":'+str(num_sent) +', "replyEnd":"'+str(datetime.today())+'"}'
         
-#        if __name__ == '__main__':
-#            param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
-#            keys(param)
+# if __name__ == '__main__':
+# param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
+# keys(param)
 
 
     
@@ -189,12 +189,12 @@ class SliceController(BaseController):
                  
                 if CALLBACK in params:
                     yield "{0}(".format(params[CALLBACK])
-                docs = self._get_view('_design/learningregistry/_view/slice', keys, not params[IDS_ONLY]) 
-                for i in  self.format_data(params[IDS_ONLY],docs,keys,True):
+                docs = self._get_view('_design/learningregistry/_view/slice', keys, not params[IDS_ONLY])
+                for i in self.format_data(params[IDS_ONLY],docs,keys,True):
                     yield i
                 if CALLBACK in params:
                     yield ");"
-        try:            
+        try:
             req_params = self._get_params()
             valid = self._validate_params(req_params)
             if valid :
@@ -209,7 +209,7 @@ class SliceController(BaseController):
         except Exception as e:
             log.error(e.message)
             return '{ "error": "Unknown Error, check log." }'
-        #return params["start_date"] + " " + params["identity"]  + " " + params["search_key"] + "\n" + str(self.format_data(False,data))
+        #return params["start_date"] + " " + params["identity"] + " " + params["search_key"] + "\n" + str(self.format_data(False,data))
         # url('obtain')
 
     def create(self):
@@ -223,19 +223,19 @@ class SliceController(BaseController):
     def update(self, id):
         """PUT /slices/id: Update an existing item"""
         # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="PUT" />
+        # <input type="hidden" name="_method" value="PUT" />
         # Or using helpers:
-        #    h.form(url('slice', id=ID),
-        #           method='put')
+        # h.form(url('slice', id=ID),
+        # method='put')
         # url('slice', id=ID)
 
     def delete(self, id):
         """DELETE /slices/id: Delete an existing item"""
         # Forms posted to this method should contain a hidden field:
-        #    <input type="hidden" name="_method" value="DELETE" />
+        # <input type="hidden" name="_method" value="DELETE" />
         # Or using helpers:
-        #    h.form(url('slice', id=ID),
-        #           method='delete')
+        # h.form(url('slice', id=ID),
+        # method='delete')
         # url('slice', id=ID)
 
     def show(self, id, format='html'):
@@ -251,4 +251,3 @@ class BadArgumentError(Exception):
         self.msg = msg
         self.datetime_now = datetime.utcnow().isoformat()
         self.path_url = request.path_url
-
