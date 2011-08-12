@@ -37,21 +37,3 @@ class StreamingCouchDBDocHandler():
             log.debug("DOC: %s" %(json.dumps(doc)))
         
         return count
-
-    def parse2(self, instream):
-        from ijson import parse
-        
-        parser = parse(instream)
-        count = 0
-        for prefix, event, value in parser:
-            
-            log.debug("prefix: %s, event: %s, value: %s" % (prefix, event, value))
-#            if (prefix, event) == ('total_rows', 'map_key')
-#            if self.docHandler != None and isinstance(self.docHandler, types.FunctionType):
-#                self.docHandler(doc)
-#            elif self.docHandler != None and isinstance(self.docHandler, CouchDBDocProcessor):
-#                self.docHandler.process(doc)
-    
-#            log.debug("DOC: %s" %(json.dumps(doc)))
-        
-        return count
