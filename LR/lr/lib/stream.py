@@ -51,3 +51,20 @@ class StreamingCouchDBDocHandler():
             log.debug("DOC: %s" %(json.dumps(doc)))
         
         return count
+    
+    def generator(self, instream):
+        from ijson import items
+        
+        docs = items(instream, 'rows.item')
+        self.generator_index = -1
+        for doc in docs:
+            self.generator_index += 1
+            if self.docHandler != None and isinstance(self.docHandler, types.FunctionType):
+                yield self.docHandler(doc)
+            elif self.docHandler != None and isinstance(self.docHandler, CouchDBDocProcessor):
+                yield self.docHandler.process(doc)
+            else:
+                yield doc
+    
+        
+
