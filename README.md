@@ -204,6 +204,22 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 * run ln -s /usr/local/etc/logrotate.d/couch /etc/logrotate.d/couchdb as root or using sudo to create the couchdb entry for logrotate
 
 
+## Install Yajl 1.0.12 ##
+
+* Install Yajl dependencies
+
+>       sudo apt-get install ruby cmake
+
+* Download and extract and build Yajl 1.0.12 from here http://lloyd.github.com/yajl/
+
+>       sudo make
+>       sudo make install
+
+* Update your LD_LIBRARY_PATH to include /usr/local/lib. Add the following line to ~learningregisty/.bashrc.d/defaults or /etc/bach.bashrc
+
+>       export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+
 ## Install Python virtualenv and Pylons ##
 
 * Install virtualenv
@@ -238,6 +254,7 @@ Installation on Turnkey Core (Ubuntu 10.04 LTS)
 >       ./pip install cython
 >       ./pip install lxml
 >       ./pip install iso8601plus
+>       ./pip install ijson
 
 
 ## Configure Nginx - Should be preinstalled on Ubuntu ##

@@ -14,7 +14,7 @@ setup(
     url='',
     install_requires=[
         "Pylons>=0.10", "pyparsing>=1.5.5", "restkit>=3.2.3",
-        "couchdb>=0.8", "lxml>=2.3", "iso8601plus"
+        "couchdb>=0.8", "lxml>=2.3", "iso8601plus", "ijson>=0.8.0"
     ],
     packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
