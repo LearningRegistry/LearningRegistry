@@ -233,7 +233,7 @@ if __name__ == "__main__":
 
 
     #Install the services, by default all the services are installed.
-    for service_type in ['access', 'broker', 'publish', 'administrative', 'distribute']:
+    for service_type in ['access', 'broker', 'publish', 'administrative', 'distribute', 'harvest']:
         service = {}
         service.update(t.service_description)
         service['service_type'] =service_type
