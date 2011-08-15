@@ -51,11 +51,11 @@ class HarvestController(BaseController):
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
-                records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+                records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
             else:
                 records = []
           else:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+            records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
           data['getrecord'] ={
             'record': records
             }
@@ -118,7 +118,7 @@ class HarvestController(BaseController):
         base_response =  json.dumps(data).split('[')
         yield base_response[0] +'['
         def debug_map(doc):
-            data ={'record':{"header":{'identifier':doc.id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
+            data ={'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
             return data
         if from_date > until_date:
           data['OK'] = False
@@ -185,7 +185,15 @@ class HarvestController(BaseController):
         abort(405,'Method not allowed')
     def show(self, id, format='html'):
         """GET /harvest/id: Show a specific item"""
-        return self.harvest(request.params,request.body,id)
+        if request.params.has_key('callback'):
+            def jsonp(callback,params,body):
+                yield '{0}('.format(callback)
+                for i in self.harvest(params,body,id):
+                    yield i
+                yield ')'
+            return jsonp(request.params['callback'],request.params,request.body)
+        else:
+            return self.harvest(request.params,request.body,id)
     def edit(self, id, format='html'):
         """GET /harvest/id/edit: Form to edit an existing item"""
         abort(405,'Method not allowed')

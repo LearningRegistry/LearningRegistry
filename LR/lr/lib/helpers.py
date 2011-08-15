@@ -1,6 +1,12 @@
 
 from datetime import datetime, timedelta
 import time
+import urllib2
+import urllib
+import urlparse
+import json
+import logging
+log = logging.getLogger(__name__)
 """Helper functions
 
 Consists of functions to typically be used within templates, but also
@@ -10,7 +16,48 @@ available to Controllers. This module is available to templates as 'h'.
 #from webhelpers.html.tags import checkbox, password
 from iso8601.iso8601 import ISO8601_REGEX
 import re
+class document:
+    def __init__(self,data):
+        if data.has_key('id'):
+            self.id = data['id']
+        if data.has_key('key'):
+            self.key=data['key']
+        if data.has_key('doc'):
+            self.doc=data['doc']
+def getView(database_url, view_name, method="GET", **kwargs):    
+    str_param_template= '\"{0}\"'
+    json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
+    for foo in kwargs:
+        if foo == 'startkey' or foo == 'endkey':
+            kwargs[foo] = str_param_template.format(kwargs[foo])
+    if method is "POST":
+        if "include_docs" in kwargs:
+            include_docs = "include_docs={0}".format(repr(kwargs["include_docs"])).lower()
+        else:
+            include_docs = ""
+        view_url = '?'.join(['/'.join([database_url,view_name]), include_docs]) 
+        post_data = json.dumps(kwargs)
+        log.debug("POST "+view_url)
+        log.debug("DATA " + post_data)
+        view_req = urllib2.Request(view_url, data=post_data, headers=json_headers)
+    else:
+        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(kwargs)]) 
+        view_req = urllib2.Request(view_url, headers=json_headers)
+        log.debug("GET "+view_url)   
+    resp = urllib2.urlopen(view_req)
+    
+    for data in resp:
+        length = data.rfind(',')
+        if length > 0:
+            data = data[:length]        
+        try:
+            data = json.loads(data)
+            doc = document(data)
+            yield doc
+        except ValueError as e:
+            log.debug(repr(e))
 
+            #pass#skip first and final chunks
 class ParseError(Exception):
     """Raised when there is a problem parsing a date string"""
 
@@ -19,8 +66,8 @@ def importModuleFromFile(fullpath):
     not be loaded"""
     import os
     import sys
-    import logging
-    log = logging.getLogger(__name__)
+    
+    
     
     sys.path.append(os.path.dirname(fullpath))
     

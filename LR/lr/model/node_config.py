@@ -25,6 +25,7 @@ import pprint
 from lr.lib import helpers as h
 import urllib2
 import json
+import atexit
 _COUCHDB_FIELDS =['_id', '_rev', 
                                     '_attachments', 
                                     '_deleted', 
@@ -249,8 +250,6 @@ class LRNodeModel(object):
                     s.save(doc_id=s.service_id)
                 else:
                     s.update()
-        
-    
     def _monitorResourceDataChanges(self):
         """Method that tracks the updates, deletes, and additions time of envelops, 
          resource_data documents in the resource_data database."""
@@ -262,10 +261,18 @@ class LRNodeModel(object):
         if self._lastChangeSeq == -1:
             self._lastChangeSeq = currentChanges['last_seq']
         log.info("Last change sequence: "+str(self._lastChangeSeq))
+        self._running = True
+        @atexit.register
+        def exitHandler():
+            log.info("exit")
+            self._running = False
         def updateView():
-            log.debug('start view update %s' % self._resourcesview)
-            log.debug(len(db.view(self._resourcesview)))
-            log.debug('end view update')
+            designDocs = db.view('_all_docs',include_docs=True,startkey='_design%2F',endkey='_design0')
+            for designDoc in designDocs:
+                if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
+                    viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
+                    log.debug('start view update %s' % viewName)
+                    log.debug(len(db.view(viewName)))        
         def distribute():
             log.debug('start distribute')
             data = json.dumps({"dist":"dist"})
@@ -286,7 +293,7 @@ class LRNodeModel(object):
             self._distUrl = appConfig['lr.distribute.url']
             self._updateThread = None
             self._distributeThread = None
-            while True:
+            while self._running:
                 # I have to include the doc since the filter does seems to work.  Otherwise
                 # using the same replication filter to get only resource_data document
                 # would work been better.
