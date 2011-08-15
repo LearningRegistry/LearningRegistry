@@ -6,6 +6,7 @@ import urllib
 import urlparse
 import json
 import logging
+from stream import StreamingCouchDBDocHandler
 log = logging.getLogger(__name__)
 """Helper functions
 
@@ -45,17 +46,10 @@ def getView(database_url, view_name, method="GET", **kwargs):
         view_req = urllib2.Request(view_url, headers=json_headers)
         log.debug("GET "+view_url)   
     resp = urllib2.urlopen(view_req)
+    data = StreamingCouchDBDocHandler()
     
-    for data in resp:
-        length = data.rfind(',')
-        if length > 0:
-            data = data[:length]        
-        try:
-            data = json.loads(data)
-            doc = document(data)
-            yield doc
-        except ValueError as e:
-            log.debug(repr(e))
+    for doc in data.generator(resp):
+		yield document(doc)
 
             #pass#skip first and final chunks
 class ParseError(Exception):
