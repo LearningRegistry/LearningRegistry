@@ -46,7 +46,7 @@ def getView(database_url, view_name, method="GET", **kwargs):
         view_req = urllib2.Request(view_url, headers=json_headers)
         log.debug("GET "+view_url)   
     resp = urllib2.urlopen(view_req)
-    data = StreamingCouchDBDocHandler()
+    data = StreamingCouchDBDocHandler()    
     
     for doc in data.generator(resp):
 		yield document(doc)

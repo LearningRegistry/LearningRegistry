@@ -52,7 +52,7 @@ class ObtainController(BaseController):
                         yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
                         firstID = False
                     else:                        
-                        yield ',\n' + json.dumps(doc.doc)
+                        yield ',\n' + json.dumps(doc.doc)    
                 else:
                     if doc.key != currentID:
                         currentID = doc.key
