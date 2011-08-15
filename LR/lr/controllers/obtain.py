@@ -47,17 +47,17 @@ class ObtainController(BaseController):
                     if doc.key != currentID:                        
                         currentID = doc.key                        
                         if not firstID:
-                            yield ']' + byIDResponseChunks[1] + ','                            
+                            yield ']' + byIDResponseChunks[1] + ',\n'                            
                         byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
                         yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
                         firstID = False
                     else:                        
-                        yield ',' + json.dumps(doc.doc)
+                        yield ',\n' + json.dumps(doc.doc)    
                 else:
                     if doc.key != currentID:
                         currentID = doc.key
                         if not firstID:
-                            yield ','
+                            yield ',\n'
                         firstID = False
                         yield json.dumps({'doc_ID': doc.key})
     
@@ -82,6 +82,7 @@ class ObtainController(BaseController):
         full_docs = (not data.has_key('ids_only')) or data['ids_only'] == False
         by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
         by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
+        resumption_token = None
         if not data.has_key('by_resource_ID') and not by_doc_ID:
             by_resource_ID = True            
         if data.has_key('resumption_token'):
