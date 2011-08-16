@@ -83,10 +83,11 @@ def importModuleFromFile(fullpath):
 
 def convertToISO8601UTC (dateTimeArg):
     """This method assumes that the datetime is local naive time."""
-    if isinstance(dateTimeArg, datetime) == True:
-        dateUTC = datetime.utcfromtimestamp(time.mktime(dateTimeArg.timetuple()))
-        #Add the macroseconds back since hte mktime conversion loses it
-        return (dateUTC + timedelta(0, 0, dateTimeArg.microsecond))
+    if isinstance(dateTimeArg, datetime) == True and dateTimeArg.tzinfo is not None:
+        dateUTC = dateTimeArg - dateTimeArg.utcoffset()
+        dateUTC_noTZ = datetime(dateUTC.year, dateUTC.month, dateUTC.day, dateUTC.hour, dateUTC.minute, dateUTC.second, dateUTC.microsecond)
+        return dateUTC_noTZ
+
     return dateTimeArg
         
 def convertToISO8601Zformat(dateTimeArg):
