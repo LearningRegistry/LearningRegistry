@@ -6,6 +6,8 @@ import urllib
 import urlparse
 import json
 import logging
+import types
+
 log = logging.getLogger(__name__)
 """Helper functions
 
@@ -16,6 +18,7 @@ available to Controllers. This module is available to templates as 'h'.
 #from webhelpers.html.tags import checkbox, password
 from iso8601.iso8601 import ISO8601_REGEX
 import re
+from stream import StreamingCouchDBDocHandler
 class document:
     def __init__(self,data):
         if data.has_key('id'):
@@ -24,38 +27,55 @@ class document:
             self.key=data['key']
         if data.has_key('doc'):
             self.doc=data['doc']
-def getView(database_url, view_name, method="GET", **kwargs):    
-    str_param_template= '\"{0}\"'
+def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):    
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
+    get_head_args = ["key", "startkey", "startkey_docid", "endkey", 
+                     "endkey_docid", "limit", "stale", "descending", "skip", 
+                     "group", "group_level", "reduce", "include_docs", 
+                     "inclusive_end", "update_seq"]
+    post_args = ["keys"]
+    # Certain keys must be proper JSON values
     for foo in kwargs:
-        if foo == 'startkey' or foo == 'endkey':
-            kwargs[foo] = str_param_template.format(kwargs[foo])
-    if method is "POST":
-        if "include_docs" in kwargs:
-            include_docs = "include_docs={0}".format(repr(kwargs["include_docs"])).lower()
-        else:
-            include_docs = ""
-        view_url = '?'.join(['/'.join([database_url,view_name]), include_docs]) 
-        post_data = json.dumps(kwargs)
+        if foo in ['startkey','endkey','key']:
+            kwargs[foo] = json.dumps(kwargs[foo])
+    
+    query_args = {}
+    post_data = {}
+    for key in kwargs:
+        val = kwargs[key]
+        if key in get_head_args:
+            if isinstance(val, types.BooleanType):
+                query_args[key] = repr(val).lower()
+            else:
+                query_args[key] = val
+        if key in post_args:
+            post_data[key] = val
+            
+    if method is "POST" or post_data != {}:
+        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)]) 
+        post_data = json.dumps(post_data)
         log.debug("POST "+view_url)
         log.debug("DATA " + post_data)
         view_req = urllib2.Request(view_url, data=post_data, headers=json_headers)
     else:
-        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(kwargs)]) 
+        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)]) 
         view_req = urllib2.Request(view_url, headers=json_headers)
         log.debug("GET "+view_url)   
     resp = urllib2.urlopen(view_req)
     
-    for data in resp:
-        length = data.rfind(',')
-        if length > 0:
-            data = data[:length]        
-        try:
-            data = json.loads(data)
-            doc = document(data)
-            yield doc
-        except ValueError as e:
-            log.debug(repr(e))
+    dh = StreamingCouchDBDocHandler(documentHandler)
+    return dh.generator(resp)
+    
+#    for data in resp:
+#        length = data.rfind(',')
+#        if length > 0:
+#            data = data[:length]        
+#        try:
+#            data = json.loads(data)
+#            doc = document(data)
+#            yield doc
+#        except ValueError as e:
+#            log.debug(repr(e))
 
             #pass#skip first and final chunks
 class ParseError(Exception):

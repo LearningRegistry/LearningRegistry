@@ -7,46 +7,51 @@ from datetime import datetime
 from pylons import request
 
 class Error(Exception):
-    def __init__(self, code, msg):
+    def __init__(self, code, msg, **kwargs):
         self.code = code
         self.msg = msg
         self.datetime_now = datetime.utcnow().isoformat()
-        self.path_url = request.path_url
+        self.response_date = self.datetime_now
+        
+        if "req" in kwargs and kwargs["req"] is not None:
+            self.path_url = kwargs["req"].path_url
+        else:
+            self.path_url = request.path_url
 
 class ErrorWithVerb(Error):
-    def __init__(self, code, msg, verb):
-        Error.__init__(self, code, msg)
+    def __init__(self, code, msg, verb, **kwargs):
+        Error.__init__(self, code, msg, **kwargs)
         self.verb = verb
 
 class BadVerbError(Error):
-    def __init__(self):
-        Error.__init__(self, "badVerb", "Illegal OAI Verb")
+    def __init__(self, **kwargs):
+        Error.__init__(self, "badVerb", "Illegal OAI Verb", **kwargs)
 
 class BadResumptionTokenError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "badResumptionToken", "Resumption tokens not supported.", verb)
+    def __init__(self, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "badResumptionToken", "Resumption tokens not supported.", verb, **kwargs)
 
 class BadArgumentError(ErrorWithVerb):
-    def __init__(self, msg, verb):
-        ErrorWithVerb.__init__(self, "badArgument", msg, verb)
+    def __init__(self, msg, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "badArgument", msg, verb, **kwargs)
 
 class CannotDisseminateFormatError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "cannotDisseminateFormat", "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.", verb)
+    def __init__(self, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "cannotDisseminateFormat", "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.", verb, **kwargs)
 
 class IdDoesNotExistError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "idDoesNotExist", "The value of the identifier argument is unknown or illegal in this repository.", verb)
+    def __init__(self, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "idDoesNotExist", "The value of the identifier argument is unknown or illegal in this repository.", verb, **kwargs)
 
 class NoMetadataFormats(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "noMetadataFormats", "No metadata formats exist.", verb)
+    def __init__(self, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "noMetadataFormats", "No metadata formats exist.", verb, **kwargs)
 
 class NoRecordsMatchError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "noRecordsMatch", "The combination of the values of the from, until, and metadataPrefix arguments results in an empty list.", verb)
+    def __init__(self, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "noRecordsMatch", "The combination of the values of the from, until, and metadataPrefix arguments results in an empty list.", verb, **kwargs)
 
 class NoSetHierarchyError(ErrorWithVerb):
-    def __init__(self, verb):
-        ErrorWithVerb.__init__(self, "noSetHierarchy", "The repository does not support sets.", verb)
+    def __init__(self, verb, **kwargs):
+        ErrorWithVerb.__init__(self, "noSetHierarchy", "The repository does not support sets.", verb, **kwargs)
         

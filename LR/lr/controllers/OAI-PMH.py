@@ -5,13 +5,14 @@ from pylons.controllers.util import abort, redirect
 
 from lr.controllers.harvest import HarvestController
 
-from lr.lib import helpers as h
+from lr.lib import helpers as h, oaipmherrors
 from lr.lib.base import BaseController, render
 from lr.lib.oaipmh import oaipmh
 from datetime import datetime
 import json, iso8601
 from couchdb.http import ResourceNotFound
 from lr.lib.oaipmherrors import *
+import types
 
 
 log = logging.getLogger(__name__)
@@ -81,18 +82,25 @@ class OaiPmhController(HarvestController):
             until_date_gran = None
             if req_params.has_key('from'):
                 try:
+                    log.error("From 0: {0}".format(req_params['from']))
                     from_date = iso8601.parse_date(req_params['from'])
+                    log.error("From 1: {0}".format(from_date))
                     params['from'] = h.convertToISO8601UTC(from_date)
+                    log.error("From 2: {0}".format(params['from']))
                     from_date_gran = h.getISO8601Granularity(req_params['from'])
                 except:
+                    log.error("from: uhh ohh!")
                     raise BadArgumentError('from does not parse to ISO 8601.', verb)
             else:
                 params['from'] = None
             
             if req_params.has_key('until'):
                 try:
+                    log.error("Until 0: {0}".format(req_params['until']))
                     until_date = iso8601.parse_date(req_params['until'])
+                    log.error("Until 1: {0}".format(until_date))
                     params['until'] = h.convertToISO8601UTC(until_date)
+                    log.error("Until 2: {0}".format(params['until']))
                     until_date_gran = h.getISO8601Granularity(req_params['until'])
                 except:
                     raise BadArgumentError('until does not parse to ISO 8601.', verb)
@@ -133,12 +141,27 @@ class OaiPmhController(HarvestController):
         
         return params
 
-    def _returnResponse(self, body):
+    def _setResponseHeaders(self):
         response.headers["Content-Type"] = "text/xml; charset=utf-8"
-        return body
+    
+    def _returnResponse(self, body, res=None):
+        if res != None:
+            response = res
+        response.headers["Content-Type"] = "text/xml; charset=utf-8"
+        if isinstance(body, types.GeneratorType):
+            return bytearray(body, encoding="utf8")
+        else:
+            return body
+            
                                  
     
-    def _initRender(self,params):
+    def _initRender(self, params, ctx=None, req=None):
+        if ctx != None:
+            c = ctx
+            
+        if req != None:
+            request = req
+            
         c.datetime_now = datetime.utcnow().isoformat()
         c.path_url = request.path_url
         if params.has_key("by_doc_ID"):
@@ -153,74 +176,139 @@ class OaiPmhController(HarvestController):
             c.until_date = params["until"]
         if params.has_key("identifier"):
             c.identifier = params["identifier"]
+            
+    def _initMustache(self, args=None, req=None):
+        from lr.lib import helpers as h
+        
+        vars = {}
+
+        if req == None:
+            req = request
+            
+        if args != None:
+            params = args
+            
+        vars["response_date"] = datetime.utcnow().isoformat()
+        vars["path_url"] = req.path_url
+        if params.has_key("by_doc_ID"):
+            vars["by_doc_ID"] = params["by_doc_ID"]
+        if params.has_key("by_resource_ID"):
+            vars["by_resource_ID"] = params["by_resource_ID"]
+        if params.has_key("metadataPrefix"):
+            vars["metadataPrefix"] = params["metadataPrefix"]
+        if params.has_key("from"):
+            vars["from_date"] = h.harvestTimeFormat(params["from"])
+        if params.has_key("until"):
+            vars["until_date"] = h.harvestTimeFormat(params["until"])
+        if params.has_key("identifier"):
+            vars["identifier"] = params["identifier"]
+        return vars
         
     def _handleOAIRequest(self, format='html'):
+        t_req = request._current_obj()
+        t_res = response._current_obj()
+        
         o = oaipmh()
         
         def GetRecord(params):
             try:
-                c.identifier = params["identifier"]
-                if params["by_doc_ID"]  == True:
-                    c.docList = [o.get_record(params["identifier"])]
+                from lr.mustache.oaipmh import GetRecord as must_GetRecord
+                identifier = params["identifier"]
+                if params["by_doc_ID"] == True:
+                    docList = [o.get_record(params["identifier"])]
                 else:
-                    c.docList = list(o.get_records_by_resource(params["identifier"]))
+                    docList = o.get_records_by_resource(params["identifier"])
 
-                for x in c.docList:
-                    if x is None:
-                        c.docList.remove(x)
+                doc_idx = 0
+                valid_docs = 0
+                mustache = must_GetRecord()
+                for doc in docList:
+                    if doc is not None:
+                        doc_idx += 1
+                        
+                        if "payload_schema" in doc and params["metadataPrefix"] in doc["payload_schema"]:
+                            valid_docs += 1
+                        
+                            if valid_docs == 1:
+                                part = mustache.prefix(**self._initMustache(args=params, req=t_req))
+                                yield self._returnResponse(part, res=t_res)
+                                
+                            part = mustache.doc(doc)
+                            yield self._returnResponse(part, res=t_res)
+                        
+                if doc_idx == 0:
+                    raise IdDoesNotExistError(params['verb'], req=t_req)
+                elif valid_docs == 0:
+                    raise CannotDisseminateFormatError(params['verb'], req=t_req)
+                else:
+                    yield self._returnResponse(mustache.suffix(), res=t_res)
                 
-                if len(c.docList) == 0:
-                    raise IdDoesNotExistError(params['verb'])
-                
-            except ResourceNotFound:
-                raise IdDoesNotExistError(params['verb'])
+            except oaipmherrors.Error as e:
+                from lr.mustache.oaipmh import Error as err_stache
+                err = err_stache()
+                yield self._returnResponse(err.xml(e), res=t_res)
             
-            self._initRender(params)
-            
-            if c.docList != None:
-                for doc in c.docList:
-                    if c.metadataPrefix not in doc["payload_schema"]:
-                        raise CannotDisseminateFormatError(params['verb'])
-
-            body = "<error/>"
-            try:
-                body = render("/oaipmh-GetRecord.mako")
-            except:
-                log.exception("Unable to render template")
-            return self._returnResponse(body)
         
         
         def ListIdentifiers(params):
-            body = ""
             try:
-                c.identifiers = o.list_identifiers(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] )
+                from lr.mustache.oaipmh import ListIdentifiers as must_ListID
                 
-                if len(c.identifiers) == 0:
-                    raise NoRecordsMatchError(params['verb'])
+                doc_index = 0
+                mustache = must_ListID()
+                for ident in o.list_identifiers(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] ):
+                    doc_index += 1
+                    log.debug(json.dumps(ident))
+                    if doc_index == 1:
+#                        self._initRender(params, c, t_req)
+#                        part = t_render("/oaipmh-ListIdentifiers-prefix.mako")
+                        part = mustache.prefix(**self._initMustache(args=params, req=t_req))
+                        yield self._returnResponse(part, res=t_res)
+                    
+                    part = mustache.doc(ident)
+                    yield part
                 
-                self._initRender(params)
-                body = render("/oaipmh-ListIdentifiers.mako")
-            except NoRecordsMatchError as e:
-                raise e
+                if doc_index == 0:
+                    raise NoRecordsMatchError(params['verb'], req=t_req)
+                else:
+                    yield mustache.suffix()
+                    
+            except oaipmherrors.Error as e:
+                from lr.mustache.oaipmh import Error as err_stache
+                err = err_stache()
+                yield self._returnResponse(err.xml(e), res=t_res)
             except:
                 log.exception("Unable to render template")
-            return self._returnResponse(body)
+
         
         def ListRecords(params):
-            body = ""
             try:
-                c.records = o.list_records(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] )
+                from lr.mustache.oaipmh import ListRecords as must_ListRec
                 
-                if len(c.records) == 0:
-                    raise NoRecordsMatchError(params['verb'])
+                doc_index = 0
+                mustache = must_ListRec()
+                for record in o.list_records(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] ):
+                    doc_index += 1
+                    log.debug(json.dumps(record))
+                    if doc_index == 1:
+                        part = mustache.prefix(**self._initMustache(args=params, req=t_req))
+                        yield self._returnResponse(part, res=t_res)
+                    
+                    part = mustache.doc(record)
+                    yield self._returnResponse(part, res=t_res)
+                    
                 
-                self._initRender(params)
-                body = render("/oaipmh-ListRecords.mako")
-            except NoRecordsMatchError as e:
-                raise e
+                if doc_index == 0:
+                    raise NoRecordsMatchError(params['verb'], req=t_req)
+                else:
+                    yield mustache.suffix()
+                
+            except oaipmherrors.Error as e:
+                from lr.mustache.oaipmh import Error as err_stache
+                err = err_stache()
+                yield self._returnResponse(err.xml(e), res=t_res)
             except:
                 log.exception("Unable to render template")
-            return self._returnResponse(body)
         
         def Identify(params=None):
             body = ""
@@ -255,6 +343,7 @@ class OaiPmhController(HarvestController):
         def NotYetSupported(params=None):
             raise BadVerbError()
         
+        
             
         switch = {
                   'GetRecord': GetRecord,
@@ -278,8 +367,9 @@ class OaiPmhController(HarvestController):
             
             return switch[verb](params)
         except Error as e:
-            c.error = e
-            return self._returnResponse(render('oaipmh-Error.mako'))
+            from lr.mustache.oaipmh import Error as err_stache
+            err = err_stache()
+            return self._returnResponse(err.xml(e), res=t_res)
 
         
     def index(self, format='xml'):
