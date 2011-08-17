@@ -15,7 +15,7 @@ setup(
     install_requires=[
         "Pylons>=0.10", "pyparsing>=1.5.5", "restkit>=3.2.3",
         "couchdb>=0.8", "lxml>=2.3", "iso8601plus>=0.1.5", "ijson>=0.8.0",
-        "pystache>=0.3.1"
+        "pystache>=0.3.1", "PyJWT>=0.1.4"
     ],
     packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
