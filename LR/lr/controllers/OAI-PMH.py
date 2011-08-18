@@ -82,15 +82,22 @@ class OaiPmhController(HarvestController):
                 token = req_params['resumptionToken']
                 log.debug("resumptionToken: %s" % token)
                 try:
-                    params['resumptionToken'] = resumption_token.parse_token(serviceid, token)
-                    if 'error' in params['resumptionToken']:
-                        raise BadResumptionTokenError(verb, msg=params['resumptionToken']['error'])
+                    parsed = resumption_token.parse_token(serviceid, token)
+                    if 'error' in parsed:
+                        raise BadResumptionTokenError(verb, msg=params['resumptionToken']['error'])  
+                    params['resumptionToken'] = parsed
+                    
+                    if "from_date" in parsed:
+                        req_params["from"] = parsed["from_date"]
+                    if "until_date" in parsed:
+                        req_params["until"] = parsed["until_date"]
                 except Exception as e:
                     raise BadResumptionTokenError(verb, msg=e.message)
+                
             
             from_date_gran = None
             until_date_gran = None
-            if req_params.has_key('from'):
+            if req_params.has_key('from') :
                 try:
                     log.error("From 0: {0}".format(req_params['from']))
                     from_date = iso8601.parse_date(req_params['from'])
@@ -282,21 +289,26 @@ class OaiPmhController(HarvestController):
                 err = err_stache()
                 yield self._returnResponse(err.xml(e), res=t_res)
 
-        def ListIdentifiers(params):
+        def ListGeneric(params, showDocs=False):
             try:
-                from lr.mustache.oaipmh import ListIdentifiers as must_ListID
+                if not showDocs:
+                    from lr.mustache.oaipmh import ListIdentifiers as must_ListID
+                    mustache = must_ListID()
+                else:
+                    from lr.mustache.oaipmh import ListRecords as must_ListRec
+                    mustache = must_ListRec()
                 
                 doc_index = 0
-                mustache = must_ListID()
                 metadataPrefix=params["metadataPrefix"]
                 from_date=params["from"]
                 until_date=params["until"]
                 resumptionToken = None if "resumptionToken" not in params else params['resumptionToken']
-                for ident in o.list_identifiers(metadataPrefix,
+                for ident in o.list_identifiers_or_records(metadataPrefix,
                                                 from_date=from_date, 
                                                 until_date=until_date, 
                                                 rt=resumptionToken, 
-                                                fc_limit=fc_id_limit ):
+                                                fc_limit=fc_id_limit, 
+                                                include_docs=showDocs ):
                     doc_index += 1
                     log.debug(json.dumps(ident))
                     if doc_index == 1:
@@ -310,14 +322,17 @@ class OaiPmhController(HarvestController):
                         from lr.lib import resumption_token
                         opts = o.list_opts(metadataPrefix, h.convertToISO8601UTC(ident["node_timestamp"]), until_date)
                         opts["startkey_docid"] = ident["doc_ID"]
-                        token = resumption_token.get_token(serviceid=service_id, **opts)
+                        token = resumption_token.get_token(serviceid=service_id, from_date=from_date, until_date=until_date, **opts)
                         part = mustache.resumptionToken(token)
                         yield part
                         break
                 
+                
                 if doc_index == 0:
                     raise NoRecordsMatchError(params['verb'], req=t_req)
                 else:
+                    if enable_flow_control and doc_index <= fc_id_limit:
+                        yield mustache.resumptionToken()
                     yield mustache.suffix()
                     
             except oaipmherrors.Error as e:
@@ -327,34 +342,39 @@ class OaiPmhController(HarvestController):
             except:
                 log.exception("Unable to render template")
 
+        def ListIdentifiers(params):
+            return ListGeneric(params, False)
+        
         def ListRecords(params):
-            try:
-                from lr.mustache.oaipmh import ListRecords as must_ListRec
-                
-                doc_index = 0
-                mustache = must_ListRec()
-                for record in o.list_records(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] ):
-                    doc_index += 1
-                    log.debug(json.dumps(record))
-                    if doc_index == 1:
-                        part = mustache.prefix(**self._initMustache(args=params, req=t_req))
-                        yield self._returnResponse(part, res=t_res)
-                    
-                    part = mustache.doc(record)
-                    yield self._returnResponse(part, res=t_res)
-                    
-                
-                if doc_index == 0:
-                    raise NoRecordsMatchError(params['verb'], req=t_req)
-                else:
-                    yield mustache.suffix()
-                
-            except oaipmherrors.Error as e:
-                from lr.mustache.oaipmh import Error as err_stache
-                err = err_stache()
-                yield self._returnResponse(err.xml(e), res=t_res)
-            except:
-                log.exception("Unable to render template")
+            return ListGeneric(params, True)
+#        def ListRecords(params):
+#            try:
+#                from lr.mustache.oaipmh import ListRecords as must_ListRec
+#                
+#                doc_index = 0
+#                mustache = must_ListRec()
+#                for record in o.list_records(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] ):
+#                    doc_index += 1
+#                    log.debug(json.dumps(record))
+#                    if doc_index == 1:
+#                        part = mustache.prefix(**self._initMustache(args=params, req=t_req))
+#                        yield self._returnResponse(part, res=t_res)
+#                    
+#                    part = mustache.doc(record)
+#                    yield self._returnResponse(part, res=t_res)
+#                    
+#                
+#                if doc_index == 0:
+#                    raise NoRecordsMatchError(params['verb'], req=t_req)
+#                else:
+#                    yield mustache.suffix()
+#                
+#            except oaipmherrors.Error as e:
+#                from lr.mustache.oaipmh import Error as err_stache
+#                err = err_stache()
+#                yield self._returnResponse(err.xml(e), res=t_res)
+#            except:
+#                log.exception("Unable to render template")
         
         def Identify(params=None):
             body = ""
