@@ -6,6 +6,8 @@ Created on Aug 17, 2011
 '''
 # MIT licensed JWT implementation:  https://github.com/progrium/pyjwt
 import jwt
+import datetime
+
 
 
 __JWT_ALG = "HS256"
@@ -21,7 +23,7 @@ def parse_token(serviceid, token):
     return decoded
 
 
-def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None):
+def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
     payload = {}
 
     payload["startkey"] = startkey
@@ -29,6 +31,12 @@ def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None):
     
     if startkey_docid:
         payload["startkey_docid"] = startkey_docid
+        
+    if from_date and isinstance(from_date, datetime.datetime):
+        from lr.lib import helpers as h
+        payload["from_date"] = h.convertToISO8601Zformat(from_date)
+    if until_date and isinstance(until_date, datetime.datetime):
+        payload["until_date"] = until_date
         
     return jwt.encode(payload, serviceid, __JWT_ALG)
 
