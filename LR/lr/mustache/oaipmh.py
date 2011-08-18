@@ -15,17 +15,17 @@ class ListIdentifiers(object):
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd">
   <responseDate>{{response_date}}</responseDate>
-  <request verb="{{verb}}" {{#identifier}}identifier="{{identifier}}"{{/identifier}}{{#from_date}}
-            from="{{from_date}}"{{/from_date}}{{#until_date}} until="{{until_date}}"{{/until_date}}{{#metadataPrefix}} 
-            metadataPrefix="{{metadataPrefix}}"{{/metadataPrefix}}{{#by_doc_ID}}
-            by_doc_ID="{{by_doc_ID}}"{{/by_doc_ID}}{{#by_resource_ID}} by_resource_ID="{{by_resource_ID}}"{{/by_resource_ID}}>{{path_url}}</request>
+  <request verb="{{verb}}" {{#identifier}}identifier="{{identifier}}"{{/identifier}} {{#from_date}}
+            from="{{from_date}}"{{/from_date}} {{#until_date}}until="{{until_date}}"{{/until_date}} {{#metadataPrefix}} 
+            metadataPrefix="{{metadataPrefix}}"{{/metadataPrefix}} {{#by_doc_ID}}
+            by_doc_ID="{{by_doc_ID}}"{{/by_doc_ID}} {{#by_resource_ID}}by_resource_ID="{{by_resource_ID}}"{{/by_resource_ID}}>{{path_url}}</request>
   <{{verb}}>"""
   
     template_doc = """<header><identifier>{{doc_ID}}</identifier><datestamp>{{node_timestamp}}</datestamp></header>"""
 
     template_suffix = """</{{verb}}></OAI-PMH>"""
     
-    template_rtoken = """<resumptionToken>{{token}}</resumptionToken>"""
+    template_rtoken = """{{#token}}<resumptionToken>{{token}}</resumptionToken>{{/token}}{{^token}}<resumptionToken />{{/token}}"""
     
     def prefix(self, response_date, metadataPrefix, path_url, from_date=None, until_date=None):
 
