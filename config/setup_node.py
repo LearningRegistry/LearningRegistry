@@ -42,6 +42,70 @@ _NODE = _config.get("app:main", "couchdb.db.node")
 _COMMUNITY = _config.get("app:main", "couchdb.db.community")
 _NETWORK = _config.get("app:main", "couchdb.db.network")
 
+# Dictionary of types services and the corresponding services that are added 
+# by default to the node.  The format is 
+# "<serviceType>":["<list of services of serviceType>"]
+_DEFAULT_SERVICES = {"administrative":["description", "services", "status", "policy"],
+                                       "access":["obtain", "OAI-PMH", "slice",  "harvest", "swordservice"],
+                                       "broker":[],
+                                       "distribute":["distribute"],
+                                       "publish":["publish"]}
+
+def publishNodeDescription(server, dbname):
+    node_description = {}
+    node_description.update(t.node_description)
+    node_description['node_name'] = nodeSetup['node_name']
+    node_description['node_description'] = nodeSetup['node_description']
+    node_description['node_admin_identity'] = nodeSetup['node_admin_identity']
+    node_description["open_connect_source"] = nodeSetup["open_connect_source"]
+    node_description["open_connect_dest"] = nodeSetup["open_connect_dest"]
+    node_description['node_id'] = uuid4().hex
+    PublishDoc(server, dbname, 'node_description', node_description)
+    
+def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
+    for serviceType in services.keys():
+        for serviceName in services[serviceType]:
+            try:
+                plugin = __import__("services.%s" % serviceType, fromlist=["install"])
+                plugin.install(server, _NODE, nodeSetup)
+            except Exception as e:
+                publishService(nodeUrl, server, dbname, serviceType, serviceName)
+
+def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
+    for dest_node_url in connectionList:
+        connection = {}
+        connection.update(t.connection_description)
+        connection['connection_id'] = uuid4().hex
+        connection['source_node_url']=sourceNodeUrl
+        connection['destination_node_url'] = dest_node_url
+        PublishDoc(server, dbname, "{0}_to_{1}_connection".format(nodeName, dest_node_url), connection)
+
+def publishCouchApps(databaseUrl, appsDirPath):
+     for app in os.listdir(appsDirPath):
+        commandPath =  os.path.join(_VIRTUAL_ENV_PATH, 'bin', 'couchapp')
+        commandArgs =  " push {0} {1}".format(os.path.join(appsDirPath, app), databaseUrl)
+        command = "{0} {1}".format(commandPath, commandArgs)
+        print("\n{0}\n".format(command))
+        p = subprocess.Popen(command, shell=True)
+        p.wait()
+        
+def setCommunityId():
+    community = getInput("Enter the community id")
+    t.community_description['community_id'] = community
+    t.community_description['community_name'] = community
+    t.community_description['community_description'] = community
+    t.network_description['community_id'] = community
+    t.node_description['community_id'] = community
+    
+def setNetworkId():
+    network = getInput("Enter the network id")
+    t.network_description['network_id'] = network
+    t.network_description['network_name'] = network
+    t.network_description['network_description'] = network
+    t.node_description['network_id'] = network
+    t.network_policy_description['network_id'] = network
+    t.network_policy_description['policy_id'] =network+" policy"
+        
 if __name__ == "__main__":
 
     from optparse import OptionParser
@@ -54,24 +118,10 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
     print("\n\n=========================\nNode Configuration\n")
     if options.devel:
-        community = getInput("Enter the community id")
-        t.community_description['community_id'] = community
-        t.community_description['community_name'] = community
-        t.community_description['community_description'] = community
-        t.network_description['community_id'] = community
-        t.node_description['community_id'] = community
-
-        network = getInput("Enter the network id")
-        t.network_description['network_id'] = network
-        t.network_description['network_name'] = network
-        t.network_description['network_description'] = network
-        t.node_description['network_id'] = network
-        t.network_policy_description['network_id'] = network
-        t.network_policy_description['policy_id'] =network+" policy"
-
-
-
-
+        setCommunityId()
+        setNetworkId()
+    
+    
     nodeSetup = getSetupInfo()
     print("\n\n=========================\nNode Configuration\n")
     for k in nodeSetup.keys():
@@ -93,6 +143,7 @@ if __name__ == "__main__":
 
     #Create the databases.
     CreateDB(server, dblist=[_RESOURCE_DATA])
+    
     #Delete the existing databases
     CreateDB(server, dblist=[ _NODE, _NETWORK, _COMMUNITY], deleteDB=True)
 
@@ -105,51 +156,19 @@ if __name__ == "__main__":
 
 
     #Add node description
-    node_description = {}
-    node_description.update(t.node_description)
-    node_description['node_name'] = nodeSetup['node_name']
-    node_description['node_description'] = nodeSetup['node_description']
-    node_description['node_admin_identity'] = nodeSetup['node_admin_identity']
-    node_description["open_connect_source"] = nodeSetup["open_connect_source"]
-    node_description["open_connect_dest"] = nodeSetup["open_connect_dest"]
-    node_description['node_id'] = uuid4().hex
-    PublishDoc(server, _NODE, 'node_description', node_description)
+    publishNodeDescription(server, _NODE)
 
-    for dest_node_url in nodeSetup['connections']:
-        connection = {}
-        connection.update(t.connection_description)
-        connection['connection_id'] = uuid4().hex
-        connection['source_node_url']=nodeSetup['couchDBUrl']
-        connection['destination_node_url'] = dest_node_url
-        PublishDoc(server, _NODE, "{0}_to_{1}_connection".format(
-                                                nodeSetup['node_name'], dest_node_url), connection)
-
+    #Add the node connections
+    publishNodeConnections(nodeSetup["nodeUrl"], server, _NODE,  
+                                            nodeSetup["node_name"],  nodeSetup['connections'])
 
     #Install the services, by default all the services are installed.
-    for service_type in ['access', 'broker', 'publish', 'administrative', 'distribute', 'oaipmh', 'harvest']:
-        try:
-            plugin = __import__("services.%s" % service_type, fromlist=["install"])
-            plugin.install(server, _NODE, nodeSetup)
-        except Exception as e:
-            service = {}
-            service.update(t.service_description)
-            service['service_type'] =service_type
-            service['service_id'] = uuid4().hex
-            service['service_name'] = service_type + " service"
-            service['service_description']= service_type + " service"
-            PublishDoc(server, _NODE, service_type + " service", service)
+    publishNodeServices(nodeSetup["nodeUrl"], server, _NODE)
+
 
     #Push the couch apps
     #Commands to go the couchapp directory and push all the apps.
     print("\n============================\n")
     print("Pushing couch apps ...")
     resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
-    for app in os.listdir(_COUCHAPP_PATH):
-        command = os.path.join(
-            _VIRTUAL_ENV_PATH, 'bin', 'couchapp') + " push {0} {1}".format(
-                os.path.join(_COUCHAPP_PATH, app), resourceDataUrl
-                )
-        print("\n{0}\n".format(command))
-        p = subprocess.Popen(command, shell=True)
-        p.wait()
-    print("\n\n\n")
+    publishCouchApps(resourceDataUrl,  _COUCHAPP_PATH)
