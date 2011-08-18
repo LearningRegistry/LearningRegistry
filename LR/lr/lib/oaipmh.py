@@ -60,40 +60,37 @@ class oaipmh(harvest):
             opts["endkey"] = [metadataPrefix, {}]
         return opts;
                 
-    def list_records(self,metadataPrefix,from_date=None, until_date=None):
-        '''Returns the list_records as a generator based upon OAI-PMH query'''
-        opts = {
-                "include_docs": True,
-                "stale": "ok"
-                };
-
-        if from_date != None:
-            from_date = from_date.replace(tzinfo=None)
-            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
-        else:
-            # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, None]
-        
-        if until_date != None:
-            until_date = until_date.replace(tzinfo=None)
-            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
-        else:
-            # somewhat of an hack... since I don't know the timestamp, and couch stores things
-            # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, {}]
-        
-        def format(row):
-            obj = row["doc"]
-            return obj
-        
-        return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
+#    def list_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None):
+#        '''Returns the list_records as a generator based upon OAI-PMH query'''
+#        opts = {
+#                "include_docs": True,
+#                "stale": "ok"
+#                };
+#
+#        if rt != None and fc_limit != None:
+#            opts["startkey"] = rt["startkey"]
+#            opts["startkey_docid"] = rt["startkey_docid"]
+#            opts["endkey"] = rt["endkey"]
+#            opts["limit"] = fc_limit + 1
+#            
+#        else:
+#            opts.update(self.list_opts(metadataPrefix, from_date, until_date))
+#        
+#        def format(row):
+#            obj = row["doc"]
+#            return obj
+#        
+#        return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
 #        view_data = self.db.view('oai-pmh/list-records', **opts)
 #        return map(lambda row: row["value"], view_data)
 
     
-    def list_identifiers(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None):
+    def list_identifiers_or_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None, include_docs=False):
         '''Returns the list_records as a generator based upon OAI-PMH query'''
         opts = { "stale": "ok" };
+        if include_docs:
+            opts["include_docs"] = True
+        
         import logging
         log = logging.getLogger(__name__)
         
@@ -108,10 +105,19 @@ class oaipmh(harvest):
         
         log.info("opts: "+ repr(opts))
         
-        def format(row):
+        def format_ids(row):
             obj = { "doc_ID": row["id"], "node_timestamp": "%sZ" %(row["key"][1]) }
             log.debug("format: %s\n" %(json.dumps(obj)))
             return obj
+        
+        def format_docs(row):
+            obj = row["doc"]
+            return obj
+        
+        if include_docs:
+            format = format_docs
+        else:
+            format = format_ids
         
         return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
 #        view_data = self.db.view('oai-pmh/list-identifiers', **opts)
