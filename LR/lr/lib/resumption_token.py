@@ -13,9 +13,9 @@ __JWT_ALG = "HS256"
 def parse_token(serviceid, token):
     decoded = {}
     try:
-        decoded = jwt.decode(token, serviceid, __JWT_ALG)
+        decoded = jwt.decode(str(token), str(serviceid), __JWT_ALG)
     except jwt.DecodeError as e:
-        decoded = jwt.decode(token, verify=False)
+        decoded = jwt.decode(str(token), verify=False)
         decoded["error"] = e.message
         
     return decoded
