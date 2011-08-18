@@ -1,5 +1,4 @@
-import logging
-
+import logging, re
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
@@ -45,7 +44,7 @@ class OaiPmhController(HarvestController):
             log.exception("Unable to parse POST.")
         return req_params
     
-    def _parseParams(self):
+    def _parseParams(self, flow_control=False, serviceid=None):
         params = {}
         req_params = self._getParams()
         if (req_params.has_key('verb') == False) :
@@ -78,6 +77,17 @@ class OaiPmhController(HarvestController):
                 params['by_doc_ID'] = not params['by_resource_ID']
         
         if verb == 'ListRecords' or verb == 'ListIdentifiers':
+            if flow_control and req_params.has_key('resumptionToken'):
+                from lr.lib import resumption_token
+                token = req_params['resumptionToken']
+                log.debug("resumptionToken: %s" % token)
+                try:
+                    params['resumptionToken'] = resumption_token.parse_token(serviceid, token)
+                    if 'error' in params['resumptionToken']:
+                        raise BadResumptionTokenError(verb, msg=params['resumptionToken']['error'])
+                except Exception as e:
+                    raise BadResumptionTokenError(verb, msg=e.message)
+            
             from_date_gran = None
             until_date_gran = None
             if req_params.has_key('from'):
@@ -208,6 +218,30 @@ class OaiPmhController(HarvestController):
         t_req = request._current_obj()
         t_res = response._current_obj()
         
+        enable_flow_control = False
+        fc_id_limit = None
+        fc_doc_limit = None
+        service_id = None
+        serviceDoc = h.getServiceDocument("OAI-PMH service")
+        if serviceDoc != None:
+            if 'service_id' in serviceDoc:
+                service_id = serviceDoc['service_id']
+                
+            if 'service_data' in serviceDoc:
+                serviceData = serviceDoc['service_data']
+                if 'flow_control' in serviceData:
+                    enable_flow_control = serviceData['flow_control']
+                
+                if enable_flow_control and 'id_limit' in serviceData:
+                    fc_id_limit = serviceData['id_limit']
+                elif enable_flow_control:
+                    fc_id_limit = 100
+                
+                if enable_flow_control and 'doc_limit' in serviceData:
+                    fc_doc_limit = serviceData['doc_limit']
+                elif enable_flow_control:
+                    fc_doc_limit = 100
+        
         o = oaipmh()
         
         def GetRecord(params):
@@ -247,26 +281,39 @@ class OaiPmhController(HarvestController):
                 from lr.mustache.oaipmh import Error as err_stache
                 err = err_stache()
                 yield self._returnResponse(err.xml(e), res=t_res)
-            
-        
-        
+
         def ListIdentifiers(params):
             try:
                 from lr.mustache.oaipmh import ListIdentifiers as must_ListID
                 
                 doc_index = 0
                 mustache = must_ListID()
-                for ident in o.list_identifiers(params["metadataPrefix"],from_date=params["from"], until_date=params["until"] ):
+                metadataPrefix=params["metadataPrefix"]
+                from_date=params["from"]
+                until_date=params["until"]
+                resumptionToken = None if "resumptionToken" not in params else params['resumptionToken']
+                for ident in o.list_identifiers(metadataPrefix,
+                                                from_date=from_date, 
+                                                until_date=until_date, 
+                                                rt=resumptionToken, 
+                                                fc_limit=fc_id_limit ):
                     doc_index += 1
                     log.debug(json.dumps(ident))
                     if doc_index == 1:
-#                        self._initRender(params, c, t_req)
-#                        part = t_render("/oaipmh-ListIdentifiers-prefix.mako")
                         part = mustache.prefix(**self._initMustache(args=params, req=t_req))
                         yield self._returnResponse(part, res=t_res)
                     
-                    part = mustache.doc(ident)
-                    yield part
+                    if fc_id_limit is None or doc_index <= fc_id_limit:
+                        part = mustache.doc(ident)
+                        yield part
+                    elif enable_flow_control and doc_index > fc_id_limit:
+                        from lr.lib import resumption_token
+                        opts = o.list_opts(metadataPrefix, h.convertToISO8601UTC(ident["node_timestamp"]), until_date)
+                        opts["startkey_docid"] = ident["doc_ID"]
+                        token = resumption_token.get_token(serviceid=service_id, **opts)
+                        part = mustache.resumptionToken(token)
+                        yield part
+                        break
                 
                 if doc_index == 0:
                     raise NoRecordsMatchError(params['verb'], req=t_req)
@@ -280,7 +327,6 @@ class OaiPmhController(HarvestController):
             except:
                 log.exception("Unable to render template")
 
-        
         def ListRecords(params):
             try:
                 from lr.mustache.oaipmh import ListRecords as must_ListRec
@@ -333,9 +379,6 @@ class OaiPmhController(HarvestController):
                 return self._returnResponse(body)
             except Error as e:
                 raise e
-#            except Exception as e:
-#                raise NoMetadataFormats(params["verb"])
-                
         
         def ListSets(params=None):
             raise NoSetHierarchyError(verb)
@@ -354,7 +397,7 @@ class OaiPmhController(HarvestController):
                   'ListSets': ListSets
                   }
         try:
-            params = self._parseParams()
+            params = self._parseParams(flow_control=enable_flow_control, serviceid=service_id)
             
             # If this is a special case where we are actually using OAI interface to serve basic harvest
             if params.has_key("metadataPrefix") and params["metadataPrefix"] == "LR_JSON_0.10.0":

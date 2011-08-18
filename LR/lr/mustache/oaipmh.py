@@ -25,6 +25,8 @@ class ListIdentifiers(object):
 
     template_suffix = """</{{verb}}></OAI-PMH>"""
     
+    template_rtoken = """<resumptionToken>{{token}}</resumptionToken>"""
+    
     def prefix(self, response_date, metadataPrefix, path_url, from_date=None, until_date=None):
 
         opts = { "response_date": response_date,
@@ -37,6 +39,9 @@ class ListIdentifiers(object):
         
     def doc(self, doc=None ):
         return pystache.render(self.template_doc, doc)
+
+    def resumptionToken(self, token=None):
+        return pystache.render(self.template_rtoken, { "token": token })
 
     def suffix(self ):
         return pystache.render(self.template_suffix, {"verb": self.verb})

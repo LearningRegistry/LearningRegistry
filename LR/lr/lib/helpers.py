@@ -7,6 +7,7 @@ import urlparse
 import json
 import logging
 import types
+from iso8601 import iso8601
 
 log = logging.getLogger(__name__)
 """Helper functions
@@ -19,6 +20,8 @@ available to Controllers. This module is available to templates as 'h'.
 from iso8601.iso8601 import ISO8601_REGEX
 import re
 from stream import StreamingCouchDBDocHandler
+
+
 class document:
     def __init__(self,data):
         if data.has_key('id'):
@@ -26,7 +29,17 @@ class document:
         if data.has_key('key'):
             self.key=data['key']
         if data.has_key('doc'):
-            self.doc=data['doc']
+            self.doc=data['doc']        
+ 
+def getServiceDocument(serviceName):
+    from lr.model.base_model import appConfig
+    json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
+    url = "{0}/{1}/{2}".format(appConfig['couchdb.url'],appConfig['couchdb.db.node'],urllib.quote(serviceName))
+    req = urllib2.Request(url=url, headers=json_headers)
+    res = urllib2.urlopen(req)
+    return json.load(res)
+
+
 def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):    
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
     get_head_args = ["key", "startkey", "startkey_docid", "endkey", 
@@ -103,8 +116,15 @@ def importModuleFromFile(fullpath):
 
 def convertToISO8601UTC (dateTimeArg):
     """This method assumes that the datetime is local naive time."""
-    if isinstance(dateTimeArg, datetime) == True and dateTimeArg.tzinfo is not None:
-        dateUTC = dateTimeArg - dateTimeArg.utcoffset()
+    arg = dateTimeArg
+    if isinstance(arg, (types.StringTypes, unicode)) == True:
+        try:
+            arg = iso8601.parse_date(arg)
+        except:
+            pass
+    
+    if isinstance(arg, datetime) == True and arg.tzinfo is not None:
+        dateUTC = arg - arg.utcoffset()
         dateUTC_noTZ = datetime(dateUTC.year, dateUTC.month, dateUTC.day, dateUTC.hour, dateUTC.minute, dateUTC.second, dateUTC.microsecond)
         return dateUTC_noTZ
 

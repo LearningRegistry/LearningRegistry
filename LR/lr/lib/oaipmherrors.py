@@ -8,8 +8,10 @@ from pylons import request
 
 class Error(Exception):
     def __init__(self, code, msg, **kwargs):
+        Exception.__init__(self, **kwargs)
         self.code = code
         self.msg = msg
+        self.message = msg
         self.datetime_now = datetime.utcnow().isoformat()
         self.response_date = self.datetime_now
         
@@ -19,7 +21,7 @@ class Error(Exception):
             self.path_url = request.path_url
 
 class ErrorWithVerb(Error):
-    def __init__(self, code, msg, verb, **kwargs):
+    def __init__(self, code, msg="", verb="unknown", **kwargs):
         Error.__init__(self, code, msg, **kwargs)
         self.verb = verb
 
@@ -29,7 +31,10 @@ class BadVerbError(Error):
 
 class BadResumptionTokenError(ErrorWithVerb):
     def __init__(self, verb, **kwargs):
-        ErrorWithVerb.__init__(self, "badResumptionToken", "Resumption tokens not supported.", verb, **kwargs)
+        if 'msg' not in kwargs:
+            kwargs['msg'] = "Resumption tokens not supported."
+
+        ErrorWithVerb.__init__(self, "badResumptionToken", verb=verb, **kwargs)
 
 class BadArgumentError(ErrorWithVerb):
     def __init__(self, msg, verb, **kwargs):

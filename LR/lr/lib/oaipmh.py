@@ -45,6 +45,21 @@ class oaipmh(harvest):
         ])
       
     
+    def list_opts(self, metadataPrefix, from_date=None, until_date=None):
+        opts = {}
+        if from_date != None:
+            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
+        else:
+            # empty string should sort before anything else.
+            opts["startkey"] = [metadataPrefix, None]
+        
+        if until_date != None:
+            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
+        else:
+            # {} sorts at end of string sequence.
+            opts["endkey"] = [metadataPrefix, {}]
+        return opts;
+                
     def list_records(self,metadataPrefix,from_date=None, until_date=None):
         '''Returns the list_records as a generator based upon OAI-PMH query'''
         opts = {
@@ -65,7 +80,7 @@ class oaipmh(harvest):
         else:
             # somewhat of an hack... since I don't know the timestamp, and couch stores things
             # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, {}];
+            opts["endkey"] = [metadataPrefix, {}]
         
         def format(row):
             obj = row["doc"]
@@ -74,25 +89,22 @@ class oaipmh(harvest):
         return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
 #        view_data = self.db.view('oai-pmh/list-records', **opts)
 #        return map(lambda row: row["value"], view_data)
+
     
-    def list_identifiers(self,metadataPrefix,from_date=None, until_date=None ):
+    def list_identifiers(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None):
         '''Returns the list_records as a generator based upon OAI-PMH query'''
         opts = { "stale": "ok" };
         import logging
         log = logging.getLogger(__name__)
-
-        if from_date != None:
-            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
-        else:
-            # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, None]
         
-        if until_date != None:
-            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
+        if rt != None and fc_limit != None:
+            opts["startkey"] = rt["startkey"]
+            opts["startkey_docid"] = rt["startkey_docid"]
+            opts["endkey"] = rt["endkey"]
+            opts["limit"] = fc_limit + 1
+            
         else:
-            # somewhat of an hack... since I don't know the timestamp, and couch stores things
-            # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, {}];
+            opts.update(self.list_opts(metadataPrefix, from_date, until_date))
         
         log.info("opts: "+ repr(opts))
         

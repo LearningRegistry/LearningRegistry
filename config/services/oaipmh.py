@@ -57,7 +57,9 @@ class __OaiServiceTemplate(ServiceTemplate):
             "service_key": "false", 
             "service_https": "false",
             "spec_kv_only": None,
-            "flow_control": "false"
+            "flow_control": "false",
+            "id_limit": None,
+            "doc_limit": None
             
         }
         return opts
