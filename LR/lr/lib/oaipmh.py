@@ -24,6 +24,7 @@ from lr.lib.harvest import harvest
 from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats
 import lr.lib.helpers as h
 from lr.model.base_model import appConfig
+import json
 
 log = logging.getLogger(__name__)
 
@@ -35,58 +36,96 @@ class oaipmh(harvest):
         '''
         Constructor
         '''
+        harvest.__init__(self, server, database)
         self.server = couchdb.Server(server)
         self.db = self.server[database]
+        self.res_data_url = '/'.join([
+            appConfig['couchdb.url'],
+            appConfig['couchdb.db.resourcedata']
+        ])
+      
     
-    
-    
-    def list_records(self,metadataPrefix,from_date=None, until_date=None):
-        opts = {};
-
+    def list_opts(self, metadataPrefix, from_date=None, until_date=None):
+        opts = {}
         if from_date != None:
-            from_date = from_date.replace(tzinfo=None)
             opts["startkey"] = [metadataPrefix, from_date.isoformat()]
         else:
             # empty string should sort before anything else.
             opts["startkey"] = [metadataPrefix, None]
         
         if until_date != None:
-            until_date = until_date.replace(tzinfo=None)
             opts["endkey"] = [metadataPrefix, until_date.isoformat()]
         else:
-            # somewhat of an hack... since I don't know the timestamp, and couch stores things
-            # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, {}];
-        
-        
-        view_data = self.db.view('oai-pmh/list-records', **opts)
-        return map(lambda row: row["value"], view_data)
+            # {} sorts at end of string sequence.
+            opts["endkey"] = [metadataPrefix, {}]
+        return opts;
+                
+#    def list_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None):
+#        '''Returns the list_records as a generator based upon OAI-PMH query'''
+#        opts = {
+#                "include_docs": True,
+#                "stale": "ok"
+#                };
+#
+#        if rt != None and fc_limit != None:
+#            opts["startkey"] = rt["startkey"]
+#            opts["startkey_docid"] = rt["startkey_docid"]
+#            opts["endkey"] = rt["endkey"]
+#            opts["limit"] = fc_limit + 1
+#            
+#        else:
+#            opts.update(self.list_opts(metadataPrefix, from_date, until_date))
+#        
+#        def format(row):
+#            obj = row["doc"]
+#            return obj
+#        
+#        return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
+#        view_data = self.db.view('oai-pmh/list-records', **opts)
+#        return map(lambda row: row["value"], view_data)
+
     
-    def list_identifiers(self,metadataPrefix,from_date=None, until_date=None ):
-        opts = {};
+    def list_identifiers_or_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None, include_docs=False):
+        '''Returns the list_records as a generator based upon OAI-PMH query'''
+        opts = { "stale": "ok" };
+        if include_docs:
+            opts["include_docs"] = True
+        
         import logging
         log = logging.getLogger(__name__)
-
-        if from_date != None:
-            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
-        else:
-            # empty string should sort before anything else.
-            opts["startkey"] = [metadataPrefix, None]
         
-        if until_date != None:
-            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
+        if rt != None and fc_limit != None:
+            opts["startkey"] = rt["startkey"]
+            opts["startkey_docid"] = rt["startkey_docid"]
+            opts["endkey"] = rt["endkey"]
+            opts["limit"] = fc_limit + 1
+            
         else:
-            # somewhat of an hack... since I don't know the timestamp, and couch stores things
-            # in alphabetical order, a string sequence with all capital Z's should always sort last.
-            opts["endkey"] = [metadataPrefix, {}];
+            opts.update(self.list_opts(metadataPrefix, from_date, until_date))
         
         log.info("opts: "+ repr(opts))
-        view_data = self.db.view('oai-pmh/list-identifiers', **opts)
-        return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
+        
+        def format_ids(row):
+            obj = { "doc_ID": row["id"], "node_timestamp": "%sZ" %(row["key"][1]) }
+            log.debug("format: %s\n" %(json.dumps(obj)))
+            return obj
+        
+        def format_docs(row):
+            obj = row["doc"]
+            return obj
+        
+        if include_docs:
+            format = format_docs
+        else:
+            format = format_ids
+        
+        return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
+#        view_data = self.db.view('oai-pmh/list-identifiers', **opts)
+#        return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
     
     def list_metadata_formats(self, identity=None, by_doc_ID=False, verb="ListMetadataFormats"):
         try:
-            opts = {}
+            opts = { "stale": "ok" }
             if identity != None:
                 if by_doc_ID == True: 
                     byID = "by_doc_ID" 
@@ -127,7 +166,8 @@ class oaipmh(harvest):
             ident["granularity"] = h.getDatetimePrecision()
             opts = {
                     "group": True,
-                    "limit": 1
+                    "limit": 1,
+                    "stale": "ok"
                     }
             
             view_data = self.db.view('oai-pmh/identify-timestamp', **opts)
