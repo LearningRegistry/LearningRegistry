@@ -3,11 +3,27 @@ Created on Aug 16, 2011
 
 @author: jklo
 '''
-import couchdb, sys, traceback
+import couchdb 
+import sys
+import traceback
+from uuid import uuid4
+import lrnodetemplate as t
 from pprint import pprint
+import urlparse
+
 
 #Default url to the couchdb server.
 _DEFAULT_COUCHDB_URL =  "http://127.0.0.1:5984/"
+
+def publishService(nodeUrl, server, dbname, serviceType, serviceName):
+    service = {}
+    service.update(t.service_description)
+    service['service_type'] =serviceType
+    service['service_id'] = uuid4().hex
+    service['service_name'] = serviceName+" service"
+    service["service_endpoint"] = urlparse.urljoin(nodeUrl, serviceName)
+    service['service_description']= "{0} {1} service".format(serviceType, serviceName)
+    PublishDoc(server, dbname,  "{0}:{1} service".format(serviceType, serviceName), service)
 
 def CreateDB(couchServer = _DEFAULT_COUCHDB_URL,  dblist=[], deleteDB=False):
     '''Creates a DB in Couch based upon config'''
@@ -32,7 +48,6 @@ def CreateDB(couchServer = _DEFAULT_COUCHDB_URL,  dblist=[], deleteDB=False):
 
 
 def PublishDoc(couchServer, dbname, name, doc_data):
-
     try:
         db = couchServer[dbname]
         #delete existing document.
@@ -106,14 +121,14 @@ def getSetupInfo():
     nodeSetup = {}
     
     nodeUrl = getInput("Enter the node service endpoint URL", _DEFAULT_ENDPOINT, isURL)
-    nodeSetup['node_service_endpoint_url'] = nodeUrl
+    nodeSetup['nodeUrl'] = nodeUrl
     
     couchDBUrl  = getInput("Enter your couchDB server URL",
                                             _DEFAULT_COUCHDB_URL, testCouchServer)
 
     nodeSetup['couchDBUrl'] = couchDBUrl
 
-    nodeName = getInput("Enter your node name", "Node@{0}".format(couchDBUrl))
+    nodeName = getInput("Enter your node name", "Node@{0}".format(nodeUrl))
     nodeSetup['node_name'] = nodeName
 
     nodeDescription = getInput("Enter your node description", nodeName)

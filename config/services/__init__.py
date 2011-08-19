@@ -18,23 +18,29 @@ class ServiceTemplate():
     "service_endpoint": "{{node_endpoint}}{{service_endpoint}}",
     "service_auth": {
         "service_authz":    [
-            {{authz}}
+            {{service_authz}}
         ],
         "service_key": {{service_key}},
         "service_https": {{service_https}}
     }{{#service_data}},"service_data":{{service_data}}{{/service_data}}
 }'''
     service_data_template = None
+    authz_data_template = '''{{authz}}'''
 
     def _optsoverride(self):
         return {}
     
     def _servicedata(self,**kwargs):
         if self.service_data_template != None:
-            return pystache.render(self.service_data_template, self.opts)
+            return pystache.render(self.service_data_template, kwargs)
         return None
     
     def _authz(self, **kwargs):
+        if self.authz_data_template != None:
+            if 'authz' in kwargs and isinstance(kwargs['authz'], types.ListType):
+                kwargs['authz'] = ','.join(map(lambda x: '"%s"' % x, kwargs['authz']))
+            
+            return pystache.render(self.authz_data_template, kwargs)
         return None
 
     opts = {
@@ -46,7 +52,8 @@ class ServiceTemplate():
         "service_version": None,
         "node_endpoint": None,
         "service_endpoint": None,
-        "authz": _authz,
+        "authz": ["none"],
+        "service_authz": _authz,
         "service_key": "false", 
         "service_https": "false",
         "service_data": _servicedata
