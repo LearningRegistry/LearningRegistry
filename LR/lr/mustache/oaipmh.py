@@ -73,7 +73,7 @@ class GetRecord(ListRecords):
                 "by_resource_ID": by_resource_ID,
                 "path_url": path_url,
                 "verb": self.verb }
-        return pystache.render(self.template_prefix, opts) 
+        return pystache.render(self.template_prefix, opts)
 
 class Error(object):
     def xml(self, err=None):

@@ -24,7 +24,7 @@ class HarvestController(BaseController):
         if params.has_key(key):
             raw_value = string.lower(str(params[key]))
             if len(raw_value) > 1:
-                print string.capitalize(raw_value)
+#                print string.capitalize(raw_value)
                 return ast.literal_eval(string.capitalize(raw_value))
             elif len(raw_value) == 1:
                 if raw_value == 't':

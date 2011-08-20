@@ -24,7 +24,7 @@ def install(server, dbname, setupInfo):
         custom_opts["doc_limit"] = int(active)
         
         
-    custom_opts["node_endpoint"] = setupInfo["node_service_endpoint_url"]
+    custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
     must = __OaiServiceTemplate()
@@ -68,8 +68,8 @@ if __name__ == "__main__":
     import couchdb
     
     nodeSetup = {
-                 'couchDBUrl': "http://localhost:5984",
-                 'node_service_endpoint_url': "http://test.example.com"
+                 'couchDBUrl': "http://127.0.0.1:5984",
+                 'node_service_endpoint_url': "http://127.0.0.1:8000"
     }
     
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])

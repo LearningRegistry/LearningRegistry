@@ -165,10 +165,7 @@ class OaiPmhController(HarvestController):
         if res != None:
             response = res
         response.headers["Content-Type"] = "text/xml; charset=utf-8"
-        if isinstance(body, types.GeneratorType):
-            return bytearray(body, encoding="utf8")
-        else:
-            return body
+        return body
             
                                  
     
@@ -313,18 +310,18 @@ class OaiPmhController(HarvestController):
                     log.debug(json.dumps(ident))
                     if doc_index == 1:
                         part = mustache.prefix(**self._initMustache(args=params, req=t_req))
-                        yield self._returnResponse(part, res=t_res)
+                        yield h.fixUtf8(self._returnResponse(part, res=t_res))
                     
                     if fc_id_limit is None or doc_index <= fc_id_limit:
                         part = mustache.doc(ident)
-                        yield part
+                        yield h.fixUtf8(part)
                     elif enable_flow_control and doc_index > fc_id_limit:
                         from lr.lib import resumption_token
                         opts = o.list_opts(metadataPrefix, h.convertToISO8601UTC(ident["node_timestamp"]), until_date)
                         opts["startkey_docid"] = ident["doc_ID"]
                         token = resumption_token.get_token(serviceid=service_id, from_date=from_date, until_date=until_date, **opts)
                         part = mustache.resumptionToken(token)
-                        yield part
+                        yield h.fixUtf8(part)
                         break
                 
                 
@@ -332,15 +329,15 @@ class OaiPmhController(HarvestController):
                     raise NoRecordsMatchError(params['verb'], req=t_req)
                 else:
                     if enable_flow_control and doc_index <= fc_id_limit:
-                        yield mustache.resumptionToken()
-                    yield mustache.suffix()
+                        yield h.fixUtf8(mustache.resumptionToken())
+                    yield h.fixUtf8(mustache.suffix())
                     
             except oaipmherrors.Error as e:
                 from lr.mustache.oaipmh import Error as err_stache
                 err = err_stache()
-                yield self._returnResponse(err.xml(e), res=t_res)
+                yield h.fixUtf8(self._returnResponse(err.xml(e), res=t_res))
             except:
-                log.exception("Unable to render template")
+                log.exception("Unknown Error Occurred")
 
         def ListIdentifiers(params):
             return ListGeneric(params, False)
@@ -379,24 +376,24 @@ class OaiPmhController(HarvestController):
         def Identify(params=None):
             body = ""
             try:
-                self._initRender(params)
+                self._initRender(params, ctx=c, req=t_req)
                 c.identify = o.identify()
                 body = render("/oaipmh-Identify.mako")
             except Exception as e:
                 raise BadVerbError()
-            return self._returnResponse(body)
+            return self._returnResponse(body, res=t_res)
         
         def ListMetadataFormats(params):
             body = ""
             try:
-                self._initRender(params)
+                self._initRender(params, ctx=c, req=t_req)
                 
                 fmts = o.list_metadata_formats(identity=params["identifier"], by_doc_ID=params["by_doc_ID"])
                 if len(fmts) == 0:
                     raise NoMetadataFormats(params["verb"])
                 c.formats = fmts
                 body = render("/oaipmh-ListMetadataFormats.mako")
-                return self._returnResponse(body)
+                return self._returnResponse(body, res=t_res)
             except Error as e:
                 raise e
         
