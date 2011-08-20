@@ -26,19 +26,29 @@ class harvest:
     for doc in view_data:
         yield doc["doc"]      
     
-  def list_records(self, from_date, until_date):    
-    rows = h.getView(database_url=self.db_url,view_name='_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), include_docs=True, stale='ok')
-    for row in rows:
-        yield row["doc"]    
-    
+  def list_records(self, from_date, until_date,resumption_token=None, limit=None):    
+    return self.getViewRows(True,until_date,from_date,limit,resumption_token)
+        
   def list_metadata_formats(self):
      return [{'metadataFormat':{'metadataPrefix':'dc'}}]
 
-  def list_identifiers(self, from_date, until_date):
-    rows = h.getView(database_url=self.db_url,view_name='_design/learningregistry/_view/by-date',startkey=h.convertToISO8601Zformat(from_date),endkey=h.convertToISO8601Zformat(until_date), stale='ok')
-    for row in rows:
-          yield row["id"]
-
+  def list_identifiers(self, from_date, until_date,resumption_token=None,limit=None):
+    return self.getViewRows(False,until_date,from_date,limit,resumption_token)
+  def getViewRows(self,includeDocs, untilDate,fromDate,limit=None,resumption_token=None):    
+    params = {
+        'stale':'ok',
+        'include_docs':includeDocs,
+        'endkey':h.convertToISO8601Zformat(untilDate),
+        'startkey':h.convertToISO8601Zformat(fromDate),
+    }    
+    if resumption_token is not None:
+        params['startkey'] = resumption_token['startkey']
+        params['endkey'] = resumption_token['endkey']
+        params['startkey_docid'] = resumption_token['startkey_docid']
+        params['skip'] = 1
+    if limit is not None:
+        params['limit'] = limit
+    return h.getView(database_url=self.db_url,view_name='_design/learningregistry/_view/by-date',**params)    
 if __name__ == "__main__":
   h = harvest()
   data = h.get_records_by_resource('http://www.prometheanplanet.com/server.php?show=conResource.8326')

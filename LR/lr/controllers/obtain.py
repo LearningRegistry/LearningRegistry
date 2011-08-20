@@ -11,7 +11,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import logging 
+ 
 import json 
 from lr.model.base_model import appConfig
 import lr.lib.helpers as h
@@ -19,23 +19,21 @@ import lr.lib.resumption_token as rt
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
-
+import logging
 log = logging.getLogger(__name__)  
 trues = ['T','t','True','true']
-LIMIT = 100
 class ObtainController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('obtain', 'obtain')
     def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False,resumption_token=None):                
-        log.debug(resumption_token)
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         args = {}
         if len(keys) > 0:
             args['keys'] = keys
         args['stale'] = 'ok'
-        args['limit'] = LIMIT
+        args['limit'] = self.limit
         args['include_docs'] = include_docs
         if resumption_token is not None:
             args['startkey'] = resumption_token['startkey']
@@ -43,6 +41,26 @@ class ObtainController(BaseController):
             args['skip'] = 1
         view = h.getView(database_url=db_url,view_name=view_name,documentHandler=lambda d: h.document(d),**args)
         return view
+    def _getServiceDocment(self,full_docs):
+        self.enable_flow_control = False
+        self.limit = None        
+        self.service_id = None
+        serviceDoc = h.getServiceDocument("access service")
+        if serviceDoc != None:
+            if 'service_id' in serviceDoc:
+                self.service_id = serviceDoc['service_id']
+                
+            if 'service_data' in serviceDoc:
+                serviceData = serviceDoc['service_data']
+                if 'flow_control' in serviceData:
+                    self.enable_flow_control = serviceData['flow_control']
+                limit_type = 'id_limit'
+                if full_docs:
+                    limit_type = "doc_limit"
+                if self.enable_flow_control and limit_type in serviceData:
+                    self.limit = serviceData['id_limit']
+                elif enable_flow_control:
+                    self.limit = 100                            
     def format_data(self, full_docs, data, currentResumptionToken):
         yield '{"documents":['
         num_sent = 0
@@ -76,10 +94,10 @@ class ObtainController(BaseController):
                         yield json.dumps({'doc_ID': doc.key})
         if full_docs and byIDResponseChunks is not None:             
             yield ']' + byIDResponseChunks[1]                        
-        if count < LIMIT:			
+        if count < self.limit or not self.enable_flow_control:			
             yield "]}"
         else:
-            token = rt.get_token("obtain",startkey=lastStartKey,endkey=None,startkey_docid=lastId)
+            token = rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId)
             yield '], "resumption_token":"%s"}' % token
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""        
@@ -95,8 +113,10 @@ class ObtainController(BaseController):
         if not by_doc_ID and not by_resource_ID:
             abort(500,"by_doc_ID and by_resource_ID cannot both be False")        
     def _performObtain(self,data):
-        keys = data['request_IDs']
         full_docs = (not data.has_key('ids_only')) or data['ids_only'] == False
+        self._getServiceDocment(full_docs)
+        keys = data['request_IDs']
+        
         by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
         by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
         resumption_token = None
@@ -115,7 +135,7 @@ class ObtainController(BaseController):
         if(data.has_key('callback')):
             yield ')'
     def create(self):
-        """POST /obtain: Create a new item"""
+        """POST /obtain: Create a new item"""                
         data = json.loads(request.body)
         self._validateParams(data)
         return self._performObtain(data)
@@ -143,10 +163,10 @@ class ObtainController(BaseController):
         # url('obtain', id=ID)
 
     def show(self, id, format='html'):
-        """GET /obtain/id: Show a specific item"""
+        """GET /obtain/id: Show a specific item"""        
         data = self._parseParams()
         keys=[id]
-        data['request_IDs'] = keys
+        data['request_IDs'] = keys        
         return self._performObtain(data)
         # url('obtain', id=ID)
     def _parseParams(self):
