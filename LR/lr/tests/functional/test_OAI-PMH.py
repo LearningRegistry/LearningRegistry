@@ -17,6 +17,7 @@ json_headers={'content-type': 'application/json'}
 
 namespaces = {
               "oai" : "http://www.openarchives.org/OAI/2.0/",
+              "lr" : "http://www.learningregistry.org/OAI/2.0/",
               "oai_dc" : "http://www.openarchives.org/OAI/2.0/oai_dc/",
               "oai_lr" : "http://www.learningregistry.org/OAI/2.0/oai_dc/",
               "dc":"http://purl.org/dc/elements/1.1/",
@@ -34,9 +35,13 @@ log = logging.getLogger(__name__)
 test_data_delete = True
 nsdl_data = { "documents" : [] }
 dc_data = { "documents" : [] }
+
+
+
 class TestOaiPmhController(TestController):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
 
         schema_file = file("lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd", "r")
         schema_doc = etree.parse(schema_file)
@@ -47,19 +52,26 @@ class TestOaiPmhController(TestController):
         self.server = self.o.server
         self.db = self.o.db
         
-        view_data = self.db.view('oai-pmh/test-data')
+        view_data = self.db.view('oai-pmh-test-data/docs')
         if (len(view_data) == 0):
+            
+            if hasattr(self, "attr"):
+                app = self.app
+            else:
+                controller =  TestOaiPmhController(methodName="test_empty")
+                app = controller.app
+            
             nsdl_data = json.load(file("lr/tests/data/nsdl_dc/data-000000000.json"))
             for doc in nsdl_data["documents"]:
                 doc["doc_ID"] = "NSDL-TEST-DATA-"+str(uuid.uuid1())
             
-            self.app.post('/publish', params=json.dumps(nsdl_data), headers=json_headers)
+            app.post('/publish', params=json.dumps(nsdl_data), headers=json_headers)
             
             dc_data = json.load(file("lr/tests/data/oai_dc/data-000000000.json"))
             for doc in dc_data["documents"]:
                 doc["doc_ID"] = "OAI-DC-TEST-DATA-"+str(uuid.uuid1())
                 
-            self.app.post('/publish', params=json.dumps(dc_data), headers=json_headers)
+            app.post('/publish', params=json.dumps(dc_data), headers=json_headers)
             view_data = self.db.view('oai-pmh/test-data')
         
         nsdl_data = { "documents" : [] }
@@ -69,9 +81,25 @@ class TestOaiPmhController(TestController):
                 nsdl_data["documents"].append(row.value)
             if re.search("^OAI-DC-TEST-DATA-", row.key) != None and re.search("-distributable$", row.key) == None:
                 dc_data["documents"].append(row.value)
+        opts = {
+                "startkey":"_design/",
+                "endkey": "_design0",
+                "include_docs": True
+        }
         
-            
-    def tearDown(self):
+        # Force indexing in oai views 
+        design_docs = self.db.view('_all_docs', **opts)
+        for row in design_docs:
+            if re.match("^_design/oai-pmh-", row.key) != None and "views" in row.doc and len(row.doc["views"].keys()) > 0:
+                view_name = "{0}/_view/{1}".format( row.key, row.doc["views"].keys()[0])
+                log.error("Indexing: {0}".format( view_name))
+                self.db.view(view_name, limit=1, descending=True)
+            else:
+                log.error("Not Indexing: {0}".format( row.key))
+        
+        
+    @classmethod       
+    def tearDownClass(self):
         global test_data_delete
         
         if test_data_delete == True:
@@ -87,26 +115,55 @@ class TestOaiPmhController(TestController):
                     del self.db["{0}-distributable".format(doc["_id"])]
                 except:
                     pass
-    
-    def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False):
-        xmlcontent = etree.fromstring(response.body)
+        else:
+            log.error("Not deleting test data!!!")
+                
+    def _get_timestamps(self, doc1, doc2):
+        if doc1["node_timestamp"] < doc2["node_timestamp"]:
+            from_ =  doc1["node_timestamp"]
+            until_ = doc2["node_timestamp"]
+        else:
+            until_ =  doc1["node_timestamp"]
+            from_ = doc2["node_timestamp"]
         
-        error = xmlcontent.xpath("oai:error", namespaces=namespaces)
+        from_ = re.sub("\.[0-9]+Z", "Z", from_)
+        until_ = re.sub("\.[0-9]+Z", "Z", until_)
+        
+        return (from_, until_)
+    
+    def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False, errorCodeExpected=None):
+        if hasattr(response, "lxml"):
+            xmlcontent = response.lxml
+        else:
+            body = response.body
+            xmlcontent = etree.fromstring(body)
+        
+        
+        
+        error = xmlcontent.xpath("//*[local-name()='error']", namespaces=namespaces)
         if errorExists == False:
             if len(error) > 0:
-                self.assertEqual(0, len(error), "validate_lr_oai_response FAIL: Error code:{0} mesg:{1}".format(error[0].xpath("@code", namespaces=namespaces), error[0].xpath("text()", namespaces=namespaces)))
+                self.assertEqual(0, len(error), "validate_lr_oai_response FAIL: Error code:{0} mesg:{1}".format(error[0].xpath("@code", namespaces=namespaces)[0], error[0].xpath("text()", namespaces=namespaces)[0]))
+        elif errorExists and errorCodeExpected != None:
+            codeReceived = error[0].xpath("@code", namespaces=namespaces)[0]
+            if errorCodeExpected != codeReceived:
+                self.assertEqual(0, len(error), "validate_lr_oai_response FAIL: Expected:{2}, Got Error code:{0} mesg:{1}".format(error[0].xpath("@code", namespaces=namespaces)[0], error[0].xpath("text()", namespaces=namespaces)[0], errorCodeExpected))
         else:
             self.assertEqual(1, len(error), "validate_lr_oai_response FAIL: Expected error, none found.")
+        
         
         if checkSchema == True:
             self.oailrschema.assertValid(xmlcontent)
         else:
             log.info("validate_lr_oai_response: Not validating response against schema.")
         
-
+    def test_empty(self):
+            pass
+        
     def test_get_oai_lr_schema(self):
         response = urllib2.urlopen("http://www.w3.org/2001/XMLSchema.xsd");
-        xmlSchema = etree.XMLSchema(etree.fromstring(response.read()))
+        body = response.read()
+        xmlSchema = etree.XMLSchema(etree.fromstring(body))
         
         response = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
         oaiLRSchema = etree.fromstring(response.body)
@@ -128,13 +185,14 @@ class TestOaiPmhController(TestController):
         
     def test_ListSets_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListSets'})
-        self.validate_lr_oai_response(response)
+        self.validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
         log.info("test_ListSets_get: pass")
         
     def test_ListSets_post(self):
         response = self.app.post("/OAI-PMH", params={'verb': 'ListSets'})
-        self.validate_lr_oai_response(response)
+        self.validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
         log.info("test_ListSets_post: pass")
+        
         
         
     def test_listMetadataFormats_get(self):
@@ -218,6 +276,11 @@ class TestOaiPmhController(TestController):
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
             self.validate_lr_oai_response(response)
+        except AssertionError:
+            global test_data_delete
+            log.exception("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
+            test_data_delete = False
+            raise
         except Exception as e:
 #            log.error("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             log.exception("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
@@ -232,6 +295,11 @@ class TestOaiPmhController(TestController):
         response = self.app.post("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
             self.validate_lr_oai_response(response)
+        except AssertionError:
+            global test_data_delete
+            log.exception("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
+            test_data_delete = False
+            raise
         except Exception as e:
 #            log.error("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             log.exception("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
@@ -246,12 +314,7 @@ class TestOaiPmhController(TestController):
         doc1 = choice(nsdl_data["documents"])
         doc2 = choice(nsdl_data["documents"])
         
-        if doc1["node_timestamp"] > doc2["node_timestamp"]:
-            from_ =  doc1["node_timestamp"]
-            until_ = doc2["node_timestamp"]
-        else:
-            until_ =  doc1["node_timestamp"]
-            from_ = doc2["node_timestamp"]
+        (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.post("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
@@ -269,12 +332,7 @@ class TestOaiPmhController(TestController):
         doc1 = choice(nsdl_data["documents"])
         doc2 = choice(nsdl_data["documents"])
         
-        if doc1["node_timestamp"] > doc2["node_timestamp"]:
-            from_ =  doc1["node_timestamp"]
-            until_ = doc2["node_timestamp"]
-        else:
-            until_ =  doc1["node_timestamp"]
-            from_ = doc2["node_timestamp"]
+        (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
@@ -293,14 +351,8 @@ class TestOaiPmhController(TestController):
         doc1 = choice(nsdl_data["documents"])
         doc2 = choice(nsdl_data["documents"])
         
-        if doc1["node_timestamp"] > doc2["node_timestamp"]:
-            from_ =  doc1["node_timestamp"]
-            until_ = doc2["node_timestamp"]
-        else:
-            until_ =  doc1["node_timestamp"]
-            from_ = doc2["node_timestamp"]
+        (from_, until_) = self._get_timestamps(doc1, doc2)
             
-        
         response = self.app.post("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
             self.validate_lr_oai_response(response)
@@ -317,13 +369,7 @@ class TestOaiPmhController(TestController):
         doc1 = choice(nsdl_data["documents"])
         doc2 = choice(nsdl_data["documents"])
         
-        if doc1["node_timestamp"] > doc2["node_timestamp"]:
-            from_ =  doc1["node_timestamp"]
-            until_ = doc2["node_timestamp"]
-        else:
-            until_ =  doc1["node_timestamp"]
-            from_ = doc2["node_timestamp"]
-            
+        (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:

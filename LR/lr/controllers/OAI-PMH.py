@@ -269,22 +269,22 @@ class OaiPmhController(HarvestController):
                         
                             if valid_docs == 1:
                                 part = mustache.prefix(**self._initMustache(args=params, req=t_req))
-                                yield self._returnResponse(part, res=t_res)
+                                yield h.fixUtf8(self._returnResponse(part, res=t_res))
                                 
                             part = mustache.doc(doc)
-                            yield self._returnResponse(part, res=t_res)
+                            yield h.fixUtf8(self._returnResponse(part, res=t_res))
                         
                 if doc_idx == 0:
                     raise IdDoesNotExistError(params['verb'], req=t_req)
                 elif valid_docs == 0:
                     raise CannotDisseminateFormatError(params['verb'], req=t_req)
                 else:
-                    yield self._returnResponse(mustache.suffix(), res=t_res)
+                    yield h.fixUtf8(self._returnResponse(mustache.suffix(), res=t_res))
                 
             except oaipmherrors.Error as e:
                 from lr.mustache.oaipmh import Error as err_stache
                 err = err_stache()
-                yield self._returnResponse(err.xml(e), res=t_res)
+                yield h.fixUtf8(self._returnResponse(err.xml(e), res=t_res))
 
         def ListGeneric(params, showDocs=False):
             try:

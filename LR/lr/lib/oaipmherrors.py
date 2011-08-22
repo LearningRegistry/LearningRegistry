@@ -8,7 +8,7 @@ from pylons import request
 
 class Error(Exception):
     def __init__(self, code, msg, **kwargs):
-        Exception.__init__(self, **kwargs)
+        Exception.__init__(self)
         self.code = code
         self.msg = msg
         self.message = msg
