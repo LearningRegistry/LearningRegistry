@@ -24,7 +24,7 @@ def install(server, dbname, setupInfo):
 #        custom_opts["doc_limit"] = int(active)
         
         
-    custom_opts["node_endpoint"] = setupInfo["node_service_endpoint_url"]
+    custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
     must = __BasicHarvestServiceTemplate()

@@ -30,7 +30,13 @@ class document:
             self.key=data['key']
         if data.has_key('doc'):
             self.doc=data['doc']        
- 
+
+def fixUtf8(input):
+    if isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
+
 def getServiceDocument(serviceName):
     from lr.model.base_model import appConfig
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
