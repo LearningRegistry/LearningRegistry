@@ -119,7 +119,7 @@ class oaipmh(harvest):
         else:
             format = format_ids
         
-        return h.getView(self.res_data_url, '_design/oai-pmh/_view/list-identifiers', method="GET", documentHandler=format, **opts)
+        return h.getView(self.res_data_url, '_design/oai-pmh-list-identifiers/_view/docs', method="GET", documentHandler=format, **opts)
 #        view_data = self.db.view('oai-pmh/list-identifiers', **opts)
 #        return map(lambda row: { "doc_ID": row["id"], "node_timestamp": row["key"][1] }, view_data)
     
@@ -133,7 +133,7 @@ class oaipmh(harvest):
                     byID = "by_resource_ID"
                 opts["key"] = [byID, identity]
                 
-                view_data = self.db.view('oai-pmh/get-records', **opts)
+                view_data = self.db.view('oai-pmh-get-records/docs', **opts)
                 if len(view_data) == 0:
                     raise IdDoesNotExistError(verb)
                 formats = [];
@@ -145,7 +145,7 @@ class oaipmh(harvest):
             else:
                 opts["group"] = True
                 opts["group_level"] = 1
-                view_data = self.db.view('oai-pmh/list-metadata-formats', **opts)
+                view_data = self.db.view('oai-pmh-list-metadata-formats/docs', **opts)
                 return map(lambda doc: {"metadataPrefix": doc.key[0], "schemas": doc.value}, view_data)
                 
         except Exception as e:
@@ -170,7 +170,7 @@ class oaipmh(harvest):
                     "stale": "ok"
                     }
             
-            view_data = self.db.view('oai-pmh/identify-timestamp', **opts)
+            view_data = self.db.view('oai-pmh-identify-timestamp/docs', **opts)
             if len(view_data) > 0:
                 ident["earliestDatestamp"] = iso8601.parse_date(list(view_data)[0].key)
             else:

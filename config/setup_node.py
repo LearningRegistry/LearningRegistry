@@ -15,14 +15,14 @@ import subprocess
 import lrnodetemplate as t
 from uuid import uuid4
 import shutil
-
+import logging
 from setup_utils import *
-
+log = logging.getLogger(__name__)
 scriptPath = os.path.dirname(os.path.abspath(__file__))
 
-_PYLONS_CONFIG_SRC =  os.path.join(scriptPath, '../LR/development.ini.orig')
-_PYLONS_CONFIG_DEST = os.path.join(scriptPath, '../LR/development.ini')
-_COUCHAPP_PATH = os.path.join(scriptPath, '../couchdb/apps')
+_PYLONS_CONFIG_SRC =  os.path.join(scriptPath, '..', 'LR', 'development.ini.orig')
+_PYLONS_CONFIG_DEST = os.path.join(scriptPath, '..', 'LR', 'development.ini')
+_COUCHAPP_PATH = os.path.join(scriptPath, '..', 'couchdb')
 
 # add path to virtualenv if the environment variable is set
 if os.getenv('VIRTUAL_ENV') is not None:
@@ -46,10 +46,10 @@ _NETWORK = _config.get("app:main", "couchdb.db.network")
 # by default to the node.  The format is 
 # "<serviceType>":["<list of services of serviceType>"]
 _DEFAULT_SERVICES = {"administrative":["description", "services", "status", "policy"],
-                                       "access":["obtain", "OAI-PMH", "slice",  "harvest", "swordservice"],
-                                       "broker":[],
-                                       "distribute":["distribute"],
-                                       "publish":["publish"]}
+                     "access":["obtain", "OAI-PMH", "slice",  "harvest", "swordservice"],
+                     "broker":[],
+                     "distribute":["distribute"],
+                     "publish":["publish"]}
 
 def publishNodeDescription(server, dbname):
     node_description = {}
@@ -65,10 +65,13 @@ def publishNodeDescription(server, dbname):
 def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
     for serviceType in services.keys():
         for serviceName in services[serviceType]:
+            plugin = None
             try:
-                plugin = __import__("services.%s" % serviceType, fromlist=["install"])
+                plugin = __import__("services.%s" % serviceName, fromlist=["install"])
                 plugin.install(server, _NODE, nodeSetup)
             except Exception as e:
+                if plugin != None:
+                    log.exception("Error occurred with %s plugin." % serviceName)
                 publishService(nodeUrl, server, dbname, serviceType, serviceName)
 
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
@@ -76,18 +79,20 @@ def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
         connection = {}
         connection.update(t.connection_description)
         connection['connection_id'] = uuid4().hex
-        connection['source_node_url']=sourceNodeUrl
+        connection['source_node_url']=nodeUrl
         connection['destination_node_url'] = dest_node_url
         PublishDoc(server, dbname, "{0}_to_{1}_connection".format(nodeName, dest_node_url), connection)
 
 def publishCouchApps(databaseUrl, appsDirPath):
-     for app in os.listdir(appsDirPath):
-        commandPath =  os.path.join(_VIRTUAL_ENV_PATH, 'bin', 'couchapp')
-        commandArgs =  " push {0} {1}".format(os.path.join(appsDirPath, app), databaseUrl)
-        command = "{0} {1}".format(commandPath, commandArgs)
-        print("\n{0}\n".format(command))
-        p = subprocess.Popen(command, shell=True)
-        p.wait()
+    import couch_utils
+    couch_utils.pushAllCouchApps(appsDirPath, databaseUrl)
+#     for app in os.listdir(appsDirPath):
+#        commandPath =  os.path.join(_VIRTUAL_ENV_PATH, 'bin', 'couchapp')
+#        commandArgs =  " push {0} {1}".format(os.path.join(appsDirPath, app), databaseUrl)
+#        command = "{0} {1}".format(commandPath, commandArgs)
+#        print("\n{0}\n".format(command))
+#        p = subprocess.Popen(command, shell=True)
+#        p.wait()
         
 def setCommunityId():
     community = getInput("Enter the community id")
@@ -110,7 +115,9 @@ if __name__ == "__main__":
 
     from optparse import OptionParser
     import os
-
+    
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+    
     parser = OptionParser()
     parser.add_option("-d", "--devel", dest="devel", action="store_true", default=False,
                       help="Development mode allows the setting of network and community.",
@@ -170,5 +177,6 @@ if __name__ == "__main__":
     #Commands to go the couchapp directory and push all the apps.
     print("\n============================\n")
     print("Pushing couch apps ...")
-    resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
-    publishCouchApps(resourceDataUrl,  _COUCHAPP_PATH)
+#    resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
+    publishCouchApps(nodeSetup['couchDBUrl'],  _COUCHAPP_PATH)
+    print("All CouchApps Pushed")

@@ -8,6 +8,7 @@ from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
 from lr.lib.base import BaseController, render
 import lr.lib.helpers
+import lr.lib.resumption_token as rt
 log = logging.getLogger(__name__)
 import ast
 import string
@@ -16,6 +17,27 @@ class HarvestController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')
+    def _getServiceDocment(self,full_docs):
+        self.enable_flow_control = False
+        self.limit = None        
+        self.service_id = None
+        serviceDoc = helpers.getServiceDocument("Basic Harvest service")
+
+        if serviceDoc != None:
+            if 'service_id' in serviceDoc:
+                self.service_id = serviceDoc['service_id']
+                
+            if 'service_data' in serviceDoc:
+                serviceData = serviceDoc['service_data']
+                if 'flow_control' in serviceData:
+                    self.enable_flow_control = serviceData['flow_control']
+                limit_type = 'id_limit'
+                if full_docs:
+                    limit_type = "doc_limit"
+                if self.enable_flow_control and limit_type in serviceData:
+                    self.limit = serviceData['id_limit']
+                elif enable_flow_control:
+                    self.limit = 100    
     def __parse_date(self,date):
         last_update_date = iso8601.parse_date(date)
         last_update = helpers.convertToISO8601UTC(last_update_date)    
@@ -24,7 +46,7 @@ class HarvestController(BaseController):
         if params.has_key(key):
             raw_value = string.lower(str(params[key]))
             if len(raw_value) > 1:
-                print string.capitalize(raw_value)
+#                print string.capitalize(raw_value)
                 return ast.literal_eval(string.capitalize(raw_value))
             elif len(raw_value) == 1:
                 if raw_value == 't':
@@ -66,17 +88,7 @@ class HarvestController(BaseController):
             return self.list_records(h,body,params,verb)
         def identify():
             data = self.get_base_response(verb,body)
-            data['identify']={
-                                    'node_id':        'string',
-                                    'repositoryName':    'string',
-                                    'baseURL':        'string',
-                                    'protocolVersion':    '2.0',
-                                    'service_version':    'string',
-                                    'earliestDatestamp':    'string',
-                                    'deletedRecord':    'string',
-                                    'granularity':        'string',
-                                    'adminEmail':        'string'
-                                 }
+            data['identify']=helpers.getServiceDocument("harvest service")
             return json.dumps(data)
         def listmetadataformats():
             data = self.get_base_response(verb,body)
@@ -115,6 +127,13 @@ class HarvestController(BaseController):
             data['request']['until'] = params['until']
         from_date, until_date = self._test_time_params(params)
         data['listrecords'] =  []
+        self._getServiceDocment(False)        
+        resumption_token = None
+        count = 0
+        lastID = None
+        lastKey = None
+        if self.enable_flow_control and params.has_key('resumption_token'):
+            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                        
         base_response =  json.dumps(data).split('[')
         yield base_response[0] +'['
         def debug_map(doc):
@@ -125,14 +144,24 @@ class HarvestController(BaseController):
           data['error'] = 'badArgument'
         else:
             first = True
-            for doc in h.list_records(from_date,until_date):                        
+            for data in h.list_records(from_date,until_date,resumption_token=resumption_token, limit=self.limit):                        
+                lastID = data['id']
+                lastKey = data['key']
+                doc = data['doc']
+                count += 1
                 if not first:
-                    yield ','
+                    yield ',\n'
                 first = False
                 yield json.dumps(debug_map(doc))
-        yield base_response[1]
+        if self.enable_flow_control and self.limit <= count:
+            token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
+            resp = base_response[1]
+            yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+        else:
+            yield base_response[1]
 
-    def list_identifiers(self,h,body ,params, verb = 'GET'):        
+    def list_identifiers(self,h, body ,params, verb = 'GET'):        
+
         data = self.get_base_response(verb,body)
         if params.has_key('from'):
             data['request']['from'] = params['from']
@@ -141,15 +170,30 @@ class HarvestController(BaseController):
         from_date, until_date = self._test_time_params(params)
         data['listidentifiers'] =  []
         base_response =  json.dumps(data).split('[')
+        self._getServiceDocment(False)        
+        resumption_token = None
+        if self.enable_flow_control and params.has_key('resumption_token'):
+            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                
         yield base_response[0] +'['
         first = True;
-        for id in h.list_identifiers(from_date,until_date):
+        count = 0
+        lastID = None
+        lastKey = None
+        for d in h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit):
+            count += 1
+            lastID = d['id']
+            lastKey = d['key']
             if not first:
-                yield ','
+                yield ',\n'
             first = False            
-            return_value = {"header":{'identifier':id, 'datestamp':helpers.convertToISO8601Zformat(datetime.today()) ,'status':'active'}}
+            return_value = {"header":{'identifier':d['id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()) ,'status':'active'}}
             yield json.dumps(return_value)
-        yield base_response[1]
+        if self.enable_flow_control and self.limit <= count:
+            token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
+            resp = base_response[1]
+            yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+        else:
+            yield base_response[1]
         
 
     def get_base_response(self, verb, body):
