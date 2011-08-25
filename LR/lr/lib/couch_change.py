@@ -25,17 +25,19 @@ _DEFAULT_CHANGE_OPTIONS = {'feed': 'continuous',
 log = logging.getLogger(__name__)
 
 class DatabaseChangeHandler(object):
-    def _canHandle(self, change):
+    def _canHandle(self, change, database):
         """Handler subclass must implement. Returns True if the handler object can or
-            wants to handle the change. Otherwise returns False."""
+        wants to handle the change. Otherwise returns False."""
         raise NotImplementedError, "Implement me"
         
-    def _handle(self, change):
-       raise NotImplementedError, "Implement me"
+    def _handle(self, change, database):
+        """Pass the database, since the handler code will be running
+        in the same process as the monitor"""
+        raise NotImplementedError, "Implement me"
         
-    def handle(self, change):
-        if self._canHandle(change):
-            self._handle(change)
+    def handle(self, change, database):
+        if self._canHandle(change, database):
+            self._handle(change, database)
 
 class DatabaseChangeThresholdHandler(DatabaseChangeHandler):
     def __init__(self,  predicate, action, countThreshold, timeThreshold=timedelta.max):
@@ -49,8 +51,8 @@ class DatabaseChangeThresholdHandler(DatabaseChangeHandler):
          self._changeCount = 0
          self._lastActionTime = datetime.now() 
          
-    def _canHandle(self, change):
-        return self._predicate(change)
+    def _canHandle(self, change, database):
+        return self._predicate(change, database)
     
     def _shouldTakeAction(self):
         log.info("count: {0} countThreshold: {1} timedelta: {2} timethreshold: {3}".format(
@@ -61,11 +63,11 @@ class DatabaseChangeThresholdHandler(DatabaseChangeHandler):
             ((datetime.now() - self._lastActionTime)  >= self._timeThreshold)):
             return True
         return False
-    
-    def _handle(self, change):
+        
+    def _handle(self, change, database):
         self._changeCount = self._changeCount + 1
         if self._shouldTakeAction():
-            self._action()
+            self._action(change, database)
             self._resetChangeToThreshold()
 
 
@@ -76,9 +78,9 @@ class MonitorDatabaseChanges(Process):
     # any change in change.  This avoid getting stuck in endless loop
     _MAX_ERROR_RESTART = 10
      
-    def __init__(self, database,  changeHandlers=None,  changeOptions=None, *args, **kwargs):
+    def __init__(self, serverUrl, databaseName,  changeHandlers=None,  changeOptions=None, *args, **kwargs):
         Process.__init__(self, None, None, "learningRegistryChangeMonitor", args, kwargs)
-        self._database = database
+        self._database = couchdb.Server(serverUrl)[databaseName]
         self._callerThread = None
         self._addHandlerQueue = Queue()
         self._removeHandlerQueue = Queue()
@@ -146,7 +148,7 @@ class MonitorDatabaseChanges(Process):
         #call all change handlers
         for handler in self._changeHandlerSet:
             try:
-                handler.handle(change)
+                handler.handle(change, self._database)
             except Exception as e:
                 log.error("Cannot run handler "+str(handler.handle))
                 log.exception(e)
@@ -204,9 +206,9 @@ if __name__=="__main__":
     logging.basicConfig()
     
     class TestHandler(DatabaseChangeHandler):
-        def _canHandle(self, change):
+        def _canHandle(self, change, database):
             return True
-        def _handle(self, change):
+        def _handle(self, change, database):
             print(str(change))
             
     h = TestHandler()
