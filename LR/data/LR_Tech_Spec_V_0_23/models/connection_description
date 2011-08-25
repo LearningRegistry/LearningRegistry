@@ -1,0 +1,21 @@
+{
+ "doc_type":                "connection_description",        // the literal "connection_description"
+                                                        // required, immutable
+ "doc_version":                "0.10.0",        // the literal for the current version -- "0.10.0"
+                                        // required, immutable
+ "doc_scope":                "node",                // the literal "node"
+                                        // required, immutable
+ "active":                boolean,        // is the connection active
+                                        // required, mutable from T to F only
+ "connection_id":        "string",                // id of the connection, required
+// unique within scope of the LR
+// immutable
+        "source_node_url":        "string",                // URL of the source of the connection
+// required, immutable
+        "destination_node_url":        "string",                // URL of the destination of the connection
+                                                // required, immutable
+        "gateway_connection":        boolean,        // T if this is a connection to a gateway node
+// F for a common node
+                                                // recommended;  F if not present (common node)
+                                                // immutable
+        }

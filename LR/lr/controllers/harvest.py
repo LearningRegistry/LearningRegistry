@@ -21,7 +21,7 @@ class HarvestController(BaseController):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = helpers.getServiceDocument("harvest service")
+        serviceDoc = helpers.getServiceDocument("Basic Harvest service")
 
         if serviceDoc != None:
             if 'service_id' in serviceDoc:

@@ -11,7 +11,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- 
+
 import json 
 from lr.model.base_model import appConfig
 import lr.lib.helpers as h
@@ -33,7 +33,8 @@ class ObtainController(BaseController):
         if len(keys) > 0:
             args['keys'] = keys
         args['stale'] = 'ok'
-        args['limit'] = self.limit
+        if self.limit is not None:
+            args['limit'] = self.limit
         args['include_docs'] = include_docs
         if resumption_token is not None:
             args['startkey'] = resumption_token['startkey']
@@ -45,7 +46,7 @@ class ObtainController(BaseController):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = h.getServiceDocument("access service")
+        serviceDoc = h.getServiceDocument("access:obtain service")
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
                 self.service_id = serviceDoc['service_id']
@@ -59,7 +60,7 @@ class ObtainController(BaseController):
                     limit_type = "doc_limit"
                 if self.enable_flow_control and limit_type in serviceData:
                     self.limit = serviceData['id_limit']
-                elif enable_flow_control:
+                elif self.enable_flow_control:
                     self.limit = 100                            
     def format_data(self, full_docs, data, currentResumptionToken):
         yield '{"documents":['

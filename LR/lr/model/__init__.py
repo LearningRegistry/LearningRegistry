@@ -22,7 +22,7 @@ from node_service import NodeServiceModel
 from network_policy import NetworkPolicyModel
 from  node_config import LRNodeModel
 from base_model import defaultCouchServer
-
+from resource_data_change import monitorResourceDataChanges
 
 _ERROR = 'error'
 _OK = "OK"
@@ -74,6 +74,8 @@ def getNodeConfig():
     return nodeConfig
     
 LRNode = LRNodeModel(getNodeConfig())
+
+monitorResourceDataChanges()
 
 def isResourceDataFilteredOut(resourceData):
     

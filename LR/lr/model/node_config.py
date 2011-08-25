@@ -49,18 +49,19 @@ def dictToObject(dictionary):
     
 class LRNodeModel(object):
     """Class that models a learning registry node"""
-    def __init__(self, data, startMonitor = True):
+    def __init__(self, data):
         self._config = {}
         self._communityDescription = None
         self._networkDescription = None
         self._filterDescription = None
         self._nodeStatus = None
-        self._monitoringChanges = False
-        self._lastChangeSeq = -1
-        self._changeMonintoringThread = None
-        config = data
-        if startMonitor:
-            self._monitorResourceDataChanges()
+        #self._monitoringChanges = False
+        #self._lastChangeSeq = -1
+        #self._changeMonintoringThread = None
+        #config = data
+        #if startMonitor:
+            ##self._monitorResourceDataChanges()
+            #from resource_data_change import 
         if isinstance(data, dict):
             config = dictToObject(data)
             
@@ -250,185 +251,185 @@ class LRNodeModel(object):
                     s.save(doc_id=s.service_id)
                 else:
                     s.update()
-    def _monitorResourceDataChanges(self):
-        """Method that tracks the updates, deletes, and additions time of envelops, 
-         resource_data documents in the resource_data database."""
-        # First get get the list sequence id of hte latest change to that we can start
-        # getting the changes for that sequence number.
-        log.info("Start  to log resource_data changes monitoring\n")
-        db = ResourceDataModel._defaultDB
-        currentChanges = db.changes();
-        if self._lastChangeSeq == -1:
-            self._lastChangeSeq = currentChanges['last_seq']
-        log.info("Last change sequence: "+str(self._lastChangeSeq))
-        self._running = True
-        @atexit.register
-        def exitHandler():
-            log.info("exit")
-            self._running = False
-        def updateView():
-            designDocs = db.view('_all_docs',include_docs=True,startkey='_design%2F',endkey='_design0')
-            for designDoc in designDocs:
-                if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
-                    viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
-                    log.debug('start view update %s' % viewName)
-                    log.debug(len(db.view(viewName)))        
-        def distribute():
-            log.debug('start distribute')
-            data = json.dumps({"dist":"dist"})
-            log.debug(self._distUrl)
-            request = urllib2.Request(self._distUrl,data,{'Content-Type':'application/json; charset=utf-8'})
-            response = urllib2.urlopen(request)   
-            log.debug('end distribute')            
-        def recordChanges():
-            if self._monitoringChanges == True:
-                return
-            self._monitoringChanges = True;
-            db = ResourceDataModel._defaultDB
-            self._seqOfLastViewUpdate = 0
-            self._seqOfLastDist = 0
-            self._updateThreshold = int(appConfig['couchdb.threshold.viewupdate'])
-            self._distributeThreshold = int(appConfig['couchdb.threshold.distrbutes'])
-            self._resourcesview = appConfig['couchdb.db.resourcesview']
-            self._distUrl = appConfig['lr.distribute.url']
-            self._updateThread = None
-            self._distributeThread = None
-            while self._running:
-                # I have to include the doc since the filter does seems to work.  Otherwise
-                # using the same replication filter to get only resource_data document
-                # would work been better.
-                options ={'feed': 'continuous',
-                              'since': self._lastChangeSeq,
-                              'include_docs':True
-                              }
-                changes =  db.changes(**options)
-                for change in changes:
-                    if 'doc' not in change:
-                        continue
-                    timestamp =  h.nowToISO8601Zformat()
-                    currentSeq = change['seq']
-                    lastViewDelta = currentSeq - self._seqOfLastViewUpdate
-                    if lastViewDelta > self._updateThreshold:
-                        if self._updateThread == None or not self._updateThread.isAlive():
-                            self._updateThread = threading.Thread(target = updateView)
-                            self._updateThread.start()
-                            self._seqOfLastViewUpdate = currentSeq
-                    if currentSeq - self._seqOfLastDist > self._distributeThreshold:                     
-                        if self._distributeThread == None or not self._distributeThread.isAlive():
-                            self._distributeThread = threading.Thread(target = distribute)
-                            self._distributeThread.start()                        
-                            self._seqOfLastDist = currentSeq                                    
-                    # See if the document is of resource_data type if not ignore it.
-                    doc = change['doc']
-                    if  ((not 'resource_data' in doc) and
-                          (not 'resource_data_distributable'  in doc)):
-                        continue
-                    log.info("Change to handle ....")
-                    # Handle resource_data. 
-                    if doc['doc_type'] == 'resource_data':
-                        log.info("\*******Changes to resource_document: "+doc['_id'])
-                        distributableID = doc['_id']+"-distributable"
-                        # Use the ResourceDataModel class to create an object that 
-                        # contains only a the resource_data spec data.
-                        distributableDoc = ResourceDataModel(doc)._specData
-                        #remove the node timestamp
-                        del distributableDoc['node_timestamp']
-                        #change thet doc_type 
-                        distributableDoc['doc_type']='resource_data_distributable'
+    #def _monitorResourceDataChanges(self):
+        #"""Method that tracks the updates, deletes, and additions time of envelops, 
+         #resource_data documents in the resource_data database."""
+        ## First get get the list sequence id of hte latest change to that we can start
+        ## getting the changes for that sequence number.
+        #log.info("Start  to log resource_data changes monitoring\n")
+        #db = ResourceDataModel._defaultDB
+        #currentChanges = db.changes();
+        #if self._lastChangeSeq == -1:
+            #self._lastChangeSeq = currentChanges['last_seq']
+        #log.info("Last change sequence: "+str(self._lastChangeSeq))
+        #self._running = True
+        #@atexit.register
+        #def exitHandler():
+            #log.info("exit")
+            #self._running = False
+        #def updateView():
+            #designDocs = db.view('_all_docs',include_docs=True,startkey='_design%2F',endkey='_design0')
+            #for designDoc in designDocs:
+                #if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
+                    #viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
+                    #log.debug('start view update %s' % viewName)
+                    #log.debug(len(db.view(viewName)))        
+        #def distribute():
+            #log.debug('start distribute')
+            #data = json.dumps({"dist":"dist"})
+            #log.debug(self._distUrl)
+            #request = urllib2.Request(self._distUrl,data,{'Content-Type':'application/json; charset=utf-8'})
+            #response = urllib2.urlopen(request)   
+            #log.debug('end distribute')            
+        #def recordChanges():
+            #if self._monitoringChanges == True:
+                #return
+            #self._monitoringChanges = True;
+            #db = ResourceDataModel._defaultDB
+            #self._seqOfLastViewUpdate = 0
+            #self._seqOfLastDist = 0
+            #self._updateThreshold = int(appConfig['couchdb.threshold.viewupdate'])
+            #self._distributeThreshold = int(appConfig['couchdb.threshold.distrbutes'])
+            #self._resourcesview = appConfig['couchdb.db.resourcesview']
+            #self._distUrl = appConfig['lr.distribute.url']
+            #self._updateThread = None
+            #self._distributeThread = None
+            #while self._running:
+                ## I have to include the doc since the filter does seems to work.  Otherwise
+                ## using the same replication filter to get only resource_data document
+                ## would work been better.
+                #options ={'feed': 'continuous',
+                              #'since': self._lastChangeSeq,
+                              #'include_docs':True
+                              #}
+                #changes =  db.changes(**options)
+                #for change in changes:
+                    #if 'doc' not in change:
+                        #continue
+                    #timestamp =  h.nowToISO8601Zformat()
+                    #currentSeq = change['seq']
+                    #lastViewDelta = currentSeq - self._seqOfLastViewUpdate
+                    #if lastViewDelta > self._updateThreshold:
+                        #if self._updateThread == None or not self._updateThread.isAlive():
+                            #self._updateThread = threading.Thread(target = updateView)
+                            #self._updateThread.start()
+                            #self._seqOfLastViewUpdate = currentSeq
+                    #if currentSeq - self._seqOfLastDist > self._distributeThreshold:                     
+                        #if self._distributeThread == None or not self._distributeThread.isAlive():
+                            #self._distributeThread = threading.Thread(target = distribute)
+                            #self._distributeThread.start()                        
+                            #self._seqOfLastDist = currentSeq                                    
+                    ## See if the document is of resource_data type if not ignore it.
+                    #doc = change['doc']
+                    #if  ((not 'resource_data' in doc) and
+                          #(not 'resource_data_distributable'  in doc)):
+                        #continue
+                    #log.info("Change to handle ....")
+                    ## Handle resource_data. 
+                    #if doc['doc_type'] == 'resource_data':
+                        #log.info("\*******Changes to resource_document: "+doc['_id'])
+                        #distributableID = doc['_id']+"-distributable"
+                        ## Use the ResourceDataModel class to create an object that 
+                        ## contains only a the resource_data spec data.
+                        #distributableDoc = ResourceDataModel(doc)._specData
+                        ##remove the node timestamp
+                        #del distributableDoc['node_timestamp']
+                        ##change thet doc_type 
+                        #distributableDoc['doc_type']='resource_data_distributable'
                         
-                        log.debug("\n\ndistributable doc:\n{0}\n".format(pprint.pformat(distributableDoc)))
+                        #log.debug("\n\ndistributable doc:\n{0}\n".format(pprint.pformat(distributableDoc)))
                         
-                        # Check to see if a corresponding distributatable document exist.
-                        # not create a new distribuation document without the 
-                        # node_timestamp and _id+distributable.
-                        if not distributableID in db:
-                            try:
-                                log.info('Adding distributable doc %s...\n' % distributableID)
-                                db[distributableID] = distributableDoc
-                            except Exception as e:
-                                log.error("Cannot save distributable document %s\n" % distributableID)
-                                log.exception(e)
-                        else:
-                            # A distributable copy of the document is in the database. See
-                            # if need be updated.
-                            try:
-                                savedDistributableDoc = db[distributableID]
-                            except Exception as e:
-                                log.error("Cannot get existing distributatable document\n")
-                                log.exception(e)
-                                continue
-                            temp = {}
-                            temp.update(savedDistributableDoc);
-                            # Remove the couchdb generated field so that can compare
-                            # the two document and see it there is a need for update.
-                            for k in _COUCHDB_FIELDS:
-                                if k in temp:
-                                    del temp[k]
-                            if distributableDoc != temp:
-                                savedDistributableDoc.update(distributableDoc)
-                                log.info("\n\nUpdate distribuatable doc:\n")
-                                log.debug("\n{0}\n\n".format(pprint.pformat(distributableDoc)))
-                                try:
+                        ## Check to see if a corresponding distributatable document exist.
+                        ## not create a new distribuation document without the 
+                        ## node_timestamp and _id+distributable.
+                        #if not distributableID in db:
+                            #try:
+                                #log.info('Adding distributable doc %s...\n' % distributableID)
+                                #db[distributableID] = distributableDoc
+                            #except Exception as e:
+                                #log.error("Cannot save distributable document %s\n" % distributableID)
+                                #log.exception(e)
+                        #else:
+                            ## A distributable copy of the document is in the database. See
+                            ## if need be updated.
+                            #try:
+                                #savedDistributableDoc = db[distributableID]
+                            #except Exception as e:
+                                #log.error("Cannot get existing distributatable document\n")
+                                #log.exception(e)
+                                #continue
+                            #temp = {}
+                            #temp.update(savedDistributableDoc);
+                            ## Remove the couchdb generated field so that can compare
+                            ## the two document and see it there is a need for update.
+                            #for k in _COUCHDB_FIELDS:
+                                #if k in temp:
+                                    #del temp[k]
+                            #if distributableDoc != temp:
+                                #savedDistributableDoc.update(distributableDoc)
+                                #log.info("\n\nUpdate distribuatable doc:\n")
+                                #log.debug("\n{0}\n\n".format(pprint.pformat(distributableDoc)))
+                                #try:
 
-                                    db.update([savedDistributableDoc])
-                                except Exception as e:
-                                    log.error("Failed to update existing distributable doc: {0}".format(
-                                                    pprint.pformat(savedDistributableDoc)))
-                                    log.exception(e)
+                                    #db.update([savedDistributableDoc])
+                                #except Exception as e:
+                                    #log.error("Failed to update existing distributable doc: {0}".format(
+                                                    #pprint.pformat(savedDistributableDoc)))
+                                    #log.exception(e)
                               
-                    elif doc['doc_type'] == 'resource_data_distributable':
-                        log.info("\n-------Changes to distributable resource doc: "+doc['_id'])
-                        #check if the document is alredy in the database.
-                        resourceDataID = doc['doc_ID']
-                        # Create a resource_data object from the distributable data.
-                        # the specData will generate a node_timestamp be default
-                        resourceDataDoc = ResourceDataModel(doc)._specData
-                        resourceDataDoc['doc_type'] = 'resource_data'
-                        if resourceDataID not in db:
-                            try:
-                                log.info("Adding new resource_data for distributable")
-                                db[resourceDataID] = resourceDataDoc
-                            except Exception as e:
-                                log.error("\n\nCannot get current document:  {0}".format(
-                                                pprint.pformat(resourceDataDoc)))
-                                log.exception(e)
-                        else:
-                            # There exist already a resource_data document for the distributable
-                            # get it and see if it needs to be updated.
-                            try:
-                                savedResourceDoc = db[resourceDataID]
-                            except Exception as e:
-                                log.error("\n\nCannot find existing resource_data doc for distributable: \n{0}".format(
-                                                pprint.pformat(doc)))
-                                log.exception(e)
-                                continue
+                    #elif doc['doc_type'] == 'resource_data_distributable':
+                        #log.info("\n-------Changes to distributable resource doc: "+doc['_id'])
+                        ##check if the document is alredy in the database.
+                        #resourceDataID = doc['doc_ID']
+                        ## Create a resource_data object from the distributable data.
+                        ## the specData will generate a node_timestamp be default
+                        #resourceDataDoc = ResourceDataModel(doc)._specData
+                        #resourceDataDoc['doc_type'] = 'resource_data'
+                        #if resourceDataID not in db:
+                            #try:
+                                #log.info("Adding new resource_data for distributable")
+                                #db[resourceDataID] = resourceDataDoc
+                            #except Exception as e:
+                                #log.error("\n\nCannot get current document:  {0}".format(
+                                                #pprint.pformat(resourceDataDoc)))
+                                #log.exception(e)
+                        #else:
+                            ## There exist already a resource_data document for the distributable
+                            ## get it and see if it needs to be updated.
+                            #try:
+                                #savedResourceDoc = db[resourceDataID]
+                            #except Exception as e:
+                                #log.error("\n\nCannot find existing resource_data doc for distributable: \n{0}".format(
+                                                #pprint.pformat(doc)))
+                                #log.exception(e)
+                                #continue
                                 
-                            #Remove the couchdb generated fields.
-                            temp = {}
-                            temp.update(savedResourceDoc)
-                            for k in _COUCHDB_FIELDS:
-                                if k in temp:
-                                    del temp[k]
-                            # Now deleate the node_timestamp field on both document
-                            # before comparing them.
-                            del temp['node_timestamp']
-                            del resourceDataDoc['node_timestamp']
+                            ##Remove the couchdb generated fields.
+                            #temp = {}
+                            #temp.update(savedResourceDoc)
+                            #for k in _COUCHDB_FIELDS:
+                                #if k in temp:
+                                    #del temp[k]
+                            ## Now deleate the node_timestamp field on both document
+                            ## before comparing them.
+                            #del temp['node_timestamp']
+                            #del resourceDataDoc['node_timestamp']
                             
-                            if temp != resourceDataDoc:
-                                savedResourceDoc.update(resourceDataDoc)
-                                try:
-                                    log.info("\nUpdate existing resource data from distributable\n")
-                                    db.update([savedResourceDoc])
-                                except Exception as e:
-                                    log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
-                                                    pprint.pformat(savedResourceDoc)))
-                                    log.exception(e)
-                    # Keep  last change sequence.
-                    self._lastChangeSeq = change['seq']
+                            #if temp != resourceDataDoc:
+                                #savedResourceDoc.update(resourceDataDoc)
+                                #try:
+                                    #log.info("\nUpdate existing resource data from distributable\n")
+                                    #db.update([savedResourceDoc])
+                                #except Exception as e:
+                                    #log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
+                                                    #pprint.pformat(savedResourceDoc)))
+                                    #log.exception(e)
+                    ## Keep  last change sequence.
+                    #self._lastChangeSeq = change['seq']
                     
-        # Use a separate thread to track to the changes in resource_data.
-        self._changeMonitoringThread = threading.Thread(target=recordChanges)
-        self._changeMonitoringThread.start()
+        ## Use a separate thread to track to the changes in resource_data.
+        #self._changeMonitoringThread = threading.Thread(target=recordChanges)
+        #self._changeMonitoringThread.start()
         
     nodeDescription = property(lambda self: self._nodeDescription, None, None, None)
     networkDescription = property(lambda self: self._networkDescription, None, None, None)

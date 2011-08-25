@@ -61,7 +61,7 @@ couchdb.db.resourcedata = resource_data
 couchdb.db.network = network
 couchdb.db.community = community
 couchdb.db.resourcesview = _design/learningregistry/_view/resources
-couchdb.threshold.distrbutes = 1000
+couchdb.threshold.distributes = 1000
 couchdb.threshold.viewupdate = 100
 lr.distribute.url = http://localhost/distribute
 
