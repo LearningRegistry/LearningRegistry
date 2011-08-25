@@ -27,7 +27,7 @@ class ObtainController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('obtain', 'obtain')
-    def get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False,resumption_token=None):                
+    def get_view(self,view_name = '_design/learningregistry-resources/_view/docs',keys=[], include_docs = False,resumption_token=None):                
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         args = {}
         if len(keys) > 0:
@@ -130,7 +130,7 @@ class ObtainController(BaseController):
         if  by_doc_ID:
             view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
         elif by_resource_ID:
-            view = self.get_view('_design/learningregistry/_view/resource-location',keys, include_docs=full_docs,resumption_token=resumption_token)        
+            view = self.get_view('_design/learningregistry-resource-location/_view/docs',keys, include_docs=full_docs,resumption_token=resumption_token)        
         for i in  self.format_data(full_docs,view, resumption_token):        
             yield i
         if(data.has_key('callback')):
