@@ -204,7 +204,7 @@ class TrackLastSequence(DatabaseChangeThresholdHandler):
              return -1
     
     def _saveSequence(self, sequence):
-        print("Last process change sequence: {0}".format(sequence))
+        log.info("Last process change sequence: {0}".format(sequence))
         doc ={"_id":self._docID,
                     self._LAST_CHANGE_SEQ : sequence}
         try: 
