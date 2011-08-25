@@ -66,15 +66,15 @@ couchdb.threshold.viewupdate = 100
 lr.distribute.url = http://localhost/distribute
 
 models_spec_dir = %(here)s/data/models
-spec.models.node_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/node_description
-spec.models.resource_data = %(here)s/data/LR_Tech_Spec_V_0_21/models/resource_data
-spec.models.network_policy_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/policy_description
-spec.models.status_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/status_description
-spec.models.filter_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/filter_description
-spec.models.node_connectivity_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/connection_description
-spec.models.community_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/community_description
-spec.models.network_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/network_description
-spec.models.node_service_description = %(here)s/data/LR_Tech_Spec_V_0_21/models/service_description
+spec.models.node_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/node_description
+spec.models.resource_data = %(here)s/data/LR_Tech_Spec_V_0_23/models/resource_data
+spec.models.network_policy_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/policy_description
+spec.models.status_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/status_description
+spec.models.filter_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/filter_description
+spec.models.node_connectivity_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/connection_description
+spec.models.community_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/community_description
+spec.models.network_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/network_description
+spec.models.node_service_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/service_description
 
 
 
