@@ -1,0 +1,34 @@
+{
+ "doc_type":                "service_description",        // the literal "node_description"
+                                                // required, immutable
+ "doc_version":                "0.20.0",        // the literal for the current version -- "0.20.0"
+                                        // required, immutable
+ "doc_scope":                "node",                // the literal "node"
+                                        // required, immutable
+ "active":                boolean,        // is the service active
+                                        // required, mutable from T to F only
+ "service_id":                "string",                // id of the service, required
+// unique within scope of the LR
+// immutable
+"service_type":                "string",                // fixed vocabulary ["publish", "access", 
+// "distribute", "broker", "administrative"]
+// required, immutable
+        "service_name":                "string",                // name of the service, optional
+        "service_description":        "string",                // description of the service, optional
+        "service_version":        "string",                // version number of the service description, required
+                                                // version is local to the Learning Registry
+                                                // not the version of some underlying spec for the service
+        "service_endpoint":        "string",                // URL of service, required
+        "service_auth":                                
+         {
+        "service_authz":                ["string"],         // fixed vocabulary
+// ["none", "basicauth", "oauth", "ssh",  ...]
+                                                // required, mutable from "none" to any stronger auth
+        "service_key":                boolean,        // is a service key required to use the service
+                                                // optional, immutable, default F
+        "service_https":                boolean                // does service require https
+                                                // optional, immutable, default F
+         },
+        "service_data":                {someobject},                // service-specific name-value pairs
+                                                // optional
+        }
