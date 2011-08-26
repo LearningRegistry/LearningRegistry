@@ -48,7 +48,7 @@ def _updateDatabaseViews():
             if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
                 viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
                 log.debug('start view update %s' % viewName)
-                log.debug(len(db.view(viewName))) 
+                log.debug(len(database.view(viewName))) 
     except Exception as e:
         log.error(e)
 
@@ -92,10 +92,10 @@ class RecordDistributableChange(DatabaseChangeHandler):
         del newResourceData['node_timestamp']
         
         if temp != newResourceData:
-            currentResourceDoc.update(newResourceData)
+            currentResourceData.update(newResourceData)
             try:
                 log.info("\nUpdate existing resource data from distributable\n")
-                db.update([currentResourceData])
+                self._database.update([currentResourceData])
             except Exception as e:
                 log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
                                 pprint.pformat(currentResourceData)))
