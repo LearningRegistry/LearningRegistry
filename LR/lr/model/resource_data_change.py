@@ -88,7 +88,7 @@ class RecordDistributableChange(DatabaseChangeHandler):
         del newResourceData['node_timestamp']
         
         if temp != newResourceData:
-            currentResourceDoc.update(newResourceData)
+            currentResourceData.update(newResourceData)
             try:
                 log.info("\nUpdate existing resource data from distributable\n")
                 database.update([currentResourceData])
@@ -188,17 +188,17 @@ class TrackLastSequence(DatabaseChangeThresholdHandler):
         self._sequenceChangeDocId =sequenceChangeDocId
 
 
-    def _saveSequence(self, sequence):
+    def _saveSequence(self, sequence, database):
         log.debug("Last process change sequence: {0}".format(sequence))
-        doc ={"_id":self._docID,
+        doc ={"_id":self._sequenceChangeDocId,
                     self._LAST_CHANGE_SEQ : sequence}
         try: 
-            if self._docID in database:
+            if self._sequenceChangeDocId in database:
                 del database[self._sequenceChangeDocId] 
             database[self._sequenceChangeDocId] = doc
         except Exception as e:
             log.error("\n\nError while saving {0} for dabase{1} \n".format(
-                    self._docID,  str(database)))
+                    self._sequenceChangeDocId,  str(database)))
             log.exception(e)
         
     def _canHandle(self, change, database):
