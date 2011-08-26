@@ -4,6 +4,10 @@ function(doc, req){
             //print("Ignore document that is not resource_data_distributable: "+ doc);
             return false;
         }
+        //Check if the document say has does distribute field. if so don't send it
+        if ("do_not_distribute" in doc){
+            return false;
+        }
         // If there is no query parameters return send the document.
         if (!req){
             //print("no req value");

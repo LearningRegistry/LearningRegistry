@@ -13,7 +13,7 @@ Created on August 19, 2011
 import urllib2
 import logging
 from lr.lib.couch_change import *
-from resource_data import ResourceDataModel
+from resource_data import appConfig, ResourceDataModel
 from node import NodeModel
 import threading
 import multiprocessing
@@ -27,21 +27,20 @@ appConfig = config['app_conf']
 
 log = logging.getLogger(__name__)
 
-def _resourceDataPredicate(change):
+def _resourceDataPredicate(change, database):
     try:
       return "doc" in change and change["doc"]["doc_type"] == "resource_data"
     except:
         return False
 
-def _distributableDataPredicate(change):
+def _distributableDataPredicate(change, database):
     try:
       return "doc" in change and change["doc"]["doc_type"] == "resource_data_distributable"
     except:
         return False
 
-def _updateDatabaseViews():
+def _updateDatabaseViews(change, database):
     try:
-        database = ResourceDataModel._defaultDB
         designDocs = database.view('_all_docs',include_docs=True,
                                                         startkey='_design%2F',endkey='_design0')
         for designDoc in designDocs:
@@ -63,25 +62,22 @@ def _doDistribute():
 
 
 class RecordDistributableChange(DatabaseChangeHandler):
-    def __init__(self, database):
-        self._database = database
-        
-    def _canHandle(self, change):
-        return _distributableDataPredicate(change)
+    def _canHandle(self, change, database):
+        return _distributableDataPredicate(change, database)
     
-    def _getResourceDataDoc(self, docID):
+    def _getResourceDataDoc(self, docID, database):
         # There exist already a resource_data document for the distributable
         # get it and see if it needs to be updated.
         try:
-            return  ResourceDataModel(self._database[docID])._specData
+            return  ResourceDataModel(database[docID])._specData
         except Exception as e:
             log.error("\n\nCannot find existing resource_data doc for distributable: \n{0}".format(
                             docID))
             log.exception(e)
             return None
     
-    def _updateResourceData(self, newResourceData):
-        currentResourceData = self._getResourceDataDoc(newResourceData['doc_ID'])
+    def _updateResourceData(self, newResourceData, database):
+        currentResourceData = self._getResourceDataDoc(newResourceData['doc_ID'], database)
         if currentResourceData == None:
             return 
             
@@ -92,29 +88,29 @@ class RecordDistributableChange(DatabaseChangeHandler):
         del newResourceData['node_timestamp']
         
         if temp != newResourceData:
-            currentResourceData.update(newResourceData)
+            currentResourceDoc.update(newResourceData)
             try:
                 log.info("\nUpdate existing resource data from distributable\n")
-                self._database.update([currentResourceData])
+                database.update([currentResourceData])
             except Exception as e:
                 log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
                                 pprint.pformat(currentResourceData)))
                 log.exception(e)
 
-    def _addResourceData(self, resourceDataCopy):
+    def _addResourceData(self, resourceDataCopy, database):
         # If corresponding resource_data type document is not already in the database
         # for the distributable document, create a local resource_data document and
         # add it the database
         try:
             log.info("Adding new resource_data for distributable")
-            self._database[resourceDataCopy['doc_ID']] = resourceDataCopy
+            database[resourceDataCopy['doc_ID']] = resourceDataCopy
         except Exception as e:
             log.error("\n\nCannot get current document:  {0}".format(
                             pprint.pformat(resourceDataCopy)))
             log.exception(e)
     
 
-    def _handle(self, change):
+    def _handle(self, change, database):
         # The resource data copy is what the corresponding resource data document
         #  for this distributable document should look like.
         resourceDataCopy = ResourceDataModel(change['doc'])._specData
@@ -122,22 +118,19 @@ class RecordDistributableChange(DatabaseChangeHandler):
 
         # Add the corresponding resource data document to database 
         # if not already in the database.  Otherwise try to update. 
-        if not resourceDataCopy['doc_ID'] in self._database:
-            self._addResourceData(resourceDataCopy )
+        if not resourceDataCopy['doc_ID'] in database:
+            self._addResourceData(resourceDataCopy, database )
         else:
-            self._updateResourceData(resourceDataCopy)
+            self._updateResourceData(resourceDataCopy, database)
 
 class RecordResourceDataChange(DatabaseChangeHandler):
-    def __init__(self, database):
-        self._database = database
-        
-    def _canHandle(self, change):
-        return _resourceDataPredicate(change)
+    def _canHandle(self, change, database):
+        return _resourceDataPredicate(change, database)
     
-    def _updateDistributableData(self, newDistributableData):
+    def _updateDistributableData(self, newDistributableData, database):
         # Use the ResourceDataModel class to create an object that 
         # contains only a the resource_data spec data.
-        currentDistributable = self._database[newDistributableData['_id']]
+        currentDistributable = database[newDistributableData['_id']]
         temp = ResourceDataModel(currentDistributable)._specData
         del temp['node_timestamp']
          
@@ -146,22 +139,22 @@ class RecordResourceDataChange(DatabaseChangeHandler):
             log.info("\n\nUpdate distribuatable doc:\n")
             log.debug("\n{0}\n\n".format(pprint.pformat(currentDistributable)))
             try:
-                self._database.update([currentDistributable])
+                database.update([currentDistributable])
             except Exception as e:
                 log.error("Failed to update existing distributable doc: {0}".format(
                                 pprint.pformat(currentDistributable)))
                 log.exception(e)
         
         
-    def _addDistributableData(self, distributableData):
+    def _addDistributableData(self, distributableData, database):
         try:
             log.info('Adding distributable doc %s...\n' % distributableData['_id'])
-            self._database[distributableData['_id']] = distributableData
+            database[distributableData['_id']] = distributableData
         except Exception as e:
             log.error("Cannot save distributable document %s\n" % distributableData['_id'] )
             log.exception(e)
 
-    def _handle(self, change):
+    def _handle(self, change, database):
       
         # Use the ResourceDataModel class to create an object that 
         # contains only a the resource_data spec data.
@@ -175,10 +168,10 @@ class RecordResourceDataChange(DatabaseChangeHandler):
         # Check to see if a corresponding distributatable document exist.
         # not create a new distribuation document without the 
         # node_timestamp and _id+distributable.
-        if not distributableDoc['_id'] in self._database:
-            self._addDistributableData(distributableDoc)
+        if not distributableDoc['_id'] in database:
+            self._addDistributableData(distributableDoc, database)
         else:
-            self._updateDistributableData(distributableDoc)
+            self._updateDistributableData(distributableDoc, database)
 
 
 # Create an handler to simply track the process change sequence in database.
@@ -186,60 +179,51 @@ class RecordResourceDataChange(DatabaseChangeHandler):
 # processess.
 class TrackLastSequence(DatabaseChangeThresholdHandler):
     _LAST_CHANGE_SEQ = "sequence_number"
-    def __init__(self, database, docID, changeSaveThreshold=25):
+    def __init__(self, sequenceChangeDocId, changeSaveThreshold=25):
         DatabaseChangeThresholdHandler.__init__(self,
                                                                              None, 
                                                                              None, 
                                                                              changeSaveThreshold, 
                                                                              timedelta(seconds=5))
-        self._database = database
-        self._docID = docID
-        self._lastSavedSequence = self.getLastSequence()
-       
-    
-    def getLastSequence(self):
-        if self._docID in self._database:
-            return self._database[self._docID][self._LAST_CHANGE_SEQ]
-        else:
-             return -1
-    
+        self._sequenceChangeDocId =sequenceChangeDocId
+
+
     def _saveSequence(self, sequence):
-        log.info("Last process change sequence: {0}".format(sequence))
+        log.debug("Last process change sequence: {0}".format(sequence))
         doc ={"_id":self._docID,
                     self._LAST_CHANGE_SEQ : sequence}
         try: 
-            if self._docID in self._database:
-                del self._database[self._docID] 
-            self._database[self._docID] = doc
+            if self._docID in database:
+                del database[self._sequenceChangeDocId] 
+            database[self._sequenceChangeDocId] = doc
         except Exception as e:
             log.error("\n\nError while saving {0} for dabase{1} \n".format(
-                    self._docID,  str(self._database)))
+                    self._docID,  str(database)))
             log.exception(e)
         
-    def _canHandle(self, change):
-        return (('doc' in change) and not self._docID in change['doc'])
+    def _canHandle(self, change, database):
+        return (('doc' in change) and not self._sequenceChangeDocId in change['doc'])
          
-    def _handle(self, change):
+    def _handle(self, change, database):
          if 'seq' in change:
              # Save the sequence before the last to ensure that all the change before
              # the save sequence number has been already processed.
              self._changeCount = self._changeCount + 1
              if self._shouldTakeAction():
-                 self._saveSequence(change['seq'] )
+                 self._saveSequence(change['seq'] , database)
                  self._resetChangeToThreshold()
-            
+   
     
 
 _RESOURCE_DATA_CHANGE_ID =  "Resource Data Last Processed Change Sequence"
-changeTracker = TrackLastSequence(ResourceDataModel._defaultDB, _RESOURCE_DATA_CHANGE_ID)
+changeTracker = TrackLastSequence( _RESOURCE_DATA_CHANGE_ID)
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
-    RecordDistributableChange(ResourceDataModel._defaultDB),
-    RecordResourceDataChange(ResourceDataModel._defaultDB),
+    RecordDistributableChange(),
+    RecordResourceDataChange(),
     DatabaseChangeThresholdHandler( _resourceDataPredicate,
                                                               _updateDatabaseViews,
                                                               appConfig['couchdb.threshold.viewupdate']),
-                                                              
     DatabaseChangeThresholdHandler(_resourceDataPredicate,
                                                             _doDistribute,
                                                              appConfig['couchdb.threshold.distributes']),
@@ -247,9 +231,15 @@ _RESOURCE_DATA_CHANGE_HANDLERS=[
     ]
 
 def monitorResourceDataChanges():
-    options = {'since':changeTracker.getLastSequence()}
+    lastSavedSequence = -1
+    if _RESOURCE_DATA_CHANGE_ID in ResourceDataModel._defaultDB:
+        lastSavedSequence=ResourceDataModel._defaultDB[_RESOURCE_DATA_CHANGE_ID][TrackLastSequence._LAST_CHANGE_SEQ]
+   
+    options = {'since':lastSavedSequence}
     log.info("\n\n-----"+pprint.pformat(options)+"------\n\n")
-    changeMonitor = MonitorDatabaseChanges(ResourceDataModel._defaultDB,
+
+    changeMonitor = MonitorDatabaseChanges(appConfig['couchdb.url'], 
+                                                                            appConfig['couchdb.db.resourcedata'],
                                                                            _RESOURCE_DATA_CHANGE_HANDLERS,
                                                                             options)
     changeMonitor.start()

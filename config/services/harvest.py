@@ -30,7 +30,7 @@ def install(server, dbname, setupInfo):
     must = __BasicHarvestServiceTemplate()
     config_doc = must.render(**custom_opts)
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname, "Basic Harvest service", doc)
+    PublishDoc(server, dbname,doc["service_type"]+":Basic Harvest service", doc)
     print("Configured Basic Harvest service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 
@@ -59,7 +59,7 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "active": "false",
             "service_name": "Basic Harvest",
             "service_version": "0.10.0",
-            "service_endpoint": None,
+            "service_endpoint": "/harvest",
             "service_key": "false", 
             "service_https": "false",
             "spec_kv_only": None,

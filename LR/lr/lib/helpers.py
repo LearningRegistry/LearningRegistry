@@ -21,6 +21,20 @@ from iso8601.iso8601 import ISO8601_REGEX
 import re
 from stream import StreamingCouchDBDocHandler
 
+def dictToObject(dictionary):
+    class DictToObject(dict):
+        def __init__(self, data):
+            dict.__init__(self, data)
+            self.data = data
+        def __getattr__(self, name):
+            if  isinstance(self.data, dict) and name in self.data.keys():
+                #Convert the requested attribute to object if it is a dictionary.
+                if isinstance(self.data[name], dict):
+                    return dictToObject(self.data[name])
+                return self.data[name]
+            else:
+                dict.__getattr__(self, name)
+    return DictToObject(dictionary)
 
 class document:
     def __init__(self,data):
@@ -29,7 +43,7 @@ class document:
         if data.has_key('key'):
             self.key=data['key']
         if data.has_key('doc'):
-            self.doc=data['doc']        
+            self.doc=data['doc']
 
 def fixUtf8(input):
     if isinstance(input, unicode):

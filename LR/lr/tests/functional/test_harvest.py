@@ -98,7 +98,7 @@ class TestHarvestController(TestController):
         assert data['identify'].has_key('adminEmail')
         
     def test_identify_get(self):
-        response = self.app.get(url('harvest', id='identify'))
+        response = self.app.get(url(controller='harvest', action='identify'))
         self.validate_identify_response(response)
 
     def test_identify_post(self):

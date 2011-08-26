@@ -135,7 +135,7 @@ def getSetupInfo():
     nodeSetup['node_description'] = nodeDescription
 
     adminUrl = getInput("Enter node admin indentity",
-                                    "{0}.node.admin@learningregistry.org".format(couchDBUrl))
+                                    "{0}.node.admin@learningregistry.org".format(nodeUrl))
     nodeSetup['node_admin_identity'] = adminUrl
 
     distributeTargets = getInput("Enter the URLs of nodes that you wish to distribute to",

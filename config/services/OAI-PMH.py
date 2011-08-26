@@ -30,7 +30,7 @@ def install(server, dbname, setupInfo):
     must = __OaiServiceTemplate()
     config_doc = must.render(**custom_opts)
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname, "OAI-PMH service", doc)
+    PublishDoc(server, dbname, doc["service_type"]+":OAI-PMH service", doc)
     print("Configured OAI-PMH Harvest service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 

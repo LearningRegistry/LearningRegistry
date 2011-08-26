@@ -29,9 +29,11 @@ class ErrorController(BaseController):
             dict(prefix=request.environ.get('SCRIPT_NAME', ''),
                  code=cgi.escape(request.GET.get('code', str(resp.status_int))),
                  message=content)
-        import json
-        return json.dumps({'OK':False, 'message':request.environ['pylons.controller.exception'].message})
-
+        if request.environ.has_key('pylons.controller.exception'):
+            import json
+            return json.dumps({'OK':False, 'message':request.environ['pylons.controller.exception'].message})
+        else:
+            return page
     def img(self, id):
         """Serve Pylons' stock images"""
         return self._serve_file('/'.join(['media/img', id]))
