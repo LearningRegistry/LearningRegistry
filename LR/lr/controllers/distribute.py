@@ -11,16 +11,20 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import logging, couchdb, urlparse, json, urllib2
+import logging
+import couchdb
+import urlparse
+import json
+import  urllib2
 import threading
 import re
-
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
-            
 from lr.lib.base import BaseController, render
+import base64
+import pprint
 
 log = logging.getLogger(__name__)
 
@@ -36,11 +40,11 @@ class DistributeController(BaseController):
         # url('distribute')
         distributeInfo = {'OK': True}
         
-        if sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False:
-            distributeInfo['OK'] = False
-        else:
-            distributeInfo['node_config'] = sourceLRNode.config
-            distributeInfo['distribute_sink_url'] = urlparse.urljoin(request.url,self.resource_data)
+        #if sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False:
+            #distributeInfo['OK'] = False
+        #else:
+        distributeInfo['node_config'] = sourceLRNode.config
+        distributeInfo['distribute_sink_url'] = urlparse.urljoin(request.url,self.resource_data)
         log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
         return json.dumps(distributeInfo)
     
@@ -62,9 +66,17 @@ class DistributeController(BaseController):
                 #confuses pylons routing libary.
                 destinationURL = urlparse.urljoin(connection.destination_node_url.strip(),
                                                                         "distribute")
-                log.info("\n\nAccess destination node at: "+destinationURL)
-                distributeInfo = json.load(urllib2.urlopen(destinationURL))
-                destinationLRNode = LRNodeModel(distributeInfo['node_config'], False)
+                
+                request = urllib2.Request(destinationURL)
+                credential = sourceLRNode.getDistributeCredentialFor(destinationURL)
+                
+                if credential is not None:
+                    base64string = base64.encodestring('%s:%s' % (credential['username'],credential['password'])).replace("\n", "")
+                    request.add_header("Authorization", "Basic %s" % base64string)
+                
+                log.info("\n\nAccess destination node at: "+pprint.pformat(request.__dict__))
+                distributeInfo = json.load(urllib2.urlopen(request))
+                destinationLRNode = LRNodeModel(distributeInfo['node_config'])
             except Exception as ex:
                 log.exception(ex)
                 continue
@@ -118,6 +130,7 @@ class DistributeController(BaseController):
                     log.info("Only gateways can distribute on gateway connection")
                     continue
             nodeInfo = { "distributeInfo": distributeInfo,
+                                  "destinationBaseUrl":connection.destination_node_url,
                                   "destinationNode":destinationLRNode}
             nodeDestinationList.append(nodeInfo)
             
@@ -137,10 +150,19 @@ class DistributeController(BaseController):
             if ((destinationNode.filterDescription is not None) and 
                  (destinationNode.filterDescription.custom_filter == False)):
                      replicationOptions['query_params'] = destinationNode.filterDescription.specData
+                     
+            #if distinationNode['distribute service'] .service_auth["service_authz"] is not  None:
+                #log.info("Destination node '{}' require authentication".format(destinationUrl))
+                #Try to get the user name and password the url.
+            credential = sourceLRNode.getDistributeCredentialFor(destinationUrl)
+            if credential is not None:
+                parsedUrl = urlparse.urlparse(destinationUrl)
+                destinationUrl = destinationUrl.replace(parsedUrl.netloc, "{0}:{1}@{2}".format(
+                                                credential['username'], credential['password'], parsedUrl.netloc))
             
             log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
                             sourceUrl, destinationUrl, str(replicationOptions)))
-        
+
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
                 
@@ -148,10 +170,10 @@ class DistributeController(BaseController):
             log.debug("Replication results: "+str(results))
         
         log.info("Distribute.......\n")
-        #Check if the distribte service is available on the node.
-        if(sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False):
-            log.info("Distribute not available on node ")
-            return
+        ##Check if the distribte service is available on the node.
+        #if(sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False):
+            #log.info("Distribute not available on node ")
+            #return
         if((sourceLRNode.connections is None) or 
             (len(sourceLRNode.connections) ==0)):
             log.info("No connection present for distribution")
@@ -162,9 +184,9 @@ class DistributeController(BaseController):
             replicationArgs = (connectionInfo['destinationNode'], 
                                          defaultCouchServer, 
                                          self.resource_data, 
-                                         connectionInfo['distributeInfo']['distribute_sink_url'])
+                                         urlparse.urljoin(connectionInfo['destinationBaseUrl'], self.resource_data))
                                          
-            # Use a thread to do the actual replication.                             
+            # Use a thread to do the actual replication.
             replicationThread = threading.Thread(target=doDistribution, 
                                                                         args=replicationArgs)
             replicationThread.start()
