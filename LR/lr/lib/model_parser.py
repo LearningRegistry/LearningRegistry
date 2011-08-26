@@ -393,7 +393,7 @@ class ModelParser(object):
         try:
             self._modelName = self._modelInfo.doc_type.value
         except Exception as e:
-            print("Cannot get document type: "+str(e))
+            log.info("Cannot get document type: "+str(e))
             
         
         self._cleanup(self._modelInfo)
