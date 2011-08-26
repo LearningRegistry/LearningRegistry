@@ -153,7 +153,10 @@ if __name__ == "__main__":
     
     #Delete the existing databases
     CreateDB(server, dblist=[ _NODE, _NETWORK, _COMMUNITY], deleteDB=True)
-
+    
+      #Install the services, by default all the services are installed.
+    publishNodeServices(nodeSetup["nodeUrl"], server, _NODE)
+    
     #Add the network and community description
     PublishDoc(server, _COMMUNITY, "community_description", t.community_description)
     PublishDoc(server, _NETWORK,  "network_description", t.network_description)
@@ -161,16 +164,12 @@ if __name__ == "__main__":
     policy.update(t.network_policy_description)
     PublishDoc(server, _NETWORK,'network_policy_description', policy)
 
-
     #Add node description
     publishNodeDescription(server, _NODE)
 
     #Add the node connections
     publishNodeConnections(nodeSetup["nodeUrl"], server, _NODE,  
                                             nodeSetup["node_name"],  nodeSetup['connections'])
-
-    #Install the services, by default all the services are installed.
-    publishNodeServices(nodeSetup["nodeUrl"], server, _NODE)
 
 
     #Push the couch apps

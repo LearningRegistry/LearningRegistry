@@ -2,7 +2,7 @@ import time
 
 node_description ={
     "doc_type":		"node_description",
-    "doc_version":		"0.21.0",
+    "doc_version":		"0.23.0",
     "doc_scope":		"node",	
     "active":			True,
     "node_id":		"<nodeid>",	
@@ -75,7 +75,7 @@ service_description= {
         "service_version": "0.1", 
         "service_endpoint": "string", 
         "service_auth": 
-                    {"service_authz":"none",
+                    {"service_authz":None,
                       "service_key":False,
                      "service_https":False},
         "service_data":{}
