@@ -8,7 +8,8 @@ from pylons.error import handle_mako_error
 import lr.lib.app_globals as app_globals
 import lr.lib.helpers
 from lr.config.routing import make_map
-
+import logging
+logging.basicConfig(level=logging.ERROR)
 def load_environment(global_conf, app_conf):
     """Configure the Pylons environment via the ``pylons.config``
     object

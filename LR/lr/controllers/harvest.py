@@ -12,6 +12,9 @@ import lr.lib.resumption_token as rt
 log = logging.getLogger(__name__)
 import ast
 import string
+from lr.model import LRNode as sourceLRNode, \
+            NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
+BASIC_HARVEST_SERVICE_DOC = "Basic Harvest service"
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -21,7 +24,7 @@ class HarvestController(BaseController):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = helpers.getServiceDocument("Basic Harvest service")
+        serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
 
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
@@ -88,7 +91,18 @@ class HarvestController(BaseController):
             return self.list_records(h,body,params,verb)
         def identify():
             data = self.get_base_response(verb,body)
-            data['identify']=helpers.getServiceDocument("harvest service")
+            serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
+            data['identify']={
+                "node_id":sourceLRNode.nodeDescription.node_name,
+                "repositoryName":sourceLRNode.communityDescription.community_name,
+                "baseU":serviceDoc['service_endpoint'],
+                "protocolVersion":"2.0",
+                "service_version":serviceDoc['service_version'],
+                "earliestDatestamp":h.earliestDate(),
+                "deletedRecord":sourceLRNode.nodeDescription.node_policy['deleted_data_policy'],
+                "granularity":helpers.getDatetimePrecision(),
+                "adminEmail":sourceLRNode.nodeDescription.node_admin_identity
+            }
             return json.dumps(data)
         def listmetadataformats():
             data = self.get_base_response(verb,body)

@@ -3,6 +3,11 @@ debug = false
 error_email_from = paste@localhost
 smtp_server = localhost
 
+[uwsgi]
+socket = 127.0.0.1:5000
+master = true
+processes = 1
+
 [loggers]
 keys = root, routes, lr
 

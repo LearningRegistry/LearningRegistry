@@ -47,7 +47,7 @@ def _updateDatabaseViews(change, database):
             if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
                 viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
                 log.debug('start view update %s' % viewName)
-                log.debug(len(db.view(viewName))) 
+                log.debug(len(database.view(viewName))) 
     except Exception as e:
         log.error(e)
 
@@ -188,9 +188,9 @@ class TrackLastSequence(DatabaseChangeThresholdHandler):
         self._sequenceChangeDocId =sequenceChangeDocId
 
 
-    def _saveSequence(self, sequence, database):
-        print("Last process change sequence: {0}".format(sequence))
-        doc ={"_id":self._sequenceChangeDocId,
+    def _saveSequence(self, sequence):
+        log.debug("Last process change sequence: {0}".format(sequence))
+        doc ={"_id":self._docID,
                     self._LAST_CHANGE_SEQ : sequence}
         try: 
             if self._docID in database:
