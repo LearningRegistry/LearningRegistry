@@ -76,7 +76,7 @@ class SliceController(BaseController):
         log.debug(json.dumps(params))
         return params
 
-    def _get_view(self,view_name = '_design/learningregistry/_view/resources',keys=[], include_docs = False):
+    def _get_view(self,view_name = '_design/learningregistry-resources/_view/docs',keys=[], include_docs = False):
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         if len(keys) > 0:
             view = h.getView(database_url=db_url, method="POST", view_name=view_name,keys=keys,include_docs=include_docs)#,stale='ok'):
@@ -189,7 +189,7 @@ class SliceController(BaseController):
                  
                 if CALLBACK in params:
                     yield "{0}(".format(params[CALLBACK])
-                docs = self._get_view('_design/learningregistry/_view/slice', keys, not params[IDS_ONLY])
+                docs = self._get_view('_design/learningregistry-slice/_view/docs', keys, not params[IDS_ONLY])
                 for i in self.format_data(params[IDS_ONLY],docs,keys,True):
                     yield i
                 if CALLBACK in params:

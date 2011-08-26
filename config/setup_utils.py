@@ -13,7 +13,7 @@ import urlparse
 
 
 #Default url to the couchdb server.
-_DEFAULT_COUCHDB_URL =  "http://127.0.0.1:5984/"
+_DEFAULT_COUCHDB_URL =  "http://127.0.0.1:5984"
 
 def publishService(nodeUrl, server, dbname, serviceType, serviceName):
     service = {}

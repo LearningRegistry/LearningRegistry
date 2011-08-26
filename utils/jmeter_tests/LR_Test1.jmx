@@ -27,13 +27,13 @@
       </Arguments>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Harvesters Group" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time"></stringProp>
+        <stringProp name="ThreadGroup.num_threads">12</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">120</stringProp>
         <longProp name="ThreadGroup.start_time">1310435253000</longProp>
         <longProp name="ThreadGroup.end_time">1310435253000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -52,7 +52,7 @@
           <stringProp name="variableNames">harvest_from,harvest_until</stringProp>
         </CSVDataSet>
         <hashTree/>
-        <RandomOrderController guiclass="RandomOrderControllerGui" testclass="RandomOrderController" testname="Random Order Controller" enabled="true"/>
+        <RandomOrderController guiclass="RandomOrderControllerGui" testclass="RandomOrderController" testname="Random Order Controller" enabled="false"/>
         <hashTree>
           <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/harvest/listrecords" enabled="false">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -134,12 +134,14 @@
             <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           </HTTPSampler>
           <hashTree/>
-          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="/harvest/listidentifiers" enabled="false">
-            <boolProp name="LoopController.continue_forever">true</boolProp>
-            <stringProp name="LoopController.loops">1</stringProp>
-          </LoopController>
+        </hashTree>
+        <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Controller" enabled="true">
+          <intProp name="InterleaveControl.style">0</intProp>
+        </RandomController>
+        <hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="/OAI-PMH?verb=ListRecords" enabled="true"/>
           <hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listindentifiers" enabled="false">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListMetadataFormats" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -149,7 +151,7 @@
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol"></stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/harvest/listidentifiers?</stringProp>
+              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListMetadataFormats</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -159,58 +161,61 @@
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree>
-              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="false">
-                <stringProp name="RegexExtractor.useHeaders">false</stringProp>
-                <stringProp name="RegexExtractor.refname">resumptionToken</stringProp>
-                <stringProp name="RegexExtractor.regex">&quot;resumption_token&quot;:\s*&quot;([^&quot;]+)&quot;</stringProp>
-                <stringProp name="RegexExtractor.template">&amp;resumption_token=$1$</stringProp>
-                <stringProp name="RegexExtractor.default"></stringProp>
-                <stringProp name="RegexExtractor.match_number">1</stringProp>
-              </RegexExtractor>
+              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                <stringProp name="XPathExtractor.default"></stringProp>
+                <stringProp name="XPathExtractor.refname">metadataPrefix</stringProp>
+                <stringProp name="XPathExtractor.xpathQuery">//*/metadataPrefix</stringProp>
+                <boolProp name="XPathExtractor.validate">false</boolProp>
+                <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                <boolProp name="XPathExtractor.namespace">false</boolProp>
+              </XPathExtractor>
+              <hashTree/>
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                <stringProp name="scriptLanguage">javascript</stringProp>
+                <stringProp name="parameters">metadataPrefix</stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="script">function nextRandomNumber(){
+  var hi = this.seed / this.Q;
+  var lo = this.seed % this.Q;
+  var test = this.A * lo - this.R * hi;
+  if(test &gt; 0){
+    this.seed = test;
+  } else {
+    this.seed = test + this.M;
+  }
+  return (this.seed * this.oneOverM);
+}
+
+function RandomNumberGenerator(){
+  var d = new Date();
+  this.seed = 2345678901 + (d.getSeconds() * 0xFFFFFF) + (d.getMinutes() * 0xFFFF);
+  this.A = 48271;
+  this.M = 2147483647;
+  this.Q = this.M / this.A;
+  this.R = this.M % this.A;
+  this.oneOverM = 1.0 / this.M;
+  this.next = nextRandomNumber;
+  return this;
+}
+
+function createRandomNumber(Min, Max){
+  var rand = new RandomNumberGenerator();
+  return Math.round((Max-Min) * rand.next() + Min);
+}
+
+
+OUT.println(&quot;refName_matchNr:&quot;+vars.get(&quot;metadataPrefix_matchNr&quot;));
+var numMatches = vars.get(&quot;metadataPrefix_matchNr&quot;);
+var prefix = null;
+if (numMatches &amp;&amp; numMatches &gt; 0) {
+	prefix = vars.get(&quot;metadataPrefix_&quot;+createRandomNumber(1, numMatches));
+	OUT.println(&quot;rand: &quot;+prefix);
+}
+vars.put(&quot;randomLRPrefix&quot;, prefix);</stringProp>
+              </BSFPostProcessor>
               <hashTree/>
             </hashTree>
-            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="false">
-              <stringProp name="WhileController.condition">&quot;${resumptionToken}&quot;!=&quot;&quot;</stringProp>
-            </WhileController>
-            <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listindentifiers" enabled="false">
-                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                  <collectionProp name="Arguments.arguments"/>
-                </elementProp>
-                <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-                <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                <stringProp name="HTTPSampler.protocol"></stringProp>
-                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/harvest/listidentifiers?${resumptionToken}</stringProp>
-                <stringProp name="HTTPSampler.method">GET</stringProp>
-                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-                <boolProp name="HTTPSampler.monitor">false</boolProp>
-                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              </HTTPSampler>
-              <hashTree>
-                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="false">
-                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
-                  <stringProp name="RegexExtractor.refname">resumptionToken</stringProp>
-                  <stringProp name="RegexExtractor.regex">&quot;resumption_token&quot;:\s*&quot;([^&quot;]+)&quot;</stringProp>
-                  <stringProp name="RegexExtractor.template">&amp;resumption_token=$1$</stringProp>
-                  <stringProp name="RegexExtractor.default"></stringProp>
-                  <stringProp name="RegexExtractor.match_number">1</stringProp>
-                </RegexExtractor>
-                <hashTree/>
-              </hashTree>
-            </hashTree>
-          </hashTree>
-          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="/harvest/listrecords" enabled="true">
-            <boolProp name="LoopController.continue_forever">true</boolProp>
-            <stringProp name="LoopController.loops">1</stringProp>
-          </LoopController>
-          <hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listrecords" enabled="true">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomLRPrefix}" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -220,7 +225,7 @@
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol"></stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/harvest/listrecords?</stringProp>
+              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomLRPrefix}</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -230,29 +235,23 @@
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree>
-              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="false">
-                <stringProp name="RegexExtractor.useHeaders">false</stringProp>
-                <stringProp name="RegexExtractor.refname">resumptionToken</stringProp>
-                <stringProp name="RegexExtractor.regex">&quot;resumption_token&quot;:\s*&quot;([^&quot;]+)&quot;</stringProp>
-                <stringProp name="RegexExtractor.template">&amp;resumption_token=$1$</stringProp>
-                <stringProp name="RegexExtractor.default"></stringProp>
-                <stringProp name="RegexExtractor.match_number">1</stringProp>
-              </RegexExtractor>
+              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                <stringProp name="XPathExtractor.default">--NONE--</stringProp>
+                <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
+                <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
+                <boolProp name="XPathExtractor.validate">false</boolProp>
+                <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                <boolProp name="XPathExtractor.namespace">true</boolProp>
+              </XPathExtractor>
               <hashTree/>
               <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                 <stringProp name="scriptLanguage">javascript</stringProp>
                 <stringProp name="parameters"></stringProp>
                 <stringProp name="filename"></stringProp>
-                <stringProp name="script">eval(&apos;var json = &apos;+prev.getResponseDataAsString());
+                <stringProp name="script">OUT.println(&quot;here 1&quot;);
 
-if (json.resumption_token) {
-	OUT.println(&quot;token:&quot;+json.resumption_token);
-	vars.put(&quot;resumptionToken&quot;, &quot;&amp;resumption_token=&quot;+json.resumption_token);
-	vars.put(&quot;continue_get&quot;, &quot;TRUE&quot;);
-} else {
-	OUT.println(&quot;no resumption_token&quot;);
-	vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);
-}</stringProp>
+var cont =(vars.get(&quot;resumptionToken_matchNr&quot;) != 0 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
+vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());</stringProp>
               </BSFPostProcessor>
               <hashTree/>
             </hashTree>
@@ -260,7 +259,7 @@ if (json.resumption_token) {
               <stringProp name="WhileController.condition">${continue_get}</stringProp>
             </WhileController>
             <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listrecords" enabled="true">
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomLRPrefix}&amp;resumptionToken=&lt;token&gt;" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -270,7 +269,7 @@ if (json.resumption_token) {
                 <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 <stringProp name="HTTPSampler.protocol"></stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/harvest/listrecords?${resumptionToken}</stringProp>
+                <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomLRPrefix}&amp;resumptionToken=${resumptionToken}</stringProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -280,72 +279,339 @@ if (json.resumption_token) {
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler>
               <hashTree>
-                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="false">
-                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
-                  <stringProp name="RegexExtractor.refname">resumptionToken</stringProp>
-                  <stringProp name="RegexExtractor.regex">&quot;resumption_token&quot;:\s*&quot;([^&quot;]+)&quot;</stringProp>
-                  <stringProp name="RegexExtractor.template">&amp;resumption_token=$1$</stringProp>
-                  <stringProp name="RegexExtractor.default"></stringProp>
-                  <stringProp name="RegexExtractor.match_number">1</stringProp>
-                </RegexExtractor>
+                <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                  <stringProp name="XPathExtractor.default">--NONE--</stringProp>
+                  <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
+                  <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
+                  <boolProp name="XPathExtractor.validate">false</boolProp>
+                  <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                  <boolProp name="XPathExtractor.namespace">false</boolProp>
+                </XPathExtractor>
                 <hashTree/>
                 <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                   <stringProp name="scriptLanguage">javascript</stringProp>
                   <stringProp name="parameters"></stringProp>
                   <stringProp name="filename"></stringProp>
-                  <stringProp name="script">eval(&apos;var json = &apos;+prev.getResponseDataAsString());
+                  <stringProp name="script">OUT.println(&quot;here 2&quot;);
 
-if (json.resumption_token) {
-	OUT.println(&quot;token:&quot;+json.resumption_token);
-	vars.put(&quot;resumptionToken&quot;, &quot;&amp;resumption_token=&quot;+json.resumption_token);
-	vars.put(&quot;continue_get&quot;, &quot;TRUE&quot;);
-} else {
-	OUT.println(&quot;no resumption_token&quot;);
-	vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);
-}</stringProp>
+var cont = (vars.get(&quot;resumptionToken_matchNr&quot;) == 1 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
+vars.put(&quot;continue_get&quot;, new String(cont).toUpperCase());</stringProp>
                 </BSFPostProcessor>
                 <hashTree/>
               </hashTree>
             </hashTree>
-            <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
-              <boolProp name="ResultCollector.error_logging">false</boolProp>
-              <objProp>
-                <name>saveConfig</name>
-                <value class="SampleSaveConfiguration">
-                  <time>true</time>
-                  <latency>true</latency>
-                  <timestamp>true</timestamp>
-                  <success>true</success>
-                  <label>true</label>
-                  <code>true</code>
-                  <message>true</message>
-                  <threadName>true</threadName>
-                  <dataType>true</dataType>
-                  <encoding>false</encoding>
-                  <assertions>true</assertions>
-                  <subresults>true</subresults>
-                  <responseData>false</responseData>
-                  <samplerData>false</samplerData>
-                  <xml>true</xml>
-                  <fieldNames>false</fieldNames>
-                  <responseHeaders>false</responseHeaders>
-                  <requestHeaders>false</requestHeaders>
-                  <responseDataOnError>false</responseDataOnError>
-                  <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-                  <assertionsResultsToSave>0</assertionsResultsToSave>
-                  <bytes>true</bytes>
-                </value>
-              </objProp>
-              <stringProp name="filename"></stringProp>
-            </ResultCollector>
-            <hashTree/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
+            <hashTree>
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                <stringProp name="scriptLanguage">javascript</stringProp>
+                <stringProp name="parameters"></stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="script">vars.put(&quot;resumptionToken&quot;, &quot;&quot;);
+vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);</stringProp>
+              </BSFPostProcessor>
+              <hashTree/>
+            </hashTree>
           </hashTree>
-          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="/harvest/listidentifiers" enabled="false">
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="/OAI-PMH?verb=ListIdentifiers" enabled="true"/>
+          <hashTree>
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListMetadataFormats" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                <collectionProp name="Arguments.arguments"/>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
+              <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+              <stringProp name="HTTPSampler.protocol"></stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListMetadataFormats</stringProp>
+              <stringProp name="HTTPSampler.method">GET</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <boolProp name="HTTPSampler.monitor">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            </HTTPSampler>
+            <hashTree>
+              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                <stringProp name="XPathExtractor.default"></stringProp>
+                <stringProp name="XPathExtractor.refname">metadataPrefix</stringProp>
+                <stringProp name="XPathExtractor.xpathQuery">//*/metadataPrefix</stringProp>
+                <boolProp name="XPathExtractor.validate">false</boolProp>
+                <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                <boolProp name="XPathExtractor.namespace">false</boolProp>
+              </XPathExtractor>
+              <hashTree/>
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                <stringProp name="scriptLanguage">javascript</stringProp>
+                <stringProp name="parameters">metadataPrefix</stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="script">function nextRandomNumber(){
+  var hi = this.seed / this.Q;
+  var lo = this.seed % this.Q;
+  var test = this.A * lo - this.R * hi;
+  if(test &gt; 0){
+    this.seed = test;
+  } else {
+    this.seed = test + this.M;
+  }
+  return (this.seed * this.oneOverM);
+}
+
+function RandomNumberGenerator(){
+  var d = new Date();
+  this.seed = 2345678901 + (d.getSeconds() * 0xFFFFFF) + (d.getMinutes() * 0xFFFF);
+  this.A = 48271;
+  this.M = 2147483647;
+  this.Q = this.M / this.A;
+  this.R = this.M % this.A;
+  this.oneOverM = 1.0 / this.M;
+  this.next = nextRandomNumber;
+  return this;
+}
+
+function createRandomNumber(Min, Max){
+  var rand = new RandomNumberGenerator();
+  return Math.round((Max-Min) * rand.next() + Min);
+}
+
+
+OUT.println(&quot;refName_matchNr:&quot;+vars.get(&quot;metadataPrefix_matchNr&quot;));
+var numMatches = vars.get(&quot;metadataPrefix_matchNr&quot;);
+var prefix = null;
+if (numMatches &amp;&amp; numMatches &gt; 0) {
+	prefix = vars.get(&quot;metadataPrefix_&quot;+createRandomNumber(1, numMatches));
+	OUT.println(&quot;rand: &quot;+prefix);
+}
+vars.put(&quot;randomPrefix&quot;, prefix);</stringProp>
+              </BSFPostProcessor>
+              <hashTree/>
+              <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="true">
+                <boolProp name="XPath.negate">true</boolProp>
+                <stringProp name="XPath.xpath">//*/error</stringProp>
+                <boolProp name="XPath.validate">false</boolProp>
+                <boolProp name="XPath.whitespace">false</boolProp>
+                <boolProp name="XPath.tolerant">false</boolProp>
+                <boolProp name="XPath.namespace">false</boolProp>
+              </XPathAssertion>
+              <hashTree/>
+            </hashTree>
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=false" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                <collectionProp name="Arguments.arguments"/>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
+              <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+              <stringProp name="HTTPSampler.protocol"></stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}</stringProp>
+              <stringProp name="HTTPSampler.method">GET</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <boolProp name="HTTPSampler.monitor">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            </HTTPSampler>
+            <hashTree>
+              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                <stringProp name="XPathExtractor.default"></stringProp>
+                <stringProp name="XPathExtractor.refname">identifiers</stringProp>
+                <stringProp name="XPathExtractor.xpathQuery">//*/header/identifier</stringProp>
+                <boolProp name="XPathExtractor.validate">false</boolProp>
+                <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                <boolProp name="XPathExtractor.namespace">false</boolProp>
+              </XPathExtractor>
+              <hashTree/>
+              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                <stringProp name="XPathExtractor.default">--NONE--</stringProp>
+                <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
+                <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
+                <boolProp name="XPathExtractor.validate">false</boolProp>
+                <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                <boolProp name="XPathExtractor.namespace">false</boolProp>
+              </XPathExtractor>
+              <hashTree/>
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                <stringProp name="scriptLanguage">javascript</stringProp>
+                <stringProp name="parameters"></stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="script">OUT.println(&quot;hi&quot;);
+
+var cont =(vars.get(&quot;resumptionToken_matchNr&quot;) != 0 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
+vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());</stringProp>
+              </BSFPostProcessor>
+              <hashTree/>
+              <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="true">
+                <boolProp name="XPath.negate">true</boolProp>
+                <stringProp name="XPath.xpath">//*/error</stringProp>
+                <boolProp name="XPath.validate">false</boolProp>
+                <boolProp name="XPath.whitespace">false</boolProp>
+                <boolProp name="XPath.tolerant">false</boolProp>
+                <boolProp name="XPath.namespace">false</boolProp>
+              </XPathAssertion>
+              <hashTree/>
+            </hashTree>
+            <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="true">
+              <stringProp name="ForeachController.inputVal">identifiers</stringProp>
+              <stringProp name="ForeachController.returnVal">identifier</stringProp>
+              <boolProp name="ForeachController.useSeparator">true</boolProp>
+            </ForeachController>
+            <hashTree>
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=&lt;var&gt;" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
+                <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=${identifier}</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler>
+              <hashTree>
+                <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="true">
+                  <boolProp name="XPath.negate">true</boolProp>
+                  <stringProp name="XPath.xpath">//*/error</stringProp>
+                  <boolProp name="XPath.validate">false</boolProp>
+                  <boolProp name="XPath.whitespace">false</boolProp>
+                  <boolProp name="XPath.tolerant">false</boolProp>
+                  <boolProp name="XPath.namespace">false</boolProp>
+                </XPathAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
+              <stringProp name="WhileController.condition">${continue_get}</stringProp>
+            </WhileController>
+            <hashTree>
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=true" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
+                <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=${resumptionToken}</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler>
+              <hashTree>
+                <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                  <stringProp name="XPathExtractor.default"></stringProp>
+                  <stringProp name="XPathExtractor.refname">identifiers</stringProp>
+                  <stringProp name="XPathExtractor.xpathQuery">//*/header/identifier</stringProp>
+                  <boolProp name="XPathExtractor.validate">false</boolProp>
+                  <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                  <boolProp name="XPathExtractor.namespace">false</boolProp>
+                </XPathExtractor>
+                <hashTree/>
+                <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="true">
+                  <stringProp name="XPathExtractor.default">--NONE--</stringProp>
+                  <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
+                  <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
+                  <boolProp name="XPathExtractor.validate">false</boolProp>
+                  <boolProp name="XPathExtractor.tolerant">false</boolProp>
+                  <boolProp name="XPathExtractor.namespace">false</boolProp>
+                  <stringProp name="Sample.scope">all</stringProp>
+                </XPathExtractor>
+                <hashTree/>
+                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                  <stringProp name="scriptLanguage">javascript</stringProp>
+                  <stringProp name="parameters"></stringProp>
+                  <stringProp name="filename"></stringProp>
+                  <stringProp name="script">OUT.println(&quot;hi2&quot;);
+
+var cont =(vars.get(&quot;resumptionToken_matchNr&quot;) != 0 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
+vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());
+</stringProp>
+                </BSFPostProcessor>
+                <hashTree/>
+                <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="true">
+                  <boolProp name="XPath.negate">true</boolProp>
+                  <stringProp name="XPath.xpath">//*/error</stringProp>
+                  <boolProp name="XPath.validate">false</boolProp>
+                  <boolProp name="XPath.whitespace">false</boolProp>
+                  <boolProp name="XPath.tolerant">false</boolProp>
+                  <boolProp name="XPath.namespace">false</boolProp>
+                </XPathAssertion>
+                <hashTree/>
+              </hashTree>
+              <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="true">
+                <stringProp name="ForeachController.inputVal">identifiers</stringProp>
+                <stringProp name="ForeachController.returnVal">identifier</stringProp>
+                <boolProp name="ForeachController.useSeparator">true</boolProp>
+              </ForeachController>
+              <hashTree>
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=&lt;var&gt;" enabled="true">
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+                    <collectionProp name="Arguments.arguments"/>
+                  </elementProp>
+                  <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
+                  <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
+                  <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                  <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                  <stringProp name="HTTPSampler.protocol"></stringProp>
+                  <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                  <stringProp name="HTTPSampler.path">/OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=${identifier}</stringProp>
+                  <stringProp name="HTTPSampler.method">GET</stringProp>
+                  <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                  <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                  <boolProp name="HTTPSampler.monitor">false</boolProp>
+                  <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                </HTTPSampler>
+                <hashTree>
+                  <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="true">
+                    <boolProp name="XPath.negate">true</boolProp>
+                    <stringProp name="XPath.xpath">//*/error</stringProp>
+                    <boolProp name="XPath.validate">false</boolProp>
+                    <boolProp name="XPath.whitespace">false</boolProp>
+                    <boolProp name="XPath.tolerant">false</boolProp>
+                    <boolProp name="XPath.namespace">false</boolProp>
+                  </XPathAssertion>
+                  <hashTree/>
+                </hashTree>
+              </hashTree>
+            </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
+            <hashTree>
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                <stringProp name="scriptLanguage">javascript</stringProp>
+                <stringProp name="parameters"></stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="script">vars.put(&quot;resumptionToken&quot;, &quot;&quot;);
+vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);</stringProp>
+              </BSFPostProcessor>
+              <hashTree/>
+            </hashTree>
+          </hashTree>
+          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="/harvest/listidentifiers" enabled="true">
             <boolProp name="LoopController.continue_forever">true</boolProp>
             <stringProp name="LoopController.loops">1</stringProp>
           </LoopController>
           <hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listindentifiers" enabled="false">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listindentifiers" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -365,7 +631,7 @@ if (json.resumption_token) {
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree>
-              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                 <stringProp name="filename"></stringProp>
                 <stringProp name="parameters"></stringProp>
                 <stringProp name="script">OUT.println(&quot;########### START ############&quot;);
@@ -391,7 +657,7 @@ if (json.listidentifiers) {
 
 if (json.resumption_token) {
 	OUT.println(&quot;token:&quot;+json.resumption_token);
-	vars.put(&quot;resumptionToken&quot;, &quot;&amp;resumption_token=&quot;+json.resumption_token);
+	vars.put(&quot;resumptionToken&quot;, json.resumption_token);
 	vars.put(&quot;continue_get&quot;, &quot;TRUE&quot;);
 } else {
 	OUT.println(&quot;no resumption_token&quot;);
@@ -403,13 +669,13 @@ OUT.println(&quot;########### END ############&quot;);
               </BSFPostProcessor>
               <hashTree/>
             </hashTree>
-            <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="false">
+            <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="true">
               <stringProp name="ForeachController.inputVal">listidentifiers</stringProp>
               <stringProp name="ForeachController.returnVal">identifier</stringProp>
               <boolProp name="ForeachController.useSeparator">true</boolProp>
             </ForeachController>
             <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/getrecord" enabled="false">
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/getrecord" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -429,7 +695,7 @@ OUT.println(&quot;########### END ############&quot;);
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler>
               <hashTree>
-                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                   <stringProp name="scriptLanguage">javascript</stringProp>
                   <stringProp name="parameters"></stringProp>
                   <stringProp name="filename"></stringProp>
@@ -440,11 +706,11 @@ OUT.println(&quot;########## END GetRecord ###########&quot;)</stringProp>
                 <hashTree/>
               </hashTree>
             </hashTree>
-            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="false">
+            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
               <stringProp name="WhileController.condition">${continue_get}</stringProp>
             </WhileController>
             <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listindentifiers" enabled="false">
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listindentifiers" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -464,7 +730,7 @@ OUT.println(&quot;########## END GetRecord ###########&quot;)</stringProp>
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler>
               <hashTree>
-                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                   <stringProp name="filename"></stringProp>
                   <stringProp name="parameters"></stringProp>
                   <stringProp name="script">OUT.println(&quot;########### START ############&quot;);
@@ -490,7 +756,7 @@ if (json.listidentifiers) {
 
 if (json.resumption_token) {
 	OUT.println(&quot;token:&quot;+json.resumption_token);
-	vars.put(&quot;resumptionToken&quot;, &quot;&amp;resumption_token=&quot;+json.resumption_token);
+	vars.put(&quot;resumptionToken&quot;, json.resumption_token);
 	vars.put(&quot;continue_get&quot;, &quot;TRUE&quot;);
 } else {
 	OUT.println(&quot;no resumption_token&quot;);
@@ -501,13 +767,13 @@ OUT.println(&quot;########### END ############&quot;);</stringProp>
                 </BSFPostProcessor>
                 <hashTree/>
               </hashTree>
-              <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="false">
+              <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="true">
                 <stringProp name="ForeachController.inputVal">listidentifiers</stringProp>
                 <stringProp name="ForeachController.returnVal">identifier</stringProp>
                 <boolProp name="ForeachController.useSeparator">true</boolProp>
               </ForeachController>
               <hashTree>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/getrecord" enabled="false">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/getrecord" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -527,7 +793,7 @@ OUT.println(&quot;########### END ############&quot;);</stringProp>
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree>
-                  <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+                  <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                     <stringProp name="scriptLanguage">javascript</stringProp>
                     <stringProp name="parameters"></stringProp>
                     <stringProp name="filename"></stringProp>
@@ -539,293 +805,24 @@ OUT.println(&quot;########## END GetRecord ###########&quot;)</stringProp>
                 </hashTree>
               </hashTree>
             </hashTree>
-          </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="/OAI-PMH?verb=ListIdentifiers" enabled="false"/>
-          <hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListMetadataFormats" enabled="false">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                <collectionProp name="Arguments.arguments"/>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-              <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-              <stringProp name="HTTPSampler.protocol"></stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListMetadataFormats</stringProp>
-              <stringProp name="HTTPSampler.method">GET</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <boolProp name="HTTPSampler.monitor">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-            </HTTPSampler>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
             <hashTree>
-              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                <stringProp name="XPathExtractor.default"></stringProp>
-                <stringProp name="XPathExtractor.refname">metadataPrefix</stringProp>
-                <stringProp name="XPathExtractor.xpathQuery">//*/metadataPrefix</stringProp>
-                <boolProp name="XPathExtractor.validate">false</boolProp>
-                <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                <boolProp name="XPathExtractor.namespace">false</boolProp>
-              </XPathExtractor>
-              <hashTree/>
-              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
-                <stringProp name="scriptLanguage">javascript</stringProp>
-                <stringProp name="parameters">metadataPrefix</stringProp>
-                <stringProp name="filename"></stringProp>
-                <stringProp name="script">function nextRandomNumber(){
-  var hi = this.seed / this.Q;
-  var lo = this.seed % this.Q;
-  var test = this.A * lo - this.R * hi;
-  if(test &gt; 0){
-    this.seed = test;
-  } else {
-    this.seed = test + this.M;
-  }
-  return (this.seed * this.oneOverM);
-}
-
-function RandomNumberGenerator(){
-  var d = new Date();
-  this.seed = 2345678901 + (d.getSeconds() * 0xFFFFFF) + (d.getMinutes() * 0xFFFF);
-  this.A = 48271;
-  this.M = 2147483647;
-  this.Q = this.M / this.A;
-  this.R = this.M % this.A;
-  this.oneOverM = 1.0 / this.M;
-  this.next = nextRandomNumber;
-  return this;
-}
-
-function createRandomNumber(Min, Max){
-  var rand = new RandomNumberGenerator();
-  return Math.round((Max-Min) * rand.next() + Min);
-}
-
-
-OUT.println(&quot;refName_matchNr:&quot;+vars.get(&quot;metadataPrefix_matchNr&quot;));
-var numMatches = vars.get(&quot;metadataPrefix_matchNr&quot;);
-var prefix = null;
-if (numMatches &amp;&amp; numMatches &gt; 0) {
-	prefix = vars.get(&quot;metadataPrefix_&quot;+createRandomNumber(1, numMatches));
-	OUT.println(&quot;rand: &quot;+prefix);
-}
-vars.put(&quot;randomPrefix&quot;, prefix);</stringProp>
-              </BSFPostProcessor>
-              <hashTree/>
-              <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="false">
-                <boolProp name="XPath.negate">true</boolProp>
-                <stringProp name="XPath.xpath">//*/error</stringProp>
-                <boolProp name="XPath.validate">false</boolProp>
-                <boolProp name="XPath.whitespace">false</boolProp>
-                <boolProp name="XPath.tolerant">false</boolProp>
-                <boolProp name="XPath.namespace">false</boolProp>
-              </XPathAssertion>
-              <hashTree/>
-            </hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=false" enabled="false">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                <collectionProp name="Arguments.arguments"/>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-              <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-              <stringProp name="HTTPSampler.protocol"></stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}</stringProp>
-              <stringProp name="HTTPSampler.method">GET</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <boolProp name="HTTPSampler.monitor">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-            </HTTPSampler>
-            <hashTree>
-              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                <stringProp name="XPathExtractor.default"></stringProp>
-                <stringProp name="XPathExtractor.refname">identifiers</stringProp>
-                <stringProp name="XPathExtractor.xpathQuery">//*/header/identifier</stringProp>
-                <boolProp name="XPathExtractor.validate">false</boolProp>
-                <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                <boolProp name="XPathExtractor.namespace">false</boolProp>
-              </XPathExtractor>
-              <hashTree/>
-              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                <stringProp name="XPathExtractor.default">--NONE--</stringProp>
-                <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
-                <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
-                <boolProp name="XPathExtractor.validate">false</boolProp>
-                <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                <boolProp name="XPathExtractor.namespace">false</boolProp>
-              </XPathExtractor>
-              <hashTree/>
-              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                 <stringProp name="scriptLanguage">javascript</stringProp>
                 <stringProp name="parameters"></stringProp>
                 <stringProp name="filename"></stringProp>
-                <stringProp name="script">OUT.println(&quot;hi&quot;);
-
-var cont =(vars.get(&quot;resumptionToken_matchNr&quot;) != 0 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
-vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());</stringProp>
+                <stringProp name="script">vars.put(&quot;resumptionToken&quot;, &quot;&quot;);
+vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);</stringProp>
               </BSFPostProcessor>
               <hashTree/>
-              <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="false">
-                <boolProp name="XPath.negate">true</boolProp>
-                <stringProp name="XPath.xpath">//*/error</stringProp>
-                <boolProp name="XPath.validate">false</boolProp>
-                <boolProp name="XPath.whitespace">false</boolProp>
-                <boolProp name="XPath.tolerant">false</boolProp>
-                <boolProp name="XPath.namespace">false</boolProp>
-              </XPathAssertion>
-              <hashTree/>
-            </hashTree>
-            <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="false">
-              <stringProp name="ForeachController.inputVal">identifiers</stringProp>
-              <stringProp name="ForeachController.returnVal">identifier</stringProp>
-              <boolProp name="ForeachController.useSeparator">true</boolProp>
-            </ForeachController>
-            <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=&lt;var&gt;" enabled="false">
-                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                  <collectionProp name="Arguments.arguments"/>
-                </elementProp>
-                <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-                <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                <stringProp name="HTTPSampler.protocol"></stringProp>
-                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=${identifier}</stringProp>
-                <stringProp name="HTTPSampler.method">GET</stringProp>
-                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-                <boolProp name="HTTPSampler.monitor">false</boolProp>
-                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              </HTTPSampler>
-              <hashTree>
-                <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="false">
-                  <boolProp name="XPath.negate">true</boolProp>
-                  <stringProp name="XPath.xpath">//*/error</stringProp>
-                  <boolProp name="XPath.validate">false</boolProp>
-                  <boolProp name="XPath.whitespace">false</boolProp>
-                  <boolProp name="XPath.tolerant">false</boolProp>
-                  <boolProp name="XPath.namespace">false</boolProp>
-                </XPathAssertion>
-                <hashTree/>
-              </hashTree>
-            </hashTree>
-            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="false">
-              <stringProp name="WhileController.condition">${continue_get}</stringProp>
-            </WhileController>
-            <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=true" enabled="false">
-                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                  <collectionProp name="Arguments.arguments"/>
-                </elementProp>
-                <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-                <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                <stringProp name="HTTPSampler.protocol"></stringProp>
-                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListIdentifiers&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=${resumptionToken}</stringProp>
-                <stringProp name="HTTPSampler.method">GET</stringProp>
-                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-                <boolProp name="HTTPSampler.monitor">false</boolProp>
-                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              </HTTPSampler>
-              <hashTree>
-                <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                  <stringProp name="XPathExtractor.default"></stringProp>
-                  <stringProp name="XPathExtractor.refname">identifiers</stringProp>
-                  <stringProp name="XPathExtractor.xpathQuery">//*/header/identifier</stringProp>
-                  <boolProp name="XPathExtractor.validate">false</boolProp>
-                  <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                  <boolProp name="XPathExtractor.namespace">false</boolProp>
-                </XPathExtractor>
-                <hashTree/>
-                <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                  <stringProp name="XPathExtractor.default">--NONE--</stringProp>
-                  <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
-                  <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
-                  <boolProp name="XPathExtractor.validate">false</boolProp>
-                  <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                  <boolProp name="XPathExtractor.namespace">false</boolProp>
-                  <stringProp name="Sample.scope">all</stringProp>
-                </XPathExtractor>
-                <hashTree/>
-                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
-                  <stringProp name="scriptLanguage">javascript</stringProp>
-                  <stringProp name="parameters"></stringProp>
-                  <stringProp name="filename"></stringProp>
-                  <stringProp name="script">OUT.println(&quot;hi2&quot;);
-
-var cont =(vars.get(&quot;resumptionToken_matchNr&quot;) != 0 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
-vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());
-</stringProp>
-                </BSFPostProcessor>
-                <hashTree/>
-                <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="false">
-                  <boolProp name="XPath.negate">true</boolProp>
-                  <stringProp name="XPath.xpath">//*/error</stringProp>
-                  <boolProp name="XPath.validate">false</boolProp>
-                  <boolProp name="XPath.whitespace">false</boolProp>
-                  <boolProp name="XPath.tolerant">false</boolProp>
-                  <boolProp name="XPath.namespace">false</boolProp>
-                </XPathAssertion>
-                <hashTree/>
-              </hashTree>
-              <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller" enabled="false">
-                <stringProp name="ForeachController.inputVal">identifiers</stringProp>
-                <stringProp name="ForeachController.returnVal">identifier</stringProp>
-                <boolProp name="ForeachController.useSeparator">true</boolProp>
-              </ForeachController>
-              <hashTree>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=&lt;var&gt;" enabled="false">
-                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                    <collectionProp name="Arguments.arguments"/>
-                  </elementProp>
-                  <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-                  <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-                  <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                  <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                  <stringProp name="HTTPSampler.protocol"></stringProp>
-                  <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/OAI-PMH?verb=GetRecord&amp;metadataPrefix=${randomPrefix}&amp;by_doc_ID=true&amp;identifier=${identifier}</stringProp>
-                  <stringProp name="HTTPSampler.method">GET</stringProp>
-                  <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                  <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                  <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-                  <boolProp name="HTTPSampler.monitor">false</boolProp>
-                  <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-                </HTTPSampler>
-                <hashTree>
-                  <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath Assertion" enabled="false">
-                    <boolProp name="XPath.negate">true</boolProp>
-                    <stringProp name="XPath.xpath">//*/error</stringProp>
-                    <boolProp name="XPath.validate">false</boolProp>
-                    <boolProp name="XPath.whitespace">false</boolProp>
-                    <boolProp name="XPath.tolerant">false</boolProp>
-                    <boolProp name="XPath.namespace">false</boolProp>
-                  </XPathAssertion>
-                  <hashTree/>
-                </hashTree>
-              </hashTree>
             </hashTree>
           </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="/OAI-PMH?verb=ListRecords" enabled="false"/>
+          <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="/harvest/listrecords" enabled="true">
+            <boolProp name="LoopController.continue_forever">true</boolProp>
+            <stringProp name="LoopController.loops">1</stringProp>
+          </LoopController>
           <hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListMetadataFormats" enabled="false">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listrecords" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -835,7 +832,7 @@ vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol"></stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListMetadataFormats</stringProp>
+              <stringProp name="HTTPSampler.path">/harvest/listrecords</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -845,105 +842,28 @@ vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree>
-              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                <stringProp name="XPathExtractor.default"></stringProp>
-                <stringProp name="XPathExtractor.refname">metadataPrefix</stringProp>
-                <stringProp name="XPathExtractor.xpathQuery">//*/metadataPrefix</stringProp>
-                <boolProp name="XPathExtractor.validate">false</boolProp>
-                <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                <boolProp name="XPathExtractor.namespace">false</boolProp>
-              </XPathExtractor>
-              <hashTree/>
-              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
-                <stringProp name="scriptLanguage">javascript</stringProp>
-                <stringProp name="parameters">metadataPrefix</stringProp>
-                <stringProp name="filename"></stringProp>
-                <stringProp name="script">function nextRandomNumber(){
-  var hi = this.seed / this.Q;
-  var lo = this.seed % this.Q;
-  var test = this.A * lo - this.R * hi;
-  if(test &gt; 0){
-    this.seed = test;
-  } else {
-    this.seed = test + this.M;
-  }
-  return (this.seed * this.oneOverM);
-}
-
-function RandomNumberGenerator(){
-  var d = new Date();
-  this.seed = 2345678901 + (d.getSeconds() * 0xFFFFFF) + (d.getMinutes() * 0xFFFF);
-  this.A = 48271;
-  this.M = 2147483647;
-  this.Q = this.M / this.A;
-  this.R = this.M % this.A;
-  this.oneOverM = 1.0 / this.M;
-  this.next = nextRandomNumber;
-  return this;
-}
-
-function createRandomNumber(Min, Max){
-  var rand = new RandomNumberGenerator();
-  return Math.round((Max-Min) * rand.next() + Min);
-}
-
-
-OUT.println(&quot;refName_matchNr:&quot;+vars.get(&quot;metadataPrefix_matchNr&quot;));
-var numMatches = vars.get(&quot;metadataPrefix_matchNr&quot;);
-var prefix = null;
-if (numMatches &amp;&amp; numMatches &gt; 0) {
-	prefix = vars.get(&quot;metadataPrefix_&quot;+createRandomNumber(1, numMatches));
-	OUT.println(&quot;rand: &quot;+prefix);
-}
-vars.put(&quot;randomPrefix&quot;, prefix);</stringProp>
-              </BSFPostProcessor>
-              <hashTree/>
-            </hashTree>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomPrefix}" enabled="false">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-                <collectionProp name="Arguments.arguments"/>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
-              <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-              <stringProp name="HTTPSampler.protocol"></stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomPrefix}</stringProp>
-              <stringProp name="HTTPSampler.method">GET</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <boolProp name="HTTPSampler.monitor">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-            </HTTPSampler>
-            <hashTree>
-              <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                <stringProp name="XPathExtractor.default">--NONE--</stringProp>
-                <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
-                <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
-                <boolProp name="XPathExtractor.validate">false</boolProp>
-                <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                <boolProp name="XPathExtractor.namespace">true</boolProp>
-              </XPathExtractor>
-              <hashTree/>
-              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                 <stringProp name="scriptLanguage">javascript</stringProp>
                 <stringProp name="parameters"></stringProp>
                 <stringProp name="filename"></stringProp>
-                <stringProp name="script">OUT.println(&quot;here 1&quot;);
+                <stringProp name="script">eval(&apos;var json = &apos;+prev.getResponseDataAsString());
 
-var cont =(vars.get(&quot;resumptionToken_matchNr&quot;) != 0 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
-vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());</stringProp>
+if (json.resumption_token) {
+	OUT.println(&quot;token:&quot;+json.resumption_token);
+	vars.put(&quot;resumptionToken&quot;, json.resumption_token);
+	vars.put(&quot;continue_get&quot;, &quot;TRUE&quot;);
+} else {
+	OUT.println(&quot;no resumption_token&quot;);
+	vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);
+}</stringProp>
               </BSFPostProcessor>
               <hashTree/>
             </hashTree>
-            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="false">
+            <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
               <stringProp name="WhileController.condition">${continue_get}</stringProp>
             </WhileController>
             <hashTree>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=&lt;token&gt;" enabled="false">
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="GET /harvest/listrecords" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -953,7 +873,7 @@ vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());</stri
                 <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 <stringProp name="HTTPSampler.protocol"></stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/OAI-PMH?verb=ListRecords&amp;metadataPrefix=${randomPrefix}&amp;resumptionToken=${resumptionToken}</stringProp>
+                <stringProp name="HTTPSampler.path">/harvest/listrecords?resumption_token=${resumptionToken}</stringProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -963,28 +883,68 @@ vars.putObject(&quot;continue_get&quot;,  new String(cont).toUpperCase());</stri
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler>
               <hashTree>
-                <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath Extractor" enabled="false">
-                  <stringProp name="XPathExtractor.default">--NONE--</stringProp>
-                  <stringProp name="XPathExtractor.refname">resumptionToken</stringProp>
-                  <stringProp name="XPathExtractor.xpathQuery">//*[local-name()=&apos;resumptionToken&apos;]</stringProp>
-                  <boolProp name="XPathExtractor.validate">false</boolProp>
-                  <boolProp name="XPathExtractor.tolerant">false</boolProp>
-                  <boolProp name="XPathExtractor.namespace">false</boolProp>
-                </XPathExtractor>
-                <hashTree/>
-                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="false">
+                <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
                   <stringProp name="scriptLanguage">javascript</stringProp>
                   <stringProp name="parameters"></stringProp>
                   <stringProp name="filename"></stringProp>
-                  <stringProp name="script">OUT.println(&quot;here 2&quot;);
+                  <stringProp name="script">eval(&apos;var json = &apos;+prev.getResponseDataAsString());
 
-var cont = (vars.get(&quot;resumptionToken_matchNr&quot;) == 1 &amp;&amp; vars.get(&quot;resumptionToken&quot;) != &quot;--NONE--&quot;);
-vars.put(&quot;continue_get&quot;, new String(cont).toUpperCase());</stringProp>
+if (json.resumption_token) {
+	OUT.println(&quot;token:&quot;+json.resumption_token);
+	vars.put(&quot;resumptionToken&quot;, json.resumption_token);
+	vars.put(&quot;continue_get&quot;, &quot;TRUE&quot;);
+} else {
+	OUT.println(&quot;no resumption_token&quot;);
+	vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);
+}</stringProp>
                 </BSFPostProcessor>
                 <hashTree/>
               </hashTree>
             </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller" enabled="true"/>
+            <hashTree>
+              <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+                <stringProp name="scriptLanguage">javascript</stringProp>
+                <stringProp name="parameters"></stringProp>
+                <stringProp name="filename"></stringProp>
+                <stringProp name="script">vars.put(&quot;resumptionToken&quot;, &quot;&quot;);
+vars.put(&quot;continue_get&quot;, &quot;FALSE&quot;);</stringProp>
+              </BSFPostProcessor>
+              <hashTree/>
+            </hashTree>
           </hashTree>
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+            <boolProp name="ResultCollector.error_logging">true</boolProp>
+            <objProp>
+              <name>saveConfig</name>
+              <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>true</xml>
+                <fieldNames>false</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+              </value>
+            </objProp>
+            <stringProp name="filename"></stringProp>
+          </ResultCollector>
+          <hashTree/>
         </hashTree>
         <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>

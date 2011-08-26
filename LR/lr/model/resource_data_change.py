@@ -88,7 +88,7 @@ class RecordDistributableChange(DatabaseChangeHandler):
         del newResourceData['node_timestamp']
         
         if temp != newResourceData:
-            currentResourceDoc.update(newResourceData)
+            currentResourceData.update(newResourceData)
             try:
                 log.debug("\nUpdate existing resource data from distributable\n")
                 database.update([currentResourceData])
