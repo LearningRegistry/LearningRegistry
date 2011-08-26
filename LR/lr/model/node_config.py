@@ -237,15 +237,13 @@ class LRNodeModel(object):
                 else:
                     s.update()
 
-    def getDistributeCredentialFor(self, nodeUrl):
+    def getDistributeCredentialFor(self, targetUrl):
         #Get all the passwords for distribute
         if _DISTRIBUTE_PASSWORD_ID not in NodeModel._defaultDB:
             return None
-        parsedUrl = urlparse(nodeUrl)
         #check if we have any credential to access the node url.
         passwords = h.dictToObject(NodeModel._defaultDB[_DISTRIBUTE_PASSWORD_ID])
-        credential = passwords.passwords.get(
-                        urlunparse(ParseResult(parsedUrl.scheme, parsedUrl.netloc, '','', '', '')))
+        credential = passwords.passwords.get(targetUrl)
         return credential
         
 
