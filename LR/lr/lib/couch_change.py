@@ -55,7 +55,7 @@ class DatabaseChangeThresholdHandler(DatabaseChangeHandler):
         return self._predicate(change, database)
     
     def _shouldTakeAction(self):
-        log.info("count: {0} countThreshold: {1} timedelta: {2} timethreshold: {3}".format(
+        log.debug("count: {0} countThreshold: {1} timedelta: {2} timethreshold: {3}".format(
                      self._changeCount, self._countThreshold, 
                      (datetime.now() -self._lastActionTime) , self._timeThreshold))
                      
@@ -95,7 +95,7 @@ class MonitorDatabaseChanges(Process):
         if isinstance(changeOptions, dict):
             self._changeOptions.update(changeOptions)
         self._changeOptions.update(_DEFAULT_CHANGE_OPTIONS)
-        log.info(pprint.pformat(self._changeOptions))
+        log.debug(pprint.pformat(self._changeOptions))
         
     def _initChangeHandlers(self, handlers):
         if hasattr(self, "_changeHandlerSet") :
@@ -125,11 +125,11 @@ class MonitorDatabaseChanges(Process):
             return
         #Simple thread run function watches the caller thread.
         def callerWatcher():
-            log.info("Waiting for caller thread to die...")
+            log.debug("Waiting for caller thread to die...")
             #Poll the caller thread and check if it is still alive.
             while(self._callerThread.is_alive()):
                 sleep(1)
-            log.info("Caller thread is longer alive ... terminate self...")
+            log.debug("Caller thread is longer alive ... terminate self...")
             self.terminate()
         
         terminator = Thread(target=callerWatcher)
@@ -163,7 +163,7 @@ class MonitorDatabaseChanges(Process):
             self._handleChange(change)
             if 'seq' in change:
                 self._lastChangeSequence = change['seq']
-                log.info("--Last change sequence: {0}".format(self._lastChangeSequence))
+                log.debug("--Last change sequence: {0}".format(self._lastChangeSequence))
 
     def addHandler(self, handler):
         if isinstance(handler, DatabaseChangeHandler):
@@ -175,7 +175,7 @@ class MonitorDatabaseChanges(Process):
 
     def run(self):
         # As long as we are running keep monitoring the change feed for changes.
-        log.info("\n\n\nStart monitoring database : {0} changes PID: {1} since:{2}".format(
+        log.debug("\n\n\nStart monitoring database : {0} changes PID: {1} since:{2}".format(
                     str(self._database), self.pid, self._lastChangeSequence))
         self._errorCount = 0
         while(self.is_alive() and self._errorCount < self._MAX_ERROR_RESTART):
@@ -193,7 +193,7 @@ class MonitorDatabaseChanges(Process):
     
     def terminate(self):
         Process.terminate(self)
-        log.info("\n\n------------I got terminated ...---------------\n\n")
+        log.debug("\n\n------------I got terminated ...---------------\n\n")
     
     def start(self, callerThread=None):
         if isinstance(callerThread, Thread):
