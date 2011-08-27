@@ -197,9 +197,16 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             self.__dict__[self._ID]   = document[self._ID] 
             self.__dict__[self._REV] = document[self._REV]
         
+        def _getDescriptionDict(self):
+            try:
+                validKeys = set(self.__class__._DESCRIPTION_DICT_KEYS).intersection(set(self._specData.keys()))
+                return dict((k, self._specData[k]) for k in  validKeys)
+            except:
+                return self._specData
         # Property that return the dictionary of the spec data.
         specData = property(lambda self: dict(self._specData), None, None,  None)
         id = property(lambda self: self.__getattr__(self._ID), None, None, None)
-         
+        descriptionDict = property(lambda self: self._getDescriptionDict(), None, None, None)
+        
     return BaseModel
 

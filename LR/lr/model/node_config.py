@@ -37,7 +37,7 @@ _COUCHDB_FIELDS =['_id', '_rev',
                                     
 log = logging.getLogger(__name__)
 
-_DISTRIBUTE_PASSWORD_ID = "distribute passwords"
+_ACCESS_CREDENTIALS_ID = "access_credentials"
 class LRNodeModel(object):
     """Class that models a learning registry node"""
     def __init__(self, data):
@@ -146,7 +146,16 @@ class LRNodeModel(object):
                                 'timestamp': h.nowToISO8601Zformat()}
         statusData.update(self._nodeStatus.specData)
         return statusData
-        
+
+    def _getNodeJsonDescription(self):
+        description = {'time_stamp': h.nowToISO8601Zformat()}
+        description.update(self._communityDescription.descriptionDict)
+        description.update(self._networkDescription.descriptionDict)
+        description.update(self._nodeDescription.descriptionDict)
+        description.update(self._networkPolicyDescription.descriptionDict)
+        if hasattr(self, '_filterDescription'):
+            description['filter'] = self._filterDescription.descriptionDict
+        return json.dumps(description, indent=2)
         
     def isServiceAvailable(self, service_name):
         """Method to test if serviceType is available """
@@ -155,7 +164,7 @@ class LRNodeModel(object):
     
     def _saveConfig(self, model, modeDB=None):
         pass
-    
+
     def save(self):
         """ Save the node configuration the couchdb database.  The documents will
         be saved to the models default dabase. A document is saved only if 
@@ -239,13 +248,13 @@ class LRNodeModel(object):
 
     def getDistributeCredentialFor(self, targetUrl):
         #Get all the passwords for distribute
-        if _DISTRIBUTE_PASSWORD_ID not in NodeModel._defaultDB:
+        if _ACCESS_CREDENTIALS_ID not in NodeModel._defaultDB:
             return None
         #check if we have any credential to access the node url.
-        passwords = h.dictToObject(NodeModel._defaultDB[_DISTRIBUTE_PASSWORD_ID])
+        passwords = h.dictToObject(NodeModel._defaultDB[_ACCESS_CREDENTIALS_ID])
         credential = passwords.passwords.get(targetUrl)
         return credential
-        
+
 
 
     nodeDescription = property(lambda self: self._nodeDescription, None, None, None)
@@ -253,7 +262,7 @@ class LRNodeModel(object):
     communityDescription = property(lambda self: self._communityDescription, None, None, None)
     filterDescription = property(lambda self: self._filterDescription, None, None, None)
     networkPolicyDescription = property(lambda self: self._networkPolicyDescription, None, None, None)
-    config = property(lambda self: dict(self._config), None, None, None)
+    nodeJsonDescription = property(_getNodeJsonDescription, None, None, None)
     connections = property(lambda self: self._connections[:], None, None, None)
     nodeServices = property(lambda self: self._nodeServices.value(), None, None, None)
     status = property(_getStatusDescription, None, None, None)

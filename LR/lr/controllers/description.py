@@ -17,6 +17,7 @@ from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 import json
+from lr.lib import helpers as h
 from lr.lib.base import BaseController, render
 from lr.model import LRNode as sourceLRNode, NodeServiceModel
 
@@ -30,14 +31,10 @@ class DescriptionController(BaseController):
 
     def index(self, format='html'):
         """GET /description: All items in the collection"""
-        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
-            return "Administrative service is not available"
+        #if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+            #return "Administrative service is not available
             
-        data = {}
-        data['timestamp'] = str(datetime.utcnow())
-        data.update(sourceLRNode.config)
-            
-        return json.dumps(data)
+        return sourceLRNode.nodeJsonDescription
         # url('description')
 
     def create(self):

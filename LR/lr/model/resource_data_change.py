@@ -90,7 +90,7 @@ class RecordDistributableChange(DatabaseChangeHandler):
         if temp != newResourceData:
             currentResourceData.update(newResourceData)
             try:
-                log.info("\nUpdate existing resource data from distributable\n")
+                log.debug("\nUpdate existing resource data from distributable\n")
                 database.update([currentResourceData])
             except Exception as e:
                 log.error("\n\nFailed to udpate existing resource_data doc:\n{0}".format(
@@ -102,7 +102,7 @@ class RecordDistributableChange(DatabaseChangeHandler):
         # for the distributable document, create a local resource_data document and
         # add it the database
         try:
-            log.info("Adding new resource_data for distributable")
+            log.debug("Adding new resource_data for distributable")
             database[resourceDataCopy['doc_ID']] = resourceDataCopy
         except Exception as e:
             log.error("\n\nCannot get current document:  {0}".format(
@@ -136,7 +136,7 @@ class RecordResourceDataChange(DatabaseChangeHandler):
          
         if newDistributableData != temp:
             currentDistributable.update(newDistributableData)
-            log.info("\n\nUpdate distribuatable doc:\n")
+            log.debug("\n\nUpdate distribuatable doc:\n")
             log.debug("\n{0}\n\n".format(pprint.pformat(currentDistributable)))
             try:
                 database.update([currentDistributable])
@@ -148,7 +148,7 @@ class RecordResourceDataChange(DatabaseChangeHandler):
         
     def _addDistributableData(self, distributableData, database):
         try:
-            log.info('Adding distributable doc %s...\n' % distributableData['_id'])
+            log.debug('Adding distributable doc %s...\n' % distributableData['_id'])
             database[distributableData['_id']] = distributableData
         except Exception as e:
             log.error("Cannot save distributable document %s\n" % distributableData['_id'] )
@@ -210,7 +210,7 @@ class TrackLastSequence(DatabaseChangeThresholdHandler):
              # the save sequence number has been already processed.
              self._changeCount = self._changeCount + 1
              if self._shouldTakeAction():
-                 self._saveSequence(change['seq'] , database)
+                 self._saveSequence(change['seq'], database)
                  self._resetChangeToThreshold()
    
     
@@ -236,7 +236,7 @@ def monitorResourceDataChanges():
         lastSavedSequence=ResourceDataModel._defaultDB[_RESOURCE_DATA_CHANGE_ID][TrackLastSequence._LAST_CHANGE_SEQ]
    
     options = {'since':lastSavedSequence}
-    log.info("\n\n-----"+pprint.pformat(options)+"------\n\n")
+    log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
 
     changeMonitor = MonitorDatabaseChanges(appConfig['couchdb.url'], 
                                                                             appConfig['couchdb.db.resourcedata'],

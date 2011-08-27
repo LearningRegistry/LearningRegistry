@@ -22,6 +22,9 @@ DB_NETWORK = appConfig['couchdb.db.network']
 
 class NetworkPolicyModel(createBaseModel(SPEC_NETWORK_POLICY_DESCRIPTION, 
                                                             DB_NETWORK)):
-    
+    _DESCRIPTION_DICT_KEYS = [ 'policy_id',
+                                                     'policy_version',
+                                                     'network_id']
+                                                     
     def __init__(self, data=None):
         super(NetworkPolicyModel, self).__init__(data)
