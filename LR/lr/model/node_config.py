@@ -262,6 +262,7 @@ class LRNodeModel(object):
     communityDescription = property(lambda self: self._communityDescription, None, None, None)
     filterDescription = property(lambda self: self._filterDescription, None, None, None)
     networkPolicyDescription = property(lambda self: self._networkPolicyDescription, None, None, None)
+    config = property(lambda self: dict(self._config), None, None, None)
     nodeJsonDescription = property(_getNodeJsonDescription, None, None, None)
     connections = property(lambda self: self._connections[:], None, None, None)
     nodeServices = property(lambda self: self._nodeServices.value(), None, None, None)
