@@ -226,7 +226,7 @@ class OaiPmhController(HarvestController):
         fc_id_limit = None
         fc_doc_limit = None
         service_id = None
-        serviceDoc = h.getServiceDocument("OAI-PMH service")
+        serviceDoc = h.getServiceDocument("access:OAI-PMH service")
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
                 service_id = serviceDoc['service_id']

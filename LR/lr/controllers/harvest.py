@@ -14,7 +14,7 @@ import ast
 import string
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
-BASIC_HARVEST_SERVICE_DOC = "Basic Harvest service"
+BASIC_HARVEST_SERVICE_DOC = "access:Basic Harvest service"
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
