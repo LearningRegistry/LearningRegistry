@@ -127,6 +127,8 @@ def isResourceDataFilteredOut(resourceData):
     return [False, None]
     
 def publish(envelopData):
+    if isinstance(envelopData,unicode):
+        envelopeData = json.loads(envelopData)
     result={_OK: True}
     resourceData = None
     try:
