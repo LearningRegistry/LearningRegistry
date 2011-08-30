@@ -16,11 +16,11 @@ def make_map(config):
 
     map = Mapper(directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
-
+    map.append_slash = True
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
     map.resource('status','status')
-    map.resource('distribute','distribute')    
+    map.resource('distribute','distribute')
     if not LRNode.nodeDescription.gateway_node:
         map.resource('publish','publish')
         map.resource('obtain','obtain')        
@@ -40,10 +40,8 @@ def make_map(config):
     # likely stay at the top, ensuring it can always be resolved
     map.connect('/error/{action}', controller='error')
     map.connect('/error/{action}/{id}', controller='error')
-
+    
     # CUSTOM ROUTES HERE
-
     map.connect('/{controller}/{action}')
     map.connect('/{controller}/{action}/{id}')
-
     return map

@@ -14,7 +14,6 @@ import ast
 import string
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
-BASIC_HARVEST_SERVICE_DOC = "Basic Harvest service"
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -24,7 +23,7 @@ class HarvestController(BaseController):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
+        serviceDoc = helpers.getServiceDocument(appConfig['lr.harvest.docid'])
 
         if serviceDoc != None:
             if 'service_id' in serviceDoc:

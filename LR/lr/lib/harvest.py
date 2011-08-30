@@ -32,11 +32,7 @@ class harvest:
   def list_metadata_formats(self):
      return [{'metadataFormat':{'metadataPrefix':'dc'}}]
   def earliestDate(self):
-    opts = {
-                    "limit": 1,
-                    "stale": "ok"
-           }            
-    view = self.db.view('_design/learningregistry/_view/by-date',**opts)
+    view = self.db.view('_design/learningregistry-by-date/_view/docs',limit=1,stale='ok')
     return view.rows[0].key
   def list_identifiers(self, from_date, until_date,resumption_token=None,limit=None):
     return self.getViewRows(False,until_date,from_date,limit,resumption_token)
