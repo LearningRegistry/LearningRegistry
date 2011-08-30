@@ -45,11 +45,11 @@ _NETWORK = _config.get("app:main", "couchdb.db.network")
 # Dictionary of types services and the corresponding services that are added 
 # by default to the node.  The format is 
 # "<serviceType>":["<list of services of serviceType>"]
-_DEFAULT_SERVICES = {"administrative":["description", "services", "status", "policy"],
-                     "access":["obtain", "OAI-PMH", "slice",  "harvest", "swordservice"],
+_DEFAULT_SERVICES = {"administrative":["Network Node Description", "Netwrok Node Services", "Network Node Status", "Resource Distribution Netwrok Policy"],
+                     "access":["Basic Obtain", "OAI-PMH Harvest", "Slice",  "Basic Harvest", "SWORD APP Publish V1.3"],
                      "broker":[],
-                     "distribute":["distribute"],
-                     "publish":["publish"]}
+                     "distribute":["Resource Data Distribution"],
+                     "publish":["Basic Publish"]}
 
 def publishNodeDescription(server, dbname):
     node_description = {}
