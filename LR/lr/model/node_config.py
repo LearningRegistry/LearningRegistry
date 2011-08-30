@@ -285,7 +285,7 @@ class LRNodeModel(object):
     nodeJsonDescription = property(_getNodeJsonDescription, None, None, None)
     nodeJsonPolicy = property(_getNodeJsonPolicy, None, None, None)
     connections = property(lambda self: self._connections[:], None, None, None)
-    nodeServices = property(lambda self: self._nodeServices.value(), None, None, None)
+    nodeServices = property(lambda self: self._nodeServices.values(), None, None, None)
     status = property(_getStatusDescription, None, None, None)
 
 
