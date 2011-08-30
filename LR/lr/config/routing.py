@@ -16,7 +16,6 @@ def make_map(config):
 
     map = Mapper(directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
-    map.append_slash = True
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
     map.resource('status','status')
