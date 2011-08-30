@@ -28,10 +28,11 @@ class PolicyController(BaseController):
 
     def index(self, format='html'):
         """GET /policy: All items in the collection"""
-        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
-            return "Administrative service is not available"
+#        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+#            return "Administrative service is not available"
             
-        return json.dumps(sourceLRNode.networkPolicyDescription.specData)
+#       return json.dumps(sourceLRNode.networkPolicyDescription.specData)
+	return sourceLRNode.nodeJsonPolicy
         # url('policy')
 
     def create(self):
