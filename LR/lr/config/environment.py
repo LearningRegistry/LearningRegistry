@@ -48,7 +48,7 @@ def load_environment(global_conf, app_conf):
     import lr.lib.helpers as helpers
     server = couchdb.Server(config['couchdb.url'])
     db = server[config['couchdb.db.node']]
-    doc = db['node status']
+    doc = db[config['lr.nodestatus.docid']]
     doc['start_time'] = helpers.nowToISO8601Zformat()
     db.save(doc)    
     return config
