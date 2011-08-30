@@ -1,0 +1,26 @@
+{"documents": [{
+    "TOS": {
+        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+    }, 
+    "active": true, 
+    "doc_type": "resource_data", 
+    "doc_version": "0.21.0", 
+    "identity": {
+        "curator": "jim.klo@sri.com", 
+        "owner": "jim.klo@sri.com", 
+        "submitter": "jim.klo@sri.com", 
+        "submitter_type": "agent"
+    },  
+    "keys": [
+        "JMETER",
+        "JMETER_JSON",
+        "lr-test-data"
+    ], 
+    "payload_placement": "inline", 
+    "payload_schema": [
+        "JMETER_JSON"
+    ],
+    "resource_data": "{\n \"query\": {\n  \"count\": 1,\n  \"created\": \"2011-08-26T21:49:36Z\",\n  \"lang\": \"en-US\",\n  \"diagnostics\": {\n   \"publiclyCallable\": \"true\",\n   \"url\": [\n    {\n     \"execution-start-time\": \"0\",\n     \"execution-stop-time\": \"135\",\n     \"execution-time\": \"135\",\n     \"proxy\": \"DEFAULT\",\n     \"content\": \"http://scooterlabs.com/yql/lorem.ipsum.xml\"\n    },\n    {\n     \"execution-start-time\": \"139\",\n     \"execution-stop-time\": \"349\",\n     \"execution-time\": \"210\",\n     \"proxy\": \"DEFAULT\",\n     \"content\": \"http://www.lipsum.com/feed/http?amount=5&what=paras&start=yes\"\n    }\n   ],\n   \"query\": {\n    \"execution-start-time\": \"139\",\n    \"execution-stop-time\": \"357\",\n    \"execution-time\": \"218\",\n    \"content\": \"select * from html where url=\"http://www.lipsum.com/feed/http?amount=5&what=paras&start=yes\" and xpath='//div[@id=\"lipsum\"]//p'\"\n   },\n   \"javascript\": {\n    \"execution-time\": \"219\",\n    \"instructions-used\": \"12000\",\n    \"table-name\": \"lorem.ipsum\"\n   },\n   \"user-time\": \"358\",\n   \"service-time\": \"345\",\n   \"build-version\": \"20871\"\n  },\n  \"results\": {\n   \"results\": {\n    \"p\": [\n     \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque adipiscing lobortis dolor nec luctus. Donec scelerisque vestibulum posuere. Proin molestie scelerisque nunc, ac aliquam leo vehicula sed. Integer accumsan, diam commodo eleifend ornare, tellus neque porttitor leo, vitae pretium lacus libero et nisl. Nam fermentum dolor sit amet mauris interdum malesuada. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nisi risus, mollis non pulvinar quis, porttitor sit amet leo. Donec tincidunt, lectus sit amet congue posuere, odio lacus venenatis nulla, cursus ultricies leo nunc quis mauris. Maecenas placerat ultrices neque eget gravida.\",\n     \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras gravida, sem nec lacinia varius, neque tellus laoreet urna, sed iaculis massa nunc eu tortor. In at leo quis felis tristique semper sed eget magna. Nunc mollis convallis auctor. Cras a diam orci, id elementum arcu. Donec eros risus, egestas non tincidunt ac, vestibulum in dolor. Aliquam metus dolor, vestibulum at euismod nec, porttitor non nisi. Nullam neque ipsum, mollis ac tempus in, scelerisque in velit. Sed commodo magna ut nibh rutrum sollicitudin. Ut mattis suscipit tortor, elementum congue libero fermentum sit amet. Nullam ut est vitae odio dignissim congue vitae at sem.\",\n     \"Cras in nulla dui. Fusce pellentesque ante eu mauris ornare adipiscing. Vestibulum vel urna porta orci imperdiet ultricies sit amet id est. Nullam mattis libero ut massa laoreet viverra. Fusce quis metus in orci tincidunt dapibus eu eu libero. Pellentesque et dolor sem, et auctor odio. Praesent urna ante, porttitor in luctus non, hendrerit a velit. Aenean et lectus nunc. Aenean fringilla volutpat leo, et dapibus lectus laoreet eu. Morbi pellentesque, dui nec rutrum mattis, leo sapien rutrum leo, eget porta felis felis sit amet orci. Phasellus sollicitudin metus quis nibh iaculis eu auctor urna lobortis. Donec massa lacus, adipiscing sit amet egestas in, ultrices non lectus.\",\n     \"Nullam aliquam condimentum tristique. Etiam blandit egestas orci eget scelerisque. Aliquam erat volutpat. Pellentesque vitae tortor ut orci condimentum commodo in vitae dui. Nam semper lobortis neque ac ultricies. Cras tempor cursus tellus sit amet mattis. Nam dapibus facilisis nulla, id porta mauris venenatis non. Curabitur et auctor elit. Ut diam quam, placerat vitae bibendum dictum, placerat sed ipsum. Mauris ullamcorper velit at lorem facilisis et bibendum massa sollicitudin. Vestibulum ac accumsan massa. Curabitur at ultrices ipsum. Vivamus sit amet nunc ac ante pharetra mollis eu a turpis. Nulla quis ligula odio. Nulla molestie purus lacus, non aliquet dui.\",\n     \"Quisque scelerisque laoreet elit nec luctus. In tortor eros, porttitor ac tempus non, pharetra id nisl. Proin sed purus eget urna ullamcorper facilisis tempus quis justo. Proin rhoncus nunc sed nibh pharetra sagittis. Pellentesque orci arcu, consectetur ut rhoncus ac, euismod eu lorem. Ut augue mauris, tempus a dictum sed, cursus quis justo. Phasellus eget hendrerit arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nullam ac nisi neque, id vehicula massa. Vivamus accumsan, quam vel blandit euismod, ligula odio commodo augue, sit amet facilisis lectus sapien ut diam. Donec sed hendrerit nisi.\"\n    ]\n   }\n  }\n }\n}",
+    "resource_data_type": "metadata", 
+    "resource_locator": "https://sites.google.com/site/learningregistrytestdata/"
+}]}

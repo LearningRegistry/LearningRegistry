@@ -21,7 +21,12 @@ SPEC_NETWORK_DESCRIPTION= appConfig['spec.models.network_description']
 DB_NETWORK = appConfig['couchdb.db.network']
 
 class NetworkModel(createBaseModel(SPEC_NETWORK_DESCRIPTION, DB_NETWORK)):
-    
+    _DESCRIPTION_DICT_KEYS =["network_id",
+                                                    "network_description",
+                                                    "network_name",
+                                                    "network_key",
+                                                    "network_admin_identity"
+                                                ]
     def __init__(self, data=None):
         super(NetworkModel,self).__init__(data)
         

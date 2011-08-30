@@ -22,7 +22,11 @@ DB_NODE = appConfig['couchdb.db.node']
 
 
 class NodeFilterModel(createBaseModel(SPEC_FILTER_DESCRIPTION, DB_NODE)):
-    
+    _DESCRIPTION_DICT_KEYS = ["filter_name",
+                                                    "custom_filter",
+                                                    "include_exclude",
+                                                    "filter"
+                                                    ]
     def __init__(self, data=None):
         super(NodeFilterModel,self).__init__(data)
         
