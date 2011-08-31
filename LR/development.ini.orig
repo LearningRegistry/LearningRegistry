@@ -69,7 +69,10 @@ couchdb.db.resourcesview = _design/learningregistry/_view/resources
 couchdb.threshold.distributes = 1000
 couchdb.threshold.viewupdate = 100
 lr.distribute.url = http://localhost/distribute
-
+lr.obtain.docid = access:obtain service
+lr.harvest.docid = Basic Harvest service
+lr.oaipmh.docid = OAI-PMH service
+lr.nodestatus.docid = node status
 models_spec_dir = %(here)s/data/models
 spec.models.node_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/node_description
 spec.models.resource_data = %(here)s/data/LR_Tech_Spec_V_0_23/models/resource_data

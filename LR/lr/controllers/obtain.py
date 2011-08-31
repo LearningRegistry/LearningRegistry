@@ -46,7 +46,7 @@ class ObtainController(BaseController):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = h.getServiceDocument("access:obtain service")
+        serviceDoc = h.getServiceDocument(appConfig['lr.obtain.docid'])
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
                 self.service_id = serviceDoc['service_id']

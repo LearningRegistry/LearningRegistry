@@ -16,6 +16,7 @@ import logging
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
+import lr.lib.helpers as h
 import urllib2, json, datetime
 from lr.model import LRNode as sourceLRNode, NodeServiceModel
 
@@ -29,7 +30,7 @@ class ServicesController(BaseController):
 
     def index(self, format='html'):
         """GET /services: All items in the collection"""
-        if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
+        if sourceLRNode.isServiceAvailable('services service') == False:  
             return "Administrative service is not available"
             
         data = {}

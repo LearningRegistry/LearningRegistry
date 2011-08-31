@@ -20,7 +20,8 @@ def publishService(nodeUrl, server, dbname, serviceType, serviceName):
     service.update(t.service_description)
     service['service_type'] =serviceType
     service['service_id'] = uuid4().hex
-    service['service_name'] = serviceName+" service"
+#    service['service_name'] = serviceName+" service"
+    service['service_name'] = serviceName
     service["service_endpoint"] = urlparse.urljoin(nodeUrl, serviceName)
     service['service_description']= "{0} {1} service".format(serviceType, serviceName)
     PublishDoc(server, dbname,  "{0}:{1} service".format(serviceType, serviceName), service)
