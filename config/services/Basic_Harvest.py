@@ -76,6 +76,15 @@ if __name__ == "__main__":
                  'node_service_endpoint_url': "http://test.example.com"
     }
     
+    def doesNotEndInSlash(input=None):
+        return input is not None and input[-1] != "/"
+    
+    def notExample(input=None):
+        return input is not None and input != nodeSetup["nodeUrl"]
+    
+    nodeSetup["couchDBUrl"] = getInput("Enter the CouchDB URL:", nodeSetup["couchDBUrl"], doesNotEndInSlash)
+    nodeSetup["nodeUrl"] = getInput("Enter the public URL of the LR Node", nodeSetup["nodeUrl"], notExample)
+    
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
     install(server, "node", nodeSetup)
     
