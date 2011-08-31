@@ -117,7 +117,7 @@ class ObtainController(BaseController):
         full_docs = (not data.has_key('ids_only')) or data['ids_only'] == False
         self._getServiceDocment(full_docs)
         keys = data['request_IDs']
-        
+        callbackKey = 'callback'
         by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
         by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
         resumption_token = None
@@ -125,15 +125,15 @@ class ObtainController(BaseController):
             by_resource_ID = True            
         if data.has_key('resumption_token'):
             resumption_token = data['resumption_token']
-        if data.has_key('callback'):
-            yield "{0}(".format(data['callback'])                    
+        if data.has_key(callbackKey):
+            yield "{0}(".format(data[callbackKey])                    
         if  by_doc_ID:
             view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
         elif by_resource_ID:
             view = self.get_view('_design/learningregistry-resource-location/_view/docs',keys, include_docs=full_docs,resumption_token=resumption_token)        
         for i in  self.format_data(full_docs,view, resumption_token):        
             yield i
-        if(data.has_key('callback')):
+        if(data.has_key(callbackKey)):
             yield ')'
     def create(self):
         """POST /obtain: Create a new item"""                
