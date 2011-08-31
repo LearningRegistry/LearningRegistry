@@ -18,7 +18,7 @@ class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
-    #     map.resource('harvest', 'harvest')
+    #     map.resource('harvest', 'harvest')call
     def _getServiceDocment(self,full_docs):
         self.enable_flow_control = False
         self.limit = None        
@@ -242,13 +242,13 @@ class HarvestController(BaseController):
         abort(405,'Method not allowed')
     def show(self, id, format='html'):
         """GET /harvest/id: Show a specific item"""
-        if request.params.has_key('callback'):
+        if request.params.has_key('jsonp'):
             def jsonp(callback,params,body):
                 yield '{0}('.format(callback)
                 for i in self.harvest(params,body,id):
                     yield i
                 yield ')'
-            return jsonp(request.params['callback'],request.params,request.body)
+            return jsonp(request.params['jsonp'],request.params,request.body)
         else:
             return self.harvest(request.params,request.body,id)
     def edit(self, id, format='html'):

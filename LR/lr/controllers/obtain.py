@@ -125,8 +125,8 @@ class ObtainController(BaseController):
             by_resource_ID = True            
         if data.has_key('resumption_token'):
             resumption_token = data['resumption_token']
-        if data.has_key('callback'):
-            yield "{0}(".format(data['callback'])                    
+        if data.has_key('jsonp'):
+            yield "{0}(".format(data['jsonp'])                    
         if  by_doc_ID:
             view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
         elif by_resource_ID:
