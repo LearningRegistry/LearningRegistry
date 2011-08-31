@@ -15,43 +15,46 @@ function(doc) {
 	
 	//grab all the people in identity or submitter (depending on version)
 	if(doc.identity) {
-		if(doc.identity.submitter) people.push(doc.identity.submitter);
-		if(doc.identity.curator) people.push(doc.identity.curator);
-		if(doc.identity.owner) people.push(doc.identity.owner);
-		if(doc.identity.signer) people.push(doc.identity.signer);
+		if(doc.identity.submitter) people.push(doc.identity.submitter.toLowerCase());
+		if(doc.identity.curator) people.push(doc.identity.curator.toLowerCase());
+		if(doc.identity.owner) people.push(doc.identity.owner.toLowerCase());
+		if(doc.identity.signer) people.push(doc.identity.signer.toLowerCase());
 	}
-	if(doc.submitter) people.push(doc.submitter);
+	if(doc.submitter) people.push(doc.submitter.toLowerCase());
 	
 
 	//build people indices
 	for each(person in people) {
-		emit(person.toLowerCase(), doc.doc_ID);
+		emit(person, null);
 	}
 	
 	//build date indices
-	emit(date_stamp, doc.doc_ID);
+	emit(date_stamp, null);
 	for each(person in people) {
-		emit([date_stamp, person.toLowerCase()], doc.doc_ID);
+		emit([date_stamp, person], null);
 	}
 	
 	//build
 	var emitaAllKeywordIndices = function(value) {
-		emit(value.toLowerCase(), doc.doc_ID);
+		emit(value, null);
 		for each(person in people) {
-			emit([person.toLowerCase(), value.toLowerCase()], doc.doc_ID);
+			emit([person, value], null);
 		}
-		emit([date_stamp, value.toLowerCase()], doc.doc_ID);
+		emit([date_stamp, value], null);
 		for each(person in people) {
-			emit([date_stamp, person.toLowerCase(), value.toLowerCase()], doc.doc_ID);
+			emit([date_stamp, person, value], null);
 		}
 	}
 
 	var usedKeys = new Array();
 	for each(var key in doc.keys) {
+		var cleanKey = key.toLowerCase();
+		cleanKey = cleanKey.replace(/^\s+/, "");
+		cleanKey = cleanKey.replace(/\s+$/, "");
 		//var used = arrayContains(usedKeys, key);
-		if(!arrayContains(usedKeys, key)) {
-			emitaAllKeywordIndices(key.toLowerCase());
-			usedKeys.push(key);
+		if(!arrayContains(usedKeys, cleanKey)) {
+			emitaAllKeywordIndices(cleanKey);
+			usedKeys.push(cleanKey);
 		}
 		
 	  }

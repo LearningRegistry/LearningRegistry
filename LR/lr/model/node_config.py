@@ -148,7 +148,7 @@ class LRNodeModel(object):
         return statusData
 
     def _getNodeJsonDescription(self):
-        description = {'time_stamp': h.nowToISO8601Zformat()}
+        description = {'timestamp': h.nowToISO8601Zformat()}
         description.update(self._communityDescription.descriptionDict)
         description.update(self._networkDescription.descriptionDict)
         description.update(self._nodeDescription.descriptionDict)
@@ -156,7 +156,26 @@ class LRNodeModel(object):
         if hasattr(self, '_filterDescription'):
             description['filter'] = self._filterDescription.descriptionDict
         return json.dumps(description, indent=2)
-        
+    
+    def _getNodeJsonPolicy(self):
+        policy = {'timestamp': h.nowToISO8601Zformat()}
+        key="network_description"
+	if key in self._networkDescription.descriptionDict.keys():
+                        policy[key] = self._networkDescription.descriptionDict[key]
+	key="network_name"
+	if key in self._networkDescription.descriptionDict.keys():
+                        policy[key] = self._networkDescription.descriptionDict[key]
+	key="node_id"
+	if key in self._nodeDescription.descriptionDict.keys():
+                        policy[key] = self._nodeDescription.descriptionDict[key]
+	key="node_name"
+	if key in self._nodeDescription.descriptionDict.keys():
+                        policy[key] = self._nodeDescription.descriptionDict[key]
+    #    policy.update(self._networkPolicyDescription.descriptionDict)
+	policy.update(self._networkPolicyDescription.specData)
+
+        return json.dumps(policy, indent=2)  
+      
     def isServiceAvailable(self, service_name):
         """Method to test if serviceType is available """
         return service_name in self._nodeServices and self._nodeServices[service_name].active
@@ -261,11 +280,12 @@ class LRNodeModel(object):
     networkDescription = property(lambda self: self._networkDescription, None, None, None)
     communityDescription = property(lambda self: self._communityDescription, None, None, None)
     filterDescription = property(lambda self: self._filterDescription, None, None, None)
-    networkPolicyDescription = property(lambda self: self._networkPolicyDescription, None, None, None)
+  #  networkPolicyDescription = property(lambda self: self._networkPolicyDescription, None, None, None)
     config = property(lambda self: dict(self._config), None, None, None)
     nodeJsonDescription = property(_getNodeJsonDescription, None, None, None)
+    nodeJsonPolicy = property(_getNodeJsonPolicy, None, None, None)
     connections = property(lambda self: self._connections[:], None, None, None)
-    nodeServices = property(lambda self: self._nodeServices.value(), None, None, None)
+    nodeServices = property(lambda self: self._nodeServices.values(), None, None, None)
     status = property(_getStatusDescription, None, None, None)
 
 

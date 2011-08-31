@@ -40,6 +40,16 @@ def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_dat
         
     return jwt.encode(payload, serviceid, __JWT_ALG)
 
+def get_offset_token(serviceid, offset=None, keys=None):
+    
+    payload = {}
+    
+    if offset:
+        payload["offset"] = offset
+    if keys:
+        payload["keys"] = keys
+    
+    return jwt.encode(payload, serviceid, __JWT_ALG)
 
 
 if __name__ == "__main__":

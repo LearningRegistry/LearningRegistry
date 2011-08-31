@@ -19,7 +19,7 @@ from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 from lr.model import LRNode as sourceLRNode, NodeServiceModel
 import json
-
+from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
 
 class StatusController(BaseController):
@@ -32,8 +32,13 @@ class StatusController(BaseController):
         """GET /status: All items in the collection"""
         #if sourceLRNode.isServiceAvailable(NodeServiceModel.ADMINISTRATIVE) == False:
         # return "Administrative service not is available"
-            
-        return json.dumps(sourceLRNode.status)
+        har = harvest()
+        s = sourceLRNode.status      
+        earliestDate = har.earliestDate()   
+        #print earliestDate
+        s['earliestDatestamp'] =earliestDate 
+        #print "here" 
+        return json.dumps(s )
         # url('status')
 
     def create(self):

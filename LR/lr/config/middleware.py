@@ -9,7 +9,6 @@ from pylons.wsgiapp import PylonsApp
 from routes.middleware import RoutesMiddleware
 
 from lr.config.environment import load_environment
-
 def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
     """Create a Pylons WSGI application and return it
 
@@ -42,7 +41,7 @@ def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
     # Routing/Session Middleware
     app = RoutesMiddleware(app, config['routes.map'])
     app = SessionMiddleware(app, config)
-
+    
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
     if asbool(full_stack):
         # Handle Python exceptions

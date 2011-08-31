@@ -17,6 +17,7 @@ from uuid import uuid4
 import shutil
 import logging
 from setup_utils import *
+import re
 log = logging.getLogger(__name__)
 scriptPath = os.path.dirname(os.path.abspath(__file__))
 
@@ -45,11 +46,14 @@ _NETWORK = _config.get("app:main", "couchdb.db.network")
 # Dictionary of types services and the corresponding services that are added 
 # by default to the node.  The format is 
 # "<serviceType>":["<list of services of serviceType>"]
-_DEFAULT_SERVICES = {"administrative":["description", "services", "status", "policy"],
-                     "access":["obtain", "OAI-PMH", "slice",  "harvest", "swordservice"],
+_DEFAULT_SERVICES = {"administrative":["Network Node Description", "Network Node Services", "Network Node Status", "Resource Distribution Network Policy"],
+                     "access":["Basic Obtain", "OAI-PMH Harvest", "Slice", "Basic Harvest", "SWORD APP Publish V1.3"],
                      "broker":[],
-                     "distribute":["distribute"],
-                     "publish":["publish"]}
+                     "distribute":["Resource Data Distribution"],
+                     "publish":["Basic Publish"]}
+
+def makePythonic(text):
+    return re.sub('''[ \.]''', "_", text)
 
 def publishNodeDescription(server, dbname):
     node_description = {}
@@ -67,7 +71,7 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
         for serviceName in services[serviceType]:
             plugin = None
             try:
-                plugin = __import__("services.%s" % serviceName, fromlist=["install"])
+                plugin = __import__("services.%s" % makePythonic(serviceName), fromlist=["install"])
                 plugin.install(server, _NODE, nodeSetup)
             except Exception as e:
                 if plugin != None:
