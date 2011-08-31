@@ -120,7 +120,10 @@ class HarvestController(BaseController):
                     'listmetadataformats': listmetadataformats,                   
                     'listsets': listsets
                  }
-        return switch[verb]()
+        if switch.has_key(verb):
+            return switch[verb]()
+        else:
+            abort(500,"Invalid Verb")
     def _test_time_params(self, params):
         
         if not params.has_key('from'):
