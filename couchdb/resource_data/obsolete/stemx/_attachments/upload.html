@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Learning Registry - Upload Envelope</title>
+<link rel="stylesheet" href="style/main.css" type="text/css">
+</head>
+<body>
+    <h1>Envelope Upload</h1>
+
+    <div id="profile"></div>
+    <div id="msg"></div>
+
+
+    
+    
+    <form action="/publish" enctype="application/json" method="POST">
+    	<div><textarea id="jsondata" rows="10" cols="80"></textarea></div>
+    	<div><input id="uploadbtn" type="button" value="Upload"></div>
+    </form>
+	<script type="text/javascript"  src="vendor/couchapp/loader.js"></script>
+	<script type="text/javascript"  src="script/prettyprint.js"></script>
+	<script type="text/javascript">
+		function uploadSuccess(data, textStatus, xhr) {
+			var msg = prettyPrint(data);
+			$("#msg").html(msg);
+		}
+	
+		function doUpload(event) {
+				$("#msg").html("started upload.");
+				
+				$.ajax({
+					url : "/publish",
+					contentType : "application/json",
+					type : "POST",
+					dataType : "json",
+					data : $("#jsondata").val(),
+					success : uploadSuccess
+				});
+		}
+		
+		$(function() {
+			$("#msg").html("page loaded");
+			$("#uploadbtn").click(doUpload);
+		});
+	
+	
+	</script>
+
+    <div id="sidebar">
+      <p>This is a demonstration system demonstrating the upload of Resource Envelopes into the Learning Registry.</p>
+    </div>
+  </body>
+</html>

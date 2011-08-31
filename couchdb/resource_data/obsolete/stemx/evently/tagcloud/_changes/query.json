@@ -1,0 +1,6 @@
+{
+  "view" : "metadata-filtering-keys",
+  "reduce" : true,
+  "group" : true,
+  "descending" : true
+}

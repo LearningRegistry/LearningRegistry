@@ -1,0 +1,19 @@
+{
+"doc_type":                "network_description",        // the literal "network_description"
+                                                // required, immutable
+"doc_version":                "0.10.0",        // the literal for the current version -- "0.10.0"
+                                        // required, immutable
+"doc_scope":                "network",        // the literal "network"
+                                        // required, immutable
+"active":                boolean,        // is the resource distribution network active
+                                        // required, mutable from T to F only
+"network_id":                "string",                // id of the network, required
+// unique within scope of the LR
+// immutable
+"network_name":         "string",                // name of the network, optional
+"network_description":        "string",                // description of the network, optional
+"network_admin_url":        "string",                // URL of network admin, optional
+         "community_id":        "string",                // id of the community that this node is a part of
+                                                // recommended
+                                                // immutable
+        }

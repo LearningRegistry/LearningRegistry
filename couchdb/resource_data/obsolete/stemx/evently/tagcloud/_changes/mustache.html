@@ -1,0 +1,12 @@
+<ul>
+<script type="text/javascript"> 
+	var word_list = [
+		{{#wordlist}}
+		{ text: "{{text}}", weight: {{weight}} },
+		{{/wordlist}}
+	];
+	$(document).ready(function() {
+	    $("#wordcloud").jQCloud(word_list);
+	});
+</script>
+</ul>

@@ -1,0 +1,91 @@
+[DEFAULT]
+debug = false
+error_email_from = paste@localhost
+smtp_server = localhost
+
+[uwsgi]
+socket = 127.0.0.1:5000
+master = true
+processes = 1
+
+[loggers]
+keys = root, routes, lr
+
+[formatter_generic]
+datefmt = %H:%M:%S
+format = %(asctime)s,%(msecs)03d %(levelname)-5.5s [%(name)s] [%(threadName)s] %(message)s
+
+[handler_console]
+formatter = generic
+args = (sys.stderr,)
+class = StreamHandler
+level = NOTSET
+
+[handlers]
+keys = console
+
+[logger_lr]
+handlers = 
+qualname = lr
+level = DEBUG
+
+[formatters]
+keys = generic
+
+[logger_root]
+handlers = console
+level = INFO
+
+[logger_routes]
+handlers = 
+qualname = routes.middleware
+level = INFO
+
+[server:main]
+use = egg:Flup#fcgi_thread
+host = 127.0.0.1
+port = 5000
+
+[app:main]
+tos.url = http://www.learningregistry.org/tos/
+use = egg:LR
+full_stack = true
+static_files = true
+cache_dir = %(here)s/data
+
+beaker.session.key = lr
+beaker.session.secret = somesecre
+couchdb.db.node.description = description
+beaker.session.secret = somesecret
+beaker.session.use_cookies = false
+
+
+couchdb.url = http://localhost:5984/
+couchdb.db.node = node
+couchdb.db.resourcedata = resource_data
+couchdb.db.network = network
+couchdb.db.community = community
+couchdb.db.resourcesview = _design/learningregistry/_view/resources
+couchdb.threshold.distributes = 1000
+couchdb.threshold.viewupdate = 100
+lr.distribute.url = http://localhost/distribute
+lr.obtain.docid = access:obtain service
+lr.harvest.docid = access:Basic Harvest service
+lr.oaipmh.docid = access:OAI-PMH service
+lr.nodestatus.docid = administrative:Network Node Status service
+models_spec_dir = %(here)s/data/models
+spec.models.node_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/node_description
+spec.models.resource_data = %(here)s/data/LR_Tech_Spec_V_0_23/models/resource_data
+spec.models.network_policy_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/policy_description
+spec.models.status_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/status_description
+spec.models.filter_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/filter_description
+spec.models.node_connectivity_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/connection_description
+spec.models.community_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/community_description
+spec.models.network_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/network_description
+spec.models.node_service_description = %(here)s/data/LR_Tech_Spec_V_0_23/models/service_description
+
+
+
+
+
+

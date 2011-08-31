@@ -1,0 +1,28 @@
+{"documents": [{
+    "TOS": {
+        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+    }, 
+    "active": true, 
+    "doc_type": "resource_data", 
+    "doc_version": "0.23.0", 
+    "identity": {
+        "curator": "jim.klo@sri.com", 
+        "owner": "jim.klo@sri.com", 
+        "submitter": "jim.klo@sri.com", 
+        "submitter_type": "agent"
+    }, 
+    "keys": [
+        "JMETER",
+        "JMETER_XML", 
+        "lr-test-data"
+    ], 
+    "payload_placement": "linked", 
+    "payload_schema": [
+        "JMETER_XML",
+        "JMETER_LINKED_XML",
+        "JMETER_LINKED"
+    ], 
+    "payload_locator": "https://sites.google.com/site/learningregistrytestdata/files/xml-linked.xml?attredirects=0&d=1",
+    "resource_data_type": "metadata", 
+    "resource_locator": "https://sites.google.com/site/learningregistrytestdata/"
+}]}

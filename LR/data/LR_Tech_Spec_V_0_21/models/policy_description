@@ -1,0 +1,20 @@
+{
+ "doc_type":                "policy_description",        // the literal "policy_description"
+                                                // required, immutable
+ "doc_version":                "0.10.0",        // the literal for the current version -- "0.10.0"
+                                        // required, immutable
+ "doc_scope":                "network",        // the literal "network"
+                                        // required, immutable
+ "active":                boolean,        // are the policies active
+                                        // required, mutable from T to F only
+ "network_id":                "string",                // id of the network, required
+// unique within scope of the LR
+// immutable
+ "policy_id":                "string",                 // id of the policy description, required
+// unique within scope of the LR
+// immutable
+         "policy_version":        "string",                // version identifier for the policy
+          "TTL":                        integer,                // minimum time to live for resource data in the network
+                                                 // in days, required
+                 "policy_element_x":    { some object},                // placeholder for more policy elements
+        }

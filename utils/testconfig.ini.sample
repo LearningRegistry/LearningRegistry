@@ -1,0 +1,8 @@
+
+[upload]
+root_path=/Users/jklo/Git/LearningRegistryData/metadata/0.21.0
+publish_url=http://192.168.96.129/publish
+sword_url=http://ec2-50-17-87-122.compute-1.amazonaws.com/sword
+[fix]
+root_path=/Users/jklo/Git/LearningRegistryData/metadata
+out_path=/Users/jklo/Git/LearningRegistryData/metadata/0.21.0

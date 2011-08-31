@@ -1,0 +1,11 @@
+This library is for python 2.3+.
+
+This library requires the Open Market FastCGI Library/SDK.
+
+It is available from http://www.fastcgi.com/
+
+Stable:
+http://www.fastcgi.com/dist/fcgi-2.4.0.tar.gz
+
+Development snapshot:
+http://www.fastcgi.com/dist/fcgi-2.4.1-SNAP-0311112127.tar.gz

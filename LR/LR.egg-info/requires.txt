@@ -1,0 +1,6 @@
+Pylons>=0.10
+pyparsing>=1.5.5
+restkit>=3.2.3
+couchdb>=0.8
+lxml>=2.3
+iso8601plus
