@@ -4,7 +4,7 @@
     }, 
     "active": true, 
     "doc_type": "resource_data", 
-    "doc_version": "0.21.0", 
+    "doc_version": "0.23.0", 
     "identity": {
         "curator": "jim.klo@sri.com", 
         "owner": "jim.klo@sri.com", 
@@ -18,7 +18,9 @@
     ], 
     "payload_placement": "attached", 
     "payload_schema": [
-        "JMETER_JSON"
+        "JMETER_JSON",
+        "JMETER_ATTACHED",
+        "JMETER_ATTACHED_JSON"
     ],
     "resource_data_type": "metadata", 
     "resource_locator": "https://sites.google.com/site/learningregistrytestdata/",
