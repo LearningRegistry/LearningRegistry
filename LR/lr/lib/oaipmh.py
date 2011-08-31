@@ -37,13 +37,19 @@ class OAIPMHDocumentResolver(CouchDBDocProcessor):
         pass
     
     def _resolve(self, doc):
+        
+        ## TODO: add caching
+        def get_payload(url):
+            payload = None
+            log.debug("Payload Locator: %s" % url)
+            with closing(urllib2.urlopen(url, timeout=90)) as res:
+                    payload = res.read()
+            return payload
+        
         if doc["active"] and doc["payload_placement"] == "linked":
             try:
                 if "payload_locator" in doc:
-                    payload = None
-                    log.debug("Paylod Locator: %s" % doc["payload_locator"])
-                    with closing(urllib2.urlopen(doc["payload_locator"], timeout=90)) as res:
-                            payload = res.read()
+                    payload = get_payload(doc["payload_locator"])
                     if payload is not None:
                         doc["resource_data"] = saxutils.escape(payload)
             except:
