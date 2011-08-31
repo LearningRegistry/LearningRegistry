@@ -6,7 +6,7 @@ from lr.controllers.harvest import HarvestController
 from lr.model import appConfig
 from lr.lib import helpers as h, oaipmherrors
 from lr.lib.base import BaseController, render
-from lr.lib.oaipmh import oaipmh
+from lr.lib.oaipmh import oaipmh, OAIPMHDocumentResolver
 from datetime import datetime
 import json, iso8601
 from couchdb.http import ResourceNotFound
@@ -253,7 +253,12 @@ class OaiPmhController(HarvestController):
                 from lr.mustache.oaipmh import GetRecord as must_GetRecord
                 identifier = params["identifier"]
                 if params["by_doc_ID"] == True:
-                    docList = [o.get_record(params["identifier"])]
+                    resolver = OAIPMHDocumentResolver()
+                    single_doc = o.get_record(params["identifier"])
+                    if single_doc is not None: 
+                        docList = [resolver.process({ "doc": single_doc })]
+                    else:
+                        docList = []
                 else:
                     docList = o.get_records_by_resource(params["identifier"])
 
@@ -311,6 +316,8 @@ class OaiPmhController(HarvestController):
                     if doc_index == 1:
                         part = mustache.prefix(**self._initMustache(args=params, req=t_req))
                         yield h.fixUtf8(self._returnResponse(part, res=t_res))
+                    
+    
                     
                     if fc_id_limit is None or doc_index <= fc_id_limit:
                         part = mustache.doc(ident)

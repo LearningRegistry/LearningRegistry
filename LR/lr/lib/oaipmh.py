@@ -25,8 +25,42 @@ from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats
 import lr.lib.helpers as h
 from lr.model.base_model import appConfig
 import json
+from lr.lib.stream import CouchDBDocProcessor
+import urllib2
+from contextlib import closing
+from xml.sax import saxutils
 
 log = logging.getLogger(__name__)
+
+class OAIPMHDocumentResolver(CouchDBDocProcessor):
+    def __init__(self):
+        pass
+    
+    def _resolve(self, doc):
+        
+        ## TODO: add caching
+        def get_payload(url):
+            payload = None
+            log.debug("Payload Locator: %s" % url)
+            with closing(urllib2.urlopen(url, timeout=90)) as res:
+                    payload = res.read()
+            return payload
+        
+        if doc["active"] and doc["payload_placement"] == "linked":
+            try:
+                if "payload_locator" in doc:
+                    payload = get_payload(doc["payload_locator"])
+                    if payload is not None:
+                        doc["resource_data"] = saxutils.escape(payload)
+            except:
+                log.exception("Unable to resolved linked payload")
+                
+    def process(self, row):
+        doc = row["doc"]
+        
+        self._resolve(doc)
+        
+        return doc
 
 class oaipmh(harvest):
     '''
@@ -84,6 +118,10 @@ class oaipmh(harvest):
 #        view_data = self.db.view('oai-pmh/list-records', **opts)
 #        return map(lambda row: row["value"], view_data)
 
+    def get_records_by_resource(self,resource_locator):
+        view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST", documentHandler=OAIPMHDocumentResolver(), include_docs=True,keys=[resource_locator], stale='ok')
+        for doc in view_data:
+            yield doc  
     
     def list_identifiers_or_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None, include_docs=False):
         '''Returns the list_records as a generator based upon OAI-PMH query'''
@@ -115,7 +153,7 @@ class oaipmh(harvest):
             return obj
         
         if include_docs:
-            format = format_docs
+            format = OAIPMHDocumentResolver()
         else:
             format = format_ids
         

@@ -51,14 +51,14 @@ class ListRecords(ListIdentifiers):
     verb = "ListRecords"
     
     def doc(self, doc=None):
-        template = '''
+        template = '''{{#resource_data}}
   <record>
     <header {{^active}}status="deleted"{{/active}}>
       <identifier>{{doc_ID}}</identifier> 
       <datestamp>{{node_timestamp}}</datestamp>
     </header>
     {{#active}}<metadata>{{{resource_data}}}</metadata>{{/active}}
-  </record>'''
+  </record>{{/resource_data}}'''
         doc["node_timestamp"] = re.sub("\.[0-9]+Z", "Z", doc["node_timestamp"], count=1)
         return pystache.render(template, doc)
         

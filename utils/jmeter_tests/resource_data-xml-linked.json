@@ -4,7 +4,7 @@
     }, 
     "active": true, 
     "doc_type": "resource_data", 
-    "doc_version": "0.21.0", 
+    "doc_version": "0.23.0", 
     "identity": {
         "curator": "jim.klo@sri.com", 
         "owner": "jim.klo@sri.com", 
@@ -18,7 +18,9 @@
     ], 
     "payload_placement": "linked", 
     "payload_schema": [
-        "JMETER_XML"
+        "JMETER_XML",
+        "JMETER_LINKED_XML",
+        "JMETER_LINKED"
     ], 
     "payload_locator": "https://sites.google.com/site/learningregistrytestdata/files/xml-linked.xml?attredirects=0&d=1",
     "resource_data_type": "metadata", 
