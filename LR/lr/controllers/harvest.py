@@ -242,13 +242,14 @@ class HarvestController(BaseController):
         abort(405,'Method not allowed')
     def show(self, id, format='html'):
         """GET /harvest/id: Show a specific item"""
-        if request.params.has_key('jsonp'):
+        callBackKey = 'callback'
+        if request.params.has_key(callBackKey):
             def jsonp(callback,params,body):
                 yield '{0}('.format(callback)
                 for i in self.harvest(params,body,id):
                     yield i
                 yield ')'
-            return jsonp(request.params['jsonp'],request.params,request.body)
+            return jsonp(request.params[callBackKey],request.params,request.body)
         else:
             return self.harvest(request.params,request.body,id)
     def edit(self, id, format='html'):
