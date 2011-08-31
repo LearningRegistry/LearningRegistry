@@ -51,7 +51,7 @@ def _updateDatabaseViews(change, database):
     except Exception as e:
         log.error(e)
 
-def _doDistribute():
+def _doDistribute(change, database):
     
     log.debug('start distribute')
     data = json.dumps({"dist":"dist"})
