@@ -37,20 +37,22 @@ def install(server, dbname, setupInfo):
 
 
 class __BasicHarvestServiceTemplate(ServiceTemplate):
-    service_data_template = '''{
-        "granularity": "YYYY-MM-DDThh:mm:ssZ",
-        "setSpec": null{{#spec_kv_only}},
-        "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}},
-        "flow_control": {{flow_control}}{{#id_limit}},
-        "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
-        "doc_limit": {{doc_limit}}{{/doc_limit}},
-        "metadataformats": [
-            {
-                "metadataFormat": "LR Resource Data Description Data Model",
-                "metadataPrefix": "LR_JSON_0.10.0"
-            }
-        ]
-    }'''
+    def __init__(self):
+        ServiceTemplate.__init__(self)
+        self.service_data_template = '''{
+            "granularity": "YYYY-MM-DDThh:mm:ssZ",
+            "setSpec": null{{#spec_kv_only}},
+            "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}},
+            "flow_control": {{flow_control}}{{#id_limit}},
+            "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
+            "doc_limit": {{doc_limit}}{{/doc_limit}},
+            "metadataformats": [
+                {
+                    "metadataFormat": "LR Resource Data Description Data Model",
+                    "metadataPrefix": "LR_JSON_0.10.0"
+                }
+            ]
+        }'''
     
     
     
@@ -73,7 +75,7 @@ if __name__ == "__main__":
     
     nodeSetup = {
                  'couchDBUrl': "http://localhost:5984",
-                 'node_service_endpoint_url': "http://test.example.com"
+                 'nodeUrl': "http://test.example.com"
     }
     
     def doesNotEndInSlash(input=None):
