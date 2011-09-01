@@ -37,11 +37,13 @@ def install(server, dbname, setupInfo):
 
 
 class __SliceServiceTemplate(ServiceTemplate):
-    service_data_template = '''{
-        "flow_control": {{flow_control}}{{#id_limit}},
-        "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
-        "doc_limit": {{doc_limit}}{{/doc_limit}}
-    }'''
+    def __init__(self):
+        ServiceTemplate.__init__(self)
+        self.service_data_template = '''{
+            "flow_control": {{flow_control}}{{#id_limit}},
+            "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
+            "doc_limit": {{doc_limit}}{{/doc_limit}}
+        }'''
     
     
     

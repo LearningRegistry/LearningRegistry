@@ -5,7 +5,8 @@ import types
 
 class ServiceTemplate():
     __metaclass__ = abc.ABCMeta
-    template = '''
+    def __init__(self):
+        self.template = '''
 {
     "doc_type": "service_description",
     "doc_version": "0.20.0",
@@ -24,13 +25,28 @@ class ServiceTemplate():
         "service_https": {{service_https}}
     }{{#service_data}},"service_data":{{service_data}}{{/service_data}}
 }'''
-    service_data_template = None
-    authz_data_template = '''{{authz}}'''
+        self.service_data_template = None
+        self.authz_data_template = '''{{authz}}'''
+        self.opts = {
+            "scope": "node",
+            "active": "false",
+            "service_id": None,
+            "service_type": "access",
+            "service_name": None,
+            "service_version": None,
+            "node_endpoint": None,
+            "service_endpoint": None,
+            "authz": ["none"],
+            "service_authz": self._authz,
+            "service_key": "false", 
+            "service_https": "false",
+            "service_data": self._servicedata
+        }
 
     def _optsoverride(self):
         return {}
     
-    def _servicedata(self,**kwargs):
+    def _servicedata(self, **kwargs):
         if self.service_data_template != None:
             return pystache.render(self.service_data_template, kwargs)
         return None
@@ -43,21 +59,7 @@ class ServiceTemplate():
             return pystache.render(self.authz_data_template, kwargs)
         return None
 
-    opts = {
-        "scope": "node",
-        "active": "false",
-        "service_id": None,
-        "service_type": "access",
-        "service_name": None,
-        "service_version": None,
-        "node_endpoint": None,
-        "service_endpoint": None,
-        "authz": ["none"],
-        "service_authz": _authz,
-        "service_key": "false", 
-        "service_https": "false",
-        "service_data": _servicedata
-    }
+    
     
  
     
@@ -71,11 +73,11 @@ class ServiceTemplate():
                 else:
                     self.opts[key] = kwargs[key]
                 
-            if isinstance(self.opts[key], types.FunctionType):
+            if isinstance(self.opts[key], (types.FunctionType, types.MethodType) ):
                 funcs.append(key)
         
         for key in funcs:
-            self.opts[key] = self.opts[key](self, **self.opts)
+            self.opts[key] = self.opts[key](**self.opts)
                    
         return pystache.render(self.template, self.opts)
         

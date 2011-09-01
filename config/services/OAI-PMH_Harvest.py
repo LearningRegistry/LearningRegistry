@@ -37,14 +37,16 @@ def install(server, dbname, setupInfo):
 
 
 class __OaiServiceTemplate(ServiceTemplate):
-    service_data_template = '''{
-        "version": "OAI-PMH 2.0",
-        "schemalocation": "http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd"{{#spec_kv_only}},
-        "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}}{{#flow_control}},
-        "flow_control": {{flow_control}}{{/flow_control}}{{#id_limit}},
-        "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
-        "doc_limit": {{doc_limit}}{{/doc_limit}}
-    }'''
+    def __init__(self):
+        ServiceTemplate.__init__(self)
+        self.service_data_template = '''{
+            "version": "OAI-PMH 2.0",
+            "schemalocation": "http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd"{{#spec_kv_only}},
+            "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}}{{#flow_control}},
+            "flow_control": {{flow_control}}{{/flow_control}}{{#id_limit}},
+            "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
+            "doc_limit": {{doc_limit}}{{/doc_limit}}
+        }'''
     
     
     
@@ -69,7 +71,7 @@ if __name__ == "__main__":
     
     nodeSetup = {
                  'couchDBUrl': "http://127.0.0.1:5984",
-                 'node_service_endpoint_url': "http://127.0.0.1:8000"
+                 'nodeUrl': "http://127.0.0.1:8000"
     }
     
     def doesNotEndInSlash(input=None):
