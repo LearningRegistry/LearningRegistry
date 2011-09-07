@@ -11,10 +11,10 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Basic Harvest?", "T", isBoolean)
+    active = getInput("Enable Basic Obtain?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable Basic Harvest Flow Control?", "F", isBoolean)
+    active = getInput("Enable Basic Obtain Flow Control?", "F", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:
@@ -27,47 +27,40 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __BasicHarvestServiceTemplate()
+    must = __BasicObtainServiceTemplate()
     config_doc = must.render(**custom_opts)
+    print config_doc
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Basic Harvest service", doc)
-    print("Configured Basic Harvest service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+    PublishDoc(server, dbname,doc["service_type"]+":Basic Obtain service", doc)
+    print("Configured Basic Obtain service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 
 
 
-class __BasicHarvestServiceTemplate(ServiceTemplate):
+class __BasicObtainServiceTemplate(ServiceTemplate):
     def __init__(self):
-        ServiceTemplate.__init__(self)
+        ServiceTemplate.__init__(self)    
         self.service_data_template = '''{
-            "granularity": "YYYY-MM-DDThh:mm:ssZ",
-            "setSpec": null{{#spec_kv_only}},
-            "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}},
+            "spec_kv_only": false,
             "flow_control": {{flow_control}}{{#id_limit}},
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
-            "doc_limit": {{doc_limit}}{{/doc_limit}},
-            "metadataformats": [
-                {
-                    "metadataFormat": "LR Resource Data Description Data Model",
-                    "metadataPrefix": "LR_JSON_0.10.0"
-                }
-            ]
-        }'''
+            "doc_limit": {{doc_limit}}{{/doc_limit}}
+        }'''    
     
     
     
     def _optsoverride(self):
         opts = {
             "active": "false",
-            "service_name": "Basic Harvest",
+            "service_name": "Basic Obtain",
             "service_version": "0.10.0",
-            "service_endpoint": "/harvest",
+            "service_endpoint": "/obtain",
             "service_key": "false", 
             "service_https": "false",
-            "spec_kv_only": None,
+            "spec_kv_only": False,
             "flow_control": False,
-            "id_limit": False,
-            "doc_limit": False         
+            "id_limit": None,
+            "doc_limit":None
         }
         return opts
         
@@ -76,7 +69,7 @@ if __name__ == "__main__":
     
     nodeSetup = {
                  'couchDBUrl': "http://localhost:5984",
-                 'nodeUrl': "http://test.example.com"
+                 'node_service_endpoint_url': "http://test.example.com"
     }
     
     def doesNotEndInSlash(input=None):

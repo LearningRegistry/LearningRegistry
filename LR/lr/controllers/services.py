@@ -30,7 +30,7 @@ class ServicesController(BaseController):
 
     def index(self, format='html'):
         """GET /services: All items in the collection"""
-        if sourceLRNode.isServiceAvailable('services service') == False:  
+        if sourceLRNode.isServiceAvailable('Network Node Services') == False:  
             return "Administrative service is not available"
             
         data = {}
