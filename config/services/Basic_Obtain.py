@@ -11,10 +11,10 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable OAI-PMH Harvest?", "T", isBoolean)
+    active = getInput("Enable Basic Obtain?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable OAI-PMH Flow Control?", "F", isBoolean)
+    active = getInput("Enable Basic Obtain Flow Control?", "F", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:
@@ -27,42 +27,40 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __OaiServiceTemplate()
+    must = __BasicObtainServiceTemplate()
     config_doc = must.render(**custom_opts)
+    print config_doc
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname, doc["service_type"]+":OAI-PMH service", doc)
-    print("Configured OAI-PMH Harvest service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+    PublishDoc(server, dbname,doc["service_type"]+":Basic Obtain service", doc)
+    print("Configured Basic Obtain service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 
 
 
-class __OaiServiceTemplate(ServiceTemplate):
+class __BasicObtainServiceTemplate(ServiceTemplate):
     def __init__(self):
-        ServiceTemplate.__init__(self)
+        ServiceTemplate.__init__(self)    
         self.service_data_template = '''{
-            "version": "OAI-PMH 2.0",
-            "schemalocation": "http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd"{{#spec_kv_only}},
-            "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}}{{#flow_control}},
-            "flow_control": {{flow_control}}{{/flow_control}}{{#id_limit}},
+            "spec_kv_only": false,
+            "flow_control": {{flow_control}}{{#id_limit}},
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}}
-        }'''
+        }'''    
     
     
     
     def _optsoverride(self):
         opts = {
             "active": "false",
-            "service_name": "OAI-PMH Harvest",
+            "service_name": "Basic Obtain",
             "service_version": "0.10.0",
-            "service_endpoint": "/OAI-PMH",
+            "service_endpoint": "/obtain",
             "service_key": "false", 
             "service_https": "false",
-            "spec_kv_only": None,
-            "flow_control": "false",
+            "spec_kv_only": False,
+            "flow_control": False,
             "id_limit": None,
-            "doc_limit": None
-            
+            "doc_limit":None
         }
         return opts
         
@@ -70,8 +68,8 @@ if __name__ == "__main__":
     import couchdb
     
     nodeSetup = {
-                 'couchDBUrl': "http://127.0.0.1:5984",
-                 'nodeUrl': "http://127.0.0.1:8000"
+                 'couchDBUrl': "http://localhost:5984",
+                 'node_service_endpoint_url': "http://test.example.com"
     }
     
     def doesNotEndInSlash(input=None):
@@ -82,7 +80,7 @@ if __name__ == "__main__":
     
     nodeSetup["couchDBUrl"] = getInput("Enter the CouchDB URL:", nodeSetup["couchDBUrl"], doesNotEndInSlash)
     nodeSetup["nodeUrl"] = getInput("Enter the public URL of the LR Node", nodeSetup["nodeUrl"], notExample)
-
+    
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
     install(server, "node", nodeSetup)
     

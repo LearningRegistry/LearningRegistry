@@ -17,11 +17,11 @@ def install(server, dbname, setupInfo):
     active = getInput("Enable Basic Harvest Flow Control?", "F", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
-#    if custom_opts["flow_control"]:
-#        active = getInput("Maximum IDs to Return?", "100", isInt)
-#        custom_opts["id_limit"] = int(active)
-#        active = getInput("Maximum Docs to Return?", "100", isInt)
-#        custom_opts["doc_limit"] = int(active)
+    if custom_opts["flow_control"]:
+        active = getInput("Maximum IDs to Return?", "100", isInt)
+        custom_opts["id_limit"] = int(active)
+        active = getInput("Maximum Docs to Return?", "100", isInt)
+        custom_opts["doc_limit"] = int(active)
         
         
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
@@ -37,20 +37,22 @@ def install(server, dbname, setupInfo):
 
 
 class __BasicHarvestServiceTemplate(ServiceTemplate):
-    service_data_template = '''{
-        "granularity": "YYYY-MM-DDThh:mm:ssZ",
-        "setSpec": null{{#spec_kv_only}},
-        "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}},
-        "flow_control": {{flow_control}}{{#id_limit}},
-        "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
-        "doc_limit": {{doc_limit}}{{/doc_limit}},
-        "metadataformats": [
-            {
-                "metadataFormat": "LR Resource Data Description Data Model",
-                "metadataPrefix": "LR_JSON_0.10.0"
-            }
-        ]
-    }'''
+    def __init__(self):
+        ServiceTemplate.__init__(self)
+        self.service_data_template = '''{
+            "granularity": "YYYY-MM-DDThh:mm:ssZ",
+            "setSpec": null{{#spec_kv_only}},
+            "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}},
+            "flow_control": {{flow_control}}{{#id_limit}},
+            "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
+            "doc_limit": {{doc_limit}}{{/doc_limit}},
+            "metadataformats": [
+                {
+                    "metadataFormat": "LR Resource Data Description Data Model",
+                    "metadataPrefix": "LR_JSON_0.10.0"
+                }
+            ]
+        }'''
     
     
     
@@ -63,8 +65,9 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "service_key": "false", 
             "service_https": "false",
             "spec_kv_only": None,
-            "flow_control": False
-            
+            "flow_control": False,
+            "id_limit": False,
+            "doc_limit": False         
         }
         return opts
         
@@ -73,7 +76,7 @@ if __name__ == "__main__":
     
     nodeSetup = {
                  'couchDBUrl': "http://localhost:5984",
-                 'node_service_endpoint_url': "http://test.example.com"
+                 'nodeUrl': "http://test.example.com"
     }
     
     def doesNotEndInSlash(input=None):
