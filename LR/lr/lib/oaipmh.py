@@ -21,7 +21,8 @@ import logging, iso8601
 import couchdb
 from lr.lib.base import render
 from lr.lib.harvest import harvest
-from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats
+from lr.lib.oaipmherrors import IdDoesNotExistError, NoMetadataFormats,\
+    CannotDisseminateFormatError
 import lr.lib.helpers as h
 from lr.model.base_model import appConfig
 import json
@@ -29,10 +30,20 @@ from lr.lib.stream import CouchDBDocProcessor
 import urllib2
 from contextlib import closing
 from xml.sax import saxutils
+from StringIO import StringIO
+import sys
+try:
+    from lxml import etree
+except:
+    from xml.etree import ElementTree as etree
 
 log = logging.getLogger(__name__)
 
+
 class OAIPMHDocumentResolver(CouchDBDocProcessor):
+    PAYLOAD_ERROR = "X_OAI-PMH-ERROR"
+    ERR_CANNOT_DISSEMINATE_FORMAT = "Cannot Disseminate Format"
+    
     def __init__(self):
         pass
     
@@ -46,14 +57,24 @@ class OAIPMHDocumentResolver(CouchDBDocProcessor):
                     payload = res.read()
             return payload
         
-        if doc["active"] and doc["payload_placement"] == "linked":
+        if doc["active"]:
+            if doc["payload_placement"] == "linked":
+                try:
+                    if "payload_locator" in doc:
+                        payload = get_payload(doc["payload_locator"])
+                        if payload is not None:
+                            doc["resource_data"] = payload
+                except:
+                    log.exception("Unable to resolved linked payload")
+ 
             try:
-                if "payload_locator" in doc:
-                    payload = get_payload(doc["payload_locator"])
-                    if payload is not None:
-                        doc["resource_data"] = saxutils.escape(payload)
+                payload = etree.parse(StringIO(doc["resource_data"]))
+                doc["resource_data"] = etree.tostring(payload)
             except:
-                log.exception("Unable to resolved linked payload")
+                exc = sys.exc_info()
+                log.debug("XML Parse Error: %s" % exc[1])
+                doc[OAIPMHDocumentResolver.PAYLOAD_ERROR] = OAIPMHDocumentResolver.ERR_CANNOT_DISSEMINATE_FORMAT
+    
                 
     def process(self, row):
         doc = row["doc"]
