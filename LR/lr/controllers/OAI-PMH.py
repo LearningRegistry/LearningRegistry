@@ -269,7 +269,7 @@ class OaiPmhController(HarvestController):
                     if doc is not None:
                         doc_idx += 1
                         
-                        if "payload_schema" in doc and params["metadataPrefix"] in doc["payload_schema"]:
+                        if "payload_schema" in doc and params["metadataPrefix"] in doc["payload_schema"] and OAIPMHDocumentResolver.PAYLOAD_ERROR not in doc:
                             valid_docs += 1
                         
                             if valid_docs == 1:
@@ -291,66 +291,95 @@ class OaiPmhController(HarvestController):
                 err = err_stache()
                 yield h.fixUtf8(self._returnResponse(err.xml(e), res=t_res))
 
-        def ListGeneric(params, showDocs=False):
+        def ListGeneric(params, showDocs=False, record_limit=None):
+            if not showDocs:
+                from lr.mustache.oaipmh import ListIdentifiers as must_ListID
+                mustache = must_ListID()
+            else:
+                from lr.mustache.oaipmh import ListRecords as must_ListRec
+                mustache = must_ListRec()
+                
             try:
-                if not showDocs:
-                    from lr.mustache.oaipmh import ListIdentifiers as must_ListID
-                    mustache = must_ListID()
-                else:
-                    from lr.mustache.oaipmh import ListRecords as must_ListRec
-                    mustache = must_ListRec()
                 
                 doc_index = 0
+                err_count = 0
                 metadataPrefix=params["metadataPrefix"]
                 from_date=params["from"]
                 until_date=params["until"]
+                doc_err = None
+                rendered_init = False
                 resumptionToken = None if "resumptionToken" not in params else params['resumptionToken']
-                for ident in o.list_identifiers_or_records(metadataPrefix,
+                records = o.list_identifiers_or_records(metadataPrefix,
                                                 from_date=from_date, 
                                                 until_date=until_date, 
                                                 rt=resumptionToken, 
-                                                fc_limit=fc_id_limit, 
-                                                include_docs=showDocs ):
+                                                fc_limit=record_limit, 
+                                                include_docs=showDocs )
+                for ident in records:
                     doc_index += 1
-                    log.debug(json.dumps(ident))
-                    if doc_index == 1:
+                    doc_err = False
+                    
+                    if OAIPMHDocumentResolver.PAYLOAD_ERROR in ident:
+                        err_count += 1
+                        doc_err = True
+                        log.debug("Payload Error detected, doc_index: {0}, err_count: {1}".format(doc_index, err_count))
+                    
+                    if doc_index - err_count == 1:
+                        rendered_init = True
                         part = mustache.prefix(**self._initMustache(args=params, req=t_req))
                         yield h.fixUtf8(self._returnResponse(part, res=t_res))
-                    
-    
-                    
-                    if fc_id_limit is None or doc_index <= fc_id_limit:
+
+                    if doc_err is False and (record_limit is None or doc_index <= record_limit):
                         part = mustache.doc(ident)
                         yield h.fixUtf8(part)
-                    elif enable_flow_control and doc_index > fc_id_limit:
+                    elif enable_flow_control:
                         from lr.lib import resumption_token
-                        opts = o.list_opts(metadataPrefix, h.convertToISO8601UTC(ident["node_timestamp"]), until_date)
-                        opts["startkey_docid"] = ident["doc_ID"]
-                        token = resumption_token.get_token(serviceid=service_id, from_date=from_date, until_date=until_date, **opts)
-                        part = mustache.resumptionToken(token)
-                        yield h.fixUtf8(part)
-                        break
+                        if doc_index - err_count > 0 and doc_index > record_limit:
+                            opts = o.list_opts(metadataPrefix, h.convertToISO8601UTC(ident["node_timestamp"]), until_date)
+                            opts["startkey_docid"] = ident["doc_ID"]
+                            token = resumption_token.get_token(serviceid=service_id, from_date=from_date, until_date=until_date, **opts)
+                            part = mustache.resumptionToken(token)
+                            yield h.fixUtf8(part)
+                            break
+                        elif doc_index - err_count == 0 and doc_index > record_limit:
+                            opts = o.list_opts(metadataPrefix, h.convertToISO8601UTC(ident["node_timestamp"]), until_date)
+                            opts["startkey_docid"] = ident["doc_ID"]
+                            payload = resumption_token.get_payload(from_date=from_date, until_date=until_date, **opts)
+                            records = o.list_identifiers_or_records(metadataPrefix,
+                                                from_date=from_date, 
+                                                until_date=until_date, 
+                                                rt=payload, 
+                                                fc_limit=record_limit, 
+                                                include_docs=showDocs )
+                            doc_index = 0
+                            err_count = 0
                 
-                
-                if doc_index == 0:
+                if (doc_index - err_count) == 0:
+                    raise CannotDisseminateFormatError(params['verb'], req=t_req)
+                elif doc_index == 0:
                     raise NoRecordsMatchError(params['verb'], req=t_req)
                 else:
-                    if enable_flow_control and doc_index <= fc_id_limit:
+                    if enable_flow_control and doc_index <= record_limit:
                         yield h.fixUtf8(mustache.resumptionToken())
                     yield h.fixUtf8(mustache.suffix())
                     
             except oaipmherrors.Error as e:
-                from lr.mustache.oaipmh import Error as err_stache
-                err = err_stache()
-                yield h.fixUtf8(self._returnResponse(err.xml(e), res=t_res))
+                if not rendered_init:
+                    from lr.mustache.oaipmh import Error as err_stache
+                    err = err_stache()
+                    yield h.fixUtf8(self._returnResponse(err.xml(e), res=t_res))
+                else:
+                    from lr.mustache.oaipmh import ErrorOnly as err_stache
+                    err = err_stache()
+                    yield h.fixUtf8(self._returnResponse(err.xml(e)+mustache.suffix(), res=t_res))
             except:
                 log.exception("Unknown Error Occurred")
 
         def ListIdentifiers(params):
-            return ListGeneric(params, False)
+            return ListGeneric(params, False, fc_id_limit)
         
         def ListRecords(params):
-            return ListGeneric(params, True)
+            return ListGeneric(params, True, fc_doc_limit)
 #        def ListRecords(params):
 #            try:
 #                from lr.mustache.oaipmh import ListRecords as must_ListRec
