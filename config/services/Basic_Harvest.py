@@ -17,11 +17,11 @@ def install(server, dbname, setupInfo):
     active = getInput("Enable Basic Harvest Flow Control?", "F", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
-#    if custom_opts["flow_control"]:
-#        active = getInput("Maximum IDs to Return?", "100", isInt)
-#        custom_opts["id_limit"] = int(active)
-#        active = getInput("Maximum Docs to Return?", "100", isInt)
-#        custom_opts["doc_limit"] = int(active)
+    if custom_opts["flow_control"]:
+        active = getInput("Maximum IDs to Return?", "100", isInt)
+        custom_opts["id_limit"] = int(active)
+        active = getInput("Maximum Docs to Return?", "100", isInt)
+        custom_opts["doc_limit"] = int(active)
         
         
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
@@ -65,8 +65,9 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "service_key": "false", 
             "service_https": "false",
             "spec_kv_only": None,
-            "flow_control": False
-            
+            "flow_control": False,
+            "id_limit": False,
+            "doc_limit": False         
         }
         return opts
         

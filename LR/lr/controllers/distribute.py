@@ -165,9 +165,12 @@ class DistributeController(BaseController):
 
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
-            sourceLRNode.status['last_out_sync'] = h.nowToISO8601Zformat()
-            sourceLRNode.status['out_sync_node'] = destinationNode
-            sourceLRNode.saveOrUpdate()
+            server = couchdb.Server(config['couchdb.url'])
+            db = server[config['couchdb.db.node']]
+            doc = db[config['lr.nodestatus.docid']]
+            doc['last_out_sync'] = h.nowToISO8601Zformat()
+            doc['out_sync_node'] = destinationNode
+            db.save(doc)                
             results = server.replicate(sourceUrl, destinationUrl, **replicationOptions)
             log.debug("Replication results: "+str(results))
         
