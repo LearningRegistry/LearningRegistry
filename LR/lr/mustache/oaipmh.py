@@ -98,3 +98,19 @@ class Error(object):
                 opts[key] = getattr(err,key)
 
         return pystache.render(template, opts)
+    
+class ErrorOnly(object):
+    def xml(self, err=None):
+        template = '''<error code="{{code}}">{{msg}}</error>'''
+        opts = {
+                "response_date": None,
+                "verb": None,
+                "path_url": None,
+                "code": None,
+                "msg": None
+                }
+        for key in opts.keys():
+            if key in dir(err):
+                opts[key] = getattr(err,key)
+
+        return pystache.render(template, opts)
