@@ -22,8 +22,7 @@ def parse_token(serviceid, token):
         
     return decoded
 
-
-def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
+def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
     payload = {}
 
     payload["startkey"] = startkey
@@ -37,11 +36,10 @@ def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_dat
         payload["from_date"] = h.convertToISO8601Zformat(from_date)
     if until_date and isinstance(until_date, datetime.datetime):
         payload["until_date"] = until_date
-        
-    return jwt.encode(payload, serviceid, __JWT_ALG)
-
-def get_offset_token(serviceid, offset=None, keys=None):
     
+    return payload
+
+def get_offset_payload(offset=None, keys=None):
     payload = {}
     
     if offset:
@@ -49,7 +47,13 @@ def get_offset_token(serviceid, offset=None, keys=None):
     if keys:
         payload["keys"] = keys
     
-    return jwt.encode(payload, serviceid, __JWT_ALG)
+    return payload
+
+def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
+    return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date), serviceid, __JWT_ALG)
+
+def get_offset_token(serviceid, offset=None, keys=None):
+    return jwt.encode(get_offset_payload(offset, keys), serviceid, __JWT_ALG)
 
 
 if __name__ == "__main__":
