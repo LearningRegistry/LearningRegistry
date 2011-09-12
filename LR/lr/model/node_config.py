@@ -82,7 +82,7 @@ class LRNodeModel(object):
             return model
         else:
             model = modelClass(modelDoc)
-        mode.validate()
+        model.validate()
         return model
     
     def _initFilter(self, config):
