@@ -29,11 +29,10 @@ class TrackLastSequence(BaseChangeThresholdHandler):
     def _initLastSavedSequence(self, database):
         if hasattr(self, '_lastSavedSequence'):
             return 
+        self._lastSavedSequence = -1
         if database.get(self._sequenceChangeDocId) is not None:
             self._lastSavedSequence =  database.get(self._sequenceChangeDocId).get(self._LAST_CHANGE_SEQ)
-        if self._lastSavedSequence is None:
-            self._lastSavedSequence = -1
-    
+
     def _getLastSavedSequence(self, database):
         self._initLastSavedSequence(database)
         return self._lastSavedSequence
@@ -59,10 +58,7 @@ class TrackLastSequence(BaseChangeThresholdHandler):
         
     def _canHandle(self, change, database):
         log.debug("lastSavedSequence: {0}\tlast_seq: {1}\n".format(
-                     self._getLastSavedSequence(database), str(change)))
-        # Return false if the change is the result of pushing our own document.
-        if ("doc" in change and self._sequenceChangeDocId != change['doc']['_id']):
-            return True
+                     self._getLastSavedSequence(database), str(change.get('last_seq'))))
         #return false if the change sequence has not changed since our last sat
         if self._getLastSavedSequence(database) <change.get('last_seq'):
             return True
