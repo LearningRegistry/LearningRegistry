@@ -23,6 +23,7 @@ from pylons.controllers.util import abort, redirect
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
 from lr.lib.base import BaseController, render
+from lr.lib import helpers as h
 import base64
 import pprint
 
