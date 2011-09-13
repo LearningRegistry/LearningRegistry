@@ -16,7 +16,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -64,7 +64,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -117,7 +117,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -165,7 +165,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -214,7 +214,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -268,7 +268,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -316,7 +316,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -361,7 +361,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -417,7 +417,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -468,7 +468,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -515,7 +515,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -563,7 +563,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -612,7 +612,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -658,7 +658,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -704,7 +704,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -752,7 +752,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -799,7 +799,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -843,7 +843,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -892,7 +892,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -948,7 +948,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1001,7 +1001,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1053,7 +1053,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1118,7 +1118,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1163,7 +1163,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1217,7 +1217,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1272,7 +1272,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1334,7 +1334,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1395,7 +1395,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1440,7 +1440,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1486,7 +1486,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1543,7 +1543,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1594,7 +1594,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1656,7 +1656,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1703,7 +1703,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1752,7 +1752,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1797,7 +1797,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1840,7 +1840,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1891,7 +1891,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1938,7 +1938,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -1988,7 +1988,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2037,7 +2037,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2087,7 +2087,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2133,7 +2133,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2181,7 +2181,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2232,7 +2232,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2283,7 +2283,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2351,7 +2351,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2401,7 +2401,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2455,7 +2455,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2498,7 +2498,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2546,7 +2546,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2598,7 +2598,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2645,7 +2645,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2693,7 +2693,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2740,7 +2740,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2786,7 +2786,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2835,7 +2835,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2881,7 +2881,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2931,7 +2931,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -2985,7 +2985,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3030,7 +3030,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3078,7 +3078,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3127,7 +3127,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3187,7 +3187,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3235,7 +3235,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3284,7 +3284,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3331,7 +3331,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3377,7 +3377,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3423,7 +3423,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3469,7 +3469,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3533,7 +3533,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3581,7 +3581,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3628,7 +3628,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3687,7 +3687,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3739,7 +3739,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3787,7 +3787,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3849,7 +3849,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3898,7 +3898,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3947,7 +3947,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -3998,7 +3998,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4041,7 +4041,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4081,7 +4081,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4129,7 +4129,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4171,7 +4171,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4217,7 +4217,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4265,7 +4265,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4314,7 +4314,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4359,7 +4359,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4405,7 +4405,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4454,7 +4454,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4508,7 +4508,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4559,7 +4559,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4603,7 +4603,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4649,7 +4649,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4697,7 +4697,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4746,7 +4746,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4789,7 +4789,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4835,7 +4835,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4882,7 +4882,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"
@@ -4929,7 +4929,7 @@
                 "signing_method": "LR-PGP.1.0"
             }, 
             "doc_type": "resource_data", 
-            "doc_version": "0.21.0", 
+            "doc_version": "0.23.0", 
             "identity": {
                 "submitter": "SRI International on behalf of The National Science Digital Library", 
                 "submitter_type": "agent"

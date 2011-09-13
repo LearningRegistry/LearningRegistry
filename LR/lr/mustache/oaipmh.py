@@ -13,7 +13,7 @@ class ListIdentifiers(object):
 <OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
          xmlns:oai="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd">
+         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd">
   <responseDate>{{response_date}}</responseDate>
   <request  verb="{{verb}}" {{#identifier}}identifier="{{identifier}}"{{/identifier}} {{#from_date}}
             from="{{from_date}}"{{/from_date}} {{#until_date}}until="{{until_date}}"{{/until_date}} {{#metadataPrefix}} 
@@ -81,7 +81,7 @@ class Error(object):
 <OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
          xmlns:oai="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd" >
+         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd" >
   <responseDate>{{response_date}}</responseDate>
   <request {{#verb}}verb="{{verb}}"{{/verb}}>{{path_url}}</request>
   <error code="{{code}}">{{msg}}</error>
