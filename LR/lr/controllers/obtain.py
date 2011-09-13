@@ -21,7 +21,7 @@ from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 import logging
 log = logging.getLogger(__name__)  
-trues = ['T','t','True','true']
+trues = ['T','t','True','true', True]
 class ObtainController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -102,7 +102,7 @@ class ObtainController(BaseController):
             yield '], "resumption_token":"%s"}' % token
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""        
-        data = self._parseParams()
+        data = self._parseParams(request.params)
         self._validateParams(data)
         return self._performObtain(data)
         # url('obtain')
@@ -137,7 +137,7 @@ class ObtainController(BaseController):
             yield ')'
     def create(self):
         """POST /obtain: Create a new item"""                
-        data = json.loads(request.body)
+        data = self._parseParams(json.loads(request.body))        
         self._validateParams(data)
         return self._performObtain(data)
 
@@ -165,31 +165,33 @@ class ObtainController(BaseController):
 
     def show(self, id, format='html'):
         """GET /obtain/id: Show a specific item"""        
-        data = self._parseParams()
+        data = self._parseParams(request.params)
         keys=[id]
         data['request_IDs'] = keys        
         return self._performObtain(data)
         # url('obtain', id=ID)
-    def _parseParams(self):
+    def _parseParams(self,inputParams):
         data = {
             'by_doc_ID':False,
             'by_resource_ID':True,
             'ids_only': False,
             'request_IDs': [],            
         }
-        if request.params.has_key('by_doc_ID'):
-            data['by_doc_ID'] = request.params['by_doc_ID'] in trues
-            data['by_resource_ID'] = False
-        
-        if request.params.has_key('by_resource_ID'):            
-            data['by_resource_ID'] = request.params['by_resource_ID'] in trues
-        if request.params.has_key('ids_only'):
-            data['ids_only'] = request.params['ids_only'] in trues
-        if request.params.has_key('resumption_token'):
-            data['resumption_token'] = rt.parse_token('obtain',request.params['resumption_token'])
+        if inputParams.has_key('by_doc_ID'):
+            data['by_doc_ID'] = inputParams['by_doc_ID'] in trues
+            if data['by_doc_ID']:
+                data['by_resource_ID'] = False
+        if inputParams.has_key('by_resource_ID'):            
+            data['by_resource_ID'] = inputParams['by_resource_ID'] in trues
+        if inputParams.has_key('ids_only'):
+            data['ids_only'] = inputParams['ids_only'] in trues
+        if inputParams.has_key('resumption_token'):
+            data['resumption_token'] = rt.parse_token('obtain',inputParams['resumption_token'])
             log.debug(data['resumption_token'])
-        if request.params.has_key('callback'):
-            data['callback'] = request.params['callback']
+        if inputParams.has_key('request_IDs'):
+            data['request_IDs'] = inputParams['request_IDs']
+        if inputParams.has_key('callback'):
+            data['callback'] = inputParams['callback']
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""
