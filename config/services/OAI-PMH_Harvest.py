@@ -41,7 +41,7 @@ class __OaiServiceTemplate(ServiceTemplate):
         ServiceTemplate.__init__(self)
         self.service_data_template = '''{
             "version": "OAI-PMH 2.0",
-            "schemalocation": "http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd"{{#spec_kv_only}},
+            "schemalocation": "http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd"{{#spec_kv_only}},
             "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}}{{#flow_control}},
             "flow_control": {{flow_control}}{{/flow_control}}{{#id_limit}},
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
