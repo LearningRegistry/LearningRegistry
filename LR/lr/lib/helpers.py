@@ -90,10 +90,11 @@ def getView(database_url, view_name, method="GET", documentHandler=None, **kwarg
         log.debug("POST "+view_url)
         log.debug("DATA " + post_data)
         view_req = urllib2.Request(view_url, data=post_data, headers=json_headers)
-    else:
-        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)]) 
+    else:        
+        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)])
+        log.error(view_url) 
         view_req = urllib2.Request(view_url, headers=json_headers)
-        log.debug("GET "+view_url)   
+        log.debug("GET "+view_url)  
     resp = urllib2.urlopen(view_req)
     
     dh = StreamingCouchDBDocHandler(documentHandler)

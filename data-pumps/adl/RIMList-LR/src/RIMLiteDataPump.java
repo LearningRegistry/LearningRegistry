@@ -172,12 +172,12 @@ public class RIMLiteDataPump {
 		Handle CAK = new Handle("wgrata001/AAddLL##2011");
 		Handle registryId = new Handle("100.51/jadl");
 		String registryURL = "http://practice-adlrim.adlnet.gov/ADLRIM/gateway";
-		String publishUrl = "http://192.168.220.128/publish";
+		String publishUrl = "http://lrdev05.learningregistry.org/publish";
 		JSONObject docs = new JSONObject();
 		try {
 			RegistrySearchProxy searchProxy = RegistryProxyBuilder
 					.createRegistrySearchProxy(CAK, registryURL, registryId);
-			SearchResults proxyResults = searchProxy.search("0");
+			SearchResults proxyResults = searchProxy.search("repositoryIdentifier:100.51/*");
 
 			java.util.List<SearchResult> results = proxyResults
 					.getSearchResults();
