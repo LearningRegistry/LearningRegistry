@@ -160,19 +160,19 @@ class LRNodeModel(object):
     def _getNodeJsonPolicy(self):
         policy = {'timestamp': h.nowToISO8601Zformat()}
         key="network_description"
-	if key in self._networkDescription.descriptionDict.keys():
+        if key in self._networkDescription.descriptionDict.keys():
                         policy[key] = self._networkDescription.descriptionDict[key]
-	key="network_name"
-	if key in self._networkDescription.descriptionDict.keys():
+        key="network_name"
+        if key in self._networkDescription.descriptionDict.keys():
                         policy[key] = self._networkDescription.descriptionDict[key]
-	key="node_id"
-	if key in self._nodeDescription.descriptionDict.keys():
+        key="node_id"
+        if key in self._nodeDescription.descriptionDict.keys():
                         policy[key] = self._nodeDescription.descriptionDict[key]
-	key="node_name"
-	if key in self._nodeDescription.descriptionDict.keys():
+        key="node_name"
+        if key in self._nodeDescription.descriptionDict.keys():
                         policy[key] = self._nodeDescription.descriptionDict[key]
-    #    policy.update(self._networkPolicyDescription.descriptionDict)
-	policy.update(self._networkPolicyDescription.specData)
+        #    policy.update(self._networkPolicyDescription.descriptionDict)
+        policy.update(self._networkPolicyDescription.specData)
 
         return json.dumps(policy, indent=2)  
       
