@@ -215,7 +215,7 @@ class TrackLastSequence(DatabaseChangeThresholdHandler):
    
     
 
-_RESOURCE_DATA_CHANGE_ID =  "Resource Data Last Processed Change Sequence"
+_RESOURCE_DATA_CHANGE_ID =  "_local/Resource Data Last Processed Change Sequence"
 changeTracker = TrackLastSequence( _RESOURCE_DATA_CHANGE_ID)
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
