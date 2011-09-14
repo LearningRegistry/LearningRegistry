@@ -168,7 +168,11 @@ class TestOaiPmhController(TestController):
                 return False
         except:
             return False
-        
+    
+    def _sanitize_timestamp(self, tstamp):
+        fix =  re.sub("\.[0-9]+Z$", "Z", tstamp)
+        return fix
+
     def _get_timestamps(self, doc1, doc2):
         if doc1["node_timestamp"] < doc2["node_timestamp"]:
             from_ =  doc1["node_timestamp"]
@@ -524,6 +528,43 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_match_requested_disseminaton_get: pass")
 
+    def test_listRecords_noRecordsMatch_get(self):
+        '''verify that if no records match the requested metadata dissemination 
+        format, the error code noRecordsMatch is displayed.'''
+        global nsdl_data, dc_data
+        last_doc = dc_data["documents"][-1]
+        
+        
+        last_time = iso8601.parse_date(last_doc["node_timestamp"], default_timezone=iso8601.iso8601.UTC)
+        time_after = last_time + datetime.timedelta(0,5)
+        from_ = helpers.convertToISO8601Zformat(time_after)
+        from_ = self._sanitize_timestamp(from_)
+        
+        log.info("Sleeping for 10 seconds... so we don't accidently use a from time in the future.")
+        time.sleep(10)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'oai_dc', 'from': from_ })
+        try:
+            obj = self.parse_response(response)
+            
+            errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
+            
+            assert len(errors) > 0, "test_listRecords_noRecordsMatch_get: Expected at least one error to be returned in response."
+            
+            noRecordsMatch = False
+            for error in errors:
+                if error == 'noRecordsMatch': noRecordsMatch = True
+                
+            assert noRecordsMatch, "test_listRecords_noRecordsMatch_get: noRecordsMatch error was not returned; instead got: %s" % ', '.join(errors)
+            
+        except Exception as e:
+#            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listRecords_noRecordsMatch_get: fail - from: {0}".format(from_))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listRecords_noRecordsMatch_get: pass")
+    
     def test_listRecords_get(self):
         global nsdl_data, dc_data
         doc1 = choice(nsdl_data["documents"])
@@ -579,7 +620,80 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_get: pass")
+        
+    def test_listIdentifiers_timestamp_headers_match_response_get(self):
+        global nsdl_data, dc_data
+        doc1 = choice(nsdl_data["documents"])
+        doc2 = choice(nsdl_data["documents"])
+        
+        (from_, until_) = self._get_timestamps(doc1, doc2)
+        
+        from_tstamp = iso8601.parse_date(from_)
+        until_tstamp = iso8601.parse_date(until_)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+        try:
+            obj = self.parse_response(response)
+            
+            req = obj["etree"].xpath("/lr:OAI-PMH/lr:request", namespaces=namespaces)
+            
+            assert len(req) == 1, "test_listIdentifiers_timestamp_headers_match_response_get: There should be exactly 1 <request/> element in the response, got %s." % len(req)
+            
+            assert "from" in req[0].keys() and req[0].get("from") is not None, "test_listIdentifiers_timestamp_headers_match_response_get: missing 'from' attribute"
+            assert "until" in req[0].keys() and req[0].get("until") is not None, "test_listIdentifiers_timestamp_headers_match_response_get: missing 'until' attribute"
+            
+            record_tstamps = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:header/lr:datestamp/text()", namespaces=namespaces)
+            
+            assert len(record_tstamps) > 0, "test_listIdentifiers_timestamp_headers_match_response_get: at least 1 record should be returned."
+            
+            for tstamp in record_tstamps:
+                assert from_ <= tstamp and until_ >= tstamp, "test_listIdentifiers_timestamp_headers_match_response_get: result not within range: %s <= %s <= %s" % (from_, tstamp, until_)
+            
+        except Exception as e:
+#            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listIdentifiers_timestamp_headers_match_response_get: fail - from: {0} until: {1}".format(from_, until_))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listIdentifiers_timestamp_headers_match_response_get: pass")
+        
 
+    def test_listIdentifiers_noRecordsMatch_get(self):
+        '''verify that if no records match the requested metadata dissemination 
+        format, the error code noRecordsMatch is displayed.'''
+        global nsdl_data, dc_data
+        last_doc = dc_data["documents"][-1]
+        
+        
+        last_time = iso8601.parse_date(last_doc["node_timestamp"], default_timezone=iso8601.iso8601.UTC)
+        time_after = last_time + datetime.timedelta(0,5)
+        from_ = helpers.convertToISO8601Zformat(time_after)
+        from_ = self._sanitize_timestamp(from_)
+        
+        log.info("Sleeping for 10 seconds... so we don't accidently use a from time in the future.")
+        time.sleep(10)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'oai_dc', 'from': from_ })
+        try:
+            obj = self.parse_response(response)
+            
+            errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
+            
+            assert len(errors) > 0, "test_listIdentifiers_noRecordsMatch_get: Expected at least one error to be returned in response."
+            
+            noRecordsMatch = False
+            for error in errors:
+                if error == 'noRecordsMatch': noRecordsMatch = True
+                
+            assert noRecordsMatch, "test_listIdentifiers_noRecordsMatch_get: noRecordsMatch error was not returned; instead got: %s" % ', '.join(errors)
+            
+        except Exception as e:
+#            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listIdentifiers_noRecordsMatch_get: fail - from: {0}".format(from_))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listIdentifiers_noRecordsMatch_get: pass")
 
 #    def test_index(self):
 #        response = self.app.get(url('OAI-PMH'))
