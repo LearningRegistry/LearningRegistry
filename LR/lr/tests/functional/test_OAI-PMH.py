@@ -565,6 +565,37 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_noRecordsMatch_get: pass")
     
+    def test_listRecords_JSON_metadataPrefix_get(self):
+        '''verify that if the requested dissemination format in metadataPrefix 
+        matches the JSON metadataPrefix in the service description the service 
+        behaves as the basic harvest service (returns the complete resource data 
+        description document as JSON).'''
+        global nsdl_data, dc_data
+        doc1 = choice(nsdl_data["documents"])
+        doc2 = choice(nsdl_data["documents"])
+        
+        (from_, until_) = self._get_timestamps(doc1, doc2)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'LR_JSON_0.10.0', 'from': from_, 'until': until_})
+
+        try:
+            json_obj = json.load(response)
+            
+            assert len(json_obj["listrecords"]["record"]) > 0, "test_listRecords_JSON_metadataPrefix_get: No JSON records returned"
+            for record in json_obj["listrecords"]["record"]:
+                try:
+                    doc_idx = nsdl_data["ids"].index(record[record["doc_ID"]])
+                    assert nsdl_data["documents"][doc_idx] == record, "test_listRecords_JSON_metadataPrefix_get: Returned document does not match."
+                except:
+                    pass # This should be okay - result may be an element not inserted by the test.
+        except Exception as e:
+#            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            log.exception("test_listRecords_JSON_metadataPrefix_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listRecords_JSON_metadataPrefix_get: pass")
+    
     def test_listRecords_get(self):
         global nsdl_data, dc_data
         doc1 = choice(nsdl_data["documents"])
