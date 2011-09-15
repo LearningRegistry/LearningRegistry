@@ -186,12 +186,12 @@ class oaipmh(harvest):
         try:
             opts = { "stale": "ok" }
             if identity != None:
-                opts["include_docs"] = True
+                opts["include_docs"] = "true"
                 
                 if by_doc_ID == True: 
                     byID = "by_doc_ID" 
                 else: 
-                    byID = "by_resource_ID"
+                    byID = "by_resource_locator"
                 opts["key"] = [byID, identity]
                 
                 view_data = self.db.view('oai-pmh-get-records/docs', **opts)

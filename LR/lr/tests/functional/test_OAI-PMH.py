@@ -328,6 +328,41 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listMetadataFormats_with_doc_id_identifier_get: pass")
         
+    def test_listMetadataFormats_with_resource_id_identifier_get(self):
+        '''verify that if an identifier is provided, the metadata formats are 
+        returned only for the identified resource data description documents.'''
+        randomDoc = choice(dc_data["documents"])
+        
+        # all docs that have the same resource_locator
+        opts = {"key": ["by_resource_locator", randomDoc["resource_locator"]], 
+                "include_docs": "true"}
+        all_matching_docs = self.db.view("oai-pmh-get-records/docs", **opts)
+        schema_formats = []
+        for row in all_matching_docs.rows:
+            if "payload_schema" in row.doc:
+                for s in row.doc["payload_schema"]:
+                    if s.strip() not in schema_formats:
+                        schema_formats.append(s.strip())
+            
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["resource_locator"], 'by_doc_ID': 'false'})
+        try:
+            obj = self.parse_response(response)
+            
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/lr:metadataFormat/lr:metadataPrefix/text()", namespaces=namespaces)
+            assert len(metadataPrefixes) == len(schema_formats), "test_listMetadataFormats_with_resource_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
+            
+            for prefix in metadataPrefixes:
+                assert prefix in schema_formats, "test_listMetadataFormats_with_resource_id_identifier_get: metadataPrefix returned that does not exist in payload_schema. %s not in %s" % (prefix, ", ".join(metadataPrefixes))
+                
+        except Exception as e:
+#            log.error("test_listMetadataFormats_get: fail")
+            log.exception("test_listMetadataFormats_with_resource_id_identifier_get: fail")
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")
+        
         
     def test_listMetadataFormats_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
