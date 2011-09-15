@@ -23,6 +23,7 @@ from pylons.controllers.util import abort, redirect
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
 from lr.lib.base import BaseController, render
+from lr.lib import helpers as h
 import base64
 import pprint
 
@@ -165,12 +166,12 @@ class DistributeController(BaseController):
 
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
-            server = couchdb.Server(config['couchdb.url'])
-            db = server[config['couchdb.db.node']]
-            doc = db[config['lr.nodestatus.docid']]
+            server = couchdb.Server(appConfig['couchdb.url'])
+            db = server[appConfig['couchdb.db.node']]
+            doc = db[appConfig['lr.nodestatus.docid']]
             doc['last_out_sync'] = h.nowToISO8601Zformat()
-            doc['out_sync_node'] = destinationNode
-            db.save(doc)                
+            doc['out_sync_node'] = destinationNode.nodeDescription.node_name
+            db[appConfig['lr.nodestatus.docid']] = doc
             results = server.replicate(sourceUrl, destinationUrl, **replicationOptions)
             log.debug("Replication results: "+str(results))
         
