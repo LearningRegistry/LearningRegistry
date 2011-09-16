@@ -16,6 +16,8 @@ from lr.lib import helpers
 import iso8601
 from iso8601.iso8601 import ParseError
 import time
+import math
+import copy
 
 json_headers={'content-type': 'application/json'}
 
@@ -655,6 +657,52 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_JSON_metadataPrefix_get: pass")
     
+    def test_listRecords_flow_control_get(self):
+        global nsdl_data, dc_data
+        doc1 = nsdl_data["documents"][0]
+        doc2 = nsdl_data["documents"][-1]
+        
+        item_limit = int(math.ceil(len(nsdl_data["documents"]) * (2.0/3.0)))
+        
+        node_db = self.server[config["couchdb.db.node"]]
+        service_doc_org = node_db[config["lr.oaipmh.docid"]] 
+        
+        service_doc_copy = copy.deepcopy(service_doc_org)
+        service_doc_copy["service_data"]["flow_control"] = True
+        service_doc_copy["service_data"]["doc_limit"] = item_limit
+        
+        node_db[service_doc_copy.id] = service_doc_copy
+        
+        try:
+            (from_, until_) = self._get_timestamps(doc1, doc2)
+                
+            response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+            try:
+                obj = self.parse_response(response)
+                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/lr:resumptionToken/text()", namespaces=namespaces)
+                
+                assert len(resumptionToken) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
+                
+                response2 = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
+                obj2 = self.parse_response(response2)
+                
+                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/lr:resumptionToken", namespaces=namespaces)
+                
+                assert len(resumptionToken2) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken2)
+                assert resumptionToken2[0].text == None or resumptionToken2[0].text == "", "test_listRecords_flow_control_get: expected last resumptionToken got '%s'" % resumptionToken2[0].text
+                
+            except Exception as e:
+    #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+                log.exception("test_listRecords_flow_control_get: fail - from: {0} until: {1}".format(from_, until_))
+                global test_data_delete
+                test_data_delete = False
+                raise e
+            log.info("test_listRecords_flow_control_get: pass")
+        finally:
+            service_doc_copy = node_db[service_doc_copy.id]
+            service_doc_copy["service_data"] = service_doc_org["service_data"]
+            node_db[service_doc_copy.id] = service_doc_copy
+    
     def test_listRecords_get(self):
         global nsdl_data, dc_data
         doc1 = choice(nsdl_data["documents"])
@@ -710,6 +758,52 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_get: pass")
+        
+    def test_listIdentifiers_flow_control_get(self):
+        global nsdl_data, dc_data
+        doc1 = nsdl_data["documents"][0]
+        doc2 = nsdl_data["documents"][-1]
+        
+        item_limit = int(math.ceil(len(nsdl_data["documents"]) * (2.0/3.0)))
+        
+        node_db = self.server[config["couchdb.db.node"]]
+        service_doc_org = node_db[config["lr.oaipmh.docid"]] 
+        
+        service_doc_copy = copy.deepcopy(service_doc_org)
+        service_doc_copy["service_data"]["flow_control"] = True
+        service_doc_copy["service_data"]["id_limit"] = item_limit
+        
+        node_db[service_doc_copy.id] = service_doc_copy
+        
+        try:
+            (from_, until_) = self._get_timestamps(doc1, doc2)
+                
+            response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+            try:
+                obj = self.parse_response(response)
+                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:resumptionToken/text()", namespaces=namespaces)
+                
+                assert len(resumptionToken) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
+                
+                response2 = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
+                obj2 = self.parse_response(response2)
+                
+                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:resumptionToken", namespaces=namespaces)
+                
+                assert len(resumptionToken2) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken2)
+                assert resumptionToken2[0].text == None or resumptionToken2[0].text == "", "test_listIdentifiers_flow_control_get: expected last resumptionToken got '%s'" % resumptionToken2[0].text
+                
+            except Exception as e:
+    #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+                log.exception("test_listIdentifiers_flow_control_get: fail - from: {0} until: {1}".format(from_, until_))
+                global test_data_delete
+                test_data_delete = False
+                raise e
+            log.info("test_listIdentifiers_flow_control_get: pass")
+        finally:
+            service_doc_copy = node_db[service_doc_copy.id]
+            service_doc_copy["service_data"] = service_doc_org["service_data"]
+            node_db[service_doc_copy.id] = service_doc_copy
         
     def test_listIdentifiers_timestamp_headers_match_response_get(self):
         global nsdl_data, dc_data
