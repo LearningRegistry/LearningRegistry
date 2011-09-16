@@ -35,7 +35,7 @@ def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, u
         from lr.lib import helpers as h
         payload["from_date"] = h.convertToISO8601Zformat(from_date)
     if until_date and isinstance(until_date, datetime.datetime):
-        payload["until_date"] = until_date
+        payload["until_date"] = h.convertToISO8601Zformat(until_date)
     
     return payload
 
