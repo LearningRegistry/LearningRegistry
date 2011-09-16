@@ -186,10 +186,12 @@ class oaipmh(harvest):
         try:
             opts = { "stale": "ok" }
             if identity != None:
+                opts["include_docs"] = "true"
+                
                 if by_doc_ID == True: 
                     byID = "by_doc_ID" 
                 else: 
-                    byID = "by_resource_ID"
+                    byID = "by_resource_locator"
                 opts["key"] = [byID, identity]
                 
                 view_data = self.db.view('oai-pmh-get-records/docs', **opts)
@@ -197,8 +199,11 @@ class oaipmh(harvest):
                     raise IdDoesNotExistError(verb)
                 formats = [];
                 for res in view_data:
-                    for schema in res.value["payload_schema"]:
-                        formats.append({"metadataPrefix":schema, "schemas":[res.value["payload_schema_locator"]]})
+                    for schema in res.doc["payload_schema"]:
+                        schemaLocators = []
+                        if "payload_schema_locator" in res.doc:
+                            schemaLocators.append(res.doc["payload_schema_locator"])
+                        formats.append({"metadataPrefix":schema, "schemas":schemaLocators})
                 return formats
             
             else:
