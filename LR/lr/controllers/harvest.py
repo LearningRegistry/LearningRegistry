@@ -152,14 +152,15 @@ class HarvestController(BaseController):
         if self.enable_flow_control and params.has_key('resumption_token'):
             resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                        
         base_response =  json.dumps(data).split('[')
-        yield base_response[0] +'['
         def debug_map(doc):
             data ={'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
             return data
         if from_date > until_date:
           data['OK'] = False
           data['error'] = 'badArgument'
+          yield json.dumps(data)
         else:
+            yield base_response[0] +'['
             first = True
             for data in h.list_records(from_date,until_date,resumption_token=resumption_token, limit=self.limit):                        
                 lastID = data['id']
@@ -170,12 +171,12 @@ class HarvestController(BaseController):
                     yield ',\n'
                 first = False
                 yield json.dumps(debug_map(doc))
-        if self.enable_flow_control and self.limit <= count:
-            token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
-            resp = base_response[1]
-            yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
-        else:
-            yield base_response[1]
+            if self.enable_flow_control and self.limit <= count:
+                token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
+                resp = base_response[1]
+                yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+            else:
+                yield base_response[1]
 
     def list_identifiers(self,h, body ,params, verb = 'GET'):        
 
@@ -190,27 +191,32 @@ class HarvestController(BaseController):
         self._getServiceDocment(False)        
         resumption_token = None
         if self.enable_flow_control and params.has_key('resumption_token'):
-            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                
-        yield base_response[0] +'['
-        first = True;
-        count = 0
-        lastID = None
-        lastKey = None
-        for d in h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit):
-            count += 1
-            lastID = d['id']
-            lastKey = d['key']
-            if not first:
-                yield ',\n'
-            first = False            
-            return_value = {"header":{'identifier':d['id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()) ,'status':'active'}}
-            yield json.dumps(return_value)
-        if self.enable_flow_control and self.limit <= count:
-            token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
-            resp = base_response[1]
-            yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
-        else:
-            yield base_response[1]
+            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])      
+        if from_date > until_date:        
+          data['OK'] = False
+          data['error'] = 'badArgument'
+          yield json.dumps(data)
+        else:        
+            yield base_response[0] +'['
+            first = True;
+            count = 0
+            lastID = None
+            lastKey = None
+            for d in h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit):
+                count += 1
+                lastID = d['id']
+                lastKey = d['key']
+                if not first:
+                    yield ',\n'
+                first = False            
+                return_value = {"header":{'identifier':d['id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()) ,'status':'active'}}
+                yield json.dumps(return_value)
+            if self.enable_flow_control and self.limit <= count:
+                token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
+                resp = base_response[1]
+                yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+            else:
+                yield base_response[1]
         
 
     def get_base_response(self, verb, body):
