@@ -16,6 +16,10 @@ from lr.lib import helpers
 import iso8601
 from iso8601.iso8601 import ParseError
 import time
+import math
+import copy
+from StringIO import StringIO
+import unittest
 
 json_headers={'content-type': 'application/json'}
 
@@ -39,6 +43,7 @@ log = logging.getLogger(__name__)
 test_data_delete = True
 nsdl_data = { "documents" : [], "ids": [] }
 dc_data = { "documents" : [], "ids": [] }
+sorted_dc_data = { "documents" : [], "ids": [] }
 
 
 
@@ -51,7 +56,7 @@ class TestOaiPmhController(TestController):
         schema_doc = etree.parse(schema_file)
         self.oailrschema = etree.XMLSchema(schema_doc)
         
-        global test_data_delete, nsdl_data, dc_data
+        global test_data_delete, nsdl_data, dc_data, sorted_dc_data
         self.o = oaipmh()
         self.server = self.o.server
         self.db = self.o.db
@@ -109,6 +114,16 @@ class TestOaiPmhController(TestController):
             if re.search("^OAI-DC-TEST-DATA-", row.key) != None and re.search("-distributable$", row.key) == None:
                 dc_data["documents"].append(row.value)
                 dc_data["ids"].append(row.id)
+                
+        sorted_dc_data = {
+                          "documents": sorted(dc_data["documents"], key=lambda k: k['node_timestamp']),
+                          "ids": []
+                          } 
+        
+        for sort in sorted_dc_data["documents"]:
+            sorted_dc_data["ids"].append(sort["doc_ID"])
+            
+            
         opts = {
                 "startkey":"_design/",
                 "endkey": "_design0",
@@ -168,7 +183,11 @@ class TestOaiPmhController(TestController):
                 return False
         except:
             return False
-        
+    
+    def _sanitize_timestamp(self, tstamp):
+        fix =  re.sub("\.[0-9]+Z$", "Z", tstamp)
+        return fix
+
     def _get_timestamps(self, doc1, doc2):
         if doc1["node_timestamp"] < doc2["node_timestamp"]:
             from_ =  doc1["node_timestamp"]
@@ -215,17 +234,22 @@ class TestOaiPmhController(TestController):
 
     def test_empty(self):
             pass
-        
+    
+    @unittest.skip("lxml/libxml can't load XMLSchema!!!")
     def test_get_oai_lr_schema(self):
-        response = urllib2.urlopen("http://www.w3.org/2001/XMLSchema.xsd");
-        body = response.read()
-        xmlSchema = etree.XMLSchema(etree.fromstring(body))
-        
-        response = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
-        oaiLRSchema = etree.fromstring(response.body)
-        
-        assert xmlSchema.validate(oaiLRSchema)
-        log.info("test_get_oai_lr_schema: pass")
+        try:
+            res = urllib2.urlopen("http://www.w3.org/2001/XMLSchema.xsd")
+            xmlSchema = etree.XMLSchema(etree.parse(res))
+    #        xmlSchema = etree.XMLSchema(etree.parse(StringIO(res.read().strip())))
+            
+            res2 = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
+            oaiLRSchema = etree.fromstring(res2.body)
+            
+            assert xmlSchema.validate(oaiLRSchema)
+            log.info("test_get_oai_lr_schema: pass")
+        except Exception as e:
+            test_data_delete = False
+            raise e
         
         
     def test_identify_get(self):
@@ -239,7 +263,9 @@ class TestOaiPmhController(TestController):
         log.info("test_identify_post: pass")
         
     def test_identify_earliest_datestamp(self):
-        '''verify that the network node maintains a value for the earliest publication time for documents harvestable from the node (earliestDatestamp)'''
+        '''test_identify_earliest_datestamp: 
+        verify that the network node maintains a value for the earliest publication 
+        time for documents harvestable from the node (earliestDatestamp)'''
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
         
         root = etree.fromstring(response.body)
@@ -255,7 +281,8 @@ class TestOaiPmhController(TestController):
         log.info("test_identify_earliest_datestamp: pass")
         
     def test_identify_timestamp_granularity(self):
-        '''verify that the granularity of the timestamp exists in Identify.'''
+        '''test_identify_timestamp_granularity: 
+        verify that the granularity of the timestamp exists in Identify.'''
 
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
         
@@ -268,7 +295,9 @@ class TestOaiPmhController(TestController):
         
 
     def test_identify_timestamp_granularity_service_doc(self):
-        '''verify that the granularity of the timestamp is stored in the service description document.'''
+        '''test_identify_timestamp_granularity_service_doc: 
+        verify that the granularity of the timestamp is stored in the service 
+        description document.'''
         serviceDoc = helpers.getServiceDocument(config["lr.oaipmh.docid"])
         assert serviceDoc is not None, "Service document '%s' is missing." % config["lr.oaipmh.docid"]
         
@@ -299,6 +328,67 @@ class TestOaiPmhController(TestController):
         self.validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
         log.info("test_ListSets_post: pass")
         
+        
+        
+    def test_listMetadataFormats_with_doc_id_identifier_get(self):
+        '''test_listMetadataFormats_with_doc_id_identifier_get: 
+        verify that if an identifier is provided, the metadata formats are 
+        returned only for the identified resource data description documents.'''
+        randomDoc = choice(dc_data["documents"])
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': 'true'})
+        try:
+            obj = self.parse_response(response)
+            
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/lr:metadataFormat/lr:metadataPrefix/text()", namespaces=namespaces)
+            assert len(metadataPrefixes) == len(randomDoc["payload_schema"]), "test_listMetadataFormats_with_doc_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
+            
+            for prefix in metadataPrefixes:
+                assert prefix in randomDoc["payload_schema"], "test_listMetadataFormats_with_doc_id_identifier_get: metadataPrefix returned that does not exist in payload_schema. %s not in %s" % (prefix, ", ".join(metadataPrefixes))
+                
+        except Exception as e:
+#            log.error("test_listMetadataFormats_get: fail")
+            log.exception("test_listMetadataFormats_with_doc_id_identifier_get: fail")
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listMetadataFormats_with_doc_id_identifier_get: pass")
+        
+    def test_listMetadataFormats_with_resource_id_identifier_get(self):
+        '''test_listMetadataFormats_with_resource_id_identifier_get: 
+        verify that if an identifier is provided, the metadata formats are 
+        returned only for the identified resource data description documents.'''
+        randomDoc = choice(dc_data["documents"])
+        
+        # all docs that have the same resource_locator
+        opts = {"key": ["by_resource_locator", randomDoc["resource_locator"]], 
+                "include_docs": "true"}
+        all_matching_docs = self.db.view("oai-pmh-get-records/docs", **opts)
+        schema_formats = []
+        for row in all_matching_docs.rows:
+            if "payload_schema" in row.doc:
+                for s in row.doc["payload_schema"]:
+                    if s.strip() not in schema_formats:
+                        schema_formats.append(s.strip())
+            
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["resource_locator"], 'by_doc_ID': 'false'})
+        try:
+            obj = self.parse_response(response)
+            
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/lr:metadataFormat/lr:metadataPrefix/text()", namespaces=namespaces)
+            assert len(metadataPrefixes) == len(schema_formats), "test_listMetadataFormats_with_resource_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
+            
+            for prefix in metadataPrefixes:
+                assert prefix in schema_formats, "test_listMetadataFormats_with_resource_id_identifier_get: metadataPrefix returned that does not exist in payload_schema. %s not in %s" % (prefix, ", ".join(metadataPrefixes))
+                
+        except Exception as e:
+#            log.error("test_listMetadataFormats_get: fail")
+            log.exception("test_listMetadataFormats_with_resource_id_identifier_get: fail")
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")
         
         
     def test_listMetadataFormats_get(self):
@@ -349,14 +439,17 @@ class TestOaiPmhController(TestController):
 
 
     def test_getRecord_by_doc_ID_match_requested_dissemination_get(self):
-        '''verify that the returned resource data matches the requested dissemination 
+        '''test_getRecord_by_doc_ID_match_requested_dissemination_get: 
+        verify that the returned resource data matches the requested dissemination 
         format for the specified  resource data description document ID or resource ID'''
         
-        '''verify that if the request ID is a resource data description document 
+        '''test_getRecord_by_doc_ID_match_requested_dissemination_get: 
+        verify that if the request ID is a resource data description document 
         ID, the service returns the metadata dissemination for the single resource 
         data description document that matches the ID'''
         
-        '''verify that the return of any resource_data that matches the requested 
+        '''test_getRecord_by_doc_ID_match_requested_dissemination_get: 
+        verify that the return of any resource_data that matches the requested 
         dissemination format associated with the requested resource data document 
         (any payload where the payload_schema matches the requested dissemination 
         format) is supported.'''
@@ -391,7 +484,8 @@ class TestOaiPmhController(TestController):
 
     
     def test_getRecord_by_doc_ID_JSON_metadataPrefix_get(self):
-        '''verify that if the requested dissemination format in metadataPrefix 
+        '''test_getRecord_by_doc_ID_JSON_metadataPrefix_get: 
+        verify that if the requested dissemination format in metadataPrefix 
         matches the JSON metadataPrefix in the servcie description the service 
         behaves as the basic harvest service (returns the complete resource data 
         description document as JSON).'''
@@ -399,10 +493,10 @@ class TestOaiPmhController(TestController):
         randomDoc = choice(dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'LR_JSON_0.10.0', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
-            json_obj = json.load(response)
+            json_obj = json.loads(response.body)
             
             assert len(json_obj["getrecord"]["record"]) == 1, "test_getRecord_by_doc_ID_JSON_metadataPrefix_get: No JSON record returned"
-            assert json_obj["getrecord"]["record"][0] == radomDoc, "test_getRecord_by_doc_ID_JSON_metadataPrefix_get: Returned document does not match."
+            assert json_obj["getrecord"]["record"][0]["resource_data"] == randomDoc, "test_getRecord_by_doc_ID_JSON_metadataPrefix_get: Returned document does not match."
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_by_doc_ID_JSON_metadataPrefix_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
@@ -524,6 +618,122 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_match_requested_disseminaton_get: pass")
 
+    def test_listRecords_noRecordsMatch_get(self):
+        '''test_listRecords_noRecordsMatch_get:
+        verify that if no records match the requested metadata dissemination 
+        format, the error code noRecordsMatch is displayed.'''
+        global nsdl_data, dc_data, sorted_dc_data
+        last_doc = sorted_dc_data["documents"][-1]
+        
+        
+        last_time = iso8601.parse_date(last_doc["node_timestamp"], default_timezone=iso8601.iso8601.UTC)
+        time_after = last_time + datetime.timedelta(0,5)
+        from_ = helpers.convertToISO8601Zformat(time_after)
+        from_ = self._sanitize_timestamp(from_)
+        
+        log.info("Sleeping for 10 seconds... so we don't accidently use a from time in the future.")
+        time.sleep(10)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'oai_dc', 'from': from_ })
+        try:
+            obj = self.parse_response(response)
+            
+            errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
+            
+            assert len(errors) > 0, "test_listRecords_noRecordsMatch_get: Expected at least one error to be returned in response."
+            
+            noRecordsMatch = False
+            for error in errors:
+                if error == 'noRecordsMatch': noRecordsMatch = True
+                
+            assert noRecordsMatch, "test_listRecords_noRecordsMatch_get: noRecordsMatch error was not returned; instead got: %s" % ', '.join(errors)
+            
+        except Exception as e:
+#            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listRecords_noRecordsMatch_get: fail - from: {0}".format(from_))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listRecords_noRecordsMatch_get: pass")
+    
+    def test_listRecords_JSON_metadataPrefix_get(self):
+        '''test_listRecords_JSON_metadataPrefix_get:
+        verify that if the requested dissemination format in metadataPrefix 
+        matches the JSON metadataPrefix in the service description the service 
+        behaves as the basic harvest service (returns the complete resource data 
+        description document as JSON).'''
+        global nsdl_data, dc_data
+        doc1 = choice(nsdl_data["documents"])
+        doc2 = choice(nsdl_data["documents"])
+        
+        (from_, until_) = self._get_timestamps(doc1, doc2)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'LR_JSON_0.10.0', 'from': from_, 'until': until_})
+
+        try:
+            json_obj = json.load(response)
+            
+            assert len(json_obj["listrecords"]["record"]) > 0, "test_listRecords_JSON_metadataPrefix_get: No JSON records returned"
+            for record in json_obj["listrecords"]["record"]:
+                try:
+                    doc_idx = nsdl_data["ids"].index(record[record["doc_ID"]])
+                    assert nsdl_data["documents"][doc_idx] == record, "test_listRecords_JSON_metadataPrefix_get: Returned document does not match."
+                except:
+                    pass # This should be okay - result may be an element not inserted by the test.
+        except Exception as e:
+#            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            log.exception("test_listRecords_JSON_metadataPrefix_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listRecords_JSON_metadataPrefix_get: pass")
+    
+    def test_listRecords_flow_control_get(self):
+        global nsdl_data, dc_data
+        doc1 = nsdl_data["documents"][0]
+        doc2 = nsdl_data["documents"][-1]
+        
+        item_limit = int(math.ceil(len(nsdl_data["documents"]) * (2.0/3.0)))
+        
+        node_db = self.server[config["couchdb.db.node"]]
+        service_doc_org = node_db[config["lr.oaipmh.docid"]] 
+        
+        service_doc_copy = copy.deepcopy(service_doc_org)
+        service_doc_copy["service_data"]["flow_control"] = True
+        service_doc_copy["service_data"]["doc_limit"] = item_limit
+        
+        node_db[service_doc_copy.id] = service_doc_copy
+        
+        try:
+            (from_, until_) = self._get_timestamps(doc1, doc2)
+                
+            response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+            try:
+                obj = self.parse_response(response)
+                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/lr:resumptionToken/text()", namespaces=namespaces)
+                
+                assert len(resumptionToken) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
+                
+                response2 = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
+                obj2 = self.parse_response(response2)
+                
+                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/lr:resumptionToken", namespaces=namespaces)
+                
+                assert len(resumptionToken2) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken2)
+                assert resumptionToken2[0].text == None or resumptionToken2[0].text == "", "test_listRecords_flow_control_get: expected last resumptionToken got '%s'" % resumptionToken2[0].text
+                
+            except Exception as e:
+    #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+                log.exception("test_listRecords_flow_control_get: fail - from: {0} until: {1}".format(from_, until_))
+                global test_data_delete
+                test_data_delete = False
+                raise e
+            log.info("test_listRecords_flow_control_get: pass")
+        finally:
+            service_doc_copy = node_db[service_doc_copy.id]
+            service_doc_copy["service_data"] = service_doc_org["service_data"]
+            node_db[service_doc_copy.id] = service_doc_copy
+    
     def test_listRecords_get(self):
         global nsdl_data, dc_data
         doc1 = choice(nsdl_data["documents"])
@@ -579,7 +789,127 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_get: pass")
+        
+    def test_listIdentifiers_flow_control_get(self):
+        global nsdl_data, dc_data
+        doc1 = nsdl_data["documents"][0]
+        doc2 = nsdl_data["documents"][-1]
+        
+        item_limit = int(math.ceil(len(nsdl_data["documents"]) * (2.0/3.0)))
+        
+        node_db = self.server[config["couchdb.db.node"]]
+        service_doc_org = node_db[config["lr.oaipmh.docid"]] 
+        
+        service_doc_copy = copy.deepcopy(service_doc_org)
+        service_doc_copy["service_data"]["flow_control"] = True
+        service_doc_copy["service_data"]["id_limit"] = item_limit
+        
+        node_db[service_doc_copy.id] = service_doc_copy
+        
+        try:
+            (from_, until_) = self._get_timestamps(doc1, doc2)
+                
+            response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+            try:
+                obj = self.parse_response(response)
+                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:resumptionToken/text()", namespaces=namespaces)
+                
+                assert len(resumptionToken) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
+                
+                response2 = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
+                obj2 = self.parse_response(response2)
+                
+                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:resumptionToken", namespaces=namespaces)
+                
+                assert len(resumptionToken2) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken2)
+                assert resumptionToken2[0].text == None or resumptionToken2[0].text == "", "test_listIdentifiers_flow_control_get: expected last resumptionToken got '%s'" % resumptionToken2[0].text
+                
+            except Exception as e:
+    #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+                log.exception("test_listIdentifiers_flow_control_get: fail - from: {0} until: {1}".format(from_, until_))
+                global test_data_delete
+                test_data_delete = False
+                raise e
+            log.info("test_listIdentifiers_flow_control_get: pass")
+        finally:
+            service_doc_copy = node_db[service_doc_copy.id]
+            service_doc_copy["service_data"] = service_doc_org["service_data"]
+            node_db[service_doc_copy.id] = service_doc_copy
+        
+    def test_listIdentifiers_timestamp_headers_match_response_get(self):
+        global nsdl_data, dc_data
+        doc1 = choice(nsdl_data["documents"])
+        doc2 = choice(nsdl_data["documents"])
+        
+        (from_, until_) = self._get_timestamps(doc1, doc2)
+        
+        from_tstamp = iso8601.parse_date(from_)
+        until_tstamp = iso8601.parse_date(until_)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+        try:
+            obj = self.parse_response(response)
+            
+            req = obj["etree"].xpath("/lr:OAI-PMH/lr:request", namespaces=namespaces)
+            
+            assert len(req) == 1, "test_listIdentifiers_timestamp_headers_match_response_get: There should be exactly 1 <request/> element in the response, got %s." % len(req)
+            
+            assert "from" in req[0].keys() and req[0].get("from") is not None, "test_listIdentifiers_timestamp_headers_match_response_get: missing 'from' attribute"
+            assert "until" in req[0].keys() and req[0].get("until") is not None, "test_listIdentifiers_timestamp_headers_match_response_get: missing 'until' attribute"
+            
+            record_tstamps = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:header/lr:datestamp/text()", namespaces=namespaces)
+            
+            assert len(record_tstamps) > 0, "test_listIdentifiers_timestamp_headers_match_response_get: at least 1 record should be returned."
+            
+            for tstamp in record_tstamps:
+                assert from_ <= tstamp and until_ >= tstamp, "test_listIdentifiers_timestamp_headers_match_response_get: result not within range: %s <= %s <= %s" % (from_, tstamp, until_)
+            
+        except Exception as e:
+#            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listIdentifiers_timestamp_headers_match_response_get: fail - from: {0} until: {1}".format(from_, until_))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listIdentifiers_timestamp_headers_match_response_get: pass")
+        
 
+    def test_listIdentifiers_noRecordsMatch_get(self):
+        '''test_listIdentifiers_noRecordsMatch_get:
+        verify that if no records match the requested metadata dissemination 
+        format, the error code noRecordsMatch is displayed.'''
+        global nsdl_data, dc_data, sorted_dc_data
+        last_doc = sorted_dc_data["documents"][-1]
+        
+        
+        last_time = iso8601.parse_date(last_doc["node_timestamp"], default_timezone=iso8601.iso8601.UTC)
+        time_after = last_time + datetime.timedelta(0,5)
+        from_ = helpers.convertToISO8601Zformat(time_after)
+        from_ = self._sanitize_timestamp(from_)
+        
+        log.info("Sleeping for 10 seconds... so we don't accidently use a from time in the future.")
+        time.sleep(10)
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'oai_dc', 'from': from_ })
+        try:
+            obj = self.parse_response(response)
+            
+            errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
+            
+            assert len(errors) > 0, "test_listIdentifiers_noRecordsMatch_get: Expected at least one error to be returned in response."
+            
+            noRecordsMatch = False
+            for error in errors:
+                if error == 'noRecordsMatch': noRecordsMatch = True
+                
+            assert noRecordsMatch, "test_listIdentifiers_noRecordsMatch_get: noRecordsMatch error was not returned; instead got: %s" % ', '.join(errors)
+            
+        except Exception as e:
+#            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
+            log.exception("test_listIdentifiers_noRecordsMatch_get: fail - from: {0}".format(from_))
+            global test_data_delete
+            test_data_delete = False
+            raise e
+        log.info("test_listIdentifiers_noRecordsMatch_get: pass")
 
 #    def test_index(self):
 #        response = self.app.get(url('OAI-PMH'))
