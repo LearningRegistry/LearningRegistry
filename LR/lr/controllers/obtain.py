@@ -177,10 +177,10 @@ class ObtainController(BaseController):
             'ids_only': False,
             'request_IDs': [],            
         }
-        if request.params.has_key('by_doc_ID'):
-            data['by_doc_ID'] = request.params['by_doc_ID'] in trues
+        if request.params.has_key('by_doc_ID') and request.params['by_doc_ID'] in trues:
+            data['by_doc_ID'] = True
             data['by_resource_ID'] = False
-        
+                    
         if request.params.has_key('by_resource_ID'):            
             data['by_resource_ID'] = request.params['by_resource_ID'] in trues
         if request.params.has_key('ids_only'):
@@ -190,6 +190,8 @@ class ObtainController(BaseController):
             log.debug(data['resumption_token'])
         if request.params.has_key('callback'):
             data['callback'] = request.params['callback']
+        if request.params.has_key('request_ID'):
+            data['request_IDs'].append(request.params['request_ID'])
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""
