@@ -14,6 +14,7 @@ import ast
 import string
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
+BASIC_HARVEST_SERVICE_DOC = appConfig['lr.harvest.docid']
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -23,7 +24,7 @@ class HarvestController(BaseController):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = helpers.getServiceDocument(appConfig['lr.harvest.docid'])
+        serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
 
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
@@ -38,12 +39,12 @@ class HarvestController(BaseController):
                     limit_type = "doc_limit"
                 if self.enable_flow_control and limit_type in serviceData:
                     self.limit = serviceData['id_limit']
-                elif enable_flow_control:
+                elif self.enable_flow_control:
                     self.limit = 100    
     def __parse_date(self,date):
-        last_update_date = iso8601.parse_date(date)
-        last_update = helpers.convertToISO8601UTC(last_update_date)    
-        return last_update
+        #last_update_date = iso8601.parse_date(date)
+        #last_update = helpers.convertToISO8601UTC(last_update_date)    
+        return helpers.harvestTimeFormat(date)
     def _check_bool_param(self,params,key):
         if params.has_key(key):
             raw_value = string.lower(str(params[key]))
@@ -94,7 +95,7 @@ class HarvestController(BaseController):
             data['identify']={
                 "node_id":sourceLRNode.nodeDescription.node_name,
                 "repositoryName":sourceLRNode.communityDescription.community_name,
-                "baseU":serviceDoc['service_endpoint'],
+                "baseURL":serviceDoc['service_endpoint'],
                 "protocolVersion":"2.0",
                 "service_version":serviceDoc['service_version'],
                 "earliestDatestamp":h.earliestDate(),
