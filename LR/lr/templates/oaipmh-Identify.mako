@@ -11,12 +11,12 @@
   <responseDate>${c.datetime_now | x}</responseDate>
   <request verb="Identify">${c.path_url | x}</request>
   <Identify>
-    <repositoryName>${c.identify["repositoryName"] | x}</repositoryName>
-    <baseURL>${c.path_url | x}</baseURL>
-    <protocolVersion>2.0</protocolVersion>
-    <adminEmail>${c.identify["adminEmail"] | x }</adminEmail>
-    <earliestDatestamp>${h.harvestTimeFormat(c.identify["earliestDatestamp"]) | x}</earliestDatestamp>
-    <deletedRecord>${c.identify["deletedRecord"] | x}</deletedRecord>
-    <granularity>${c.identify["granularity"] | x}</granularity>
+    <oai:repositoryName>${c.identify["repositoryName"] | x}</oai:repositoryName>
+    <oai:baseURL>${c.path_url | x}</oai:baseURL>
+    <oai:protocolVersion>2.0</oai:protocolVersion>
+    <oai:adminEmail>${c.identify["adminEmail"] | x }</oai:adminEmail>
+    <oai:earliestDatestamp>${h.harvestTimeFormat(c.identify["earliestDatestamp"]) | x}</oai:earliestDatestamp>
+    <oai:deletedRecord>${c.identify["deletedRecord"] | x}</oai:deletedRecord>
+    <oai:granularity>${c.identify["granularity"] | x}</oai:granularity>
  </Identify>
 </OAI-PMH>
