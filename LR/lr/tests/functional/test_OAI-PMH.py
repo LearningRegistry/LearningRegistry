@@ -1,25 +1,27 @@
-from lr.tests import *
-from pylons import config
-import couchdb
-from routes.util import url_for
-import logging
-import urllib2
-from lxml import etree
-from random import choice
-import json
-import uuid
-import datetime
-import re
-from lr.lib.oaipmh import oaipmh
-import pprint
-from lr.lib import helpers
-import iso8601
-from iso8601.iso8601 import ParseError
-import time
-import math
-import copy
 from StringIO import StringIO
+from iso8601.iso8601 import ParseError
+from lr.lib import helpers
+from lr.lib.oaipmh import oaipmh
+from lr.tests import *
+from lxml import etree
+from pylons import config
+from random import choice
+from routes.util import url_for
+import copy
+import couchdb
+import datetime
+import iso8601
+import json
+import logging
+import math
+import os
+import pprint
+import re
+import subprocess
+import time
 import unittest
+import urllib2
+import uuid
 
 json_headers={'content-type': 'application/json'}
 
@@ -46,6 +48,34 @@ dc_data = { "documents" : [], "ids": [] }
 sorted_dc_data = { "documents" : [], "ids": [] }
 
 
+class XercesValidator():
+    def __init__(self):
+        def is_exe(fpath):
+            return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+        
+        if "xerces-c.StdInParse" in config and is_exe(config["xerces-c.StdInParse"]):
+            self.stdinparse = [config["xerces-c.StdInParse"], '-n', '-f', '-s']
+            self.enabled = True
+        else:
+            self.enabled = False
+            
+    def validate(self, contents=""):
+        errors = []
+        if self.enabled:
+            process = subprocess.Popen(self.stdinparse, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            xmlin = contents 
+            (_, stderr) = process.communicate(input=xmlin.encode("utf8"))
+            if stderr != None or stderr != "":
+                err_lines = stderr.splitlines()
+                for err in err_lines:
+                    m = re.match('''.*\s+line\s+([0-9]+),\s+char\s+([0-9]+)\):\s*(.*)$''', err)
+                    if m is not None:
+                        errors.append({ "line": m.group(1), 'char': m.group(2), 'msg': m.group(3) })
+        else:
+            log.info("Xerces not available for validation.")
+        return errors 
+
+
 
 class TestOaiPmhController(TestController):
 
@@ -55,6 +85,8 @@ class TestOaiPmhController(TestController):
         schema_file = file("lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd", "r")
         schema_doc = etree.parse(schema_file)
         self.oailrschema = etree.XMLSchema(schema_doc)
+        
+        self.validator = XercesValidator()
         
         global test_data_delete, nsdl_data, dc_data, sorted_dc_data
         self.o = oaipmh()
@@ -201,6 +233,7 @@ class TestOaiPmhController(TestController):
         
         return (from_, until_)
     
+    
     def parse_response(self, response):
         body = response.body
         xmlcontent = etree.fromstring(body)
@@ -221,31 +254,38 @@ class TestOaiPmhController(TestController):
             self.assertEqual(1, len(error), "validate_lr_oai_etree FAIL: Expected error, none found.")
         
         
-        if checkSchema == True:
-            self.oailrschema.assertValid(xmlcontent)
-        else:
-            log.info("validate_lr_oai_etree: Not validating response against schema.")
+        
         
     def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False, errorCodeExpected=None):
         obj = self.parse_response(response)
         xmlcontent = obj["etree"]
         self.validate_lr_oai_etree(xmlcontent, errorExists, checkSchema, errorCodeExpected)
+
+        schemaErrors = self.validator.validate(obj["raw"])
+        assert len(schemaErrors) == 0, "validate_lr_oai_response: Schema validation error:\n%s" % '\n'.join(map(lambda x: "\t(line: {0}, char: {1}): {2}".format(x["line"], x["char"], x["msg"]), schemaErrors))
         
+        
+
 
     def test_empty(self):
             pass
     
-    @unittest.skip("lxml/libxml can't load XMLSchema!!!")
+#    @unittest.skip("lxml/libxml can't load XMLSchema!!!")
     def test_get_oai_lr_schema(self):
         try:
-            res = urllib2.urlopen("http://www.w3.org/2001/XMLSchema.xsd")
-            xmlSchema = etree.XMLSchema(etree.parse(res))
-    #        xmlSchema = etree.XMLSchema(etree.parse(StringIO(res.read().strip())))
+#            res = urllib2.urlopen("http://www.w3.org/2001/XMLSchema.xsd")
+#            xmlSchema = etree.XMLSchema(etree.parse(res))
+#    #        xmlSchema = etree.XMLSchema(etree.parse(StringIO(res.read().strip())))
+#            
+#            res2 = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
+#            oaiLRSchema = etree.fromstring(res2.body)
             
             res2 = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
-            oaiLRSchema = etree.fromstring(res2.body)
+            schemaErrors = self.validator.validate(res2.body)
+            assert len(schemaErrors) == 0, "Schema validation error:\n%s" % '\n'.join(map(lambda x: "\t(line: {0}, char: {1}): {2}".format(x["line"], x["char"], x["msg"]), schemaErrors))
+
             
-            assert xmlSchema.validate(oaiLRSchema)
+#            assert xmlSchema.validate(oaiLRSchema)
             log.info("test_get_oai_lr_schema: pass")
         except Exception as e:
             test_data_delete = False
@@ -269,7 +309,7 @@ class TestOaiPmhController(TestController):
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
         
         root = etree.fromstring(response.body)
-        earliestDatestamp = root.xpath('/lr:OAI-PMH/lr:Identify/lr:earliestDatestamp/text()', namespaces=namespaces)
+        earliestDatestamp = root.xpath('/lr:OAI-PMH/lr:Identify/oai:earliestDatestamp/text()', namespaces=namespaces)
         
         assert len(earliestDatestamp) == 1, "Identify: missing earliest datestamp"
         
@@ -287,7 +327,7 @@ class TestOaiPmhController(TestController):
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
         
         root = etree.fromstring(response.body)
-        identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/lr:granularity/text()', namespaces=namespaces)
+        identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/oai:granularity/text()', namespaces=namespaces)
         
         assert len(identifyGranularity) == 1, "Identify: missing <granularity>"
         
@@ -309,7 +349,7 @@ class TestOaiPmhController(TestController):
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
         
         root = etree.fromstring(response.body)
-        identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/lr:granularity/text()', namespaces=namespaces)
+        identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/oai:granularity/text()', namespaces=namespaces)
         
         assert len(identifyGranularity) == 1, "Identify: missing <granularity>"
         
@@ -340,7 +380,7 @@ class TestOaiPmhController(TestController):
         try:
             obj = self.parse_response(response)
             
-            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/lr:metadataFormat/lr:metadataPrefix/text()", namespaces=namespaces)
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix/text()", namespaces=namespaces)
             assert len(metadataPrefixes) == len(randomDoc["payload_schema"]), "test_listMetadataFormats_with_doc_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
             
             for prefix in metadataPrefixes:
@@ -376,7 +416,7 @@ class TestOaiPmhController(TestController):
         try:
             obj = self.parse_response(response)
             
-            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/lr:metadataFormat/lr:metadataPrefix/text()", namespaces=namespaces)
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix/text()", namespaces=namespaces)
             assert len(metadataPrefixes) == len(schema_formats), "test_listMetadataFormats_with_resource_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
             
             for prefix in metadataPrefixes:
@@ -470,7 +510,7 @@ class TestOaiPmhController(TestController):
             
             assert hasSchema, "test_getRecord_match_requested_dissemination_get: Test document does not have a matching payload_schema"
             
-            identifier = obj["etree"].xpath("/lr:OAI-PMH/lr:GetRecord/lr:record/lr:header/lr:identifier/text()", namespaces=namespaces)
+            identifier = obj["etree"].xpath("/lr:OAI-PMH/lr:GetRecord/lr:record/oai:header/oai:identifier/text()", namespaces=namespaces)
             
             assert len(identifier) == 1 and identifier[0] == randomDoc["doc_ID"], "test_getRecord_match_requested_dissemination_get: Requested document does not match."
             
@@ -599,7 +639,7 @@ class TestOaiPmhController(TestController):
             obj = self.parse_response(response)
             oaipmh_root = obj["etree"]
             
-            response_ids = oaipmh_root.xpath("./lr:ListRecords/lr:record/lr:header/lr:identifier/text()", namespaces=namespaces)
+            response_ids = oaipmh_root.xpath("./lr:ListRecords/oai:record/oai:header/oai:identifier/text()", namespaces=namespaces)
             assert len(response_ids) > 0, "test_listRecords_match_requested_disseminaton_get: Unable to locate identifiers in response"
             
             for identifier in response_ids:
@@ -710,14 +750,14 @@ class TestOaiPmhController(TestController):
             response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
             try:
                 obj = self.parse_response(response)
-                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/lr:resumptionToken/text()", namespaces=namespaces)
+                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:resumptionToken/text()", namespaces=namespaces)
                 
                 assert len(resumptionToken) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
                 
                 response2 = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
                 obj2 = self.parse_response(response2)
                 
-                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/lr:resumptionToken", namespaces=namespaces)
+                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:resumptionToken", namespaces=namespaces)
                 
                 assert len(resumptionToken2) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken2)
                 assert resumptionToken2[0].text == None or resumptionToken2[0].text == "", "test_listRecords_flow_control_get: expected last resumptionToken got '%s'" % resumptionToken2[0].text
@@ -812,14 +852,14 @@ class TestOaiPmhController(TestController):
             response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
             try:
                 obj = self.parse_response(response)
-                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:resumptionToken/text()", namespaces=namespaces)
+                resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:resumptionToken/text()", namespaces=namespaces)
                 
                 assert len(resumptionToken) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
                 
                 response2 = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
                 obj2 = self.parse_response(response2)
                 
-                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:resumptionToken", namespaces=namespaces)
+                resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:resumptionToken", namespaces=namespaces)
                 
                 assert len(resumptionToken2) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken2)
                 assert resumptionToken2[0].text == None or resumptionToken2[0].text == "", "test_listIdentifiers_flow_control_get: expected last resumptionToken got '%s'" % resumptionToken2[0].text
@@ -857,7 +897,7 @@ class TestOaiPmhController(TestController):
             assert "from" in req[0].keys() and req[0].get("from") is not None, "test_listIdentifiers_timestamp_headers_match_response_get: missing 'from' attribute"
             assert "until" in req[0].keys() and req[0].get("until") is not None, "test_listIdentifiers_timestamp_headers_match_response_get: missing 'until' attribute"
             
-            record_tstamps = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/lr:header/lr:datestamp/text()", namespaces=namespaces)
+            record_tstamps = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:header/oai:datestamp/text()", namespaces=namespaces)
             
             assert len(record_tstamps) > 0, "test_listIdentifiers_timestamp_headers_match_response_get: at least 1 record should be returned."
             

@@ -13,10 +13,11 @@
   % endif
   <ListMetadataFormats>
   % for fmt in c.formats:
-   <metadataFormat>
-    <metadataPrefix>${fmt["metadataPrefix"] | x}</metadataPrefix>
-    <schema>${fmt["schemas"][0] | x}</schema>
-   </metadataFormat>
+   <oai:metadataFormat>
+    <oai:metadataPrefix>${fmt["metadataPrefix"] | x}</oai:metadataPrefix>
+    <oai:schema>${fmt["schemas"][0] | x}</oai:schema>
+    <oai:metadataNamespace></oai:metadataNamespace>
+   </oai:metadataFormat>
   % endfor
   </ListMetadataFormats>
 </OAI-PMH>
