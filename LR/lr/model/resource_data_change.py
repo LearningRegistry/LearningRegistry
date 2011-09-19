@@ -127,10 +127,10 @@ class RecordResourceDataChange(DatabaseChangeHandler):
     def _canHandle(self, change, database):
         return _resourceDataPredicate(change, database)
     
-    def _updateDistributableData(self, newDistributableData, database):
+    def _updateDistributableData(self, newDistributableData, database, distributableDocId):
         # Use the ResourceDataModel class to create an object that 
         # contains only a the resource_data spec data.
-        currentDistributable = database[newDistributableData['_id']]
+        currentDistributable = database[distributableDocId]
         temp = ResourceDataModel(currentDistributable)._specData
         del temp['node_timestamp']
          
@@ -146,12 +146,12 @@ class RecordResourceDataChange(DatabaseChangeHandler):
                 log.exception(e)
         
         
-    def _addDistributableData(self, distributableData, database):
+    def _addDistributableData(self, distributableData, database, distributableDocId):
         try:
-            log.debug('Adding distributable doc %s...\n' % distributableData['_id'])
-            database[distributableData['_id']] = distributableData
+            log.debug('Adding distributable doc %s...\n' % distributableDocId)
+            database[distributableDocId] = distributableData
         except Exception as e:
-            log.error("Cannot save distributable document %s\n" % distributableData['_id'] )
+            log.error("Cannot save distributable document %s\n" % distributableDocId )
             log.exception(e)
 
     def _handle(self, change, database):
@@ -163,15 +163,15 @@ class RecordResourceDataChange(DatabaseChangeHandler):
         del distributableDoc['node_timestamp']
         #change thet doc_type 
         distributableDoc['doc_type']='resource_data_distributable'
-        distributableDoc['_id'] = change['doc']['_id']+"-distributable"
+        distributableDocId = change['doc']['_id']+"-distributable"
        
         # Check to see if a corresponding distributatable document exist.
         # not create a new distribuation document without the 
         # node_timestamp and _id+distributable.
-        if not distributableDoc['_id'] in database:
-            self._addDistributableData(distributableDoc, database)
+        if not distributableDocId in database:
+            self._addDistributableData(distributableDoc, database, distributableDocId)
         else:
-            self._updateDistributableData(distributableDoc, database)
+            self._updateDistributableData(distributableDoc, database, distributableDocId)
 
 
 # Create an handler to simply track the process change sequence in database.
