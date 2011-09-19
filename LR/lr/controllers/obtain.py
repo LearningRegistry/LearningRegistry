@@ -95,8 +95,10 @@ class ObtainController(BaseController):
                         yield json.dumps({'doc_ID': doc.key})
         if full_docs and byIDResponseChunks is not None:             
             yield ']' + byIDResponseChunks[1]                        
-        if count < self.limit or not self.enable_flow_control:			
+        if  not self.enable_flow_control:			
             yield "]}"
+        elif count < self.limit:
+            yield '], "resumption_token":%s}' % 'null'
         else:
             token = rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId)
             yield '], "resumption_token":"%s"}' % token

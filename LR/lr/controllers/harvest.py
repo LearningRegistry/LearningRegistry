@@ -25,7 +25,7 @@ class HarvestController(BaseController):
         self.limit = None        
         self.service_id = None
         serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
-
+        log.error(serviceDoc)
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
                 self.service_id = serviceDoc['service_id']
@@ -38,9 +38,11 @@ class HarvestController(BaseController):
                 if full_docs:
                     limit_type = "doc_limit"
                 if self.enable_flow_control and limit_type in serviceData:
-                    self.limit = serviceData['id_limit']
+                    self.limit = serviceData[limit_type]
                 elif self.enable_flow_control:
-                    self.limit = 100    
+                    self.limit = 100
+                if 'metadataformats' in serviceData:    
+                    self.metadataFormats = serviceData['metadataformats']
     def __parse_date(self,date):
         #last_update_date = iso8601.parse_date(date)
         #last_update = helpers.convertToISO8601UTC(last_update_date)    
@@ -105,8 +107,9 @@ class HarvestController(BaseController):
             }
             return json.dumps(data)
         def listmetadataformats():
+            self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=h.list_metadata_formats()
+            data['listmetadataformats']=map(lambda format: {'metadataformat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
@@ -175,6 +178,8 @@ class HarvestController(BaseController):
                 token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
                 resp = base_response[1]
                 yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+            elif self.limit > count:
+                yield resp[:-1] +(',"resumption_token":%s' % 'null')    
             else:
                 yield base_response[1]
 
@@ -215,6 +220,8 @@ class HarvestController(BaseController):
                 token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
                 resp = base_response[1]
                 yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+            elif self.limit > count:
+                yield resp[:-1] +(',"resumption_token":%s' % 'null')
             else:
                 yield base_response[1]
         
