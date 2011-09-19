@@ -140,7 +140,7 @@ class DistributeController(BaseController):
     def create(self):
         """POST / distribute start distribution"""
         
-        def doDistribution(destinationNode, server, sourceUrl, destinationUrl):
+        def doDistribution(destinationNode, server, sourceUrl, destinationUrl, lock):
             # We want to always use the replication filter function to replicate
             # only distributable doc and filter out any other type of documents.
             # However we don't have any query arguments until we test if there is any filter.
@@ -166,14 +166,15 @@ class DistributeController(BaseController):
 
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
-            server = couchdb.Server(appConfig['couchdb.url'])
-            db = server[appConfig['couchdb.db.node']]
-            doc = db[appConfig['lr.nodestatus.docid']]
-            doc['last_out_sync'] = h.nowToISO8601Zformat()
-            doc['out_sync_node'] = destinationNode.nodeDescription.node_name
-            db[appConfig['lr.nodestatus.docid']] = doc
             results = server.replicate(sourceUrl, destinationUrl, **replicationOptions)
             log.debug("Replication results: "+str(results))
+            with lock:
+                server = couchdb.Server(appConfig['couchdb.url'])
+                db = server[appConfig['couchdb.db.node']]
+                doc = db[appConfig['lr.nodestatus.docid']]
+                doc['last_out_sync'] = h.nowToISO8601Zformat()
+                doc['out_sync_node'] = destinationNode.nodeDescription.node_name
+                db[appConfig['lr.nodestatus.docid']] = doc                
         
         log.info("Distribute.......\n")
         ##Check if the distribte service is available on the node.
@@ -185,12 +186,12 @@ class DistributeController(BaseController):
             log.info("No connection present for distribution")
             return
         log.info("Connections: "+str(sourceLRNode.connections)+"\n")
-
+        lock = threading.Lock()
         for connectionInfo in self._getDistributeDestinations():
             replicationArgs = (connectionInfo['destinationNode'], 
                                          defaultCouchServer, 
                                          self.resource_data, 
-                                         urlparse.urljoin(connectionInfo['destinationBaseUrl'], self.resource_data))
+                                         urlparse.urljoin(connectionInfo['destinationBaseUrl'], self.resource_data),lock)
                                          
             # Use a thread to do the actual replication.
             replicationThread = threading.Thread(target=doDistribution, 
