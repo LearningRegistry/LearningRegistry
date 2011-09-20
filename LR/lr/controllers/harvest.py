@@ -109,7 +109,7 @@ class HarvestController(BaseController):
         def listmetadataformats():
             self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=map(lambda format: {'metadataformat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
+            data['listmetadataformats']=map(lambda format: {'metadataf224ormat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
@@ -179,7 +179,8 @@ class HarvestController(BaseController):
                 resp = base_response[1]
                 yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
             elif self.limit > count:
-                yield resp[:-1] +(',"resumption_token":%s' % 'null')    
+                resp = base_response[1]
+                yield resp[:-1] +(',"resumption_token":"%s"' %'null') +resp[-1:]    
             else:
                 yield base_response[1]
 
@@ -221,7 +222,8 @@ class HarvestController(BaseController):
                 resp = base_response[1]
                 yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
             elif self.limit > count:
-                yield resp[:-1] +(',"resumption_token":%s' % 'null')
+                resp = base_response[1]
+                yield resp[:-1] +(',"resumption_token":"%s"' %'null') +resp[-1:]
             else:
                 yield base_response[1]
         
