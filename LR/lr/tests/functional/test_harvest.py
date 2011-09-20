@@ -113,8 +113,8 @@ class TestHarvestController(TestController):
         metadata_formats = data['listmetadataformats']
         assert len(metadata_formats) >= 0
         for format in metadata_formats: 
-          assert format.has_key('metadataFormat')
-          assert format['metadataFormat'].has_key('metadataPrefix')
+          assert format.has_key('metadataformat')
+          assert format['metadataformat'].has_key('metadataPrefix')
 
     def test_listmetadataformats_get(self):
         response = self.app.get(url('harvest', id='listmetadataformats'))

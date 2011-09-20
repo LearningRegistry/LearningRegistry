@@ -109,7 +109,7 @@ class HarvestController(BaseController):
         def listmetadataformats():
             self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=map(lambda format: {'metadataf224ormat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
+            data['listmetadataformats']=map(lambda format: {'metadataformat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
