@@ -164,6 +164,16 @@ def OAIPMHTimeFormat(dateTimeArg):
 #        log.exception(utcdate.utctimetuple())
         return time.strftime(fmtStr,utcdate.utctimetuple())
     return dateTimeArg
+
+def harvestTimeFormat(dateTimeArg):
+    if isinstance(dateTimeArg, datetime) ==True:
+        fmtStr = getHarvestDatetimeFormatString()
+        utcdate = convertToISO8601UTC (dateTimeArg)
+#        import logging
+#        log = logging.getLogger(__name__)
+#        log.exception(utcdate.utctimetuple())
+        return time.strftime(fmtStr,utcdate.utctimetuple())
+    return dateTimeArg
     
 def nowToISO8601Zformat():
     return datetime.utcnow().isoformat()+"Z"
@@ -226,11 +236,19 @@ def getDatetimePrecision(service_descriptor=None):
             log.error("Service Description Document is missing granularity data.")
     
     return granularity
+
     
-    
+def getHarvestDatetimeFormatString():
+    from lr.model.base_model import appConfig
+    service_doc = getServiceDocument(appConfig["lr.harvest.docid"])
+    return getDatetimeFormatString(service_doc)
+
 def getOAIPMHDatetimeFormatString():
     from lr.model.base_model import appConfig
     service_doc = getServiceDocument(appConfig["lr.oaipmh.docid"])
+    return getDatetimeFormatString(service_doc)
+    
+def getDatetimeFormatString(service_doc):
     precision = getDatetimePrecision(service_doc)
     precision = re.sub("[Y]{4}", "%Y", precision)
     precision = re.sub("[M]{2}", "%m", precision)
