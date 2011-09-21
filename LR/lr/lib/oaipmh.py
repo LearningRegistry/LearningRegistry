@@ -32,6 +32,7 @@ from contextlib import closing
 from xml.sax import saxutils
 from StringIO import StringIO
 import sys
+from lr.lib import helpers
 try:
     from lxml import etree
 except:
@@ -98,6 +99,8 @@ class oaipmh(harvest):
             appConfig['couchdb.url'],
             appConfig['couchdb.db.resourcedata']
         ])
+        
+        self.service_doc = helpers.getServiceDocument(appConfig["lr.oaipmh.docid"])
       
     
     def list_opts(self, metadataPrefix, from_date=None, until_date=None):
@@ -227,7 +230,7 @@ class oaipmh(harvest):
             # TODO: This should map to the deleted_data_policy from the node_policy from the
             #       network node description
             ident["deletedRecord"] = "transient"
-            ident["granularity"] = h.getDatetimePrecision()
+            ident["granularity"] = h.getDatetimePrecision(self.service_doc)
             opts = {
                     "group": True,
                     "limit": 1,

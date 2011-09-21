@@ -15,7 +15,7 @@
     <oai:baseURL>${c.path_url | x}</oai:baseURL>
     <oai:protocolVersion>2.0</oai:protocolVersion>
     <oai:adminEmail>${c.identify["adminEmail"] | x }</oai:adminEmail>
-    <oai:earliestDatestamp>${h.harvestTimeFormat(c.identify["earliestDatestamp"]) | x}</oai:earliestDatestamp>
+    <oai:earliestDatestamp>${h.OAIPMHTimeFormat(c.identify["earliestDatestamp"]) | x}</oai:earliestDatestamp>
     <oai:deletedRecord>${c.identify["deletedRecord"] | x}</oai:deletedRecord>
     <oai:granularity>${c.identify["granularity"] | x}</oai:granularity>
  </Identify>

@@ -724,18 +724,23 @@ class TestOaiPmhController(TestController):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'LR_JSON_0.10.0', 'from': from_, 'until': until_})
 
         try:
-            json_obj = json.load(response)
+            json_obj = json.loads(response.body)
             
-            assert len(json_obj["listrecords"]["record"]) > 0, "test_listRecords_JSON_metadataPrefix_get: No JSON records returned"
-            for record in json_obj["listrecords"]["record"]:
+            assert len(json_obj["listrecords"]) > 0, "test_listRecords_JSON_metadataPrefix_get: No JSON records returned"
+            for entry in json_obj["listrecords"]:
                 try:
-                    doc_idx = sorted_nsdl_data["ids"].index(record[record["doc_ID"]])
-                    assert sorted_nsdl_data["documents"][doc_idx] == record, "test_listRecords_JSON_metadataPrefix_get: Returned document does not match."
+                    resource_data = entry["record"]["resource_data"]
+                except:
+                    self.fail("test_listRecords_JSON_metadataPrefix_get: result missing expected resource data.")
+                
+                try:
+                    doc_idx = sorted_nsdl_data["ids"].index(resource_data["doc_ID"])
+                    assert sorted_nsdl_data["documents"][doc_idx] == resource_data, "test_listRecords_JSON_metadataPrefix_get: Returned document does not match."
                 except:
                     pass # This should be okay - result may be an element not inserted by the test.
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
-            log.exception("test_listRecords_JSON_metadataPrefix_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
+            log.exception("test_listRecords_JSON_metadataPrefix_get: fail - from: {0} until: {1}".format(from_, until_))
             global test_data_delete
             test_data_delete = False
             raise e
