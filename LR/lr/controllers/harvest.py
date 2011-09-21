@@ -101,7 +101,7 @@ class HarvestController(BaseController):
                 "service_version":serviceDoc['service_version'],
                 "earliestDatestamp":h.earliestDate(),
                 "deletedRecord":sourceLRNode.nodeDescription.node_policy['deleted_data_policy'],
-                "granularity":helpers.getDatetimePrecision(),
+                "granularity":helpers.getDatetimePrecision(serviceDoc),
                 "adminEmail":sourceLRNode.nodeDescription.node_admin_identity
             }
             return json.dumps(data)

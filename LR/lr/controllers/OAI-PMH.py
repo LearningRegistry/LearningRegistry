@@ -130,7 +130,7 @@ class OaiPmhController(HarvestController):
                 if from_date_gran != until_date_gran:
                     raise BadArgumentError('from and until parameters do not use the same granularity.', verb)
             
-            harvestServiceGranularity = h.getHarvestServiceGranularity()
+            harvestServiceGranularity = h.getOAIPMHServiceGranularity()
             
             if params['from'] != None and from_date_gran > harvestServiceGranularity:
                 raise BadArgumentError('from is more granular than Harvest service permits', verb)
@@ -211,9 +211,9 @@ class OaiPmhController(HarvestController):
         if params.has_key("metadataPrefix"):
             vars["metadataPrefix"] = params["metadataPrefix"]
         if params.has_key("from"):
-            vars["from_date"] = h.harvestTimeFormat(params["from"])
+            vars["from_date"] = h.OAIPMHTimeFormat(params["from"])
         if params.has_key("until"):
-            vars["until_date"] = h.harvestTimeFormat(params["until"])
+            vars["until_date"] = h.OAIPMHTimeFormat(params["until"])
         if params.has_key("identifier"):
             vars["identifier"] = params["identifier"]
         return vars
@@ -456,6 +456,10 @@ class OaiPmhController(HarvestController):
             if params.has_key("metadataPrefix") and params["metadataPrefix"] == "LR_JSON_0.10.0":
                 if params.has_key("identifier") == True:
                     params["request_id"] = params["identifier"]
+                if params.has_key("from") and isinstance(params["from"], datetime):
+                    params["from"] = h.convertToISO8601Zformat(params["from"])
+                if params.has_key("until") and isinstance(params["until"], datetime):
+                    params["until"] = h.convertToISO8601Zformat(params["until"])
                 
                 return HarvestController.harvest(self, params, request.body, params['verb'].lower())
         
