@@ -46,6 +46,7 @@ test_data_delete = True
 nsdl_data = { "documents" : [], "ids": [] }
 dc_data = { "documents" : [], "ids": [] }
 sorted_dc_data = { "documents" : [], "ids": [] }
+sorted_nsdl_data = { "documents" : [], "ids": [] }
 
 
 class XercesValidator():
@@ -88,7 +89,7 @@ class TestOaiPmhController(TestController):
         
         self.validator = XercesValidator()
         
-        global test_data_delete, nsdl_data, dc_data, sorted_dc_data
+        global test_data_delete, nsdl_data, dc_data, sorted_dc_data, sorted_nsdl_data
         self.o = oaipmh()
         self.server = self.o.server
         self.db = self.o.db
@@ -155,6 +156,14 @@ class TestOaiPmhController(TestController):
         for sort in sorted_dc_data["documents"]:
             sorted_dc_data["ids"].append(sort["doc_ID"])
             
+        sorted_nsdl_data = {
+                          "documents": sorted(nsdl_data["documents"], key=lambda k: k['node_timestamp']),
+                          "ids": []
+                          } 
+        
+        for sort in sorted_nsdl_data["documents"]:
+            sorted_nsdl_data["ids"].append(sort["doc_ID"])
+            
             
         opts = {
                 "startkey":"_design/",
@@ -165,7 +174,8 @@ class TestOaiPmhController(TestController):
         # Force indexing in oai views 
         design_docs = self.db.view('_all_docs', **opts)
         for row in design_docs:
-            if re.match("^_design/oai-pmh-", row.key) != None and "views" in row.doc and len(row.doc["views"].keys()) > 0:
+#            if re.match("^_design/oai-pmh-", row.key) != None and "views" in row.doc and len(row.doc["views"].keys()) > 0:
+            if "views" in row.doc and len(row.doc["views"].keys()) > 0:
                 view_name = "{0}/_view/{1}".format( row.key, row.doc["views"].keys()[0])
                 log.error("Indexing: {0}".format( view_name))
                 self.db.view(view_name, limit=1, descending=True)
@@ -374,7 +384,8 @@ class TestOaiPmhController(TestController):
         '''test_listMetadataFormats_with_doc_id_identifier_get: 
         verify that if an identifier is provided, the metadata formats are 
         returned only for the identified resource data description documents.'''
-        randomDoc = choice(dc_data["documents"])
+        global sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': 'true'})
         try:
@@ -398,7 +409,8 @@ class TestOaiPmhController(TestController):
         '''test_listMetadataFormats_with_resource_id_identifier_get: 
         verify that if an identifier is provided, the metadata formats are 
         returned only for the identified resource data description documents.'''
-        randomDoc = choice(dc_data["documents"])
+        global sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         
         # all docs that have the same resource_locator
         opts = {"key": ["by_resource_locator", randomDoc["resource_locator"]], 
@@ -462,7 +474,8 @@ class TestOaiPmhController(TestController):
         # this works, except for the xsi namespace which is allready declared
         # on the root element, which means lxml will not declare it again on
         # the metadata element
-        randomDoc = choice(dc_data["documents"])
+        global sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         tree = etree.fromstring(response.body)
         
@@ -494,8 +507,8 @@ class TestOaiPmhController(TestController):
         (any payload where the payload_schema matches the requested dissemination 
         format) is supported.'''
         
-        global nsdl_data, dc_data
-        randomDoc = choice(dc_data["documents"])
+        global nsdl_data, sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
             obj = self.parse_response(response)           
@@ -529,8 +542,8 @@ class TestOaiPmhController(TestController):
         matches the JSON metadataPrefix in the servcie description the service 
         behaves as the basic harvest service (returns the complete resource data 
         description document as JSON).'''
-        global nsdl_data, dc_data
-        randomDoc = choice(dc_data["documents"])
+        global nsdl_data, sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'LR_JSON_0.10.0', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
             json_obj = json.loads(response.body)
@@ -547,8 +560,8 @@ class TestOaiPmhController(TestController):
         
         
     def test_getRecord_by_doc_ID_get(self):
-        global nsdl_data, dc_data
-        randomDoc = choice(dc_data["documents"])
+        global nsdl_data, sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
             self.validate_lr_oai_response(response)
@@ -561,8 +574,8 @@ class TestOaiPmhController(TestController):
         log.info("test_getRecord_by_doc_ID_get: pass")
         
     def test_getRecord_by_doc_ID_post(self):
-        global nsdl_data, dc_data
-        randomDoc = choice(dc_data["documents"])
+        global nsdl_data, sorted_dc_data
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.post("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
             self.validate_lr_oai_response(response)
@@ -575,8 +588,8 @@ class TestOaiPmhController(TestController):
         log.info("test_getRecord_by_doc_ID_post: pass")
         
     def test_getRecord_by_resource_ID_get(self):
-        global nsdl_data, dc_data, test_data_delete
-        randomDoc = choice(dc_data["documents"])
+        global nsdl_data, sorted_dc_data, test_data_delete
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
             self.validate_lr_oai_response(response)
@@ -592,8 +605,8 @@ class TestOaiPmhController(TestController):
         log.info("test_getRecord_by_resource_ID_get: pass")
         
     def test_getRecord_by_resource_ID_post(self):
-        global nsdl_data, dc_data, test_data_delete
-        randomDoc = choice(dc_data["documents"])
+        global nsdl_data, sorted_dc_data, test_data_delete
+        randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.post("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
             self.validate_lr_oai_response(response)
@@ -610,9 +623,9 @@ class TestOaiPmhController(TestController):
 
 
     def test_listRecords_post(self):
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
@@ -628,9 +641,9 @@ class TestOaiPmhController(TestController):
         log.info("test_listRecords_post: pass")
         
     def test_listRecords_match_requested_disseminaton_get(self):
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
@@ -646,7 +659,7 @@ class TestOaiPmhController(TestController):
                 '''need to weed out any non-known test data since this is based upon a range'''
                 if self._is_test_data(identifier):
                     try: 
-                        assert nsdl_data["ids"].index(identifier) >= 0, "Unexpected test identifier returned in result"
+                        assert sorted_nsdl_data["ids"].index(identifier) >= 0, "Unexpected test identifier returned in result"
                     except:
                         self.fail("Identifier %s should have existed within result and did not" % identifier)
             
@@ -702,9 +715,9 @@ class TestOaiPmhController(TestController):
         matches the JSON metadataPrefix in the service description the service 
         behaves as the basic harvest service (returns the complete resource data 
         description document as JSON).'''
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
@@ -716,8 +729,8 @@ class TestOaiPmhController(TestController):
             assert len(json_obj["listrecords"]["record"]) > 0, "test_listRecords_JSON_metadataPrefix_get: No JSON records returned"
             for record in json_obj["listrecords"]["record"]:
                 try:
-                    doc_idx = nsdl_data["ids"].index(record[record["doc_ID"]])
-                    assert nsdl_data["documents"][doc_idx] == record, "test_listRecords_JSON_metadataPrefix_get: Returned document does not match."
+                    doc_idx = sorted_nsdl_data["ids"].index(record[record["doc_ID"]])
+                    assert sorted_nsdl_data["documents"][doc_idx] == record, "test_listRecords_JSON_metadataPrefix_get: Returned document does not match."
                 except:
                     pass # This should be okay - result may be an element not inserted by the test.
         except Exception as e:
@@ -729,11 +742,11 @@ class TestOaiPmhController(TestController):
         log.info("test_listRecords_JSON_metadataPrefix_get: pass")
     
     def test_listRecords_flow_control_get(self):
-        global nsdl_data, dc_data
-        doc1 = nsdl_data["documents"][0]
-        doc2 = nsdl_data["documents"][-1]
+        global nsdl_data, dc_data, sorted_nsdl_data
+        doc1 = sorted_nsdl_data["documents"][0]
+        doc2 = sorted_nsdl_data["documents"][-1]
         
-        item_limit = int(math.ceil(len(nsdl_data["documents"]) * (2.0/3.0)))
+        item_limit = int(math.ceil(len(sorted_nsdl_data["documents"]) * (2.0/3.0)))
         
         node_db = self.server[config["couchdb.db.node"]]
         service_doc_org = node_db[config["lr.oaipmh.docid"]] 
@@ -775,9 +788,9 @@ class TestOaiPmhController(TestController):
             node_db[service_doc_copy.id] = service_doc_copy
     
     def test_listRecords_get(self):
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
@@ -795,9 +808,9 @@ class TestOaiPmhController(TestController):
         
         
     def test_listIdentifiers_post(self):
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
@@ -813,9 +826,9 @@ class TestOaiPmhController(TestController):
         log.info("test_listIdentifiers_post: pass")
         
     def test_listIdentifiers_get(self):
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
@@ -831,11 +844,11 @@ class TestOaiPmhController(TestController):
         log.info("test_listIdentifiers_get: pass")
         
     def test_listIdentifiers_flow_control_get(self):
-        global nsdl_data, dc_data
-        doc1 = nsdl_data["documents"][0]
-        doc2 = nsdl_data["documents"][-1]
+        global nsdl_data, dc_data, sorted_nsdl_data
+        doc1 = sorted_nsdl_data["documents"][0]
+        doc2 = sorted_nsdl_data["documents"][-1]
         
-        item_limit = int(math.ceil(len(nsdl_data["documents"]) * (2.0/3.0)))
+        item_limit = int(math.ceil(len(sorted_nsdl_data["documents"]) * (2.0/3.0)))
         
         node_db = self.server[config["couchdb.db.node"]]
         service_doc_org = node_db[config["lr.oaipmh.docid"]] 
@@ -877,9 +890,9 @@ class TestOaiPmhController(TestController):
             node_db[service_doc_copy.id] = service_doc_copy
         
     def test_listIdentifiers_timestamp_headers_match_response_get(self):
-        global nsdl_data, dc_data
-        doc1 = choice(nsdl_data["documents"])
-        doc2 = choice(nsdl_data["documents"])
+        global sorted_nsdl_data, dc_data
+        doc1 = choice(sorted_nsdl_data["documents"])
+        doc2 = choice(sorted_nsdl_data["documents"])
         
         (from_, until_) = self._get_timestamps(doc1, doc2)
         

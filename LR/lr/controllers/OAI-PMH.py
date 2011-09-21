@@ -354,10 +354,10 @@ class OaiPmhController(HarvestController):
                             doc_index = 0
                             err_count = 0
                 
-                if (doc_index - err_count) == 0:
-                    raise CannotDisseminateFormatError(params['verb'], req=t_req)
-                elif doc_index == 0:
+                if doc_index == 0 and err_count == 0:
                     raise NoRecordsMatchError(params['verb'], req=t_req)
+                elif (doc_index - err_count) == 0:
+                    raise CannotDisseminateFormatError(params['verb'], req=t_req)
                 else:
                     if enable_flow_control and doc_index <= record_limit:
                         yield h.fixUtf8(mustache.resumptionToken())
