@@ -25,7 +25,6 @@ class HarvestController(BaseController):
         self.limit = None        
         self.service_id = None
         serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
-        log.error(serviceDoc)
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
                 self.service_id = serviceDoc['service_id']
@@ -130,11 +129,11 @@ class HarvestController(BaseController):
             abort(500,"Invalid Verb")
     def _test_time_params(self, params):
         
-        if not params.has_key('from'):
+        if not params.has_key('from') or (params.has_key('from') and params['from'] is None):
             from_date = self.__parse_date('1990-10-10 12:12:12.0Z')
         else:
             from_date = self.__parse_date(params['from'])
-        if not params.has_key('until'):
+        if not params.has_key('until') or (params.has_key('until') and params['until'] is None):
             until_date = self.__parse_date(datetime.utcnow().isoformat()+ "Z")
         else:
             until_date = self.__parse_date(params['until'])
