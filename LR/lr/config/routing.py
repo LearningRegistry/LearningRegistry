@@ -8,6 +8,8 @@ from routes import Mapper
 import logging
 from lr.lib import helpers as h
 log = logging.getLogger(__name__)
+
+
 def make_map(config):
     """Create, configure and return the routes Mapper"""
     from pylons import config as c    
@@ -16,21 +18,36 @@ def make_map(config):
 
     map = Mapper(directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
+    
+    
+    def mapResource(config_key, member_name, collection_name):
+        try:
+            service_doc_id = config[config_key]
+            service_doc = h.getServiceDocument(service_doc_id)
+            if service_doc is not None and service_doc["active"]:
+                map.resource(member_name, collection_name)
+                log.info("Enabling service route for: {0} member: {1} collection: {2}".format(service_doc_id, member_name, collection_name))
+            else:
+                log.info("Service route for {0} is disabled".format(service_doc_id))
+        except:
+                log.exception("Exception caught: Not enabling service route for config: {0} member: {1} collection: {2}".format(config_key, member_name, collection_name))
+            
+    
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
-    map.resource('status','status')
-    map.resource('distribute','distribute')
+    mapResource('lr.status.docid', 'status','status')
+    mapResource('lr.distribute.docid','distribute','distribute')
     if not LRNode.nodeDescription.gateway_node:
-        map.resource('publish','publish')
-        map.resource('obtain','obtain')        
-        map.resource('description','description')
-        map.resource('services','services')
-        map.resource('policy','policy')
-        map.resource('harvest','harvest')
+        mapResource('lr.publish.docid', 'publish','publish')
+        mapResource('lr.obtain.docid', 'obtain','obtain')        
+        mapResource('lr.description.docid', 'description','description')
+        mapResource('lr.services.docid', 'services','services')
+        mapResource('lr.policy.docid', 'policy','policy')
+        mapResource('lr.harvest.docid','harvest','harvest')
         # Value added services
-        map.resource('OAI-PMH', 'OAI-PMH')
-        map.resource('swordservice','swordservice')
-        map.resource('slice', 'slice')
+        mapResource('lr.oaipmh.docid', 'OAI-PMH', 'OAI-PMH')
+        mapResource('lr.sword.docid', 'swordservice','swordservice')
+        mapResource('lr.slice.docid', 'slice', 'slice')
     
     map.minimization = False
     map.explicit = False
