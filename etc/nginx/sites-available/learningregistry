@@ -2,25 +2,25 @@ server {
 	listen   80 default;
 	server_name  localhost;
 
-	access_log  /var/log/nginx/learningregistry.access.log;
+	access_log  /var/log/nginx/learningregistry.access.log lr_log_query;
 
 	location / {
-        fastcgi_pass 127.0.0.1:5000;
-        fastcgi_param PATH_INFO $fastcgi_script_name;
-        fastcgi_param REQUEST_METHOD $request_method;
-        fastcgi_param QUERY_STRING $query_string;
-        fastcgi_param CONTENT_TYPE $content_type;
-        fastcgi_param CONTENT_LENGTH $content_length;
-        fastcgi_param  SERVER_ADDR        $server_addr;
-        fastcgi_param  SERVER_PORT        $server_port;
-        fastcgi_param  SERVER_NAME        $server_name;
-        fastcgi_param  SERVER_PROTOCOL    $server_protocol;
-        fastcgi_pass_header Authorization;
-        fastcgi_intercept_errors off;
+         uwsgi_pass 127.0.0.1:5000;
+         include learningregistry_cgi/uwsgi_params;
 
     }
+    location /publish{
+         #For publish use the default 
+         access_log /var/log/nginx/learningregistry.access.log lr_log_no_query ;
+         uwsgi_pass 127.0.0.1:5000;
+         include learningregistry_cgi/uwsgi_params;
+
+        }
 
     location /resource_data {
+        # For resource_data access don't log the data.
+        access_log   /var/log/nginx/learningregistry.access.log lr_log_query;
+
         proxy_pass   http://127.0.0.1:5984;
         proxy_redirect     off;
 
