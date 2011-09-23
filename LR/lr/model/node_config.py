@@ -142,7 +142,11 @@ class LRNodeModel(object):
         self._nodeStatus = nodeStatus
           
     def _getStatusDescription(self):
-        statusData = {'doc_count': ResourceDataModel._defaultDB.view(appConfig['couchdb.db.resourcesview'],stale='ok').total_rows,
+        count = 0
+        view = ResourceDataModel._defaultDB.view(appConfig['couchdb.db.resourcecount'],stale='ok')
+        if len(view.rows) > 0:
+            count = view.rows[0].value 
+        statusData = {'doc_count': count,
                                 'timestamp': h.nowToISO8601Zformat()}
         statusData.update(self._nodeStatus.specData)
         return statusData
