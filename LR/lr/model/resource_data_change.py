@@ -47,12 +47,14 @@ def _updateDatabaseViews(change, database):
         designDocs = database.view('_all_docs',include_docs=True,
                                                         startkey='_design%2F',endkey='_design0')
         for designDoc in designDocs:
-            viewInfo = "{0}{1}/{2}/_info".format(appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata'],designDoc.id)
-            viewInfo = json.load(urllib2.urlopen(viewInfo))
-            
+            baseUrl = appConfig['couchdb.url']
+            if not baseUrl.endswith('/'):
+                baseUrl = baseUrl + '/'
+            viewInfo = "{0}{1}/{2}/_info".format(baseUrl,appConfig['couchdb.db.resourcedata'],designDoc.id)
+            viewInfo = json.load(urllib2.urlopen(viewInfo))            
             if not viewInfo['view_index']['updater_running'] and designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
-                viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
-                viewUrl = "{0}{1}/{2}?limit=1".format(appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata'],viewName)          
+                viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0]) 
+                viewUrl = "{0}{1}/{2}?limit=1".format(baseUrl,appConfig['couchdb.db.resourcedata'],viewName)          
                 multiprocessing.Process(target=updateView,args=(viewUrl,)).start()
     except Exception as e:
         log.error(e)
