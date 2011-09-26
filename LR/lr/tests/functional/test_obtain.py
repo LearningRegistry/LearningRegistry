@@ -1,43 +1,87 @@
 from lr.tests import *
-
+import json
+import urllib
+import logging
+from webtest import AppError
+log = logging.getLogger(__name__)
+headers={'Content-Type': 'application/json'}
 class TestObtainController(TestController):
-
-    def test_index(self):
-        response = self.app.get(url('obtain'))
-        # Test response...
-
-    def test_index_as_xml(self):
-        response = self.app.get(url('formatted_obtain', format='xml'))
-
+    def _getInitialPostData(self):
+        data = {
+            "by_doc_ID":False,
+            "by_resource_ID":True,
+            "ids_only":False
+        }
+        return data
+    def _validateResponse(self,resp):
+        data = json.loads(resp.body)
+        assert(data['documents'])
+        assert(len(data['documents'])>0)
+        return data
+    def _validateError(self,error):
+        data = json.loads(error)
+        assert(data["OK"] == False)
     def test_create(self):
-        response = self.app.post(url('obtain'))
-
-    def test_new(self):
-        response = self.app.get(url('new_obtain'))
-
-    def test_new_as_xml(self):
-        response = self.app.get(url('formatted_new_obtain', format='xml'))
-
-    def test_update(self):
-        response = self.app.put(url('obtain', id=1))
-
-    def test_update_browser_fakeout(self):
-        response = self.app.post(url('obtain', id=1), params=dict(_method='put'))
-
-    def test_delete(self):
-        response = self.app.delete(url('obtain', id=1))
-
-    def test_delete_browser_fakeout(self):
-        response = self.app.post(url('obtain', id=1), params=dict(_method='delete'))
-
-    def test_show(self):
-        response = self.app.get(url('obtain', id=1))
-
-    def test_show_as_xml(self):
-        response = self.app.get(url('formatted_obtain', id=1, format='xml'))
-
-    def test_edit(self):
-        response = self.app.get(url('edit_obtain', id=1))
-
-    def test_edit_as_xml(self):
-        response = self.app.get(url('formatted_edit_obtain', id=1, format='xml'))
+        params = self._getInitialPostData()
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        self._validateResponse(response)
+        # Test response...
+    def test_create_ids_only(self):
+        params = self._getInitialPostData()
+        params['ids_only'] = True
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        self._validateResponse(response)
+    def test_create_by_doc_id(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        del params['by_resource_ID']
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        self._validateResponse(response)
+    def test_create_by_resource_id(self):
+        params = self._getInitialPostData()
+        del params['by_doc_ID']
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        self._validateResponse(response)        
+    def test_create_by_doc_id_and_by_resource_id(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = False
+        params['request_IDs'] = ['ffefb02adcf74d7e887f2cba5869619c','ffd0d4092f8546cda731a307d709fca8']
+        response = self.app.post(url(controller='obtain'), params=json.dumps(params) ,headers=headers)
+        data = self._validateResponse(response)
+        for doc in data['documents']:
+            assert(doc['doc_ID'] in params['request_IDs'])
+    def test_create_by_doc_id_and_by_resource_id_fail(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = False
+        params['by_resource_ID'] = True
+        params['request_IDs'] = ['http://melt.cup.cam.ac.uk/DataServlet/113374.jpg','http://www3.ac-nancy-metz.fr/cddp57/cinema/']
+        response = self.app.post(url(controller='obtain'), params=json.dumps(params) ,headers=headers)
+        data = self._validateResponse(response)
+        for doc in data['documents']:
+            assert(doc['doc_ID'] in params['request_IDs'])
+    def test_create_by_doc_id_and_by_resource_id_both_true(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = True
+        params['request_IDs'] = ['ffefb02adcf74d7e887f2cba5869619c']
+        try:
+            response = self.app.post(url(controller='obtain'), params=json.dumps(params) ,headers=headers)
+        except AppError as ex:
+            self._validateError(ex.message[ex.message.rfind('{'):])
+            pass#expected error
+    def test_create_by_doc_id_and_by_resource_id_fail_both_false(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = False
+        params['by_resource_ID'] = False
+        params['request_IDs'] = ['http://dum.rvp.cz/materialy/stahnout.html?s=uvwcqfum']
+        params = json.dumps(params)
+        try:
+            response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        except AppError as ex:
+            self._validateError(ex.message[ex.message.rfind('{'):])
+            pass#expected error        
