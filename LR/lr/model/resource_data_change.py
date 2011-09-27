@@ -40,14 +40,22 @@ def _distributableDataPredicate(change, database):
         return False
 
 def _updateDatabaseViews(change, database):
+    def updateView(viewUrl):
+        log.error('start view update %s' % viewUrl)
+        log.error(urllib2.urlopen(viewUrl).read())
     try:
         designDocs = database.view('_all_docs',include_docs=True,
                                                         startkey='_design%2F',endkey='_design0')
         for designDoc in designDocs:
-            if designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
-                viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
-                log.debug('start view update %s' % viewName)
-                log.debug(len(database.view(viewName))) 
+            baseUrl = appConfig['couchdb.url']
+            if not baseUrl.endswith('/'):
+                baseUrl = baseUrl + '/'
+            viewInfo = "{0}{1}/{2}/_info".format(baseUrl,appConfig['couchdb.db.resourcedata'],designDoc.id)
+            viewInfo = json.load(urllib2.urlopen(viewInfo))            
+            if not viewInfo['view_index']['updater_running'] and designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0:
+                viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0]) 
+                viewUrl = "{0}{1}/{2}?limit=1".format(baseUrl,appConfig['couchdb.db.resourcedata'],viewName)          
+                multiprocessing.Process(target=updateView,args=(viewUrl,)).start()
     except Exception as e:
         log.error(e)
 

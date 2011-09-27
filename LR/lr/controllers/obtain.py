@@ -110,7 +110,9 @@ class ObtainController(BaseController):
         # url('obtain')
     def _validateParams(self,data):
         by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
-        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])        
+        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
+        if not data.has_key("request_IDs"):        
+            data['request_IDs'] = []
         if by_doc_ID and by_resource_ID:
             abort(500,"by_doc_ID and by_resource_ID cannot both be True")
         if not by_doc_ID and not by_resource_ID:

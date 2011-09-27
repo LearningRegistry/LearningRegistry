@@ -21,7 +21,7 @@ class SwordserviceController(BaseController):
         response.headers['content-type'] = 'application/atom+xml;charset=utf-8'
         self.parse_params()
     def index(self): 
-        c.collection_url = 'http://' + request.host
+        c.collection_url = request.url
         if sourceLRNode.nodeDescription.node_name is not None:
             c.node_name = sourceLRNode.nodeDescription.node_name
         else:
