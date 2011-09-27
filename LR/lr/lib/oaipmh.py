@@ -206,7 +206,8 @@ class oaipmh(harvest):
                         schemaLocators = []
                         if "payload_schema_locator" in res.doc:
                             schemaLocators.append(res.doc["payload_schema_locator"])
-                        formats.append({"metadataPrefix":schema, "schemas":schemaLocators})
+                        if {"metadataPrefix":schema, "schemas":schemaLocators} not in formats:
+                            formats.append({"metadataPrefix":schema, "schemas":schemaLocators})
                 return formats
             
             else:

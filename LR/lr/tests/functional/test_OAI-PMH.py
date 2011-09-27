@@ -410,10 +410,12 @@ class TestOaiPmhController(TestController):
         verify that if an identifier is provided, the metadata formats are 
         returned only for the identified resource data description documents.'''
         global sorted_dc_data
-        randomDoc = choice(sorted_dc_data["documents"])
+        
+        # There are 2 documents with this same URL with the same format
+        resource_locator = "http://hdl.loc.gov/loc.gdc/collgdc.gc000019"
         
         # all docs that have the same resource_locator
-        opts = {"key": ["by_resource_locator", randomDoc["resource_locator"]], 
+        opts = {"key": ["by_resource_locator", resource_locator], 
                 "include_docs": "true"}
         all_matching_docs = self.db.view("oai-pmh-get-records/docs", **opts)
         schema_formats = []
@@ -424,7 +426,7 @@ class TestOaiPmhController(TestController):
                         schema_formats.append(s.strip())
             
         
-        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["resource_locator"], 'by_doc_ID': 'false'})
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': resource_locator, 'by_doc_ID': 'false'})
         try:
             obj = self.parse_response(response)
             
