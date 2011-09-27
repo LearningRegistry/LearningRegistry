@@ -53,6 +53,47 @@
                     "https://keyserver2.pgp.com/vkd/DownloadKey.event?keyid=0x890B513B01D8F913"
                 ], 
                 "key_owner": "Publish (SRI DBA Learning Registry Publisher) <publish+sri@learningregistry.org>", 
+                "signature": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\n766d7d8a59db92e7e4b6fec33c744ba9767d66dea02b2a0b8fb26d57f7ce7172\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1.4.11 (Darwin)\nComment: GPGTools - http://gpgtools.org\n\niQEcBAEBAgAGBQJODjujAAoJEFwZ2y1f8DJJ4sQIAMc50AdBiYnlcbIZhHi1EORb\nP+XTNPsOt379voEHqowfCLJLA8+y2uXe9gPfXKn7jhAFMUpZ5LQ6g6r0yZ3ubBV+\ndOIeb92jaLZgbL5HUyRMCbFYB0zruIHi607wTBbqLxttwRlKcrMMcvdqmkjue+YY\nW4n6P3GkLP1NNPA3t0qirY1nxnIgvp6MSSCTGyEe3FVJlW+b8uS3bBkbc49no4uU\n1Qebjv+9WHYrsUP0yP5zwIXHaAsnXPQS05rtN4zzq266JEx2egaZq6RxnjFgGrsk\n7Qyi/McxiDaGOfQD7zm9NZrG9MfG9yTryoShxu8MqUeahiWtwGmPCNOtITvPjY0=\n=T4qh\n-----END PGP SIGNATURE-----\n", 
+                "signing_method": "LR-PGP.1.0"
+            }, 
+            "doc_type": "resource_data", 
+            "doc_version": "0.23.0", 
+            "identity": {
+                "submitter": "SRI International on behalf of The Learning Registry", 
+                "submitter_type": "agent"
+            }, 
+            "keys": [
+                "African Americans--Music.", 
+                "Minstrel music.", 
+                "United States--History--Civil War, 1861-1865--Songs and music.", 
+                "Popular music--United States.", 
+                "Music--United States--19th century.", 
+                "Music--United States--20th century.", 
+                "sheet music; African-American", 
+                "eng", 
+                "lr-test-data"
+            ], 
+            "payload_placement": "inline", 
+            "payload_schema": [
+                "oai_dc"
+            ], 
+            "payload_schema_locator": "http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd", 
+            "resource_data": "<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.openarchives.org/OAI/2.0/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/                          http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n<dc:title>African-American sheet music, 1850-1920 selected from the collection of Brown University.</dc:title>\n<dc:creator>Library of Congress. National Digital Library Program.</dc:creator>\n<dc:subject>African Americans--Music.</dc:subject>\n<dc:subject>Minstrel music.</dc:subject>\n<dc:subject>United States--History--Civil War, 1861-1865--Songs and music.</dc:subject>\n<dc:subject>Popular music--United States.</dc:subject>\n<dc:subject>Music--United States--19th century.</dc:subject>\n<dc:subject>Music--United States--20th century.</dc:subject>\n<dc:subject>sheet music; African-American</dc:subject>\n<dc:description>Selected from the Sheet Music Collection at the John Hay Library at Brown University. Consists of 1,305 pieces of American-American sheet music dating from 1850 through 1920. Includes many songs from the heyday of antebellum black face minstrelsy in the 1850s and from the abolitionist movement of the same period. Numerous titles are associated with the novel and the play Uncle Tom's Cabin. Civil War period music includes songs about African-American soldiers and the plight of the newly emancipated slave. Post-Civil War music reflects the problems of Reconstruction and the beginnings of urbanization and the northern migration of African Americans. African-American popular composers include James Bland, Ernest Hogan, Bob Cole, James Reese Europe, and Will Marion Cook.</dc:description>\n<dc:description>Copyright and other restrictions: Permission to copy in any form or to publish material from the Collection must be obtained from Brown University Library.</dc:description>\n<dc:description>Title from home page as viewed on Nov. 9, 1999.</dc:description>\n<dc:description>Offered as part of the American Memory online resource compiled by the National Digital Library Program of the Library of Congress.</dc:description>\n<dc:description>\"LC/Ameritech Award Winner\"</dc:description>\n<dc:publisher>[Washington, D.C.] : Library of Congress, American Memory</dc:publisher>\n<dc:date>1999-</dc:date>\n<dc:identifier>http://hdl.loc.gov/loc.gdc/collgdc.gc000019</dc:identifier>\n<dc:language>eng</dc:language>\n</oai_dc:dc>\n      ", 
+            "resource_data_type": "metadata", 
+            "resource_locator": "http://hdl.loc.gov/loc.gdc/collgdc.gc000019"
+        }, 
+        {
+            "TOS": {
+                "submission_TOS": "http://www.loc.gov/homepage/legal.html", 
+                "submission_attribution": "The Library of Congress"
+            }, 
+            "active": true, 
+            "digital_signature": {
+                "key_location": [
+                    "http://pool.sks-keyservers.net:11371/pks/lookup?op=get&search=0x890B513B01D8F913", 
+                    "https://keyserver2.pgp.com/vkd/DownloadKey.event?keyid=0x890B513B01D8F913"
+                ], 
+                "key_owner": "Publish (SRI DBA Learning Registry Publisher) <publish+sri@learningregistry.org>", 
                 "signature": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\nda8799006ed6ea658418070435f85e36bedb547c188ba8cd7418a99bbbf4a87f\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1.4.11 (Darwin)\nComment: GPGTools - http://gpgtools.org\n\niQEcBAEBAgAGBQJODjujAAoJEFwZ2y1f8DJJkSoH/1USr3adpwUvcME3QpS1lqFb\n2zwHhoGfZ1+CCMp5NQ9MyfLk2s7+KFM/8sYk5o3NgaBLBcSJLaDpYiPFBObOMuWt\nKbS8JsT0LrNHY5ae1yurE1sp0VC3CuoxwrmipGIR5W6dIopq3BRJoGWw95jV7YPP\nT1PmjQSYUzu2SBHjwCwY6Kyec4gh6n4m0BPCED8ZNJxwgCR7XDzdvhTUIXXK2Pww\nJfCF+D2rXP9+XAXKtqsh7a3PH8dDvjw77hrKrLr3QgEfQCM+0ZueP+jAWHADhEnj\nn+fLrS11g6ipYZItWAa3HT2ySjIHEQz6nzXSnD6gBqf55f7jymyrTRBVZuUA47o=\n=yFjr\n-----END PGP SIGNATURE-----\n", 
                 "signing_method": "LR-PGP.1.0"
             }, 
