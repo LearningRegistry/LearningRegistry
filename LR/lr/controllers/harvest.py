@@ -36,6 +36,8 @@ class HarvestController(BaseController):
                 limit_type = 'id_limit'
                 if full_docs:
                     limit_type = "doc_limit"
+                log.error(serviceData)
+                log.error(serviceData[limit_type])
                 if self.enable_flow_control and limit_type in serviceData:
                     self.limit = serviceData[limit_type]
                 elif self.enable_flow_control:
@@ -64,27 +66,29 @@ class HarvestController(BaseController):
           data = self.get_base_response(verb,body)
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
-          if not params.has_key('request_id'):
+          if not params.has_key('request_ID'):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)
           if by_doc_ID and by_resource_ID:
             data['OK'] = False
             data['error'] = 'badArgument'
-            return json.dumps(data)
-
-          request_id = params['request_id']
+            return json.dumps(data)          
+          request_id = params['request_ID']
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
-                records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+                records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},[document])
             else:
                 records = []
           else:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+            records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
           data['getrecord'] ={
             'record': records
             }
+          data['request']['identifier']  = request_id
+          data['request']['by_doc_ID'] = by_doc_ID
+          data['request']['by_resource_ID'] = by_resource_ID
           return json.dumps(data)
         def listidentifiers():
             return self.list_identifiers(h,body,params,verb)            
