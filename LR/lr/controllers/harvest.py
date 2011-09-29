@@ -45,9 +45,9 @@ class HarvestController(BaseController):
                 if 'metadataformats' in serviceData:    
                     self.metadataFormats = serviceData['metadataformats']
     def __parse_date(self,date):
-        #last_update_date = iso8601.parse_date(date)
-        #last_update = helpers.convertToISO8601UTC(last_update_date)    
-        return helpers.harvestTimeFormat(date)
+        last_update = helpers.convertToISO8601UTC(date)    
+        last_update_date = iso8601.parse_date(date)
+        return helpers.harvestTimeFormat(last_update)
     def _check_bool_param(self,params,key):
         if params.has_key(key):
             raw_value = string.lower(str(params[key]))
@@ -83,9 +83,11 @@ class HarvestController(BaseController):
                 records = []
           else:
             records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
+          if len(records) == 0:
+            abort(500,'idDoesNotExist')
           data['getrecord'] ={
             'record': records
-            }
+          }
           data['request']['identifier']  = request_id
           data['request']['by_doc_ID'] = by_doc_ID
           data['request']['by_resource_ID'] = by_resource_ID
@@ -144,11 +146,15 @@ class HarvestController(BaseController):
         return from_date,until_date         
     def list_records(self, h , body , params, verb = 'GET' ):                
         data = self.get_base_response(verb,body)
-        if params.has_key('from'):
-            data['request']['from'] = params['from']
-        if params.has_key('until'):
-            data['request']['until'] = params['until']
-        from_date, until_date = self._test_time_params(params)
+        try:
+            from_date, until_date = self._test_time_params(params)
+        except:
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            yield json.dumps(data)
+            return
+        data['request']['from'] = from_date
+        data['request']['until'] = until_date                    
         data['listrecords'] =  []
         self._getServiceDocment(False)        
         resumption_token = None
@@ -161,6 +167,7 @@ class HarvestController(BaseController):
         def debug_map(doc):
             data ={'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
             return data
+        
         if from_date > until_date:
           data['OK'] = False
           data['error'] = 'badArgument'
@@ -188,13 +195,16 @@ class HarvestController(BaseController):
                 yield base_response[1]
 
     def list_identifiers(self,h, body ,params, verb = 'GET'):        
-
         data = self.get_base_response(verb,body)
-        if params.has_key('from'):
-            data['request']['from'] = params['from']
-        if params.has_key('until'):
-            data['request']['until'] = params['until']
-        from_date, until_date = self._test_time_params(params)
+        try:
+            from_date, until_date = self._test_time_params(params)
+        except:
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            yield json.dumps(data)            
+            return
+        data['request']['from'] = from_date
+        data['request']['until'] = until_date        
         data['listidentifiers'] =  []
         base_response =  json.dumps(data).split('[')
         self._getServiceDocment(False)        
