@@ -1,0 +1,98 @@
+@text: #fff;
+@titlecolor: #f00;
+@bg: #000;
+@appheight: 768px;
+@appwidth: 1024px;
+@thumbwidth: 120px;
+@add: #0f0;
+
+#related-keys {
+    position:relative;
+    width:@appwidth * 1/2;
+    height:@appheight * 9/10;
+    margin:auto;
+    overflow:hidden;
+    background-color:@bg;
+    float: left;
+}
+
+#results {
+    float: right;
+    height:@appheight * 9/10;
+    width: @appwidth * 1/2;
+    overflow: auto;	
+}
+
+body {
+    font: 10px arial,sans-serif;
+    width: @appwidth;
+    height: @appheight * 9/10;
+    background-color:@bg;
+    color:@text;	
+}
+
+a .add {
+    &:link    {color:@add;}
+    &:visited {color:@add;}
+    &:hover   {color:@add;}
+    &:active  {color:@add;}
+}
+
+.secure {
+    visibility: hidden;
+}
+
+#resource_head {
+    visibility: collapse;
+}
+
+#input {
+    height: @appheight * 1/10;
+    .infoblock {
+        float: right;	
+        width: @appwidth * 1/2;
+        text-align: right;
+        
+        > div {
+            display: inline;
+        }
+        
+        .login {
+            vertical-align: top;
+        }
+       
+        
+        .clickable:hover {
+            opacity: .5;
+            cursor: pointer;
+        }
+        
+        .thumb {
+            width: @thumbwidth;
+        }
+        
+        .details {
+            width: (@appwidth * 1/2) - @thumbwidth;
+        }
+    }
+    
+     .title {
+            color: @titlecolor;
+            display: block;
+            font: bold 12px;
+     }
+}
+a {
+
+    &:link    {color:@text;}
+    &:visited {color:@text;}
+    &:hover   {color:@text;}
+    &:active  {color:@text;}
+}
+
+.tip { 
+    background-color: @text;
+    padding: 4px; 
+    .tip-text {color:@bg;}
+    .tip-title {color:@bg;}
+}
