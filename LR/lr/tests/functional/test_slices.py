@@ -18,7 +18,7 @@ RESUMPTION = 'resumption_token'
 ANY_TAGS = 'any_tags'
 IDS_ONLY = 'ids_only'
 
-DATA_MULTIPLIER = 1
+DATA_MULTIPLIER = 5
 
 def DataCleaner(testName, type="Basic"):
     
