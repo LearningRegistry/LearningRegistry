@@ -32,6 +32,7 @@ from contextlib import closing
 from xml.sax import saxutils
 from StringIO import StringIO
 import sys
+import re
 from lr.lib import helpers
 try:
     from lxml import etree
@@ -69,6 +70,8 @@ class OAIPMHDocumentResolver(CouchDBDocProcessor):
                     log.exception("Unable to resolved linked payload")
  
             try:
+                doc["resource_data"] = re.sub('''^<\?xml\s+version\s*=\s*(["][^"]+["]|['][^']+['])[^?]*\?>''', "", doc["resource_data"])
+                doc["resource_data"] = re.sub('''\s*<!DOCTYPE\s[^>]*>''', "", doc["resource_data"], flags=re.MULTILINE)
                 payload = etree.parse(StringIO(doc["resource_data"]))
                 doc["resource_data"] = etree.tostring(payload)
             except:
