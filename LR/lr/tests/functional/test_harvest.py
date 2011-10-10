@@ -2,8 +2,8 @@ from lr.tests import *
 import logging,json
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
-test_location = 'http://www.scholaris.pl/cms/index.php/resources/8640.html'
-test_id ='f4821dde0f154c439468d18f0ff845b9'
+test_location = 'http://aspect.cup.cam.ac.uk/DataServlet/2a2a504b86a0ed9bb9b0be3587fea0e7959b0846.jpg'
+test_id ='a9d87bd0793b49029491d597365e52f8'
 class TestHarvestController(TestController):
 
     def validate_getrecord_response_base(self, response):
@@ -27,19 +27,21 @@ class TestHarvestController(TestController):
           assert doc['resource_data']['resource_locator'] == test_location
 
     def test_getrecord_get_by_doc_id(self):
-        response = self.app.get(url('harvest', id='getrecord',request_id=test_id, by_doc_ID=True))
+        response = self.app.get(url('harvest', id='getrecord',request_ID=test_id, by_doc_ID=True))
         self.validate_getrecord_response(response)
 
     def test_getrecord_get_by_resource_id(self):
-        response = self.app.get(url('harvest', id='getrecord',request_id=test_location, by_doc_ID=False,by_resource_id=True))
+        response = self.app.get(url('harvest', id='getrecord',request_ID=test_location, by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_response_resource_id(response)
 
     def test_getrecord_post(self):
-        data = json.dumps({'request_id':test_id,'by_doc_ID':True})
+        data = json.dumps({'request_ID':test_id,'by_doc_ID':True})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
         self.validate_getrecord_response(response)
 
-
+    def _validate_error_message(self,response):
+        data = json.loads(response.body)
+        assert (not data['OK'])
     def validate_listrecords_response(self, response):
         data = json.loads(response.body)
         assert data.has_key('OK') and data['OK']
@@ -62,6 +64,15 @@ class TestHarvestController(TestController):
         response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
         self.validate_listrecords_response(response)
 
+    def test_listrecords_post_bad_from(self):
+        data = json.dumps({'from':"aaa",'until':self.until_date})
+        response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
+        self._validate_error_message(response)
+
+    def test_listrecords_post_bad_until(self):
+        data = json.dumps({'from':self.from_date,'until':'self.until_date'})
+        response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
+        self._validate_error_message(response)
 
     def validate_listidentifiers_response(self, response):
         data = json.loads(response.body)
@@ -81,6 +92,16 @@ class TestHarvestController(TestController):
         data = json.dumps({'from':self.from_date,'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self.validate_listidentifiers_response(response)
+
+    def test_listidentifiers_post_bad_from(self):
+        data = json.dumps({'from':'self.from_date','until':self.until_date})
+        response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
+        self._validate_error_message(response)
+
+    def test_listidentifiers_post_bad_until(self):
+        data = json.dumps({'from':self.from_date,'until':'self.until_date'})
+        response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
+        self._validate_error_message(response)
 
 
     def validate_identify_response(self, response):
