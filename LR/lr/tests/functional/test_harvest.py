@@ -27,15 +27,15 @@ class TestHarvestController(TestController):
           assert doc['resource_data']['resource_locator'] == test_location
 
     def test_getrecord_get_by_doc_id(self):
-        response = self.app.get(url('harvest', id='getrecord',request_id=test_id, by_doc_ID=True))
+        response = self.app.get(url('harvest', id='getrecord',request_ID=test_id, by_doc_ID=True))
         self.validate_getrecord_response(response)
 
     def test_getrecord_get_by_resource_id(self):
-        response = self.app.get(url('harvest', id='getrecord',request_id=test_location, by_doc_ID=False,by_resource_id=True))
+        response = self.app.get(url('harvest', id='getrecord',request_ID=test_location, by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_response_resource_id(response)
 
     def test_getrecord_post(self):
-        data = json.dumps({'request_id':test_id,'by_doc_ID':True})
+        data = json.dumps({'request_ID':test_id,'by_doc_ID':True})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
         self.validate_getrecord_response(response)
 

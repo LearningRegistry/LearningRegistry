@@ -48,8 +48,8 @@ class ObtainController(BaseController):
         self.service_id = None
         serviceDoc = h.getServiceDocument(appConfig['lr.obtain.docid'])
         if serviceDoc != None:
-            if 'service_id' in serviceDoc:
-                self.service_id = serviceDoc['service_id']
+            if 'service_ID' in serviceDoc:
+                self.service_id = serviceDoc['service_ID']
                 
             if 'service_data' in serviceDoc:
                 serviceData = serviceDoc['service_data']

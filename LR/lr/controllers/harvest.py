@@ -66,7 +66,7 @@ class HarvestController(BaseController):
           data = self.get_base_response(verb,body)
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
-          if not params.has_key('request_id'):
+          if not params.has_key('request_ID'):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)
@@ -74,7 +74,7 @@ class HarvestController(BaseController):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)          
-          request_id = params['request_id']
+          request_id = params['request_ID']
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
