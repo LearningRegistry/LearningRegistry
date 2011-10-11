@@ -20,6 +20,7 @@ class HarvestController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')call
+    REQUESTID = "request_ID"
     def _getServiceDocment(self,full_docs):
         self.enable_flow_control = False
         self.limit = None        
@@ -66,7 +67,7 @@ class HarvestController(BaseController):
           data = self.get_base_response(verb,body)
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
-          if not params.has_key('request_ID'):
+          if not params.has_key(self.REQUESTID):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)
@@ -74,7 +75,7 @@ class HarvestController(BaseController):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)          
-          request_id = params['request_ID']
+          request_id = params[self.REQUESTID]
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
