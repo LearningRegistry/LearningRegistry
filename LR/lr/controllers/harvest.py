@@ -20,6 +20,7 @@ class HarvestController(BaseController):
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')call
+    REQUESTID = "request_ID"
     def _getServiceDocment(self,full_docs):
         self.enable_flow_control = False
         self.limit = None        
@@ -36,6 +37,8 @@ class HarvestController(BaseController):
                 limit_type = 'id_limit'
                 if full_docs:
                     limit_type = "doc_limit"
+                log.error(serviceData)
+                log.error(serviceData[limit_type])
                 if self.enable_flow_control and limit_type in serviceData:
                     self.limit = serviceData[limit_type]
                 elif self.enable_flow_control:
@@ -43,9 +46,9 @@ class HarvestController(BaseController):
                 if 'metadataformats' in serviceData:    
                     self.metadataFormats = serviceData['metadataformats']
     def __parse_date(self,date):
-        #last_update_date = iso8601.parse_date(date)
-        #last_update = helpers.convertToISO8601UTC(last_update_date)    
-        return helpers.harvestTimeFormat(date)
+        last_update = helpers.convertToISO8601UTC(date)    
+        last_update_date = iso8601.parse_date(date)
+        return helpers.harvestTimeFormat(last_update)
     def _check_bool_param(self,params,key):
         if params.has_key(key):
             raw_value = string.lower(str(params[key]))
@@ -64,27 +67,31 @@ class HarvestController(BaseController):
           data = self.get_base_response(verb,body)
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
-          if not params.has_key('request_id'):
+          if not params.has_key(self.REQUESTID):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)
           if by_doc_ID and by_resource_ID:
             data['OK'] = False
             data['error'] = 'badArgument'
-            return json.dumps(data)
-
-          request_id = params['request_id']
+            return json.dumps(data)          
+          request_id = params[self.REQUESTID]
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
-                records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+                records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},[document])
             else:
                 records = []
           else:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+            records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
+          if len(records) == 0:
+            abort(500,'idDoesNotExist')
           data['getrecord'] ={
             'record': records
-            }
+          }
+          data['request']['identifier']  = request_id
+          data['request']['by_doc_ID'] = by_doc_ID
+          data['request']['by_resource_ID'] = by_resource_ID
           return json.dumps(data)
         def listidentifiers():
             return self.list_identifiers(h,body,params,verb)            
@@ -140,11 +147,15 @@ class HarvestController(BaseController):
         return from_date,until_date         
     def list_records(self, h , body , params, verb = 'GET' ):                
         data = self.get_base_response(verb,body)
-        if params.has_key('from'):
-            data['request']['from'] = params['from']
-        if params.has_key('until'):
-            data['request']['until'] = params['until']
-        from_date, until_date = self._test_time_params(params)
+        try:
+            from_date, until_date = self._test_time_params(params)
+        except:
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            yield json.dumps(data)
+            return
+        data['request']['from'] = from_date
+        data['request']['until'] = until_date                    
         data['listrecords'] =  []
         self._getServiceDocment(False)        
         resumption_token = None
@@ -157,6 +168,7 @@ class HarvestController(BaseController):
         def debug_map(doc):
             data ={'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
             return data
+        
         if from_date > until_date:
           data['OK'] = False
           data['error'] = 'badArgument'
@@ -184,13 +196,16 @@ class HarvestController(BaseController):
                 yield base_response[1]
 
     def list_identifiers(self,h, body ,params, verb = 'GET'):        
-
         data = self.get_base_response(verb,body)
-        if params.has_key('from'):
-            data['request']['from'] = params['from']
-        if params.has_key('until'):
-            data['request']['until'] = params['until']
-        from_date, until_date = self._test_time_params(params)
+        try:
+            from_date, until_date = self._test_time_params(params)
+        except:
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            yield json.dumps(data)            
+            return
+        data['request']['from'] = from_date
+        data['request']['until'] = until_date        
         data['listidentifiers'] =  []
         base_response =  json.dumps(data).split('[')
         self._getServiceDocment(False)        

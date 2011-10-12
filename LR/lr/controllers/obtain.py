@@ -132,7 +132,10 @@ class ObtainController(BaseController):
         if data.has_key(callbackKey):
             yield "{0}(".format(data[callbackKey])                    
         if  by_doc_ID:
-            view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
+            if len(keys) == 0:
+                view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
+            else:
+                view = self.get_view('_all_docs',keys, include_docs=full_docs,resumption_token=resumption_token)            
         elif by_resource_ID:
             view = self.get_view('_design/learningregistry-resource-location/_view/docs',keys, include_docs=full_docs,resumption_token=resumption_token)        
         for i in  self.format_data(full_docs,view, resumption_token):        
@@ -194,8 +197,8 @@ class ObtainController(BaseController):
             log.debug(data['resumption_token'])
         if request.params.has_key('callback'):
             data['callback'] = request.params['callback']
-        if request.params.has_key('request_ID'):
-            data['request_IDs'].append(request.params['request_ID'])
+        if request.params.has_key('request_id'):
+            data['request_IDs'].append(request.params['request_id'])
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""

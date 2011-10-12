@@ -244,6 +244,32 @@ class TestOaiPmhController(TestController):
         return (from_, until_)
     
     
+    def validate_xml_content_type(self, res):
+        content_type = None
+        
+        try:
+            content_type = res.headers['Content-Type']
+        except:
+            try:
+                content_type = res.headers['content-type']
+            except:
+                pass
+            
+        assert re.match("""text/xml;\s*charset=utf-8""", content_type) != None , '''Expected Content Type: "text/xml; charset=utf-8"  Got: "%s"''' % content_type
+        
+    def validate_json_content_type(self, res):
+        content_type = None
+        
+        try:
+            content_type = res.headers['Content-Type']
+        except:
+            try:
+                content_type = res.headers['content-type']
+            except:
+                pass
+            
+        assert re.match("""application/json;\s*charset=utf-8""", content_type) != None , '''Expected Content Type: "application/json; charset=utf-8"  Got: "%s"''' % content_type
+    
     def parse_response(self, response):
         body = response.body
         xmlcontent = etree.fromstring(body)
@@ -267,6 +293,8 @@ class TestOaiPmhController(TestController):
         
         
     def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False, errorCodeExpected=None):
+        self.validate_xml_content_type(response)
+        
         obj = self.parse_response(response)
         xmlcontent = obj["etree"]
         self.validate_lr_oai_etree(xmlcontent, errorExists, checkSchema, errorCodeExpected)
@@ -317,7 +345,7 @@ class TestOaiPmhController(TestController):
         verify that the network node maintains a value for the earliest publication 
         time for documents harvestable from the node (earliestDatestamp)'''
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        
+        self.validate_xml_content_type(response)
         root = etree.fromstring(response.body)
         earliestDatestamp = root.xpath('/lr:OAI-PMH/lr:Identify/oai:earliestDatestamp/text()', namespaces=namespaces)
         
@@ -335,7 +363,7 @@ class TestOaiPmhController(TestController):
         verify that the granularity of the timestamp exists in Identify.'''
 
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        
+        self.validate_xml_content_type(response)
         root = etree.fromstring(response.body)
         identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/oai:granularity/text()', namespaces=namespaces)
         
@@ -357,7 +385,7 @@ class TestOaiPmhController(TestController):
             self.fail("%s: granularity setting missing from service document." % config["lr.oaipmh.docid"])
             
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        
+        self.validate_xml_content_type(response)
         root = etree.fromstring(response.body)
         identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/oai:granularity/text()', namespaces=namespaces)
         
@@ -388,6 +416,7 @@ class TestOaiPmhController(TestController):
         randomDoc = choice(sorted_dc_data["documents"])
         
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': 'true'})
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)
             
@@ -410,10 +439,12 @@ class TestOaiPmhController(TestController):
         verify that if an identifier is provided, the metadata formats are 
         returned only for the identified resource data description documents.'''
         global sorted_dc_data
-        randomDoc = choice(sorted_dc_data["documents"])
+        
+        # There are 2 documents with this same URL with the same format
+        resource_locator = "http://hdl.loc.gov/loc.gdc/collgdc.gc000019"
         
         # all docs that have the same resource_locator
-        opts = {"key": ["by_resource_locator", randomDoc["resource_locator"]], 
+        opts = {"key": ["by_resource_locator", resource_locator], 
                 "include_docs": "true"}
         all_matching_docs = self.db.view("oai-pmh-get-records/docs", **opts)
         schema_formats = []
@@ -424,7 +455,8 @@ class TestOaiPmhController(TestController):
                         schema_formats.append(s.strip())
             
         
-        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["resource_locator"], 'by_doc_ID': 'false'})
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': resource_locator, 'by_doc_ID': 'false'})
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)
             
@@ -477,6 +509,7 @@ class TestOaiPmhController(TestController):
         global sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
+        self.validate_xml_content_type(response)
         tree = etree.fromstring(response.body)
         
         metadata = tree.xpath("//oai_dc:dc", namespaces=namespaces)
@@ -510,6 +543,7 @@ class TestOaiPmhController(TestController):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)           
             
@@ -545,6 +579,7 @@ class TestOaiPmhController(TestController):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'LR_JSON_0.10.0', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
+        self.validate_json_content_type(response)
         try:
             json_obj = json.loads(response.body)
             
@@ -648,6 +683,7 @@ class TestOaiPmhController(TestController):
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)
             oaipmh_root = obj["etree"]
@@ -688,6 +724,7 @@ class TestOaiPmhController(TestController):
         time.sleep(10)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'oai_dc', 'from': from_ })
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)
             
@@ -722,7 +759,7 @@ class TestOaiPmhController(TestController):
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'LR_JSON_0.10.0', 'from': from_, 'until': until_})
-
+        self.validate_json_content_type(response)
         try:
             json_obj = json.loads(response.body)
             
@@ -766,6 +803,7 @@ class TestOaiPmhController(TestController):
             (from_, until_) = self._get_timestamps(doc1, doc2)
                 
             response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+            self.validate_xml_content_type(response)
             try:
                 obj = self.parse_response(response)
                 resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:resumptionToken/text()", namespaces=namespaces)
@@ -773,6 +811,7 @@ class TestOaiPmhController(TestController):
                 assert len(resumptionToken) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
                 
                 response2 = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
+                self.validate_xml_content_type(response2)
                 obj2 = self.parse_response(response2)
                 
                 resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:resumptionToken", namespaces=namespaces)
@@ -868,6 +907,7 @@ class TestOaiPmhController(TestController):
             (from_, until_) = self._get_timestamps(doc1, doc2)
                 
             response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+            self.validate_xml_content_type(response)
             try:
                 obj = self.parse_response(response)
                 resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:resumptionToken/text()", namespaces=namespaces)
@@ -875,6 +915,7 @@ class TestOaiPmhController(TestController):
                 assert len(resumptionToken) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
                 
                 response2 = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
+                self.validate_xml_content_type(response2)
                 obj2 = self.parse_response(response2)
                 
                 resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:resumptionToken", namespaces=namespaces)
@@ -905,6 +946,7 @@ class TestOaiPmhController(TestController):
         until_tstamp = iso8601.parse_date(until_)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)
             
@@ -948,6 +990,7 @@ class TestOaiPmhController(TestController):
         time.sleep(10)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'oai_dc', 'from': from_ })
+        self.validate_xml_content_type(response)
         try:
             obj = self.parse_response(response)
             

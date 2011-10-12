@@ -20,7 +20,8 @@ class OaiPmhController(HarvestController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
-    #     map.resource('OAI-PMH', 'OAI-PMH')
+    #     map.resource('OAI-PMH', 'OAI-PMH')        
+    
     def _isTrue(self, value):
         return str(value).lower() in ['true', 't', '1', 'y', 'yes']
     
@@ -455,7 +456,7 @@ class OaiPmhController(HarvestController):
             # If this is a special case where we are actually using OAI interface to serve basic harvest
             if params.has_key("metadataPrefix") and params["metadataPrefix"] == "LR_JSON_0.10.0":
                 if params.has_key("identifier") == True:
-                    params["request_id"] = params["identifier"]
+                    params[self.REQUESTID] = params["identifier"]
                 if params.has_key("from") and isinstance(params["from"], datetime):
                     params["from"] = h.convertToISO8601Zformat(params["from"])
                 if params.has_key("until") and isinstance(params["until"], datetime):
@@ -464,6 +465,7 @@ class OaiPmhController(HarvestController):
                 return HarvestController.harvest(self, params, request.body, params['verb'].lower())
         
             verb = params['verb']
+            response.headers['Content-Type'] = "text/xml; charset=utf-8"
             
             return switch[verb](params)
         except Error as e:
