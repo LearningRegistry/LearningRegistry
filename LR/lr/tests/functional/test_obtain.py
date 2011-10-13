@@ -4,6 +4,7 @@ import urllib
 import logging
 from lr.lib.harvest import harvest
 from webtest import AppError
+import time
 log = logging.getLogger(__name__)
 headers={'Content-Type': 'application/json'}
 class TestObtainController(TestController):
@@ -19,17 +20,37 @@ class TestObtainController(TestController):
             app = controller.app  
         h = harvest()
         self.db = h.db              
-        result = app.post('/publish', params=json.dumps(data), headers=headers)
-        len(self.db.view('_design/learningregistry-resources/_view/docs'))
-        len(self.db.view('_design/learningregistry-resource-location/_view/docs'))
+        result = app.post('/publish', params=json.dumps(data), headers=headers)        
         result = json.loads(result.body)
         self.ids = map(lambda doc: doc['doc_ID'],result['document_results'])
         self.resourceLocators = map(lambda doc: doc['resource_locator'],data['documents'])
+        done = False
+        while not done:      
+            done = True  
+            for id in self.ids:
+                try:
+                    doc = self.db[id+'-distributable']
+                    done = done and True
+                except:
+                    done = done and False
+            time.sleep(0.5)
+
+
+        len(self.db.view('_design/learningregistry-resources/_view/docs'))
+        len(self.db.view('_design/learningregistry-resource-location/_view/docs'))
     @classmethod
     def tearDownClass(self):
-        for id in self.ids:
-            del self.db[id]
-            del self.db[id+'-distributable']
+        for doc in self.ids:
+            try:
+                self.db.delete(self.db[doc])
+            except:
+                pass
+            try:
+                self.db.delete(self.db[doc+'-distributable'])
+            except:
+                pass
+        self.db.commit()
+                
     def _getInitialPostData(self):
         data = {
             "by_doc_ID":False,
@@ -41,14 +62,10 @@ class TestObtainController(TestController):
         data = json.loads(resp.body)
         requestData = json.loads(requestData)
         assert(data['documents'])
-        assert(len(data['documents'])>0)
-        if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
-            for d in self.ids:
-                print d            
+        assert(len(data['documents'])>0) 
         for d in data['documents']:
-            print "Target Doc %s" %d['doc_ID']
             if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
-                assert d['doc_ID'] in self.ids 
+                assert d['doc_ID'] in self.ids
             else:
                 assert d['doc_ID'] in self.resourceLocators
         return data
