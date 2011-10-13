@@ -7,16 +7,16 @@
 <OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
          xmlns:oai="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd">
+         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd">
   <responseDate>${c.datetime_now | x}</responseDate>
   <request verb="Identify">${c.path_url | x}</request>
   <Identify>
-    <repositoryName>${c.identify["repositoryName"] | x}</repositoryName>
-    <baseURL>${c.path_url | x}</baseURL>
-    <protocolVersion>2.0</protocolVersion>
-    <adminEmail>${c.identify["adminEmail"] | x }</adminEmail>
-    <earliestDatestamp>${h.harvestTimeFormat(c.identify["earliestDatestamp"]) | x}</earliestDatestamp>
-    <deletedRecord>${c.identify["deletedRecord"] | x}</deletedRecord>
-    <granularity>${c.identify["granularity"] | x}</granularity>
+    <oai:repositoryName>${c.identify["repositoryName"] | x}</oai:repositoryName>
+    <oai:baseURL>${c.path_url | x}</oai:baseURL>
+    <oai:protocolVersion>2.0</oai:protocolVersion>
+    <oai:adminEmail>${c.identify["adminEmail"] | x }</oai:adminEmail>
+    <oai:earliestDatestamp>${h.OAIPMHTimeFormat(c.identify["earliestDatestamp"]) | x}</oai:earliestDatestamp>
+    <oai:deletedRecord>${c.identify["deletedRecord"] | x}</oai:deletedRecord>
+    <oai:granularity>${c.identify["granularity"] | x}</oai:granularity>
  </Identify>
 </OAI-PMH>

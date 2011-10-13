@@ -32,6 +32,8 @@ from contextlib import closing
 from xml.sax import saxutils
 from StringIO import StringIO
 import sys
+import re
+from lr.lib import helpers
 try:
     from lxml import etree
 except:
@@ -68,6 +70,8 @@ class OAIPMHDocumentResolver(CouchDBDocProcessor):
                     log.exception("Unable to resolved linked payload")
  
             try:
+                doc["resource_data"] = re.sub('''^<\?xml\s+version\s*=\s*(["][^"]+["]|['][^']+['])[^?]*\?>''', "", doc["resource_data"])
+                doc["resource_data"] = re.sub('''\s*<!DOCTYPE\s[^>]*>''', "", doc["resource_data"], flags=re.MULTILINE)
                 payload = etree.parse(StringIO(doc["resource_data"]))
                 doc["resource_data"] = etree.tostring(payload)
             except:
@@ -98,6 +102,8 @@ class oaipmh(harvest):
             appConfig['couchdb.url'],
             appConfig['couchdb.db.resourcedata']
         ])
+        
+        self.service_doc = helpers.getServiceDocument(appConfig["lr.oaipmh.docid"])
       
     
     def list_opts(self, metadataPrefix, from_date=None, until_date=None):
@@ -186,10 +192,12 @@ class oaipmh(harvest):
         try:
             opts = { "stale": "ok" }
             if identity != None:
+                opts["include_docs"] = "true"
+                
                 if by_doc_ID == True: 
                     byID = "by_doc_ID" 
                 else: 
-                    byID = "by_resource_ID"
+                    byID = "by_resource_locator"
                 opts["key"] = [byID, identity]
                 
                 view_data = self.db.view('oai-pmh-get-records/docs', **opts)
@@ -197,8 +205,12 @@ class oaipmh(harvest):
                     raise IdDoesNotExistError(verb)
                 formats = [];
                 for res in view_data:
-                    for schema in res.value["payload_schema"]:
-                        formats.append({"metadataPrefix":schema, "schemas":[res.value["payload_schema_locator"]]})
+                    for schema in res.doc["payload_schema"]:
+                        schemaLocators = []
+                        if "payload_schema_locator" in res.doc:
+                            schemaLocators.append(res.doc["payload_schema_locator"])
+                        if {"metadataPrefix":schema, "schemas":schemaLocators} not in formats:
+                            formats.append({"metadataPrefix":schema, "schemas":schemaLocators})
                 return formats
             
             else:
@@ -222,7 +234,7 @@ class oaipmh(harvest):
             # TODO: This should map to the deleted_data_policy from the node_policy from the
             #       network node description
             ident["deletedRecord"] = "transient"
-            ident["granularity"] = h.getDatetimePrecision()
+            ident["granularity"] = h.getDatetimePrecision(self.service_doc)
             opts = {
                     "group": True,
                     "limit": 1,

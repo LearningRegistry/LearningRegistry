@@ -20,7 +20,8 @@ class OaiPmhController(HarvestController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
-    #     map.resource('OAI-PMH', 'OAI-PMH')
+    #     map.resource('OAI-PMH', 'OAI-PMH')        
+    
     def _isTrue(self, value):
         return str(value).lower() in ['true', 't', '1', 'y', 'yes']
     
@@ -130,7 +131,7 @@ class OaiPmhController(HarvestController):
                 if from_date_gran != until_date_gran:
                     raise BadArgumentError('from and until parameters do not use the same granularity.', verb)
             
-            harvestServiceGranularity = h.getHarvestServiceGranularity()
+            harvestServiceGranularity = h.getOAIPMHServiceGranularity()
             
             if params['from'] != None and from_date_gran > harvestServiceGranularity:
                 raise BadArgumentError('from is more granular than Harvest service permits', verb)
@@ -211,9 +212,9 @@ class OaiPmhController(HarvestController):
         if params.has_key("metadataPrefix"):
             vars["metadataPrefix"] = params["metadataPrefix"]
         if params.has_key("from"):
-            vars["from_date"] = h.harvestTimeFormat(params["from"])
+            vars["from_date"] = h.OAIPMHTimeFormat(params["from"])
         if params.has_key("until"):
-            vars["until_date"] = h.harvestTimeFormat(params["until"])
+            vars["until_date"] = h.OAIPMHTimeFormat(params["until"])
         if params.has_key("identifier"):
             vars["identifier"] = params["identifier"]
         return vars
@@ -354,10 +355,10 @@ class OaiPmhController(HarvestController):
                             doc_index = 0
                             err_count = 0
                 
-                if (doc_index - err_count) == 0:
-                    raise CannotDisseminateFormatError(params['verb'], req=t_req)
-                elif doc_index == 0:
+                if doc_index == 0 and err_count == 0:
                     raise NoRecordsMatchError(params['verb'], req=t_req)
+                elif (doc_index - err_count) == 0:
+                    raise CannotDisseminateFormatError(params['verb'], req=t_req)
                 else:
                     if enable_flow_control and doc_index <= record_limit:
                         yield h.fixUtf8(mustache.resumptionToken())
@@ -455,11 +456,16 @@ class OaiPmhController(HarvestController):
             # If this is a special case where we are actually using OAI interface to serve basic harvest
             if params.has_key("metadataPrefix") and params["metadataPrefix"] == "LR_JSON_0.10.0":
                 if params.has_key("identifier") == True:
-                    params["request_id"] = params["identifier"]
+                    params[self.REQUESTID] = params["identifier"]
+                if params.has_key("from") and isinstance(params["from"], datetime):
+                    params["from"] = h.convertToISO8601Zformat(params["from"])
+                if params.has_key("until") and isinstance(params["until"], datetime):
+                    params["until"] = h.convertToISO8601Zformat(params["until"])
                 
                 return HarvestController.harvest(self, params, request.body, params['verb'].lower())
         
             verb = params['verb']
+            response.headers['Content-Type'] = "text/xml; charset=utf-8"
             
             return switch[verb](params)
         except Error as e:

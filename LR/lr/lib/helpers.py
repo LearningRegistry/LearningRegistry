@@ -156,6 +156,16 @@ def convertToISO8601Zformat(dateTimeArg):
         return convertToISO8601UTC (dateTimeArg).isoformat()+ "Z" 
     return dateTimeArg
 
+def OAIPMHTimeFormat(dateTimeArg):
+    if isinstance(dateTimeArg, datetime) ==True:
+        fmtStr = getOAIPMHDatetimeFormatString()
+        utcdate = convertToISO8601UTC (dateTimeArg)
+#        import logging
+#        log = logging.getLogger(__name__)
+#        log.exception(utcdate.utctimetuple())
+        return time.strftime(fmtStr,utcdate.utctimetuple())
+    return dateTimeArg
+
 def harvestTimeFormat(dateTimeArg):
     if isinstance(dateTimeArg, datetime) ==True:
         fmtStr = getHarvestDatetimeFormatString()
@@ -204,30 +214,43 @@ def getISO8601Granularity(iso8601string):
 
 _DATETIME_REPLACEMENT_REGEX = re.compile(r"[YMDhms]")
 
-def getHarvestServiceGranularity():
-    '''Determines the Granularity object of 8601 time format specified by Basic Harvest'''
-    format = getDatetimePrecision()
+def getOAIPMHServiceGranularity():
+    '''Determines the Granularity object of 8601 time format specified by OAI-PMH Harvest'''
+    from lr.model.base_model import appConfig
+    service_doc = getServiceDocument(appConfig["lr.oaipmh.docid"])
+    
+    format = getDatetimePrecision(service_doc)
     return getISO8601Granularity(re.sub(_DATETIME_REPLACEMENT_REGEX, "1", format))
     
     
-def getDatetimePrecision():
-    '''Get's the ISO8601 Time format string as stored in the Basic Harvest service descriptor.
+def getDatetimePrecision(service_descriptor=None):
+    '''Get's the ISO8601 Time format string as stored in the service descriptor.
     
-        FIXME: Basic Harvest is currently missing it's service description document, so this method currently
-        always returns YYYY-MM-DDThh:mm:ssZ'''
+        if the service_descriptor is null or is missing the granularity setting
+        a value of YYYY-MM-DDThh:mm:ssZ will be returned'''
     granularity = "YYYY-MM-DDThh:mm:ssZ"
-#    from lr.model import LRNode
-#    for s in LRNode.nodeServices:
-#        if (s.has_key("service_name") and s["service_name"] == "Basic Harvest" and 
-#            s.has_key("service_data") and s["service_data"].has_key("granularity") and 
-#            s["service_data"]["granularity"] != None):
-#                granularity = s["service_data"]["granularity"]
-#                break
-    return granularity
     
+    if service_descriptor != None:
+        try:
+            granularity = service_descriptor["service_data"]["granularity"]
+        except:
+            log.error("Service Description Document is missing granularity data.")
+    
+    return granularity
+
     
 def getHarvestDatetimeFormatString():
-    precision = getDatetimePrecision()
+    from lr.model.base_model import appConfig
+    service_doc = getServiceDocument(appConfig["lr.harvest.docid"])
+    return getDatetimeFormatString(service_doc)
+
+def getOAIPMHDatetimeFormatString():
+    from lr.model.base_model import appConfig
+    service_doc = getServiceDocument(appConfig["lr.oaipmh.docid"])
+    return getDatetimeFormatString(service_doc)
+    
+def getDatetimeFormatString(service_doc):
+    precision = getDatetimePrecision(service_doc)
     precision = re.sub("[Y]{4}", "%Y", precision)
     precision = re.sub("[M]{2}", "%m", precision)
     precision = re.sub("[D]{2}", "%d", precision)

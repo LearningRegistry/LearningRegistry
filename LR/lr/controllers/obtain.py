@@ -97,6 +97,8 @@ class ObtainController(BaseController):
             yield ']' + byIDResponseChunks[1]                        
         if count < self.limit or not self.enable_flow_control:			
             yield "]}"
+        elif count < self.limit:
+            yield '], "resumption_token":%s}' % 'null'
         else:
             token = rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId)
             yield '], "resumption_token":"%s"}' % token
@@ -108,7 +110,9 @@ class ObtainController(BaseController):
         # url('obtain')
     def _validateParams(self,data):
         by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
-        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])        
+        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
+        if not data.has_key("request_IDs"):        
+            data['request_IDs'] = []
         if by_doc_ID and by_resource_ID:
             abort(500,"by_doc_ID and by_resource_ID cannot both be True")
         if not by_doc_ID and not by_resource_ID:
@@ -128,7 +132,10 @@ class ObtainController(BaseController):
         if data.has_key(callbackKey):
             yield "{0}(".format(data[callbackKey])                    
         if  by_doc_ID:
-            view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
+            if len(keys) == 0:
+                view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
+            else:
+                view = self.get_view('_all_docs',keys, include_docs=full_docs,resumption_token=resumption_token)            
         elif by_resource_ID:
             view = self.get_view('_design/learningregistry-resource-location/_view/docs',keys, include_docs=full_docs,resumption_token=resumption_token)        
         for i in  self.format_data(full_docs,view, resumption_token):        

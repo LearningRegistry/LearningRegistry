@@ -1,10 +1,5 @@
 function(doc) {
 
-	var makeValidSchema = function (origSchema) {		
-		clean = origSchema.replace(/[^A-Za-z0-9\-_\.!~\*'\(\)]/g, '_');
-		return clean;
-	}
-	
 	if (doc.doc_type && doc.doc_type=="resource_data" && doc.node_timestamp && doc.payload_schema) {
 		
 		var okay = false;
@@ -24,9 +19,11 @@ function(doc) {
 		}
 		
 		if (okay) {
-			for (var i = 0; i < doc.payload_schema.length; i++) {
-				ts = doc.node_timestamp.replace(/\.[0-9]+Z/gi, "");
-				emit([makeValidSchema(doc.payload_schema[i]),ts], null);
+			if (doc.doc_ID) {
+				emit(["by_doc_ID",doc.doc_ID], null);
+			}
+			if (doc.resource_locator) {
+				emit(["by_resource_locator",doc.resource_locator], null);
 			}
 		}
 	}
