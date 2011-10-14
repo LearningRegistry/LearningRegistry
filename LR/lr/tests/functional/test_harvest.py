@@ -1,11 +1,49 @@
 from lr.tests import *
 import logging,json
+from datetime import datetime
+from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
-test_location = 'http://aspect.cup.cam.ac.uk/DataServlet/2a2a504b86a0ed9bb9b0be3587fea0e7959b0846.jpg'
-test_id ='a9d87bd0793b49029491d597365e52f8'
+db = None
+def updateViews():
+    len(db.view('_design/learningregistry-resources/_view/docs'))
+    len(db.view('_design/learningregistry-resource-location/_view/docs'))
+    len(db.view('_design/learningregistry-by-date/_view/docs'))        
 class TestHarvestController(TestController):
-
+    @classmethod
+    def setupClass(self):
+        self.setup = True
+        with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
+            data = json.load(f)
+        if hasattr(self, "attr"):
+            app = self.app
+        else:
+            controller =  TestHarvestController(methodName="test_empty")
+            app = controller.app  
+        h = harvest()
+        self.db = h.db                      
+        global db
+        db = self.db
+        result = app.post('/publish', params=json.dumps(data), headers=headers)
+        updateViews()
+        result = json.loads(result.body)
+        self.ids = map(lambda doc: doc['doc_ID'],result['document_results'])
+        self.resourceLocators = map(lambda doc: doc['resource_locator'],data['documents'])
+        self.from_date = datetime(1990,1,1).isoformat()
+        self.from_date = self.from_date[0:self.from_date.rfind('.')]
+        self.from_date += 'Z'
+        self.until_date = datetime.utcnow().isoformat()
+        self.until_date = self.until_date[0:self.until_date.rfind('.')]
+        self.until_date += 'Z'
+    def test_empty(self):
+        pass
+    @classmethod
+    def tearDownClass(self):
+        for id in self.ids:
+            del self.db[id]
+            del self.db[id+'-distributable']
+        updateViews()
+        pass
     def validate_getrecord_response_base(self, response):
         data = json.loads(response.body)   
         assert data.has_key('OK') and data['OK']
@@ -14,30 +52,30 @@ class TestHarvestController(TestController):
         assert data.has_key('getrecord')
         return data
 
-    def validate_getrecord_response(self, response):
+    def validate_getrecord_response(self, response, targetId):
         data = self.validate_getrecord_response_base(response)         
         for doc in data['getrecord']['record']:
           assert doc.has_key('resource_data')
-          assert doc['resource_data']['_id'] == test_id
+          assert doc['resource_data']['_id'] == targetId
 
-    def validate_getrecord_response_resource_id(self, response):
+    def validate_getrecord_response_resource_id(self, response, resourceLocator):
         data = self.validate_getrecord_response_base(response)
         for doc in data['getrecord']['record']:
           assert doc.has_key('resource_data')
-          assert doc['resource_data']['resource_locator'] == test_location
+          assert doc['resource_data']['resource_locator'] == resourceLocator
 
     def test_getrecord_get_by_doc_id(self):
-        response = self.app.get(url('harvest', id='getrecord',request_ID=test_id, by_doc_ID=True))
-        self.validate_getrecord_response(response)
+        response = self.app.get(url('harvest', id='getrecord',request_ID=self.ids[0], by_doc_ID=True))
+        self.validate_getrecord_response(response,self.ids[0])
 
     def test_getrecord_get_by_resource_id(self):
-        response = self.app.get(url('harvest', id='getrecord',request_ID=test_location, by_doc_ID=False,by_resource_id=True))
-        self.validate_getrecord_response_resource_id(response)
+        response = self.app.get(url('harvest', id='getrecord',request_ID=self.resourceLocators[0], by_doc_ID=False,by_resource_id=True))
+        self.validate_getrecord_response_resource_id(response,self.resourceLocators[0])
 
     def test_getrecord_post(self):
-        data = json.dumps({'request_ID':test_id,'by_doc_ID':True})
+        data = json.dumps({'request_ID':self.ids[0],'by_doc_ID':True})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
-        self.validate_getrecord_response(response)
+        self.validate_getrecord_response(response,self.ids[0])
 
     def _validate_error_message(self,response):
         data = json.loads(response.body)
@@ -53,6 +91,8 @@ class TestHarvestController(TestController):
           assert record.has_key('resource_data')            
           resource = record['resource_data']
           assert resource['node_timestamp'] >= self.from_date
+          print self.until_date
+          print resource['node_timestamp']
           assert resource['node_timestamp'] <= self.until_date
 
     def test_listrecords_get(self):
