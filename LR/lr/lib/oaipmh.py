@@ -42,6 +42,9 @@ except:
 log = logging.getLogger(__name__)
 
 
+def getMetadataPrefix(metadataFormat):
+    return re.sub('''[^A-Za-z0-9\-_\.!~\*'\(\)]''', "_", metadataFormat)   
+
 class OAIPMHDocumentResolver(CouchDBDocProcessor):
     PAYLOAD_ERROR = "X_OAI-PMH-ERROR"
     ERR_CANNOT_DISSEMINATE_FORMAT = "Cannot Disseminate Format"
@@ -256,7 +259,7 @@ class oaipmh(harvest):
 #    def list_metadata_formats(self,identifier=None, by_doc_ID=False, by_resource_ID=True):
 #        opts = {}
 
-                
+
 
     
 if __name__ == "__main__":
