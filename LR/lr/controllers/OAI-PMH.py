@@ -459,7 +459,7 @@ class OaiPmhController(HarvestController):
             # If this is a special case where we are actually using OAI interface to serve basic harvest
             if params.has_key("metadataPrefix") and params["metadataPrefix"] == "LR_JSON_0.10.0":
                 if params.has_key("identifier") == True:
-                    params["request_ID"] = params["identifier"]
+                    params[self.REQUESTID] = params["identifier"]
                 if params.has_key("from") and isinstance(params["from"], datetime):
                     params["from"] = h.convertToISO8601Zformat(params["from"])
                 if params.has_key("until") and isinstance(params["until"], datetime):
