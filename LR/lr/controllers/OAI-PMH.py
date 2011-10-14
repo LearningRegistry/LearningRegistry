@@ -4,7 +4,7 @@ from pylons.controllers.util import abort, redirect
 
 from lr.controllers.harvest import HarvestController
 from lr.model import appConfig
-from lr.lib import helpers as h, oaipmherrors
+from lr.lib import helpers as h, oaipmherrors, oaipmh as o_mod
 from lr.lib.base import BaseController, render
 from lr.lib.oaipmh import oaipmh, OAIPMHDocumentResolver
 from datetime import datetime
@@ -60,6 +60,9 @@ class OaiPmhController(HarvestController):
             if req_params.has_key('metadataPrefix') == False:
                 raise BadArgumentError('metadataPrefix is a required parameter.', verb)
             params["metadataPrefix"] = metadataPrefix = req_params['metadataPrefix']
+            
+            if metadataPrefix != o_mod.getMetadataPrefix(metadataPrefix):
+                raise CannotDisseminateFormatError(verb)
         
         if verb == 'GetRecord' or verb == 'ListMetadataFormats':
             if req_params.has_key('by_doc_ID') and req_params.has_key('by_resource_ID'):
@@ -270,7 +273,7 @@ class OaiPmhController(HarvestController):
                     if doc is not None:
                         doc_idx += 1
                         
-                        if "payload_schema" in doc and params["metadataPrefix"] in doc["payload_schema"] and OAIPMHDocumentResolver.PAYLOAD_ERROR not in doc:
+                        if "payload_schema" in doc and params["metadataPrefix"] in map(lambda x: o_mod.getMetadataPrefix(x), doc["payload_schema"]) and OAIPMHDocumentResolver.PAYLOAD_ERROR not in doc:
                             valid_docs += 1
                         
                             if valid_docs == 1:

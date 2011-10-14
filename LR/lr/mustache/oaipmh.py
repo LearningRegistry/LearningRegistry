@@ -5,10 +5,34 @@ Created on Aug 15, 2011
 '''
 import pystache
 import re
-        
-        
-class ListIdentifiers(object):
+from xml.dom.minidom import Text
+
+
+
+class BaseRenderer(object):
     def __init__(self):
+        pass
+    
+    
+    def _render(self, template, context):
+        def xml_escape(text):
+            t = Text()
+            t.data = pystache.render(text, context)
+            return t.toxml("utf-8")
+            
+        def xml_quote(text):
+            t = Text()
+            t.data = pystache.render(text, context)
+            return '''"{0}"'''.format(t.toxml("utf-8"))
+        
+        context["xE"] = xml_escape
+        context["xQ"] = xml_quote
+        
+        return pystache.render(template, context)
+    
+class ListIdentifiers(BaseRenderer):
+    def __init__(self):
+        BaseRenderer.__init__(self)
         self.verb = "ListIdentifiers"
         self.template_prefix="""<?xml version="1.0" encoding="UTF-8"?>
     <OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
@@ -18,7 +42,7 @@ class ListIdentifiers(object):
       <responseDate>{{response_date}}</responseDate>
       <request  verb="{{verb}}" {{#identifier}}identifier="{{identifier}}"{{/identifier}} {{#from_date}}
                 from="{{from_date}}"{{/from_date}} {{#until_date}}until="{{until_date}}"{{/until_date}} {{#metadataPrefix}} 
-                metadataPrefix="{{metadataPrefix}}"{{/metadataPrefix}} {{#by_doc_ID}}
+                metadataPrefix={{#xQ}}{{{metadataPrefix}}}{{/xQ}}{{/metadataPrefix}} {{#by_doc_ID}}
                 by_doc_ID="{{by_doc_ID}}"{{/by_doc_ID}} {{#by_resource_ID}}by_resource_ID="{{by_resource_ID}}"{{/by_resource_ID}}>{{path_url}}</request>
       <{{verb}}>"""
       
@@ -28,6 +52,7 @@ class ListIdentifiers(object):
         
         self.template_rtoken = """{{#token}}<oai:resumptionToken>{{token}}</oai:resumptionToken>{{/token}}{{^token}}<oai:resumptionToken />{{/token}}"""
     
+
     def prefix(self, response_date, metadataPrefix, path_url, from_date=None, until_date=None):
 
         opts = { "response_date": response_date,
@@ -36,16 +61,16 @@ class ListIdentifiers(object):
                  "metadataPrefix": metadataPrefix,
                  "path_url": path_url,
                  "verb": self.verb }
-        return pystache.render(self.template_prefix, opts)
+        return self._render(self.template_prefix, opts)
         
     def doc(self, doc=None ):
-        return pystache.render(self.template_doc, doc)
+        return self._render(self.template_doc, doc)
 
     def resumptionToken(self, token=None):
-        return pystache.render(self.template_rtoken, { "token": token })
+        return self._render(self.template_rtoken, { "token": token })
 
     def suffix(self ):
-        return pystache.render(self.template_suffix, {"verb": self.verb})
+        return self._render(self.template_suffix, {"verb": self.verb})
         
         
 class ListRecords(ListIdentifiers):
@@ -63,7 +88,7 @@ class ListRecords(ListIdentifiers):
     {{#active}}<oai:metadata>{{{resource_data}}}</oai:metadata>{{/active}}
   </oai:record>{{/resource_data}}'''
         doc["node_timestamp"] = re.sub("\.[0-9]+Z", "Z", doc["node_timestamp"], count=1)
-        return pystache.render(template, doc)
+        return self._render(template, doc)
         
 
 class GetRecord(ListRecords):
@@ -80,7 +105,7 @@ class GetRecord(ListRecords):
                 "by_resource_ID": by_resource_ID,
                 "path_url": path_url,
                 "verb": self.verb }
-        return pystache.render(self.template_prefix, opts)
+        return self._render(self.template_prefix, opts)
     
     def doc(self, doc=None):
         template = '''{{#resource_data}}
@@ -92,9 +117,12 @@ class GetRecord(ListRecords):
     {{#active}}<oai:metadata>{{{resource_data}}}</oai:metadata>{{/active}}
   </record>{{/resource_data}}'''
         doc["node_timestamp"] = re.sub("\.[0-9]+Z", "Z", doc["node_timestamp"], count=1)
-        return pystache.render(template, doc)
+        return self._render(template, doc)
 
-class Error(object):
+class Error(BaseRenderer):
+    def __init__(self):
+        BaseRenderer.__init__(self)
+    
     def xml(self, err=None):
         template = '''<?xml version="1.0" encoding="UTF-8"?>
 <OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
@@ -116,9 +144,12 @@ class Error(object):
             if key in dir(err):
                 opts[key] = getattr(err,key)
 
-        return pystache.render(template, opts)
+        return self._render(template, opts)
     
-class ErrorOnly(object):
+class ErrorOnly(BaseRenderer):
+    def __init__(self):
+        BaseRenderer.__init__(self)
+    
     def xml(self, err=None):
         template = '''<error code="{{code}}">{{msg}}</error>'''
         opts = {
@@ -132,4 +163,4 @@ class ErrorOnly(object):
             if key in dir(err):
                 opts[key] = getattr(err,key)
 
-        return pystache.render(template, opts)
+        return self._render(template, opts)
