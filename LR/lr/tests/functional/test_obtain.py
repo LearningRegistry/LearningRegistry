@@ -25,17 +25,11 @@ class TestObtainController(TestController):
         self.ids = map(lambda doc: doc['doc_ID'],result['document_results'])
         self.resourceLocators = map(lambda doc: doc['resource_locator'],data['documents'])
         done = False
+        distributableIds = map(lambda id: id+'-distributable',self.ids)
         while not done:      
-            done = True  
-            for id in self.ids:
-                try:
-                    doc = self.db[id+'-distributable']
-                    done = done and True
-                except:
-                    done = done and False
+            view = self.db.view('_all_docs',keys=distributableIds)                
+            done = len(distributableIds) == len(view.rows)
             time.sleep(0.5)
-
-
         len(self.db.view('_design/learningregistry-resources/_view/docs'))
         len(self.db.view('_design/learningregistry-resource-location/_view/docs'))
     @classmethod

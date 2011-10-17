@@ -1,5 +1,6 @@
 from lr.tests import *
 import logging,json
+import time
 from datetime import datetime
 from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
@@ -24,24 +25,30 @@ class TestHarvestController(TestController):
         self.db = h.db                      
         global db
         db = self.db
-        result = app.post('/publish', params=json.dumps(data), headers=headers)
-        updateViews()
+        result = app.post('/publish', params=json.dumps(data), headers=headers)        
         result = json.loads(result.body)
         self.ids = map(lambda doc: doc['doc_ID'],result['document_results'])
         self.resourceLocators = map(lambda doc: doc['resource_locator'],data['documents'])
-        self.from_date = datetime(1990,1,1).isoformat()
-        self.from_date = self.from_date[0:self.from_date.rfind('.')]
-        self.from_date += 'Z'
-        self.until_date = datetime.utcnow().isoformat()
-        self.until_date = self.until_date[0:self.until_date.rfind('.')]
-        self.until_date += 'Z'
+        done = False
+        distributableIds = map(lambda id: id+'-distributable',self.ids)
+        while not done:      
+            view = self.db.view('_all_docs',keys=distributableIds)                
+            done = len(distributableIds) == len(view.rows)
+            time.sleep(0.5)        
+        updateViews()
     def test_empty(self):
         pass
     @classmethod
     def tearDownClass(self):
         for id in self.ids:
-            del self.db[id]
-            del self.db[id+'-distributable']
+            try:
+                del self.db[id]
+            except:
+                pass
+            try:
+                del self.db[id+'-distributable']
+            except:
+                pass
         updateViews()
         pass
     def validate_getrecord_response_base(self, response):
@@ -90,10 +97,11 @@ class TestHarvestController(TestController):
           record = doc['record']          
           assert record.has_key('resource_data')            
           resource = record['resource_data']
-          assert resource['node_timestamp'] >= self.from_date
+          nodeTimestamp = resource['node_timestamp']
+          print nodeTimestamp
           print self.until_date
-          print resource['node_timestamp']
-          assert resource['node_timestamp'] <= self.until_date
+          assert nodeTimestamp >= self.from_date
+          assert nodeTimestamp <= self.until_date
 
     def test_listrecords_get(self):
         response = self.app.get(url('harvest', id='listrecords'),params={'from':self.from_date,'until':self.until_date})
@@ -116,6 +124,8 @@ class TestHarvestController(TestController):
 
     def validate_listidentifiers_response(self, response):
         data = json.loads(response.body)
+        if not data['OK']:
+            print data
         assert data.has_key('OK') and data['OK']
         assert data.has_key('listidentifiers')
         assert len(data['listidentifiers']) > 0
