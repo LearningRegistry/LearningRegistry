@@ -158,7 +158,9 @@ class TestObtainController(TestController):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
         params['by_resource_ID'] = False
+        params['ids_only'] = True
         params['request_IDs'] = self.ids[0:2]
+        print params
         params = json.dumps(params)        
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.ids[0:2])
