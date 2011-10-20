@@ -59,16 +59,13 @@ class TestObtainController(TestController):
             "ids_only":False
         }
         return data
-    def _validateResponse(self,resp,requestData):
+    def _validateResponse(self,resp,requestData,testids):
         data = json.loads(resp.body)
         requestData = json.loads(requestData)
         assert(data['documents'])
         assert(len(data['documents'])>0) 
         for d in data['documents']:
-            if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
-                assert d['doc_ID'] in self.ids
-            else:
-                assert d['doc_ID'] in self.resourceLocators
+            assert d['doc_ID'] in testids
         return data
     def _validateError(self,error):
         data = json.loads(error)
@@ -77,14 +74,15 @@ class TestObtainController(TestController):
         params = self._getInitialPostData()
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
-        self._validateResponse(response,params)
+        self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
         # Test response...
     def test_create_ids_only(self):
         params = self._getInitialPostData()
         params['ids_only'] = True
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
-        self._validateResponse(response,params)
+        self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
+
     def test_flow_control_enabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.obtain.docid"]]
@@ -133,13 +131,13 @@ class TestObtainController(TestController):
         params['by_resource_ID'] = False
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
-        self._validateResponse(response,params)
+        self._validateResponse(response,params,self.db)
     def test_create_by_resource_id(self):
         params = self._getInitialPostData()
         del params['by_doc_ID']
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
-        self._validateResponse(response,params)        
+        self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
     def test_create_by_doc_id_and_by_resource_id(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
@@ -147,7 +145,7 @@ class TestObtainController(TestController):
         params['request_IDs'] = self.ids
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
-        self._validateResponse(response,params)
+        self._validateResponse(response,params,self.db)
     def test_create_by_doc_id_and_by_resource_id_fail(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = False
@@ -155,7 +153,15 @@ class TestObtainController(TestController):
         params['request_IDs'] = self.resourceLocators
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
-        self._validateResponse(response,params)
+        self._validateResponse(response,params,self.resourceLocators)
+    def test_create_by_doc_id_subset_of_ids(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = False
+        params['request_IDs'] = self.ids[0:2]
+        params = json.dumps(params)        
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        self._validateResponse(response,params,self.ids[0:2])
     def test_create_by_doc_id_and_by_resource_id_both_true(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
