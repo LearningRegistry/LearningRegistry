@@ -1,4 +1,5 @@
 import logging
+import urlparse
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
@@ -7,6 +8,7 @@ import lr.model as m
 from lr.lib.harvest import harvest
 import json
 from lr.model import LRNode as sourceLRNode
+from pylons.decorators.rest import restrict
 log = logging.getLogger(__name__)
 
 class SwordError(Exception):
@@ -18,10 +20,10 @@ class SwordserviceController(BaseController):
     def __init__(self):
         self.h = harvest()
     def __before__(self):
-        response.headers['content-type'] = 'application/atom+xml;charset=utf-8'
+        response.headers['Content-Type'] = 'application/atom+xml;charset=utf-8'
         self.parse_params()
     def index(self): 
-        c.collection_url = request.url
+        c.collection_url = urlparse.urljoin(self.baseUrl,'swordpub')
         if sourceLRNode.nodeDescription.node_name is not None:
             c.node_name = sourceLRNode.nodeDescription.node_name
         else:
@@ -36,6 +38,9 @@ class SwordserviceController(BaseController):
         c.user_agent = request.headers['user-agent']
         c.no_op = False
         c.verbose = False
+        #for some reason request.url has an extra '/' in it
+        lastSlash = request.url.rfind('/')        
+        self.baseUrl = request.url[:lastSlash]+request.url[lastSlash+1:]
         if request.headers.has_key('X-On-Behalf-Of'):
             c.on_behalf_of = request.headers['X-On-Behalf-Of']
         if request.headers.has_key('X-Verbose'):
@@ -43,7 +48,8 @@ class SwordserviceController(BaseController):
         if request.headers.has_key('X-No-Op'):
             c.no_op = request.headers['X-No-Op']
         c.tos_url = m.base_model.appConfig['tos.url']
-        c.generator_url = 'http://' + request.host + '/sword'
+        c.generator_url = self.baseUrl
+    @restrict("POST")
     def create(self):		
         if c.no_op:
             result = {'OK':True}
@@ -51,7 +57,7 @@ class SwordserviceController(BaseController):
         else:
             result = m.publish(json.loads(request.body))
         if result['OK']:
-            c.content_url = 'http://' + request.host + '/obtain/'+result['doc_ID']
+            c.content_url = urlparse.urljoin(self.baseUrl,'obtain') + '?request_id=%s&by_doc_ID=true' % result['doc_ID']
             c.doc = self.h.get_record(result['doc_ID'])			
             return render('sword-publish.mako')    
         else:
