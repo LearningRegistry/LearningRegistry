@@ -3,8 +3,10 @@ import json
 import urllib
 import logging
 from lr.lib.harvest import harvest
+import lr.lib.helpers as h
 from webtest import AppError
 import time
+from pylons import config
 log = logging.getLogger(__name__)
 headers={'Content-Type': 'application/json'}
 class TestObtainController(TestController):
@@ -20,9 +22,14 @@ class TestObtainController(TestController):
             app = controller.app  
         h = harvest()
         self.db = h.db              
-        result = app.post('/publish', params=json.dumps(data), headers=headers)        
+        self.server = h.server
+        result = app.post('/publish', params=json.dumps(data), headers=headers)                
         result = json.loads(result.body)
-        self.ids = map(lambda doc: doc['doc_ID'],result['document_results'])
+        self.ids = []
+        self.ids.extend(map(lambda doc: doc['doc_ID'],result['document_results']))
+        result = app.post('/publish', params=json.dumps(data), headers=headers)                
+        result = json.loads(result.body)
+        self.ids.extend(map(lambda doc: doc['doc_ID'],result['document_results']))
         self.resourceLocators = map(lambda doc: doc['resource_locator'],data['documents'])
         done = False
         distributableIds = map(lambda id: id+'-distributable',self.ids)
@@ -78,6 +85,48 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params)
+    def test_flow_control_enabled(self):
+        nodeDb = self.server[config["couchdb.db.node"]]
+        serviceDoc = nodeDb[config["lr.obtain.docid"]]
+        flowControlCurrent = serviceDoc['service_data']['flow_control']
+        serviceDoc['service_data']['flow_control'] = True
+        idLimit = None
+        if serviceDoc['service_data'].has_key('id_limit'):
+            idLimit = serviceDoc['service_data']['id_limit']
+        serviceDoc['service_data']['id_limit'] = 100
+        nodeDb[config["lr.obtain.docid"]] = serviceDoc
+        params = self._getInitialPostData()        
+        params['ids_only'] = True
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = False
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        result = json.loads(response.body)
+        serviceDoc['service_data']['flow_control'] = flowControlCurrent
+        if idLimit is None:
+            del serviceDoc['service_data']['id_limit']
+        else:
+            serviceDoc['service_data']['id_limit'] = idLimit
+        nodeDb[config["lr.obtain.docid"]] = serviceDoc
+        assert result.has_key('resumption_token')
+        assert len(result['documents']) == 100
+    def test_flow_control_disabled(self):
+        nodeDb = self.server[config["couchdb.db.node"]]
+        serviceDoc = nodeDb[config["lr.obtain.docid"]]
+        flowControlCurrent = serviceDoc['service_data']['flow_control']
+        serviceDoc['service_data']['flow_control'] = False
+        serviceDoc['service_data']['id_limit'] = 100
+        nodeDb[config["lr.obtain.docid"]] = serviceDoc
+        params = self._getInitialPostData()        
+        params['ids_only'] = True
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = False
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        result = json.loads(response.body)
+        serviceDoc['service_data']['flow_control'] = flowControlCurrent
+        nodeDb[config["lr.obtain.docid"]] = serviceDoc
+        assert not result.has_key('resumption_token')
     def test_create_by_doc_id(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
@@ -129,5 +178,7 @@ class TestObtainController(TestController):
         except AppError as ex:
             self._validateError(ex.message[ex.message.rfind('{'):])
             pass#expected error        
+
+
     def test_empty(self):
             pass

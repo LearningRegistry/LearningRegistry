@@ -1,6 +1,7 @@
 from lr.tests import *
 import logging,json
 import time
+from pylons import config
 from datetime import datetime
 from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
@@ -23,11 +24,16 @@ class TestHarvestController(TestController):
             app = controller.app  
         h = harvest()
         self.db = h.db                      
+        self.server = h.server
         global db
         db = self.db
         result = app.post('/publish', params=json.dumps(data), headers=headers)        
         result = json.loads(result.body)
-        self.ids = map(lambda doc: doc['doc_ID'],result['document_results'])
+        self.ids = []
+        self.ids.extend(map(lambda doc: doc['doc_ID'],result['document_results']))
+        result = app.post('/publish', params=json.dumps(data), headers=headers)        
+        result = json.loads(result.body)
+        self.ids.extend(map(lambda doc: doc['doc_ID'],result['document_results']))
         self.resourceLocators = map(lambda doc: doc['resource_locator'],data['documents'])
         done = False
         distributableIds = map(lambda id: id+'-distributable',self.ids)
@@ -102,7 +108,6 @@ class TestHarvestController(TestController):
           print self.until_date
           assert nodeTimestamp >= self.from_date
           assert nodeTimestamp <= self.until_date
-
     def test_listrecords_get(self):
         response = self.app.get(url('harvest', id='listrecords'),params={'from':self.from_date,'until':self.until_date})
         self.validate_listrecords_response(response)
@@ -153,6 +158,71 @@ class TestHarvestController(TestController):
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self._validate_error_message(response)
 
+    def test_listidentifiers_flow_control_enabled(self):
+        nodeDb = self.server[config["couchdb.db.node"]]
+        serviceDoc = nodeDb[config["lr.harvest.docid"]]
+        flowControlCurrent = serviceDoc['service_data']['flow_control']
+        serviceDoc['service_data']['flow_control'] = True
+        idLimit = None
+        if serviceDoc['service_data'].has_key('id_limit'):
+            idLimit = serviceDoc['service_data']['id_limit']
+        serviceDoc['service_data']['id_limit'] = 100
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        response = self.app.get(url('harvest', id='listidentifiers'))
+        result = json.loads(response.body)
+        serviceDoc['service_data']['flow_control'] = flowControlCurrent
+        if idLimit is None:
+            del serviceDoc['service_data']['id_limit']
+        else:
+            serviceDoc['service_data']['id_limit'] = idLimit
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        assert result.has_key('resumption_token')
+        assert len(result['documents']) == 100
+    def test_listidentifiers_flow_control_enabled(self):
+        nodeDb = self.server[config["couchdb.db.node"]]
+        serviceDoc = nodeDb[config["lr.harvest.docid"]]
+        flowControlCurrent = serviceDoc['service_data']['flow_control']
+        serviceDoc['service_data']['flow_control'] = False
+        serviceDoc['service_data']['id_limit'] = 100
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        response = self.app.get(url('harvest', id='listidentifiers'))
+        result = json.loads(response.body)
+        serviceDoc['service_data']['flow_control'] = flowControlCurrent
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        assert not result.has_key('resumption_token')
+
+    def test_listrecords_flow_control_enabled(self):
+        nodeDb = self.server[config["couchdb.db.node"]]
+        serviceDoc = nodeDb[config["lr.harvest.docid"]]
+        flowControlCurrent = serviceDoc['service_data']['flow_control']
+        serviceDoc['service_data']['flow_control'] = True
+        idLimit = None
+        if serviceDoc['service_data'].has_key('id_limit'):
+            idLimit = serviceDoc['service_data']['id_limit']
+        serviceDoc['service_data']['id_limit'] = 100
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        response = self.app.get(url('harvest', id='listrecords'))
+        result = json.loads(response.body)
+        serviceDoc['service_data']['flow_control'] = flowControlCurrent
+        if idLimit is None:
+            del serviceDoc['service_data']['id_limit']
+        else:
+            serviceDoc['service_data']['id_limit'] = idLimit
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        assert result.has_key('resumption_token')
+        assert len(result['documents']) == 100
+    def test_listrecords_flow_control_enabled(self):
+        nodeDb = self.server[config["couchdb.db.node"]]
+        serviceDoc = nodeDb[config["lr.harvest.docid"]]
+        flowControlCurrent = serviceDoc['service_data']['flow_control']
+        serviceDoc['service_data']['flow_control'] = False
+        serviceDoc['service_data']['id_limit'] = 100
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        response = self.app.get(url('harvest', id='listrecords'))
+        result = json.loads(response.body)
+        serviceDoc['service_data']['flow_control'] = flowControlCurrent
+        nodeDb[config["lr.harvest.docid"]] = serviceDoc
+        assert not result.has_key('resumption_token')
 
     def validate_identify_response(self, response):
         data = json.loads(response.body)
