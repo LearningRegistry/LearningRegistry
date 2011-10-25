@@ -26,6 +26,8 @@ def make_map(config):
             service_doc = h.getServiceDocument(service_doc_id)
             if service_doc is not None and service_doc["active"]:
                 map.resource(member_name, collection_name)
+                if member_name == 'swordservice':
+                    map.connect("/swordpub",controller='swordservice',action='create')
                 log.info("Enabling service route for: {0} member: {1} collection: {2}".format(service_doc_id, member_name, collection_name))
             else:
                 log.info("Service route for {0} is disabled".format(service_doc_id))
@@ -46,9 +48,8 @@ def make_map(config):
         mapResource('lr.harvest.docid','harvest','harvest')
         # Value added services
         mapResource('lr.oaipmh.docid', 'OAI-PMH', 'OAI-PMH')
-        mapResource('lr.sword.docid', 'swordservice','swordservice')
         mapResource('lr.slice.docid', 'slice', 'slice')
-    
+        mapResource('lr.sword.docid', 'swordservice','swordservice')    
     map.minimization = False
     map.explicit = False
 

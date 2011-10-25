@@ -109,8 +109,8 @@ class ObtainController(BaseController):
         return self._performObtain(data)
         # url('obtain')
     def _validateParams(self,data):
-        by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
-        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
+        by_doc_ID =data['by_doc_ID']
+        by_resource_ID = data['by_resource_ID']
         if not data.has_key("request_IDs"):        
             data['request_IDs'] = []
         if by_doc_ID and by_resource_ID:
@@ -144,7 +144,7 @@ class ObtainController(BaseController):
             yield ')'
     def create(self):
         """POST /obtain: Create a new item"""                
-        data = self._parseParams(json.loads(request.body))        
+        data = self._parseParams(json.loads(request.body))
         self._validateParams(data)
         return self._performObtain(data)
 
@@ -177,28 +177,30 @@ class ObtainController(BaseController):
         data['request_IDs'] = keys        
         return self._performObtain(data)
         # url('obtain', id=ID)
-    def _parseParams(self,inputParams):
+    def _parseParams(self,params):
         data = {
             'by_doc_ID':False,
             'by_resource_ID':True,
             'ids_only': False,
             'request_IDs': [],            
         }
-        if inputParams.has_key('by_doc_ID'):
-            data['by_doc_ID'] = inputParams['by_doc_ID'] in trues
-            if data['by_doc_ID']:
-                data['by_resource_ID'] = False
-        if inputParams.has_key('by_resource_ID'):            
-            data['by_resource_ID'] = inputParams['by_resource_ID'] in trues
-        if inputParams.has_key('ids_only'):
-            data['ids_only'] = inputParams['ids_only'] in trues
-        if inputParams.has_key('resumption_token'):
-            data['resumption_token'] = rt.parse_token('obtain',inputParams['resumption_token'])
+        if params.has_key('by_doc_ID') and params['by_doc_ID'] in trues:
+            data['by_doc_ID'] = True
+            data['by_resource_ID'] = False
+                    
+        if params.has_key('by_resource_ID'):            
+            data['by_resource_ID'] = params['by_resource_ID'] in trues
+        if params.has_key('ids_only'):
+            data['ids_only'] = params['ids_only'] in trues
+        if params.has_key('resumption_token'):
+            data['resumption_token'] = rt.parse_token('obtain',params['resumption_token'])
             log.debug(data['resumption_token'])
-        if inputParams.has_key('request_IDs'):
-            data['request_IDs'] = inputParams['request_IDs']
-        if inputParams.has_key('callback'):
-            data['callback'] = inputParams['callback']
+        if params.has_key('callback'):
+            data['callback'] = params['callback']
+        if params.has_key('request_ID'):
+            data['request_IDs'].append(params['request_ID'])
+        if params.has_key('request_IDs'):
+            data['request_IDs'].extend(params['request_IDs'])
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""
