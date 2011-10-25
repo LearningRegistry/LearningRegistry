@@ -1,7 +1,7 @@
 from StringIO import StringIO
 from iso8601.iso8601 import ParseError
 from lr.lib import helpers
-from lr.lib.oaipmh import oaipmh
+from lr.lib.oaipmh import oaipmh, getMetadataPrefix
 from lr.tests import *
 from lxml import etree
 from pylons import config
@@ -22,6 +22,8 @@ import time
 import unittest
 import urllib2
 import uuid
+from lr.util.testdata import getDC_v1_1, getTestDataForMetadataFormats
+from lr.util.decorators import PublishTestDocs
 
 json_headers={'content-type': 'application/json'}
 
@@ -474,6 +476,74 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")
         
+    @PublishTestDocs(getTestDataForMetadataFormats(1), "LMF-schema-syntax")
+    def test_listMetadataFormats_schema_format_syntax(self):
+        validPrefix = '''^[A-Za-z0-9\-_\.!~\*'\(\)]+$'''
+        
+        doc = self.test_data_sorted["LMF-schema-syntax"][0]
+        
+        def checkFormats(response):
+            self.validate_xml_content_type(response)
+            obj = self.parse_response(response)
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix/text()", namespaces=namespaces)
+            
+            assert len(metadataPrefixes) > 0, "Missing payload schemas in response:\n%s" % obj["raw"]
+            
+            for prefix in metadataPrefixes:
+                assert re.match(validPrefix, prefix) != None, "test_listMetadataFormats_schema_format_syntax: Bad metadataPrefix '%s'" % prefix
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
+        checkFormats(response)
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': doc["resource_locator"], 'by_doc_ID': 'false'})
+        checkFormats(response)
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': doc["doc_ID"], 'by_doc_ID': 'true'})
+        checkFormats(response)
+        
+    @PublishTestDocs(getTestDataForMetadataFormats(1), "GR-schema-syntax")
+    def test_getRecord_schema_format_syntax(self):
+        validPrefix = '''^[A-Za-z0-9\-_\.!~\*'\(\)]+$'''
+        
+        doc = self.test_data_sorted["GR-schema-syntax"][0]
+        
+        def checkFormats(response, expectValid):
+            self.validate_xml_content_type(response)
+            obj = self.parse_response(response)
+            if expectValid:
+                identifier = obj["etree"].xpath("/lr:OAI-PMH/lr:GetRecord/lr:record/oai:header/oai:identifier/text()", namespaces=namespaces)
+                assert len(identifier) > 0, "Expected a valid response, got this instead:\n%s" % obj["raw"]
+            else:
+                errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
+                assert len(errors) > 0, "Expected an error, got this instead:\n%s" % obj["raw"]
+        
+        assert len(doc["payload_schema"]) > 0, "test_getRecord_schema_format_syntax: Test data is missing payload_schema"
+        
+        for schema in doc["payload_schema"]:
+            if re.match(validPrefix, schema) == None:
+                valid = False
+                goodPrefix = getMetadataPrefix(schema)
+                assert re.match(validPrefix, goodPrefix) != None, "Prefix cleaner produced an invalid prefix: '%s'" % goodPrefix
+            else:
+                valid = True
+                goodPrefix = None
+            
+            response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': schema, 'identifier': doc["doc_ID"], 'by_doc_ID': 'true'})
+            checkFormats(response, valid)
+            
+            response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': schema, 'identifier': doc["resource_locator"], 'by_doc_ID': 'false'})
+            checkFormats(response, valid)
+            
+            if goodPrefix:
+                response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': goodPrefix, 'identifier': doc["doc_ID"], 'by_doc_ID': 'true'})
+                checkFormats(response, True)
+                
+                response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': goodPrefix, 'identifier': doc["resource_locator"], 'by_doc_ID': 'false'})
+                checkFormats(response, True)
+                
+            
+        
+
         
     def test_listMetadataFormats_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
