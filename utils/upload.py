@@ -23,7 +23,6 @@ _config = ConfigParser.ConfigParser()
 _config.read(args.config)
 root_path = _config.get("upload", "root_path")
 publish_url = _config.get("upload", "publish_url")
-publish_urls = ['http://lrdev1.learningregistry.org/publish','http://lrdev2.learningregistry.org/publish','http://lrdev3.learningregistry.org/publish']
 lr_test_data = args.lr_test_data.lower() in ["true", "t", "yes" "1"]
 
 if args.publish_url != None:
@@ -35,6 +34,11 @@ if args.data_dir != None:
 def upload_files(docs):
   try:
     data = json.dumps({'documents':docs})
+    password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    password_mgr.add_password(None, publish_url, "lrprod", "lrpr0d")
+    auth_handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+    opener = urllib2.build_opener(auth_handler)
+    urllib2.install_opener(opener)
     request = urllib2.Request(publish_url,data,{'Content-Type':'application/json; charset=utf-8'})
     response = urllib2.urlopen(request)
     with open('error.html','a') as out:
