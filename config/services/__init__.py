@@ -2,6 +2,8 @@
 import abc
 import pystache
 import types
+import urlparse
+import pprint
 
 class ServiceTemplate():
     __metaclass__ = abc.ABCMeta
@@ -31,7 +33,7 @@ class ServiceTemplate():
             "scope": "node",
             "active": "false",
             "service_id": None,
-            "service_type": "access",
+            "service_type": None,
             "service_name": None,
             "service_version": None,
             "node_endpoint": None,
@@ -65,6 +67,8 @@ class ServiceTemplate():
     
     def render(self, **kwargs):
         self.opts.update(self._optsoverride())
+       
+            
         funcs = []
         for key in self.opts.keys():
             if key in kwargs:
@@ -75,9 +79,13 @@ class ServiceTemplate():
                 
             if isinstance(self.opts[key], (types.FunctionType, types.MethodType) ):
                 funcs.append(key)
-        
+       
         for key in funcs:
             self.opts[key] = self.opts[key](**self.opts)
-                   
+        # Check to see if the service is using https so the service_https is
+        # set correctly
+        if urlparse.urlparse(self.opts["node_endpoint"]).scheme == "https":
+            self.opts["service_https"] ="true" 
+            
         return pystache.render(self.template, self.opts)
         
