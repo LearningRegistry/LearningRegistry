@@ -53,7 +53,7 @@ class __BasicObtainServiceTemplate(ServiceTemplate):
         opts = {
             "active": "false",
             "service_name": "Basic Obtain",
-            "service_version": "0.10.0",
+            "service_version": "0.21",
             "service_endpoint": "/obtain",
             "service_key": "false", 
             "service_https": "false",

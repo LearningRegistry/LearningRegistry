@@ -14,11 +14,12 @@
 
 import logging, urllib2, couchdb, json
 
-from pylons import request, response, session, tmpl_context as c, url
+from pylons import request, response, session, tmpl_context as c, url, config
 from pylons.controllers.util import abort, redirect
 
 from lr.lib.base import BaseController, render
 import lr.model as m
+import lr.lib.helpers as  h
 
 log = logging.getLogger(__name__)
 
@@ -34,8 +35,14 @@ class PublishController(BaseController):
 
     def create(self):
         data = json.loads(request.body)
-        results = map(m.publish,data['documents'])
-        return json.dumps({'OK':True, 'document_results':results})
+        doc_limit =  h.getServiceDocument(config['lr.publish.docid'])['service_data']['doc_limit']
+        num_docs = len(data['documents'])
+        if num_docs < doc_limit:
+            results = map(m.publish,data['documents'])
+            return json.dumps({'OK':True, 'document_results':results})
+        else:
+             return json.dumps({'OK':False, 
+                                        'error':"number of posted docs {0} exceeds doc limit: {1}".format(num_docs, str(doc_limit))})
         """POST /publisher: Create a new item"""
 
     def new(self, format='html'):
