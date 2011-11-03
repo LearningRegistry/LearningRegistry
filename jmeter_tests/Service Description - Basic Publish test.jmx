@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Obtain Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1315503257000</longProp>
+        <longProp name="ThreadGroup.end_time">1315503257000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="LRNodeAddress" elementType="Argument">
+              <stringProp name="Argument.name">LRNodeAddress</stringProp>
+              <stringProp name="Argument.value">lrtest02.learningregistry.org</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="LRNodePort" elementType="Argument">
+              <stringProp name="Argument.name">LRNodePort</stringProp>
+              <stringProp name="Argument.value">80</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="/services" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${LRNodeAddress}</stringProp>
+          <stringProp name="HTTPSampler.port">${LRNodePort}</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/services</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.implementation">Java</stringProp>
+          <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <BSFPostProcessor guiclass="TestBeanGUI" testclass="BSFPostProcessor" testname="BSF PostProcessor" enabled="true">
+            <stringProp name="scriptLanguage">javascript</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="script">function raiseError(txt) {
+	OUT.println(&quot;Caught Error: &quot;+txt);
+	AssertionResult.setFailureMessage(txt);
+	AssertionResult.setFailure(true);
+}
+
+//service name to search
+var expectedServiceName = &apos;Basic Publish&apos;;
+
+//expected return values
+var doc_type = &quot;service_description&quot;;
+var service_version = &quot;0.1&quot;;
+var service_name = &quot;Basic Publish&quot;;
+var service_type = &quot;publish&quot;;
+var doc_version = &quot;0.20.0&quot;;
+var service_endpoint = &quot;http://lrtest02.learningregistry.org/Basic Publish&quot;;
+var service_description = &quot;publish Basic Publish service&quot;;
+var active = true;
+var doc_scope = &quot;node222&quot;;
+var service_id = &quot;2aee3968385d4047ad3cc3b1fb17a7b0&quot;;
+
+//expected return values - service_data fields
+var schemalocation = &quot;http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd&quot;;
+var version = &quot;OAI-PMH 2.0&quot;;
+var flow_control = true;
+var doc_limit = 100;
+var id_limit = 100;
+
+//expected return values - service_auth fields
+var service_https = false;
+var service_key = false;
+var service_authz = null;
+
+//flags
+var foundService = false;
+var testPassed = false;
+
+
+eval(&apos;var json = &apos;+prev.getResponseDataAsString());
+
+try {
+	if (json.services) {
+		for (i=0; i&lt;json.services.length; i++) {
+
+			var serviceDocument = json.services[i];
+			var serviceName = serviceDocument[&quot;service_name&quot;];
+			if (serviceName == expectedServiceName)
+			{
+				foundService = true;
+				vars.put(&quot;-----SERVICE_NAME&quot;, expectedServiceName);
+
+				var doc_type_PASSED = serviceDocument[&quot;doc_type&quot;] == doc_type;
+				vars.put(&quot;doc_type_PASSED&quot;, doc_type_PASSED);
+
+				var service_version_PASSED = serviceDocument[&quot;service_version&quot;] == service_version;
+				vars.put(&quot;service_version_PASSED&quot;, service_version_PASSED);
+
+				var service_name_PASSED = serviceDocument[&quot;service_name&quot;] == service_name;
+				vars.put(&quot;service_name_PASSED&quot;, service_name_PASSED);
+					
+				var service_type_PASSED = serviceDocument[&quot;service_type&quot;] == service_type;
+				vars.put(&quot;service_type_PASSED&quot;, service_type_PASSED);
+
+				var doc_version_PASSED = serviceDocument[&quot;doc_version&quot;] == doc_version;
+				vars.put(&quot;doc_version_PASSED&quot;, doc_version_PASSED);
+
+				var service_endpoint_PASSED = serviceDocument[&quot;service_endpoint&quot;] == service_endpoint;
+				vars.put(&quot;service_endpoint_PASSED&quot;, service_endpoint_PASSED);
+
+				var service_description_PASSED = serviceDocument[&quot;service_description&quot;] == service_description;
+				vars.put(&quot;service_description_PASSED&quot;, service_description_PASSED);
+
+				var active_PASSED = serviceDocument[&quot;active&quot;] == active;
+				vars.put(&quot;active_PASSED&quot;, active_PASSED);
+
+				var doc_scope_PASSED = serviceDocument[&quot;doc_scope&quot;] == doc_scope;
+				vars.put(&quot;doc_scope_PASSED&quot;, doc_scope_PASSED);
+
+				var service_id_PASSED = serviceDocument[&quot;service_id&quot;] == service_id;
+				vars.put(&quot;service_id_PASSED&quot;, service_id_PASSED);
+
+				//service_data properties -----------------------------------------
+				var service_data = serviceDocument[&quot;service_data&quot;];
+
+				var schemalocation_PASSED = service_data[&quot;schemalocation&quot;] == schemalocation;
+				vars.put(&quot;schemalocation_PASSED&quot;, schemalocation_PASSED);
+
+				var version_PASSED = service_data[&quot;version&quot;] == version;
+				vars.put(&quot;version_PASSED&quot;, version_PASSED);
+
+				var flow_control_PASSED = service_data[&quot;flow_control&quot;] == flow_control;
+				vars.put(&quot;flow_control_PASSED&quot;, flow_control_PASSED);
+
+				var doc_limit_PASSED = service_data[&quot;doc_limit&quot;] == doc_limit;
+				vars.put(&quot;doc_limit_PASSED&quot;, doc_limit_PASSED);
+
+				var id_limit_PASSED = service_data[&quot;id_limit&quot;] == id_limit;
+				vars.put(&quot;id_limit_PASSED&quot;, id_limit_PASSED);
+
+
+				//service_auth properties ----------------------------------------
+				var service_auth = serviceDocument[&quot;service_auth&quot;];
+		
+				var service_https_PASSED = service_auth[&quot;service_https&quot;] == service_https;
+				vars.put(&quot;service_https_PASSED&quot;, service_https_PASSED);
+
+				var service_key_PASSED = service_auth[&quot;service_key&quot;] == service_key;
+				vars.put(&quot;service_key_PASSED&quot;, service_key_PASSED);
+
+				var service_authz_PASSED = service_auth[&quot;service_authz&quot;] == service_authz;
+				vars.put(&quot;service_authz_PASSED&quot;, service_authz_PASSED);
+
+				//all assertions PASSED???
+				testPassed = doc_type_PASSED &amp;&amp; service_version_PASSED &amp;&amp; service_name_PASSED &amp;&amp; service_type_PASSED &amp;&amp; doc_version_PASSED &amp;&amp; service_endpoint_PASSED &amp;&amp; service_description_PASSED &amp;&amp; active_PASSED &amp;&amp; doc_scope_PASSED &amp;&amp; service_id_PASSED &amp;&amp; schemalocation_PASSED &amp;&amp; version_PASSED &amp;&amp; flow_control_PASSED &amp;&amp; doc_limit_PASSED &amp;&amp; id_limit_PASSED &amp;&amp; service_https_PASSED &amp;&amp; service_key_PASSED &amp;&amp; service_authz_PASSED;
+				vars.put(&quot;-----TEST_PASSED&quot;, testPassed);
+			}			
+
+		}
+		if (!testPassed)
+		{
+			raiseError( &quot;TEST FAILED&quot; );
+		}
+		
+	} else {
+		//raiseError( &quot;Bad Reply&quot; );
+	}
+} catch (error) {
+	OUT.println(error);
+}
+
+
+//put in variables
+//vars.put(&quot;foundService2&quot;, foundService);
+
+</stringProp>
+          </BSFPostProcessor>
+          <hashTree/>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">1</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Debug Sampler" enabled="true">
+          <boolProp name="displayJMeterProperties">false</boolProp>
+          <boolProp name="displayJMeterVariables">true</boolProp>
+          <boolProp name="displaySystemProperties">false</boolProp>
+        </DebugSampler>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
