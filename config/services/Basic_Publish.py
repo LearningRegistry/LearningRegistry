@@ -1,7 +1,7 @@
 '''
-Created on Aug 16, 2011
+Created on Oct16, 2011
 
-@author: jklo
+@author: jpoyau
 '''
 from services import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
@@ -9,41 +9,39 @@ import pystache, uuid
 import json
 
 
+
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Basic Obtain?", "T", isBoolean)
+    active = getInput("Enable Basic Publish?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
+
     
-    active = getInput("Enable Basic Obtain Flow Control?", "F", isBoolean)
-    custom_opts["flow_control"] = active.lower() in YES
-    
-    if custom_opts["flow_control"]:
-        active = getInput("Maximum IDs to Return?", "100", isInt)
-        custom_opts["id_limit"] = int(active)
-        active = getInput("Maximum Docs to Return?", "100", isInt)
-        custom_opts["doc_limit"] = int(active)
-        
-        
+    active = getInput("Maximum documents the node will accepts?", "1000", isInt)
+    custom_opts["doc_limit"] = int(active)
+
+    active = getInput("Enter message size limit in octet. \n"+
+                    "This should the maximum publish data the the node  will accepts ", None, isInt)
+    custom_opts["msg_size_limit"] = int(active)
+
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __BasicObtainServiceTemplate()
+    
+    must = __BasicPublishServiceTemplate()
     config_doc = must.render(**custom_opts)
     print config_doc
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Basic Obtain service", doc)
-    print("Configured Basic Obtain service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+    PublishDoc(server, dbname,doc["service_type"]+":Basic Publish service", doc)
+    print("Configured Basic Publish service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 
 
 
-class __BasicObtainServiceTemplate(ServiceTemplate):
+class __BasicPublishServiceTemplate(ServiceTemplate):
     def __init__(self):
         ServiceTemplate.__init__(self)    
         self.service_data_template = '''{
-            "spec_kv_only": false,
-            "flow_control": {{flow_control}}{{#id_limit}},
-            "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
+            "msg_size_limit": {{msg_size_limit}}{{/msg_size_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}}
         }'''    
     
@@ -52,15 +50,14 @@ class __BasicObtainServiceTemplate(ServiceTemplate):
     def _optsoverride(self):
         opts = {
             "active": "false",
-            "service_name": "Basic Obtain",
-            "service_version": "0.21",
-            "service_endpoint": "/obtain",
+            "service_type": "publish",
+            "service_name": "Basic Publish",
+            "service_version": "0.23.0",
+            "service_endpoint": "/publish",
             "service_key": "false", 
             "service_https": "false",
-            "spec_kv_only": False,
-            "flow_control": False,
-            "id_limit": None,
-            "doc_limit":None
+            "doc_limit": None ,
+            "msg_size_limit": None
         }
         return opts
         
@@ -69,7 +66,7 @@ if __name__ == "__main__":
     
     nodeSetup = {
                  'couchDBUrl': "http://localhost:5984",
-                 'node_service_endpoint_url': "http://test.example.com"
+                 'nodeUrl': "http://test.example.com"
     }
     
     def doesNotEndInSlash(input=None):
