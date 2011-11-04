@@ -6,7 +6,7 @@ import time
     
 import json
 from pylons.configuration import config
-from urllib2 import urlopen
+from urllib2 import urlopen, quote
 
 #json_headers={'Content-Type':'application/json; charset=utf-8'}
 json_headers={'content-type': 'application/json'}
@@ -92,9 +92,14 @@ def DataCleaner(testName, type="Basic"):
                    }
         return testDoc
     
-    
+    #{"tag": "grade 8"}
+    #http://127.0.0.1:5984//resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key={"tag": "lr-test-data-slice-jbrecht"}
     def removeTestData(obj):
-        response = urlopen(obj.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key=\""+obj.testDataKey+"\"")
+        #{"tag": "lr-test-data-slice-jbrecht"}
+        del_key = quote("{\"tag\": \""+obj.testDataKey+"\"}")
+        print("del_key: " + del_key)
+        print("del response call: " + obj.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key="+del_key)
+        response = urlopen(obj.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key="+del_key)
         body = response.read()
         data = json.loads(body) 
         rows = data["rows"]
@@ -236,6 +241,7 @@ class TestSlicesController(TestController):
         parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         data = json.loads(response.body) 
+        print "data is: " + str(data)
         docs = data["documents"]
         if len(docs) != 9*DATA_MULTIPLIER :
             print "assert will fail in test_by_date. len(docs): " + str(len(docs))
