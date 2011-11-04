@@ -4,7 +4,7 @@ function(doc) {
 	
 	var date_stamp = doc.node_timestamp;
 	date_stamp = date_stamp.substring(0,10);
-	var people = new Array();
+	var identities = new Array();
 	
 	var arrayContains = function(testArray, testValue) {
 		for each(var val in testArray) {
@@ -13,36 +13,36 @@ function(doc) {
 		return false;
 	}	
 	
-	//grab all the people in identity or submitter (depending on version)
+	//grab all the identities in identity or submitter/curator/owner/signer (depending on version)
 	if(doc.identity) {
-		if(doc.identity.submitter) people.push(doc.identity.submitter.toLowerCase());
-		if(doc.identity.curator) people.push(doc.identity.curator.toLowerCase());
-		if(doc.identity.owner) people.push(doc.identity.owner.toLowerCase());
-		if(doc.identity.signer) people.push(doc.identity.signer.toLowerCase());
+		if(doc.identity.submitter) identities.push(doc.identity.submitter.toLowerCase());
+		if(doc.identity.curator) identities.push(doc.identity.curator.toLowerCase());
+		if(doc.identity.owner) identities.push(doc.identity.owner.toLowerCase());
+		if(doc.identity.signer) identities.push(doc.identity.signer.toLowerCase());
 	}
-	if(doc.submitter) people.push(doc.submitter.toLowerCase());
+	if(doc.submitter) identities.push(doc.submitter.toLowerCase());
 	
 
-	//build people indices
-	for each(person in people) {
-		emit(person, null);
+	//build identities indices
+	for each(identity in identities) {
+		emit({'id':identity}, null);
 	}
 	
 	//build date indices
-	emit(date_stamp, null);
-	for each(person in people) {
-		emit([date_stamp, person], null);
+	emit({'date':date_stamp}, null);
+	for each(identity in identities) {
+		emit([{'date':date_stamp}, {'id':identity}], null);
 	}
 	
 	//build
 	var emitaAllKeywordIndices = function(value) {
-		emit(value, null);
-		for each(person in people) {
-			emit([person, value], null);
+		emit({'tag':value}, null);
+		for each(identity in identities) {
+			emit([{'id':identity}, {'tag':value}], null);
 		}
-		emit([date_stamp, value], null);
-		for each(person in people) {
-			emit([date_stamp, person, value], null);
+		emit([{'date':date_stamp}, {'tag':value}], null);
+		for each(identity in identities) {
+			emit([{'date':date_stamp}, {'id':identity}, {'tag':value}], null);
 		}
 	}
 

@@ -6,7 +6,7 @@ import time
     
 import json
 from pylons.configuration import config
-from urllib2 import urlopen
+from urllib2 import urlopen, quote
 from lr.lib import helpers as helpers
 
 json_headers={'content-type': 'application/json'}
@@ -123,6 +123,7 @@ def DataCleaner(testName, type="Basic"):
                    }
         return testDoc
     
+
     #attempt to delete all test data. get a list of doc ids to be deleted by slicing for the signature test
     #data key. then attempt to delete a doc having each id and each id+"-distributable". A single pass at
     #this can fail to delete many docs, but the exception message thrown is empty so it is not yet known
@@ -136,8 +137,10 @@ def DataCleaner(testName, type="Basic"):
             deleteFail = 0
             deleteDistributableFail = 0
             print "delete attempt: " + str(deleteAttempts)
-            
-            response = urlopen(obj.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key=\""+obj.testDataKey+"\"")
+            del_key = quote("{\"tag\": \""+obj.testDataKey+"\"}")
+            print("del_key: " + del_key)
+            print("del response call: " + obj.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key="+del_key)
+            response = urlopen(obj.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?reduce=false&key="+del_key)
             data = json.loads(response.read()) 
             rows = data["rows"]
             print "rows of data to delete: " + str(len(rows))
