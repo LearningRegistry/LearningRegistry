@@ -1,0 +1,35 @@
+#!/usr/bin/python
+
+from pylons import *
+from lr.lib import ModelParser, helpers as h
+from uuid import uuid4
+import pprint 
+import logging
+
+import lr.model as m
+from lr.tests import *
+
+
+log = logging.getLogger(__name__)
+
+if __name__=="__main__":
+
+    from optparse import OptionParser
+    
+    parser = OptionParser()
+    
+    praser.add_option("-u", "couch_url",  dest=couchdbURl, 
+                                help="URL of couchdb database")
+                                
+    parser.add_option("-d", "--dump_config",  dest="dumpConfig", 
+                                 action="store_true", default=False,
+                                  help="dump node configuration")
+                   
+    parser.add_option("-o", "--output", dest="filepath", 
+                      help="Path to output dump",
+                      metavar="FILE")
+                      
+    (options, args) = parser.parse_args()
+     
+    if options.dumpConfig:
+        pprint.pformat(m.getNodeConfig())
