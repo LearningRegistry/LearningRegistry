@@ -181,10 +181,41 @@ class SliceController(BaseController):
                 dates = [params[START_DATE]]
         identity = params[IDENTITY].lower()
         any_tags = params[ANY_TAGS].lower()
+        
         param_count = params['param_count']
         
         if any_tags != "" :
             any_tag_list = any_tags.split(",")
+            wrapped_any_tag_list = []
+            for tag in any_tag_list:
+                try:
+                    #tag = "{\"tag\":\""+tag+"\"}"
+                    tag = {"tag":tag}
+                    wrapped_any_tag_list.append(tag)
+                    print("wrapped tag: " + str(tag))
+                except:
+                    print("failed to wrap tag: " + str(tag))
+                    pass
+            any_tag_list = wrapped_any_tag_list
+        if(identity != ""):
+            try:
+                #identity = "{\"tag\":\""+identity+"\"}"
+                identity = {"id":identity}
+                print("wrapped identity: " + str(identity))
+            except:
+            	pass
+        
+        wrapped_dates = []
+        for date in dates:
+            try:
+                #date = "{\"tag\":\""+date+"\"}"
+                date = {"date":date}
+                wrapped_dates.append(date)
+                print("wrapped date: " + str(date))
+            except:
+                print("failed to wrap date: " + str(date))
+                pass
+        dates = wrapped_dates
         
         if param_count == 1:
             if len(dates)>0 :
@@ -212,6 +243,7 @@ class SliceController(BaseController):
                 for date in dates:
                     keys.append([date, identity, tag])
          
+        print("final slice keys: " + str(keys))
         return keys
     
     
@@ -232,7 +264,7 @@ class SliceController(BaseController):
         
     def format_data(self,keys_only,docs, keys, forceUnique, current_rt=None):
         sentIDs = []
-        prefix = '{"replyStart":"'+str(datetime.today())+'", "keyCount":'+str(len(keys)) +', "documents":[\n'
+        prefix = '{"documents":[\n'
         num_sent = 0
         doc_count = 0
         if docs is not None:
@@ -272,7 +304,7 @@ class SliceController(BaseController):
 
         
 
-        yield '\n],'+rt+'"resultCount":'+str(maxResults) +', "replyEnd":"'+str(datetime.today())+'"}'
+        yield '\n],'+rt+'"resultCount":'+str(maxResults) +'}'
         
 # if __name__ == '__main__':
 # param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
