@@ -69,7 +69,7 @@ class TestHarvestController(TestController):
         data = self.validate_getrecord_response_base(response)         
         for doc in data['getrecord']['record']:
           assert doc.has_key('resource_data')
-          assert doc['resource_data']['_id'] == targetId
+          assert doc['resource_data']['doc_ID'] == targetId
 
     def validate_getrecord_response_resource_id(self, response, resourceLocator):
         data = self.validate_getrecord_response_base(response)

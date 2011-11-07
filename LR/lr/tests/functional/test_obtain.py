@@ -66,6 +66,12 @@ class TestObtainController(TestController):
         assert(len(data['documents'])>0) 
         for d in data['documents']:
             assert d['doc_ID'] in testids
+            if not requestData.has_key('ids_only') or (requestData.has_key('ids_only') and not requestData['ids_only']):
+                for doc in d['document']:
+                    if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
+                        assert doc['doc_ID'] == d['doc_ID']
+                    else:
+                        assert doc['resource_locator'] == d['doc_ID']
         return data
     def _validateError(self,error):
         data = json.loads(error)
@@ -187,6 +193,13 @@ class TestObtainController(TestController):
             self._validateError(ex.message[ex.message.rfind('{'):])
             pass#expected error        
 
-
+    def test_create_by_doc_id_and_by_resource_id_empty(self):
+        params = self._getInitialPostData()
+        del params['by_doc_ID']
+        del params['by_resource_ID']
+        params['request_IDs'] = self.resourceLocators
+        params = json.dumps(params)
+        response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
+        self._validateResponse(response,params,self.resourceLocators)        
     def test_empty(self):
             pass
