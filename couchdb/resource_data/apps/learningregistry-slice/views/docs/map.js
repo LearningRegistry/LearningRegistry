@@ -60,9 +60,9 @@ function(doc) {
 	  }
 	
 	for each(var schema in doc.payload_schema) {
-		emitaAllKeywordIndices(schema);
+		emitaAllKeywordIndices(schema.toLowerCase());
 	}
 	
-	if(doc.resource_data_type) emitaAllKeywordIndices(doc.resource_data_type);
+	if(doc.resource_data_type) emitaAllKeywordIndices(doc.resource_data_type.toLowerCase());
 	
 }
