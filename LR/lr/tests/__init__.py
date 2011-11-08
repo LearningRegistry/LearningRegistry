@@ -33,5 +33,5 @@ class TestController(TestCase):
         self.app = TestApp(wsgiapp)
         url._push_object(URLGenerator(config['routes.map'], environ))
         TestCase.__init__(self, *args, **kwargs)
-        self.from_date = datetime(1990,1,1).isoformat()+ "Z" 
-        self.until_date = datetime.utcnow().isoformat()+ "Z" 
+        self.from_date = datetime(1990,1,1).isoformat() + "Z"
+        self.until_date = datetime.utcnow().isoformat()+"Z"

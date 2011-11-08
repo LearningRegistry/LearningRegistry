@@ -7,8 +7,9 @@ from lr.model.base_model import appConfig
 
 log = logging.getLogger(__name__)
 class harvest:
-  def __init__(self, server=appConfig['couchdb.url'], database='resource_data'):
+  def __init__(self, server=appConfig['couchdb.url'], database=appConfig['couchdb.db.resourcedata']):
     couchServer = couchdb.Server(server)
+    self.server = couchServer
     self.db = couchServer[database]
     self.db_url = '/'.join([server,database])
   def __parse_date(self,date):

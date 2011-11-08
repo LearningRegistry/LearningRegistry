@@ -12,6 +12,7 @@ import lr.lib.resumption_token as rt
 log = logging.getLogger(__name__)
 import ast
 import string
+
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
 BASIC_HARVEST_SERVICE_DOC = appConfig['lr.harvest.docid']
@@ -37,8 +38,6 @@ class HarvestController(BaseController):
                 limit_type = 'id_limit'
                 if full_docs:
                     limit_type = "doc_limit"
-                log.error(serviceData)
-                log.error(serviceData[limit_type])
                 if self.enable_flow_control and limit_type in serviceData:
                     self.limit = serviceData[limit_type]
                 elif self.enable_flow_control:
@@ -67,7 +66,7 @@ class HarvestController(BaseController):
           data = self.get_base_response(verb,body)
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
-          if not params.has_key(self.REQUESTID):
+          if not params.has_key(self.REQUESTID) and not params.has_key(self.REQUESTID.lower()):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)
@@ -75,7 +74,10 @@ class HarvestController(BaseController):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)          
-          request_id = params[self.REQUESTID]
+          if params.has_key(self.REQUESTID):
+            request_id = params[self.REQUESTID]
+          elif params.has_key(self.REQUESTID.lower()):
+            request_id = params[self.REQUESTID.lower()]
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
