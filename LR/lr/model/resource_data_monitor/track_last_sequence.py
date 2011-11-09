@@ -25,6 +25,7 @@ class TrackLastSequence(BaseChangeThresholdHandler):
                     countThreshold=25, timeThreshold=timedelta(seconds=60)):
         BaseChangeThresholdHandler.__init__(self, countThreshold, timeThreshold)
         self._sequenceChangeDocId =sequenceChangeDocId
+        self._lastSavedSequence = None
 
     def _initLastSavedSequence(self, database):
         if hasattr(self, '_lastSavedSequence'):
@@ -71,5 +72,8 @@ class TrackLastSequence(BaseChangeThresholdHandler):
     def _handle(self, change, database):
         # Save the sequence before the last to ensure that all the change before
         # the save sequence number has been already processed.
-        self._saveSequence(change['last_seq'], database)
+        try:
+            self._saveSequence(change['last_seq'], database)
+        except:
+            log.error(change)
    
