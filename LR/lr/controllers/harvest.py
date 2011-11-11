@@ -87,9 +87,7 @@ class HarvestController(BaseController):
           else:
             records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
           if len(records) == 0:
-            data['OK'] = False
-            data['error'] = 'idDoesNotExist'
-            return json.dumps(data)            
+            abort(500,'idDoesNotExist')
           data['getrecord'] ={
             'record': records
           }
