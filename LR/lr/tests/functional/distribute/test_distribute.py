@@ -1,279 +1,226 @@
-#from pylons import config
+#!/usr/bin/env python
+#    Copyright 2011 Lockheed Martin
+#
+'''
+Created on Nov 11, 2011
 
-import ConfigParser
-import couchdb
-from node_config import services, lrnodetemplate as nodeTemplate, setup_utils, couch_utils
-from node_config.setup_node import publishNodeConnections
+@author: jpoyau
+'''
+from lr_node import Node
+
 import os
 from os import path
-import uuid
+import ConfigParser
 import json
-import urllib2
-import urlparse
-from node_config.services.Resource_Data_Distribution import __ResourceDataDistributionServiceTemplate as DistributeServiceTemplate
-import subprocess
-from lr.lib import helpers as h
-from datetime import datetime
-
-import logging
-
-log = logging.getLogger(__name__)
+from time import sleep
 
 _PWD = path.abspath(path.dirname(__file__))
-_PYLONS_CONFIG = path.abspath(path.join(_PWD, "../../../../development.ini.orig"))
-_RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchdb/resource_data/apps/filtered-replication"))
 _TEST_DATA_PATH = path.abspath(path.join(_PWD, "../../data/nsdl_dc/data-000000000.json"))
+_TEST_NODE_CONFIG_DIR = path.abspath(path.join(_PWD, "config"))
 
-            
-
-class Node(object):
-    _CONFIG_DATABASE_NAMES=["community", "network", "node", "resourcedata"]
-    _RESOURCE_DATA_FILTER = """
-        function(doc , req)
-        {
-            if (doc.doc_type == "resource_data")
-            {
-                return true;
-            }
-            return false;
-        }
-    """
-    def __init__(self, nodeConfig, nodeName, communityId, networkId):
-        self._nodeConfig = nodeConfig
-        self._nodeName = nodeName
-        self._pylonsConfigPath = path.abspath(path.join(path.dirname(_PYLONS_CONFIG),
-                                                                        self._nodeName+"_config.ini"))
-        self._setupPylonsConfig()
-        self._setupDescriptions()
-        self._setupNode()
-        self._setupDistributeService()
-        self.setNodeId(nodeName)
-        self.setCommunityId(communityId)
-        self.setNetworkId(networkId)
-
-    #def __del__(self):
-        #self.stop()
-        #self.clear()
-
-    def _getNodeDatabaseList(self):
-        return [self._nodeConfig.get("couch_info", db) for db in self._CONFIG_DATABASE_NAMES]
-
-    def _getNodeUrl(self):
-        return self._nodeConfig.get("node_config", "node_url")
-
-    def _setupDescriptions(self):
-        #  Set the node, network and community
-        self._communityDescription = dict(nodeTemplate.community_description)
-        self._networkDescription = dict(nodeTemplate.network_description)
-        self._nodeDescription = dict (nodeTemplate.node_description) 
+class TestDistribute(object):
     
-    def _setupNode(self):
-        #create the couch db databases
-        self._server = couchdb.Server(url=self._nodeConfig.get("couch_info", "server"))
-        setup_utils.CreateDB(self._server,  dblist=self._getNodeDatabaseList(), deleteDB=True)
-        policy = dict(nodeTemplate.network_policy_description)
-        setup_utils.PublishDoc(self._server, 
-                                            self._nodeConfig.get("couch_info", "network"), 
-                                            'network_policy_description', policy)
-        #Push the filter design document for the ressource_data.
-        couch_utils.pushCouchApp(_RESOURCE_DATA_FILTER_APP,  
-                                        urlparse.urljoin(self._nodeConfig.get("couch_info", "server"),
-                                                                 self._nodeConfig.get("couch_info", "resourcedata")))
-        #Get the filter for distributable and change to filter resource_data
-        resourceDataDB = self._server[self._nodeConfig.get("couch_info", "resourcedata")]
-        doc = resourceDataDB["_design/"+_RESOURCE_DATA_FILTER_APP.split("/")[-1]]
-        doc["filters"]["replicated_resource_data_filter"] = \
-                    doc["filters"]["replication_filter"].replace("resource_data_distributable", "resource_data")
-        doc["filters"]["resource_data_filter"] = self._RESOURCE_DATA_FILTER
-        resourceDataDB.update([doc])
-        
-        
-    def _setupDistributeService(self):
-        custom_opts = {}
-        custom_opts["node_endpoint"] = self._getNodeUrl()
-        custom_opts["service_id"] = uuid.uuid4().hex
-        custom_opts["active"] = True
-        
-        must = DistributeServiceTemplate()
-        config_doc = must.render(**custom_opts)
-
-        doc = json.loads(config_doc)
-        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node") ,
-                          doc["service_type"]+":Resource Data Distribution service", doc)
-
-    def _setupPylonsConfig(self):
-        #Read the original configuration and update with the test node data.
-        pylonsConfig = ConfigParser.ConfigParser()
-        pylonsConfig.read(_PYLONS_CONFIG)
-
-        #Set the couchdb database info
-        for database in self._CONFIG_DATABASE_NAMES:
-            pylonsConfig.set("app:main", "couchdb.db.{0}".format(database),
-                                       self._nodeConfig.get("couch_info" , database))
-
-        #Set the port number and url.
-        for option in self._nodeConfig.options("pylons_server"):
-            pylonsConfig.set("server:main", option, self._nodeConfig.get("pylons_server", option))
+    @classmethod 
+    def setupClass(cls):
+        # For now grab the two node configuration files one source and one destination.
+        # To test distribute.
+        cls._NODES = []
+        for c in os.listdir(_TEST_NODE_CONFIG_DIR):
+            config = ConfigParser.ConfigParser()
+            config.read(path.join(_TEST_NODE_CONFIG_DIR, c))
+            cls._NODES.append(Node(config, "Test_Node_{0}".format(len(cls._NODES)+1)))
     
-        #Add the distribute_sink_url
-        pylonsConfig.set("app:main", "distribute_sink_url",  
-                                    urlparse.urljoin(self._nodeConfig.get("couch_info", "server"),
-                                                           self._nodeConfig.get("couch_info", "resourcedata")))
-        configFile = open(self._pylonsConfigPath, 'w')
-        pylonsConfig.write(configFile)
-        configFile.close()
-    
-    def setCommunityId(self, community):
-        self._communityDescription["community_id"]= community
-        self._communityDescription["community_name"] = community
-        self._communityDescription["community_description"] = community
-        self._networkDescription["community_id"] = community
-        self._nodeDescription["community_id"] = community
-        
-        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node"),  
-                                            self._nodeDescription["doc_type"] , 
-                                            self._nodeDescription)
-                                            
-        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "network"),
-                                            self._networkDescription["doc_type"], 
-                                            self._networkDescription)
-        
-        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "community"),
-                                            self._communityDescription["doc_type"], 
-                                            self._communityDescription)
+    @classmethod
+    def tearDownClass(cls):
+        for node in cls._NODES:
+            node.tearDown()
 
-    def setNetworkId(self, network):
-        self._networkDescription["network_name"] = network
-        self._networkDescription["network_description"] = network
-        self._networkDescription["network_id"] = network
-        self._nodeDescription["network_id"] = network
+    def __init__(self):
+        self._sourceNodes = []
+        self._destinationNodes = []
+
+
+    def setUp(self):
+        for node in self._NODES:
+            node.stop()
+            node.resetResourceData()
        
-        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node"),  
-                                            self._nodeDescription["doc_type"] , 
-                                            self._nodeDescription)
-                                            
-        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "network"),
-                                            self._networkDescription["doc_type"], 
-                                            self._networkDescription)
-    
-    def setNodeId(self, nodeName):
-       self._nodeDescription["node_id"] =  uuid.uuid4().hex
-       self._nodeDescription["node_name"] = nodeName
-       self._nodeDescription["node_description"] = nodeName
-       self._nodeDescription["node_admin_identity"] = "testNode@admin.distribute"
-       
-       setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node"),  
-                                        self._nodeDescription["doc_type"] , 
-                                        self._nodeDescription)
-
-    def publishResourceData(self, docs):
-        resourceDatabase = self._server[self._nodeConfig.get("couch_info", "resourcedata")]
-        for d in docs:
-            doc = {}
-            doc.update(d)
-            #delete any previous revision number for the docs
-            del doc['_rev']
-            doc['doc_ID'] = uuid.uuid4().hex
-            now = datetime.utcnow().isoformat()+"Z"
-            doc['node_timestamp'] = now
-            doc['create_timestamp'] = now
-            doc['update_timestamp']  = now
-            resourceDatabase[doc['doc_ID']] = doc
-    
-    def addConnections(self, connections):
-        publishNodeConnections(self._getNodeUrl(), self._server, 
-                                                self._nodeConfig.get("couch_info", "node"),
-                                                self._nodeName, connections)  
-    
-    def distribute(self):
-        if hasattr(self, '_pylonsProcess'):
-            data = json.dumps({"dist":"dist"})
-            request = urllib2.Request(urlparse.urljoin(self._getNodeUrl(), "distribute"), 
-                                                    data,
-                                                    {'Content-Type':'application/json; charset=utf-8'})
-            response = urllib2.urlopen(request) 
-
-    def compareDistributedResources(self, destination, 
-                                                            sourceNodeComparisonFilter="filtered-replication/resource_data_filter",
-                                                            filterArgs={}):
-        """This method considered this node as source node.
-        It compares its resource_data document with the destionation node to
-        verify that data was distributed.  This comparison assumes that distribute/
-        replication is done and that there is no other additions or deletions the
-        nodes that are being compared"""
-        sourceDatabase = self._server[self._nodeConfig.get("couch_info", "resourcedata")]
-        destinationDatabase = destination._server[destination._nodeConfig.get("couch_info", "resourcedata")]
         
-        #For source node get all the resource_data documents using the filter
-        # that was using to distribute the document to destination node.
-        sourceResults = sourceDatabase.changes(**{"filter": sourceNodeComparisonFilter,
-                                                                                  "include_docs":True,
-                                                                                   "query_params":filterArgs})["results"]
-        #Get all the resource_data of hte destionation node.
-        destinationResults = destinationDatabase.changes(**{"filter":"filtered-replication/resource_data_filter",
-                                                                                                "include_docs":True})["results"] 
+    def _setupNodePair(self, sourceNode, destinationNode, 
+                                    sourceCommunityId="DistributeTestCommunity",
+                                    destinationCommunityId="DistributeTestCommunity",
+                                    sourceNetworkId="DistributeTestNetwork",
+                                    destinationNetworkId="DistributeTestNetwork",
+                                    sourceIsSocialCommunity=True,
+                                    destinationIsSocialCommunity=True,
+                                    sourceIsGateway = False,
+                                    destinationIsGateway = False,
+                                    sourceIsActive = True,
+                                    destinationIsActive = True,
+                                    destinationFilter = None,
+                                    isGatewayConnection=None):
+        #Set the community id
+        sourceNode.setCommunityInfo(sourceCommunityId, sourceIsSocialCommunity)
+        destinationNode.setCommunityInfo(destinationCommunityId, destinationIsSocialCommunity)
         
-        #check the number of source document is the same at destination.
-        #otherwise the nodes resource distribution failed somehow.
-        if len(destinationResults) != len(sourceResults):
-            return False
+        #set the network id
+        sourceNode.setNetworkInfo( sourceNetworkId)
+        destinationNode.setNetworkInfo(destinationNetworkId)
+        
+        #set gateway info.
+        sourceNode.setNodeInfo(isGateway=sourceIsGateway, isActive=sourceIsActive)
+        destinationNode.setNodeInfo(isGateway=destinationIsGateway, isActive=destinationIsActive)
+        
+        #set destination node filter
+        if(destinationFilter is not None):
+            destinationNode.setFilterInfo(**destinationFilter)
+        
+        #add the destination node as connection to the source node.
+        if isinstance(isGatewayConnection, bool):
+            sourceNode.addConnectionTo(destinationNode._getNodeUrl(). gatewayConnection)
+        else:
+            sourceNode.addConnectionTo(destinationNode._getNodeUrl(), (sourceIsGateway and destinationIsGateway))
+
+    def _doDistributeTest(self, sourceNode, destinationNode):
+        #start the node nodes.
+        sourceNode.start()
+        destinationNode.start()
+        sleep(30)
+        #Do the distribute
+        sourceNode.distribute()
+        # Wait for two minutes or that that all the document and be transfer to test that
+        # there are indeed distributed correctly
+        sleep(30)
+        
+    def test_common_nodes_same_network_community_no_filter(self):
+        """ This tests distribute/replication between to common nodes on the same
+            network.  There is no filter on the destination node. Distribution/replication 
+            is expected to the successful.
+        """
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode )
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
+        assert sourceNode.compareDistributedResources(destinationNode), \
+                    """Distribute between two common nodes on the same network and 
+                    community and no filter on the destination node."""
+
+
+    def test_gatewaynodes_on_different_open_communities(self):
+        """ This tests distribute/replication between to gateway nodes on different
+            networks and community.  There is no filter on destination node.
+            Distribution/replication is expected to be successful.
+        """
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        sourceCommunityId="Test Source Community",
+                                        destinationNetworkId="Test Source Network",
+                                        sourceIsGateway =True,
+                                        destinationIsGateway=True )
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
+        assert sourceNode.compareDistributedResources(destinationNode), \
+                    """Distribute between two gateway nodes on different community
+                    and network and no filter on the destination node."""
+
+
+    def test_gatewaynodes_on_same_communities_different_network(self):
+        """ This tests distribute/replication between to gateway nodes on the same
+            communities but different network.  There is no filter on the destionation node.
+             Distribution/replication is expected to 
+            be successful.
+        """
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        destinationNetworkId="Test Source Network",
+                                        sourceIsGateway =True,
+                                        destinationIsGateway=True )
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
+        assert sourceNode.compareDistributedResources(destinationNode), \
+                    """Distribute between two gateway nodes on the same community but
+                    different network and no filter on the destination node."""
+
+
+    def _setup_common_nodes_same_network_and_community_filter(self, 
+            include_exclude=True, 
+            count=50,
+            mode=5):
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        filterDescription = {"include_exclude": include_exclude,
+                                        "filter":[{"filter_key":"keys", 
+                                                    "filter_value":"Filter Me In"},
+                                                    {"filter_key":"active", 
+                                                    "filter_value":"True"},
+                                                    ]}
+        self._setupNodePair(sourceNode, destinationNode, destinationFilter=filterDescription)
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        #Add some marker documents that will be filter in.
+        for i in range(count):
+            data["documents"][i]["keys"].append("Filter Me In")
+            if i % mode == 0:
+                data["documents"][i]["active"] = False
                 
-        #Sort the documents by doc id for easy comparison
-        sourceDocs = sorted(sourceResults, key= lambda doc: doc["id"])
-        destinationDocs = sorted(destinationResults, key= lambda doc: doc["id"])
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
         
-        # compare documents by documents and check that the destionation time is
-        # greater than the source node time.
-        for i  in range(len(sourceDocs)):
-            sourceDoc = {}
-            sourceDoc.update(sourceDocs[i]["doc"])
-            destDoc ={}
-            destDoc.update(destinationDocs[i]["doc"])
-            if (h.convertToISO8601UTC(destDoc["node_timestamp"]) <= h.convertToISO8601UTC(sourceDoc["node_timestamp"])):
-                log.debug("{0} and {1} error".format(sourceDoc['doc_ID'], destDoc['doc_ID']))
-                return False
-            #remove the node_timestamp and _rev then compare  the docs
-            del sourceDoc["node_timestamp"]
-            del destDoc["node_timestamp"]
-            del destDoc["_rev"]
-            del sourceDoc["_rev"]
-            if sourceDoc != destDoc:
-                 log.debug("{0} and {1} error".format(sourceDoc['doc_ID'], destDoc['doc_ID']))
-                 return False
-        return True
-        
-    def stop(self):
-        if hasattr(self, '_pylonsProcess'):
-            self._pylonsProcess.terminate()
-        
-    def start(self):
-        command = '(cd {0}; paster serve {1})'.format(
-                                        path.abspath(path.dirname(self._pylonsConfigPath)),
-                                        self._pylonsConfigPath) 
-        self._pylonsProcess = subprocess.Popen(command, shell=True)
-        
-    def clear(self):
-        self.stop()
-        #Delete the generated pylons configuration files
-        os.remove(self._pylonsConfigPath)
-        #Delete the generated database.
-        for database in self._getNodeDatabaseList():
-            del self._server[database]
+        assert sourceNode.compareDistributedResources(destinationNode, 
+                                                                            destinationNode._nodeFilterDescription), \
+                    """Distribute between to common nodes on the same network and 
+                    community with an include_exclude filter on the destination node."""
 
 
+    def test_common_nodes_same_network_community_with_filter_in(self):
+        """ This tests distribute/replication between two common nodes on the same
+            network and community.  There is an include filter on the destionation.
+             Distribution/replication is expected to the successful. Only the filtered
+             documents should get replicated/distributed to the destination node.
+        """
+        self._setup_common_nodes_same_network_and_community_filter()
+    
+        
+    def test_common_nodes_same_network_community_with_filter_out(self):
+        """ This tests distribute/replication between two common nodes on the same
+            network and community.  There is one exclude filter on the destionation.
+             Distribution/replication is expected to the successful. Only the filtered
+             documents should get replication on the destination node.
+        """
+        self._setup_common_nodes_same_network_and_community_filter(include_exclude=False, count=100,  mode=2)
 
-def getNodeConfiguration():
-    #for confFiles in path.join(path.abspath(__file__),  '../config'):
-        #print     
-        pass
-    
-def test_distribute_common_nodes_same_community_same_network():
-    #node1 = Node("couchURL", "nodeURL", {})
-    #node2 = Node("couchURL", "nodeURL", {})
-    
-    #setupNode(node1)
-    #setupNode(node2)
-    pass
-    
-    assert True == True, "The truth is not true"
-    pass
+
+    def test_gateway_to_common_node(self):
+        """ This tests distribute/replication between a source gateway node on to a
+            common node.  There  should be NO distribution/replication.  Distribution
+            is not allowed between a gateway and common node.
+        """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        sourceIsGateway =True)
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
+        # There should be no replication. Destination node should be 
+        # empty of resource_data docs
+        assert len (destinationNode.getResourceDataDocs()) == 0, \
+                    """There  should be NO distribution/replication.  Distribution
+            is not allowed between a gateway and common node."""
+        sleep(120)
