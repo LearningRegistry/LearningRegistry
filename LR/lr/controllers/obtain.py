@@ -144,7 +144,7 @@ class ObtainController(BaseController):
             yield ')'
     def create(self):
         """POST /obtain: Create a new item"""                
-        data = self._parseParams(json.loads(request.body))        
+        data = self._parseParams(json.loads(request.body))
         self._validateParams(data)
         return self._performObtain(data)
 

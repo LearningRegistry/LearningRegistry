@@ -138,7 +138,7 @@ function install_couch_ubuntu () {
     if [[ "${ARCH}" == "x86_64" ]] ; then
 	COUCH_DOWN_URL="${COUCHONE_x86_64_DOWNLOAD_URL}"
     elif [[ "${ARCH}" == "i386" ]] || [[ "${ARCH}" == "i686" ]] ; then
-	COUCH_DOWN_URL="${COUCH_x86_DOWNLOAD_URL}"
+	COUCH_DOWN_URL="${COUCHONE_x86_DOWNLOAD_URL}"
     else
 	# In this case, Couch One isn't available for the current architecture.
 	echo "There is no Couch One installer available for your architecture."
