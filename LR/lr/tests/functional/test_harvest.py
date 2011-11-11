@@ -77,6 +77,10 @@ class TestHarvestController(TestController):
           assert doc.has_key('resource_data')
           assert doc['resource_data']['resource_locator'] == resourceLocator
 
+    def validate_getrecord_id_doesnot_exist(self,resp):
+        doc = json.loads(resp.body)
+        assert doc.has_key("OK") and not doc["OK"]
+        assert doc.has_key("error") and doc['error'] == "idDoesNotExist"        
     def test_getrecord_get_by_doc_id(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID=self.ids[0], by_doc_ID=True))
         self.validate_getrecord_response(response,self.ids[0])
@@ -85,10 +89,33 @@ class TestHarvestController(TestController):
         response = self.app.get(url('harvest', id='getrecord',request_ID=self.resourceLocators[0], by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_response_resource_id(response,self.resourceLocators[0])
 
-    def test_getrecord_post(self):
+    def test_getrecord_post_by_resource_id(self):
+        data = json.dumps({'request_ID':self.resourceLocators[0],'by_resource_ID':True,'by_doc_ID':False})
+        response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
+        self.validate_getrecord_response_resource_id(response,self.resourceLocators[0])
+
+    def test_getrecord_post_by_doc_id(self):
         data = json.dumps({'request_ID':self.ids[0],'by_doc_ID':True})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
         self.validate_getrecord_response(response,self.ids[0])
+
+    def test_getrecord_get_by_doc_id_fail(self):
+        response = self.app.get(url('harvest', id='getrecord',request_ID="blah", by_doc_ID=True))
+        self.validate_getrecord_id_doesnot_exist(response)
+
+    def test_getrecord_get_by_resource_id_fail(self):
+        response = self.app.get(url('harvest', id='getrecord',request_ID="blah", by_doc_ID=False,by_resource_id=True))
+        self.validate_getrecord_id_doesnot_exist(response)
+
+    def test_getrecord_post_by_doc_id_fail(self):
+        data = json.dumps({'request_ID':"blah",'by_resource_ID':True,'by_doc_ID':False})
+        response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
+        self.validate_getrecord_id_doesnot_exist(response)
+
+    def test_getrecord_post_by_resource_id_fail(self):
+        data = json.dumps({'request_ID':"blah",'by_doc_ID':True})
+        response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
+        self.validate_getrecord_id_doesnot_exist(response)
 
     def _validate_error_message(self,response):
         data = json.loads(response.body)
