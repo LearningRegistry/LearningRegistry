@@ -223,4 +223,64 @@ class TestDistribute(object):
         assert len (destinationNode.getResourceDataDocs()) == 0, \
                     """There  should be NO distribution/replication.  Distribution
             is not allowed between a gateway and common node."""
-        sleep(120)
+
+    def test_gateway_to_gateway_closed_community(self):
+        """Tests distribute between to gateway with one close community. 
+        Replication distribute should not happen """
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        sourceCommunityId="Closed Source Community Id",
+                                        sourceNetworkId = "Closed Source NetworkId",
+                                        destinationIsGateway = True,
+                                        sourceIsSocialCommunity = False,
+                                        sourceIsGateway =True)
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
+        # There should be no replication. Destination node should be 
+        # empty of resource_data docs
+        assert len (destinationNode.getResourceDataDocs()) == 0, \
+                """There  should be NO distribution/replication.  Distribution
+            is not allowed between gateway nodes on closed network."""
+
+
+    def test_common_to_gateway_same_community_network(self):
+        """ This tests distribute/replication between common node to a gateway 
+            common node.  distribution/replication should work.
+        """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        destinationIsGateway =True)
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        self._doDistributeTest(sourceNode, destinationNode)
+        # There should be no replication. Destination node should be 
+        # empty of resource_data docs
+        assert sourceNode.compareDistributedResources(destinationNode), \
+                    """Distribution from a common node to gateway node should work"""
+
+
+    def test_source_node_with_more_than_two_gateway_connections(self):
+        """Test source node with more than on gateway connections.  There should
+            be no replication/distribute.  The node connection are invalid"""
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        destinationIsGateway =True)
+        sourceNode.addConnectionTo(destinationNode._getNodeUrl(), True) 
+        sourceNode.addConnectionTo("http://fake.node.org",  True)
+        
+        # There should be no replication. Destination node should be 
+        # empty of resource_data docs
+        assert len (destinationNode.getResourceDataDocs()) == 0, \
+                """There  should be NO distribution/replication.  Source node connections
+                are invalid"""
