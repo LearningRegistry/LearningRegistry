@@ -3,7 +3,7 @@ Created on Oct16, 2011
 
 @author: jpoyau
 '''
-from services import ServiceTemplate
+from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
 import pystache, uuid
 import json
@@ -20,7 +20,7 @@ def install(server, dbname, setupInfo):
     custom_opts["doc_limit"] = int(active)
 
     active = getInput("Enter message size limit in octet. \n"+
-                    "This should the maximum publish data the the node  will accepts ", None, isInt)
+                    "This should the maximum publish data that the node  will accept", None, isInt)
     custom_opts["msg_size_limit"] = int(active)
 
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]

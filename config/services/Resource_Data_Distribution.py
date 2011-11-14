@@ -1,7 +1,7 @@
 '''
-Created on Aug 16, 2011
+Created on Oct16, 2011
 
-@author: jklo
+@author: jpoyau
 '''
 from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
@@ -9,56 +9,38 @@ import pystache, uuid
 import json
 
 
+
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Slice?", "T", isBoolean)
+    active = getInput("Enable Resource Data Distribution?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
-    
-    active = getInput("Enable Flow Control for Slice?", "F", isBoolean)
-    custom_opts["flow_control"] = active.lower() in YES
-    
-    if custom_opts["flow_control"]:
-        active = getInput("Maximum IDs to Return?", "100", isInt)
-        custom_opts["id_limit"] = int(active)
-        active = getInput("Maximum Docs to Return?", "100", isInt)
-        custom_opts["doc_limit"] = int(active)
-        
-        
+
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __SliceServiceTemplate()
+    must = __ResourceDataDistributionServiceTemplate()
     config_doc = must.render(**custom_opts)
+    print config_doc
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":slice", doc)
-    print("Configured Slice service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+    PublishDoc(server, dbname,doc["service_type"]+":Resource Data Distribution service", doc)
+    print("Configured Resource Data Distribution service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 
 
 
-class __SliceServiceTemplate(ServiceTemplate):
+class __ResourceDataDistributionServiceTemplate(ServiceTemplate):
     def __init__(self):
-        ServiceTemplate.__init__(self)
-        self.service_data_template = '''{
-            "flow_control": {{flow_control}}{{#id_limit}},
-            "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
-            "doc_limit": {{doc_limit}}{{/doc_limit}}
-        }'''
-    
-    
-    
+        ServiceTemplate.__init__(self)    
+
     def _optsoverride(self):
         opts = {
             "active": "false",
-            "service_name": "Slice",
-            "service_version": "0.10.0",
-            "service_endpoint": "/slice",
+            "service_type": "distribute",
+            "service_name": "Resource Data Distribution",
+            "service_version": "0.23.0",
+            "service_endpoint": "/distribute",
             "service_key": "false", 
-            "service_https": "false",
-            "flow_control": False,
-            "id_limit": None,
-            "doc_limit": None,
-            
+            "service_https": "false"
         }
         return opts
         
