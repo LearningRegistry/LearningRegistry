@@ -57,6 +57,7 @@ class __BasicObtainServiceTemplate(ServiceTemplate):
             "service_endpoint": "/obtain",
             "service_key": "false", 
             "service_https": "false",
+            "service_type": "access",   
             "spec_kv_only": False,
             "flow_control": False,
             "id_limit": None,
