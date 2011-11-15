@@ -64,19 +64,30 @@ community_description ={
 }
 
 service_description= {
-        "doc_type": "service_description",
-        "doc_version": "0.20.0",
-        "doc_scope": "node", 
-        "active": True,
-        "service_id": "<service_id>",
-        "service_type": "<server type>",
-        "service_name": "<service name>",
-        "service_description": "<service description>", 
-        "service_version": "0.1", 
-        "service_endpoint": "string", 
-        "service_auth": 
-                    {"service_authz":None,
-                      "service_key":False,
-                     "service_https":False},
-        "service_data":{}
+    "doc_type": "service_description",
+    "doc_version": "0.20.0",
+    "doc_scope": "node", 
+    "active": True,
+    "service_id": "<service_id>",
+    "service_type": "<server type>",
+    "service_name": "<service name>",
+    "service_description": "<service description>", 
+    "service_version": "0.1", 
+    "service_endpoint": "string", 
+    "service_auth": 
+                {"service_authz":None,
+                  "service_key":False,
+                 "service_https":False},
+    "service_data":{}
 }
+
+filter_description ={
+    "doc_type": "filter_description",
+    "doc_version":  "0.10.0", 
+    "doc_scope": "node",
+    "active": True,
+    "filter_name":" <Filter Name>", 
+    "custom_filter": True, 
+    "include_exclude": True,
+    "filter": ["<array of filter rules>"]
+    }

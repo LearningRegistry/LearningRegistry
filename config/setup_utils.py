@@ -50,8 +50,11 @@ def CreateDB(couchServer = _DEFAULT_COUCHDB_URL,  dblist=[], deleteDB=False):
 
 def PublishDoc(couchServer, dbname, name, doc_data):
     try:
-        db = couchServer[dbname]
         #delete existing document.
+        db = couchServer[dbname]
+        if "_rev" in doc_data:
+            del doc_data["_rev"]
+       
         try:
             del db[name]
         except:

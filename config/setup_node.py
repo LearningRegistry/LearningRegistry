@@ -80,8 +80,7 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
 
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
     for dest_node_url in connectionList:
-        connection = {}
-        connection.update(t.connection_description)
+        connection = dict(t.connection_description)
         connection['connection_id'] = uuid4().hex
         connection['source_node_url']=nodeUrl
         connection['destination_node_url'] = dest_node_url
