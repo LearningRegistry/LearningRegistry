@@ -7,20 +7,27 @@ Created on Nov 11, 2011
 @author: jpoyau
 '''
 
-#from pylons import config
+import os
+from os import path
+
+_PWD = path.abspath(path.dirname(__file__))
+
+import sys
+#Add the config and lr module the sys path so that they can used.
+sys.path.append(path.abspath(path.join(_PWD,"../../../../../config")))
+sys.path.append(path.abspath(path.join(_PWD, "../../../../")))
+
 
 import ConfigParser
 import couchdb
-from node_config import services, lrnodetemplate as nodeTemplate, setup_utils, couch_utils
-from node_config.setup_node import publishNodeConnections
-import os
-from os import path
+import lrnodetemplate as nodeTemplate 
+import setup_utils, couch_utils
+from setup_node import publishNodeConnections
 import uuid
 import json
 import urllib2
 import urlparse
-import node_config.services
-from node_config.services.Resource_Data_Distribution import __ResourceDataDistributionServiceTemplate as DistributeServiceTemplate
+from services.Resource_Data_Distribution import __ResourceDataDistributionServiceTemplate as DistributeServiceTemplate
 import subprocess
 from lr.lib import helpers as h
 from datetime import datetime
@@ -31,7 +38,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-_PWD = path.abspath(path.dirname(__file__))
+
 _PYLONS_CONFIG = path.abspath(path.join(_PWD, "../../../../development.ini.orig"))
 _RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchdb/resource_data/apps/filtered-replication"))
 _DISTRIBUTE_TEST_LOG = "test_distribute.log"
