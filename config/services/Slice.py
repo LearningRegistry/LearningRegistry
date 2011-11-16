@@ -55,6 +55,7 @@ class __SliceServiceTemplate(ServiceTemplate):
             "service_endpoint": "/slice",
             "service_key": "false", 
             "service_https": "false",
+            "service_type": "access",
             "flow_control": False,
             "id_limit": None,
             "doc_limit": None,
