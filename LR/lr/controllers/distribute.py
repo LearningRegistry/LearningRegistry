@@ -46,6 +46,10 @@ class DistributeController(BaseController):
         #else:
         distributeInfo['node_config'] = sourceLRNode.config
         distributeInfo['distribute_sink_url'] = urlparse.urljoin(request.url,self.resource_data)
+        # Check to see if the couch resource_data is defined in the config if so use it.
+        if appConfig.has_key("distribute_sink_url"):
+             distributeInfo['distribute_sink_url'] = appConfig["distribute_sink_url"]
+
         log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
         return json.dumps(distributeInfo)
     
@@ -131,7 +135,7 @@ class DistributeController(BaseController):
                     log.info("Only gateways can distribute on gateway connection")
                     continue
             nodeInfo = { "distributeInfo": distributeInfo,
-                                  "destinationBaseUrl":connection.destination_node_url,
+                                  "distribute_sink_url": distributeInfo["distribute_sink_url"],
                                   "destinationNode":destinationLRNode}
             nodeDestinationList.append(nodeInfo)
             
@@ -174,7 +178,7 @@ class DistributeController(BaseController):
                 doc = db[appConfig['lr.nodestatus.docid']]
                 doc['last_out_sync'] = h.nowToISO8601Zformat()
                 doc['out_sync_node'] = destinationNode.nodeDescription.node_name
-                db[appConfig['lr.nodestatus.docid']] = doc                
+                db[appConfig['lr.nodestatus.docid']] = doc
         
         log.info("Distribute.......\n")
         ##Check if the distribte service is available on the node.
@@ -191,7 +195,7 @@ class DistributeController(BaseController):
             replicationArgs = (connectionInfo['destinationNode'], 
                                          defaultCouchServer, 
                                          self.resource_data, 
-                                         urlparse.urljoin(connectionInfo['destinationBaseUrl'], self.resource_data),lock)
+                                         connectionInfo["distribute_sink_url"],lock)
                                          
             # Use a thread to do the actual replication.
             replicationThread = threading.Thread(target=doDistribution, 
