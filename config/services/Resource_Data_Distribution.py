@@ -12,53 +12,35 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Basic Publish?", "T", isBoolean)
+    active = getInput("Enable Resource Data Distribution?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
-
-    
-    active = getInput("Maximum documents the node will accepts?", "1000", isInt)
-    custom_opts["doc_limit"] = int(active)
-
-    active = getInput("Enter message size limit in octet. \n"+
-                    "This should the maximum data size  the the node  will accept ", None, isInt)
-
-    custom_opts["msg_size_limit"] = int(active)
 
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    
-    must = __BasicPublishServiceTemplate()
+    must = __ResourceDataDistributionServiceTemplate()
     config_doc = must.render(**custom_opts)
     print config_doc
     doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Basic Publish service", doc)
-    print("Configured Basic Publish service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+    PublishDoc(server, dbname,doc["service_type"]+":Resource Data Distribution service", doc)
+    print("Configured Resource Data Distribution service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
 
 
 
 
-class __BasicPublishServiceTemplate(ServiceTemplate):
+class __ResourceDataDistributionServiceTemplate(ServiceTemplate):
     def __init__(self):
         ServiceTemplate.__init__(self)    
-        self.service_data_template = '''{
-            "msg_size_limit": {{msg_size_limit}}{{/msg_size_limit}},
-            "doc_limit": {{doc_limit}}{{/doc_limit}}
-        }'''    
-    
-    
-    
+
     def _optsoverride(self):
         opts = {
             "active": "false",
-            "service_type": "publish",
-            "service_name": "Basic Publish",
+            "service_type": "distribute",
+            "service_name": "Resource Data Distribution",
             "service_version": "0.23.0",
-            "service_endpoint": "/publish",
+            "service_endpoint": "/distribute",
             "service_key": "false", 
-            "service_https": "false",
-            "doc_limit": None ,
-            "msg_size_limit": None
+            "service_https": "false"
         }
         return opts
         

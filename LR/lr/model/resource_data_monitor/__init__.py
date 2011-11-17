@@ -24,7 +24,7 @@ from pylons import config
 appConfig = config['app_conf']
 log = logging.getLogger(__name__)
 
-_RESOURCE_DATA_CHANGE_ID =  "Last_Processed_Change_Sequence"
+_RESOURCE_DATA_CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
     TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
