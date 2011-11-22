@@ -1,6 +1,7 @@
 import logging, json
 from lr.lib.harvest import harvest
 import lr.lib.helpers as helpers
+from urllib import unquote_plus
 import iso8601
 from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
@@ -85,6 +86,7 @@ class HarvestController(BaseController):
             else:
                 records = []
           else:
+            request_id = unquote_plus(request_id)
             records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
           if len(records) == 0:
             data['OK'] = False
@@ -119,7 +121,7 @@ class HarvestController(BaseController):
         def listmetadataformats():
             self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=map(lambda format: {'metadataformat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
+            data['listmetadataformats']=map(lambda format: {'metadataformat':format['metadataFormat']},self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
