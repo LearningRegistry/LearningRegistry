@@ -75,6 +75,8 @@ class OAIPMHDocumentResolver(CouchDBDocProcessor):
             try:
                 doc["resource_data"] = re.sub('''^<\?xml\s+version\s*=\s*(["][^"]+["]|['][^']+['])[^?]*\?>''', "", doc["resource_data"])
 #                doc["resource_data"] = re.sub('''\s*<!DOCTYPE\s[^>]*>''', "", doc["resource_data"], flags=re.MULTILINE)
+                expr = re.compile('''\s*<!DOCTYPE\s[^>]*>''', flags=re.MULTILINE)
+                doc["resource_data"] = expr.sub("", doc["resource_data"])
                 payload = etree.parse(StringIO(doc["resource_data"]))
                 doc["resource_data"] = etree.tostring(payload)
             except:

@@ -12,6 +12,7 @@ import time
 import urllib2
 import ijson
 from ijson.parse import items
+import os
 import urllib
 
 log = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
             for doc in sourceData:
                 doc["doc_ID"] = prefix+str(uuid1())
                 obj.app.post('/publish', params=json.dumps({"documents": [ doc ]}), headers=json_headers)
-                plog.write(doc["doc_ID"])
+                plog.write(doc["doc_ID"] + os.linesep)
                 obj.test_data_ids[prefix].append(doc["doc_ID"])
                 if sleep > 0:
                     time.sleep(sleep)

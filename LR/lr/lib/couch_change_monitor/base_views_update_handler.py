@@ -37,6 +37,6 @@ class BaseViewsUpdateHandler(BaseChangeThresholdHandler):
                     designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0):
                     viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
                     viewUrl = "{0}{1}/{2}?limit=1".format(appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata'],viewName)
-                    multiprocessing.Process(target=updateView,args=(viewUrl,)).start()
+                    multiprocessing.Process(target=_updateView,args=(viewUrl,)).start()
         except Exception as e:
             log.error(e)
