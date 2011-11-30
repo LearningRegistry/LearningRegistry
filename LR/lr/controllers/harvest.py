@@ -1,6 +1,7 @@
 import logging, json
 from lr.lib.harvest import harvest
 import lr.lib.helpers as helpers
+from urllib import unquote_plus
 import iso8601
 from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
@@ -85,6 +86,7 @@ class HarvestController(BaseController):
             else:
                 records = []
           else:
+            request_id = unquote_plus(request_id)
             records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
           if len(records) == 0:
             data['OK'] = False
@@ -99,7 +101,7 @@ class HarvestController(BaseController):
           return json.dumps(data)
         def listidentifiers():
             return self.listGeneral(h,body,params,False,verb)            
-        def listrecords():
+        def listrecords():            
             return self.listGeneral(h,body,params,True,verb)
         def identify():
             data = self.get_base_response(verb,body)
@@ -119,7 +121,7 @@ class HarvestController(BaseController):
         def listmetadataformats():
             self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=map(lambda format: {'metadataformat':{'metadataPrefix':format['metadataPrefix']}},self.metadataFormats)
+            data['listmetadataformats']=map(lambda format: {'metadataformat':{"metadataPrefix":format['metadataFormat']}},self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
@@ -160,35 +162,29 @@ class HarvestController(BaseController):
             return
         data['request']['from'] = from_date
         data['request']['until'] = until_date             
-        if includeDocs:       
-            data['listrecords'] =  []   
-        else:
-            data['listidentifiers'] =  []   
-        self._getServiceDocment(includeDocs)        
-        resumption_token = None
-        count = 0
-        lastID = None
-        lastKey = None
-        if self.enable_flow_control and params.has_key('resumption_token'):
-            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                        
-        base_response =  json.dumps(data).split('[')
-        def debug_map(doc):                  
-            if includeDocs:
-                data ={'record':{"header":{'identifier':doc['id'], 'datestamp':doc['key']+"Z",'status':'active'},'resource_data':doc['doc']}}
-            else:
-                data = {"header":{'identifier':doc['id'], 'datestamp':doc['key']+"Z",'status':'active'}}
-            return data        
         if from_date > until_date:
           data['OK'] = False
           data['error'] = 'badArgument'
           yield json.dumps(data)
         else:
+            self._getServiceDocment(includeDocs)        
+            resumption_token = None
+            count = 0
+            lastID = None
+            lastKey = None
+            if self.enable_flow_control and params.has_key('resumption_token'):
+                resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                                    
+            if includeDocs:       
+                data['listrecords'] =  []   
+                viewResults = h.list_records(from_date,until_date,resumption_token=resumption_token, limit=self.limit)                
+                debug_map = lambda doc: {'record':{"header":{'identifier':doc['id'], 'datestamp':doc['key']+"Z",'status':'active'},'resource_data':doc['doc']}}                
+            else:
+                data['listidentifiers'] =  []   
+                viewResults = h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit)
+                debug_map = lambda doc:{"header":{'identifier':doc['id'], 'datestamp':doc['key']+"Z",'status':'active'}}                
+            base_response =  json.dumps(data).split('[')            
             yield base_response[0] +'['
             first = True
-            if includeDocs:
-                viewResults = h.list_records(from_date,until_date,resumption_token=resumption_token, limit=self.limit)
-            else:
-                viewResults = h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit)
             for data in viewResults:                        
                 lastID = data['id']
                 lastKey = data['key']
