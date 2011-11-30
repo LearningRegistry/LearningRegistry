@@ -33,7 +33,7 @@ class PublishController(BaseController):
     #     map.resource('publish', 'publisher')
     __ERROR = 'error'
     __OK = "OK"
-    __DOCUMENT_RESULTS =  'documents_results'
+    __DOCUMENT_RESULTS =  'document_results'
     __DOCUMENTS = 'documents'
     
     def create(self):
