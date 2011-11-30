@@ -46,12 +46,34 @@ _NETWORK = _config.get("app:main", "couchdb.db.network")
 # Dictionary of types services and the corresponding services that are added 
 # by default to the node.  The format is 
 # "<serviceType>":["<list of services of serviceType>"]
-_DEFAULT_SERVICES = {"administrative":["Network Node Description", "Network Node Services", "Network Node Status", "Resource Distribution Network Policy"],
-                     "access":["Basic Obtain", "OAI-PMH Harvest", "Slice", "Basic Harvest", "SWORD APP Publish V1.3"],
-                     "broker":[],
-                     "distribute":["Resource Data Distribution"],
-                     "publish":["Basic Publish"]}
-
+_DEFAULT_SERVICES = {"administrative":
+                                                    ["Network Node Description", 
+                                                     "Network Node Services", 
+                                                     "Network Node Status", 
+                                                     "Resource Distribution Network Policy"],
+                                        "access":
+                                                    ["Basic Obtain", 
+                                                     "OAI-PMH Harvest", "Slice", 
+                                                     "Basic Harvest", 
+                                                     "SWORD APP Publish V1.3"],
+                                        "broker":[],
+                                        "distribute":
+                                                    ["Resource Data Distribution"],
+                                        "publish":
+                                                    ["Basic Publish"]}
+                                                    
+#Create specific gateway node service list.  It saves the user from setting up 
+# services that will be available on gateway nodes.  This also avoid the confusion 
+# of setting up services asavailable yet cannot be use since the node was setup 
+# as gateway node.
+_GATEWAY_NODE_SERVICES ={"administrative":
+                                                    ["Network Node Description", 
+                                                     "Network Node Services", 
+                                                     "Network Node Status", 
+                                                     "Resource Distribution Network Policy"],
+                                        "distribute":
+                                                    ["Resource Data Distribution"]
+                                    }
 def makePythonic(text):
     return re.sub('''[ \.]''', "_", text)
 
@@ -89,14 +111,7 @@ def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
 def publishCouchApps(databaseUrl, appsDirPath):
     import couch_utils
     couch_utils.pushAllCouchApps(appsDirPath, databaseUrl)
-#     for app in os.listdir(appsDirPath):
-#        commandPath =  os.path.join(_VIRTUAL_ENV_PATH, 'bin', 'couchapp')
-#        commandArgs =  " push {0} {1}".format(os.path.join(appsDirPath, app), databaseUrl)
-#        command = "{0} {1}".format(commandPath, commandArgs)
-#        print("\n{0}\n".format(command))
-#        p = subprocess.Popen(command, shell=True)
-#        p.wait()
-        
+
 def setCommunityId():
     community = getInput("Enter the community id")
     t.community_description['community_id'] = community
@@ -158,7 +173,10 @@ if __name__ == "__main__":
     CreateDB(server, dblist=[ _NODE, _NETWORK, _COMMUNITY], deleteDB=True)
     
       #Install the services, by default all the services are installed.
-    publishNodeServices(nodeSetup["nodeUrl"], server, _NODE)
+    services = _DEFAULT_SERVICES
+    if nodeSetup['gateway_node']:
+        services = _GATEWAY_NODE_SERVICES
+    publishNodeServices(nodeSetup["nodeUrl"], server, _NODE, services)
     
     #Add the network and community description
     PublishDoc(server, _COMMUNITY, "community_description", t.community_description)
