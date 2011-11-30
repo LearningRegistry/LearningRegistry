@@ -46,12 +46,12 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "flow_control": {{flow_control}}{{#id_limit}},
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}},
-            "metadataformats": [
-                {
-                    "metadataFormat": "LR Resource Data Description Data Model",
+            "metadataformats": [{"metadataFormat":
+                {                    
                     "metadataPrefix": "LR_JSON_0.10.0"
                 }
-            ]
+
+            }]
         }'''
     
     

@@ -1,6 +1,7 @@
 from lr.tests import *
 import logging,json
 import time
+from urllib import unquote_plus,quote_plus
 from pylons import config
 from datetime import datetime
 from lr.lib.harvest import harvest
@@ -75,7 +76,7 @@ class TestHarvestController(TestController):
         data = self.validate_getrecord_response_base(response)
         for doc in data['getrecord']['record']:
           assert doc.has_key('resource_data')
-          assert doc['resource_data']['resource_locator'] == resourceLocator
+          assert unquote_plus(doc['resource_data']['resource_locator']) == unquote_plus(resourceLocator)
 
     def validate_getrecord_id_doesnot_exist(self,resp):
         doc = json.loads(resp.body)
@@ -88,6 +89,11 @@ class TestHarvestController(TestController):
     def test_getrecord_get_by_resource_id(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID=self.resourceLocators[0], by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_response_resource_id(response,self.resourceLocators[0])
+
+    def test_getrecord_get_by_resource_id_url_quoted(self):
+        testID = quote_plus(self.resourceLocators[0])
+        response = self.app.get(url('harvest', id='getrecord',request_ID=testID, by_doc_ID=False,by_resource_id=True))
+        self.validate_getrecord_response_resource_id(response,testID)
 
     def test_getrecord_post_by_resource_id(self):
         data = json.dumps({'request_ID':self.resourceLocators[0],'by_resource_ID':True,'by_doc_ID':False})

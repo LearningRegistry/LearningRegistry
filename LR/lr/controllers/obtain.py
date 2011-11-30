@@ -20,6 +20,7 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 import logging
+from urllib import unquote_plus
 log = logging.getLogger(__name__)  
 trues = ['T','t','True','true', True]
 class ObtainController(BaseController):
@@ -186,8 +187,7 @@ class ObtainController(BaseController):
         }
         if params.has_key('by_doc_ID') and params['by_doc_ID'] in trues:
             data['by_doc_ID'] = True
-            data['by_resource_ID'] = False
-                    
+            data['by_resource_ID'] = False                    
         if params.has_key('by_resource_ID'):            
             data['by_resource_ID'] = params['by_resource_ID'] in trues
         if params.has_key('ids_only'):
@@ -203,6 +203,9 @@ class ObtainController(BaseController):
             data['request_IDs'].append(params['request_id'])            
         if params.has_key('request_IDs'):
             data['request_IDs'].extend(params['request_IDs'])
+        if data['by_resource_ID']:
+            data['request_IDs'] = [unquote_plus(id) for id in data['request_IDs']]        
+        log.debug(data)
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""

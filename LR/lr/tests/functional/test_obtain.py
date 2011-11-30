@@ -64,14 +64,19 @@ class TestObtainController(TestController):
         requestData = json.loads(requestData)
         assert(data['documents'])
         assert(len(data['documents'])>0) 
+        byDocId = requestData.has_key('by_doc_ID') and requestData['by_doc_ID']
         for d in data['documents']:
-            assert d['doc_ID'] in testids
+            if byDocId:
+                assert d['doc_ID'] in testids
+            else:
+                testids = [urllib.unquote_plus(x) for x in testids]
+                assert urllib.unquote_plus(d['doc_ID']) in testids
             if not requestData.has_key('ids_only') or (requestData.has_key('ids_only') and not requestData['ids_only']):
                 for doc in d['document']:
                     if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
                         assert doc['doc_ID'] == d['doc_ID']
                     else:
-                        assert doc['resource_locator'] == d['doc_ID']
+                        assert urllib.unquote_plus(doc['resource_locator']) == urllib.unquote_plus(d['doc_ID'])
         return data
     def _validateError(self,error):
         data = json.loads(error)
@@ -201,5 +206,13 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.resourceLocators)        
+    def test_request_id_with_uri_escaped_characters(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = False
+        params['by_resource_ID'] = True
+        testId = urllib.quote_plus(self.resourceLocators[0])
+        params['request_ID'] = testId
+        response = self.app.get(url(controller='obtain',**params))
+        self._validateResponse(response,json.dumps(params),[testId])        
     def test_empty(self):
             pass
