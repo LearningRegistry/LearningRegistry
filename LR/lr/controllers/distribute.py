@@ -190,7 +190,7 @@ class DistributeController(BaseController):
             (len(sourceLRNode.connections) ==0)):
             log.info("No connection present for distribution")
             return json.dumps({self.__ERROR:''})
-        log.info("Connections: "+str(sourceLRNode.connections)+"\n")
+        log.info("Connections: \n{0}\n"+pprint.pformat([c.specData for c in sourceLRNode.connections]))
         
         lock = threading.Lock()
         connectionsStatusInfo = self._getDistributeDestinations()
