@@ -28,6 +28,10 @@ def make_map(config):
                 map.resource(member_name, collection_name)
                 if member_name == 'swordservice':
                     map.connect("/swordpub",controller='swordservice',action='create')
+                
+                if member_name == 'distribute':
+                    map.connect("/destination", controller='distribute', action='destination',
+                                          conditions=dict(method='GET'))
                 log.info("Enabling service route for: {0} member: {1} collection: {2}".format(service_doc_id, member_name, collection_name))
             else:
                 log.info("Service route for {0} is disabled".format(service_doc_id))

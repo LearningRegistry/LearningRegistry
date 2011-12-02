@@ -85,12 +85,12 @@ class TestDistribute(object):
         #start the node nodes.
         sourceNode.start()
         destinationNode.start()
-        sleep(60)
+        sleep(30)
         #Do the distribute
         sourceNode.distribute()
         # Wait for two minutes or that that all the document and be transfer to test that
         # there are indeed distributed correctly
-        sleep(60)
+        sleep(30)
         
     def test_common_nodes_same_network_community_no_filter(self):
         """ This tests distribute/replication between to common nodes on the same

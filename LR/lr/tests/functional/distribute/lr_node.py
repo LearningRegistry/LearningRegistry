@@ -139,8 +139,9 @@ class Node(object):
         for option in self._nodeConfig.options("pylons_server"):
             pylonsConfig.set("server:main", option, self._nodeConfig.get("pylons_server", option))
     
-        #Add the distribute_sink_url
-        pylonsConfig.set("app:main", "distribute_sink_url",  
+        #Set the ressource data url
+
+        pylonsConfig.set("app:main", "lr.distribute_resource_data_url",  
                                     urlparse.urljoin(self._nodeConfig.get("couch_info", "server"),
                                                            self._nodeConfig.get("couch_info", "resourcedata")))
         #change the logging level to the highest level to avoid spamming log.
@@ -222,7 +223,7 @@ class Node(object):
                 del doc['_rev']
                 
             doc['doc_ID'] = uuid.uuid4().hex
-            now = datetime.utcnow().isoformat()+"Z"
+            now = h. nowToISO8601Zformat()
             doc['node_timestamp'] = now
             doc['create_timestamp'] = now
             doc['update_timestamp']  = now

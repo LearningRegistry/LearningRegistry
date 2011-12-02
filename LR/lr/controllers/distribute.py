@@ -30,121 +30,121 @@ import pprint
 log = logging.getLogger(__name__)
 
 class DistributeController(BaseController):
+    __TARGET_NODE_INFO = 'taget_node_info'
+    __OK = 'OK'
+    __ERROR = 'error'
+    
     def __before__(self):
         self.resource_data = appConfig['couchdb.db.resourcedata']
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('distribute', 'distribute')
-    def index(self, format='html'):
-        """GET /distribute: All items in the collection"""
-        # url('distribute')
-        distributeInfo = {'OK': True}
-        
-        #if sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False:
-            #distributeInfo['OK'] = False
-        #else:
-        distributeInfo['node_config'] = sourceLRNode.config
-        distributeInfo['distribute_sink_url'] = urlparse.urljoin(request.url,self.resource_data)
-        # Check to see if the couch resource_data is defined in the config if so use it.
-        if appConfig.has_key("distribute_sink_url"):
-             distributeInfo['distribute_sink_url'] = appConfig["distribute_sink_url"]
-
-        log.info("received distribute request...returning: \n"+json.dumps(distributeInfo))
-        return json.dumps(distributeInfo)
     
+    def destination(self):
+        """GET /destination: return node information"""
+        # url('distribute')
+        response = {'OK': True}
+        
+        try:
+            response[self.__TARGET_NODE_INFO] = sourceLRNode.distributeInfo
+            if appConfig.has_key("distribute_sink_url"):
+                  response['target_node_info']['distribute_sink_url'] = appConfig["distribute_sink_url"]
+        except Exception as ex:
+            log.exception(ex)
+            response["error":"Internal error"]
+        
+        log.info("received distribute request...returning: \n"+pprint.pformat(response, 4))
+        return json.dumps(response)
+        
+    def _getDistinationInfo(self, connection):
+        # Make sure we only have one slash in the url path. More than one 
+        #confuses pylons routing libary.
+        destinationURL = urlparse.urljoin(connection.destination_node_url.strip(),
+                                                                "destination")
+        
+        request = urllib2.Request(destinationURL)
+        credential = sourceLRNode.getDistributeCredentialFor(destinationURL)
+        
+        if credential is not None:
+            base64string = base64.encodestring('%s:%s' % (credential['username'],credential['password'])).replace("\n", "")
+            request.add_header("Authorization", "Basic %s" % base64string)
+        
+        log.info("\n\nAccess destination node at: "+pprint.pformat(request.__dict__))
+        return json.load(urllib2.urlopen(request))
+
+    def _canDistributeTo(self, connection, sourceNodeInfo):
+        
+        if  not connection.active:
+            return {self.__OK: False, 
+                         'connection_id': connection.connection_id, 
+                         self.__ERROR: 'Inactive connection'}
+              
+        result={self.__OK:True, 'connection_id': connection.connection_id }
+        sourceNodeInfo = h.dictToObject(sourceNodeInfo)
+        try:
+            destinationNodeInfo = h.dictToObject(self._getDistinationInfo(connection)[self.__TARGET_NODE_INFO])
+            result['destinationNodeInfo'] = destinationNodeInfo
+            
+            if ((sourceNodeInfo.gateway_node or destinationNodeInfo.gateway_node)  != connection.gateway_connection):
+                result[self.__ERROR] = " 'gateway_connection' mismatch between nodes and connection data"
+            
+            elif ((sourceNodeInfo.community_id != destinationNodeInfo.community_id) and
+                    ((not sourceNodeInfo.social_community) or (not destinationNodeInfo.social_community))):
+                result[self.__ERROR] = 'cannot distribute across non social communities'
+             
+            elif ((sourceNodeInfo.network_id != destinationNodeInfo.network_id) and
+                    ((not sourceNodeInfo.gateway_node)or(not destinationNodeInfo.gateway_node))):
+                result[self.__ERROR] = 'cannot distribute across networks (or communities) unless gateway'
+            
+            elif ((sourceNodeInfo.gateway_node and destinationNodeInfo.gateway_node)
+                    and (sourceNodeInfo.network_id == destinationNodeInfo.network_id)):
+                result[self.__ERROR]  = 'gateway must only distribute across different networks'
+
+            elif (sourceNodeInfo.gateway_node and not destinationNodeInfo.gateway_node):
+                result[self.__ERROR]  = 'gateways can only distribute to gateways'
+        except urllib2.URLError as ex:
+            log.exception(ex)
+            result[self.__ERROR] = "Cannot reach destination node.  "+str(ex.reason)
+        except Exception as ex:
+            log.exception(ex)
+            result[self.__ERROR] = "Internal error. Cannot process destination node info"
+        
+        if result.has_key(self.__ERROR):
+            result[self.__OK] = False
+        
+        return result
+
+
     def _getDistributeDestinations(self):
         """"Method to test the connections and returns a list of destionation node
              if the connections are valid"""
-        nodeDestinationList =[]
         gatewayConnectionList = []
-        for connection in sourceLRNode.connections:
-            # Make sure that the connection is active 
-            if connection.active == False:
-                continue
-            destinationLRNode = None
-           
-            if connection.gateway_connection == True:
-                gatewayConnectionList.append(connection)
-            try:
-                # Make sure we only have one slash in the url path. More than one 
-                #confuses pylons routing libary.
-                destinationURL = urlparse.urljoin(connection.destination_node_url.strip(),
-                                                                        "distribute")
-                
-                request = urllib2.Request(destinationURL)
-                credential = sourceLRNode.getDistributeCredentialFor(destinationURL)
-                
-                if credential is not None:
-                    base64string = base64.encodestring('%s:%s' % (credential['username'],credential['password'])).replace("\n", "")
-                    request.add_header("Authorization", "Basic %s" % base64string)
-                
-                log.info("\n\nAccess destination node at: "+pprint.pformat(request.__dict__))
-                distributeInfo = json.load(urllib2.urlopen(request))
-                destinationLRNode = LRNodeModel(distributeInfo['node_config'])
-            except Exception as ex:
-                log.exception(ex)
-                continue
-             # Use of local variable to store if  the connection is gateway connection. It is
-            # done this way to deal with mismatch between node de and connection
-            # description.
-            isGatewayConnection = (
-                        (sourceLRNode.nodeDescription.gateway_node == True) and
-                        (destinationLRNode.nodeDescription.gateway_node ==True))
-            # Skip the connection if there is any mismatch between the connection and
-            # the node data.
-            if isGatewayConnection != connection.gateway_connection:
-                log.info("Skip connection. 'gateway_connection' mismatch between node and connection data")
-                continue
+        connectionsStatusInfo = {self.__OK:True, 'connections':[]}
         
-            # Only one gateway  connection is allowed, faulty network description
+        for connection in sourceLRNode.connections:
+            # Make sure that the connection is active
+            connectionsStatusInfo['connections'].append(self._canDistributeTo(connection, sourceLRNode.distributeInfo))
+        
+            if connectionsStatusInfo['connections'][-1][self.__OK] and connection.gateway_connection == True:
+                gatewayConnectionList.append(connection)
+              # Only one gateway  connection is allowed, faulty network description
             if len(gatewayConnectionList) > 1:
                 log.info("***Abort distribution. More than one gateway node connection")
-                #Clear the node destination list no distribution is network description 
-                # is faulty
-                nodeDestinationList = []
+                connectionsStatusInfo[self.__ERROR] ="only one active gateway connection is allowed, faulty network description"
                 break
-            #Calcuate if the connection is gateway one, if so 
-            #cannot distribute across non social communities
-            if ((sourceLRNode.communityDescription.community_id != 
-                 destinationLRNode.communityDescription.community_id) and
-                 ((sourceLRNode.communityDescription.social_community == False) or
-                  (destinationLRNode.communityDescription.social_community == False))):
-                      log.info("Cannot distribute across non social communities")
-                      continue
-            # Cannot distribute across networks (or communities) unless gateway
-            if((isGatewayConnection == False) and
-                ((sourceLRNode.communityDescription.community_id != 
-                 destinationLRNode.communityDescription.community_id) or
-                (sourceLRNode.networkDescription.network_id != 
-                  destinationLRNode.networkDescription.network_id))):
-                      log.info("Different Network. Cannot distribute across networks (or communities) unless gateway")
-                      continue
-            # Gateway must only distribute across different networks.
-            if((isGatewayConnection ==True) and
-                   (sourceLRNode.networkDescription.network_id == 
-                    destinationLRNode.networkDescription.network_id)):
-                        log.info("Gateway must only distribute across different networks")
-                        continue
-            # Only gateways can distribute on gateway connection. This is really for 
-            # catching mismatch in the data where a connection says it is between 
-            # gateways when the nodes are not both gateways.
-            if((connection.gateway_connection == True) and 
-                ((sourceLRNode.nodeDescription.gateway_node == False) or
-                (destinationLRNode.nodeDescription.gateway_node == False))):
-                    log.info("Only gateways can distribute on gateway connection")
-                    continue
-            nodeInfo = { "distributeInfo": distributeInfo,
-                                  "distribute_sink_url": distributeInfo["distribute_sink_url"],
-                                  "destinationNode":destinationLRNode}
-            nodeDestinationList.append(nodeInfo)
-            
-        return nodeDestinationList
+        if len (sourceLRNode.connections) == 0:
+            connectionsStatusInfo[self.__ERROR] ="No connection present for distribution"
+
+        if connectionsStatusInfo.has_key(self.__ERROR) :
+            connectionsStatusInfo[self.__OK] = False
+          
+        return connectionsStatusInfo
         
     def create(self):
         """POST / distribute start distribution"""
         
-        def doDistribution(destinationNode, server, sourceUrl, destinationUrl, lock):
+        def doDistribution(destinationNodeInfo, server, sourceUrl, lock):
             # We want to always use the replication filter function to replicate
             # only distributable doc and filter out any other type of documents.
             # However we don't have any query arguments until we test if there is any filter.
@@ -152,16 +152,18 @@ class DistributeController(BaseController):
                                              'query_params': None}
             # If the destination node is using an filter and is not custom use it
             # as the query params for the filter function
-            if ((destinationNode.filterDescription is not None) and 
-                 (destinationNode.filterDescription.custom_filter == False)):
-                     replicationOptions['query_params'] = destinationNode.filterDescription.specData
+            if ((destinationNodeInfo.filter_description is not None ) and 
+                 (destinationNodeInfo.filter_description.get('custom_filter') == False)):
+                     replicationOptions['query_params'] = destinationNodeInfo.filter_description
                      
             #if distinationNode['distribute service'] .service_auth["service_authz"] is not  None:
                 #log.info("Destination node '{}' require authentication".format(destinationUrl))
-                #Try to get the user name and password the url.
+                #Try to get the user name and password the url
+            destinationUrl = destinationNodeInfo.resource_data_url
+
             credential = sourceLRNode.getDistributeCredentialFor(destinationUrl)
             if credential is not None:
-                parsedUrl = urlparse.urlparse(destinationUrl)
+                parsedUrl = urlparse.urlparse()
                 destinationUrl = destinationUrl.replace(parsedUrl.netloc, "{0}:{1}@{2}".format(
                                                 credential['username'], credential['password'], parsedUrl.netloc))
             
@@ -170,14 +172,13 @@ class DistributeController(BaseController):
 
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
-            results = server.replicate(sourceUrl, destinationUrl, **replicationOptions)
+            results = server.replicate(sourceUrl, destinationNodeInfo.resource_data_url, **replicationOptions)
             log.debug("Replication results: "+str(results))
             with lock:
                 server = couchdb.Server(appConfig['couchdb.url'])
                 db = server[appConfig['couchdb.db.node']]
                 doc = db[appConfig['lr.nodestatus.docid']]
                 doc['last_out_sync'] = h.nowToISO8601Zformat()
-                doc['out_sync_node'] = destinationNode.nodeDescription.node_name
                 db[appConfig['lr.nodestatus.docid']] = doc
         
         log.info("Distribute.......\n")
@@ -188,17 +189,20 @@ class DistributeController(BaseController):
         if((sourceLRNode.connections is None) or 
             (len(sourceLRNode.connections) ==0)):
             log.info("No connection present for distribution")
-            return
+            return json.dumps({self.__ERROR:''})
         log.info("Connections: "+str(sourceLRNode.connections)+"\n")
+        
         lock = threading.Lock()
-        for connectionInfo in self._getDistributeDestinations():
-            replicationArgs = (connectionInfo['destinationNode'], 
-                                         defaultCouchServer, 
-                                         self.resource_data, 
-                                         connectionInfo["distribute_sink_url"],lock)
-                                         
-            # Use a thread to do the actual replication.
-            replicationThread = threading.Thread(target=doDistribution, 
-                                                                        args=replicationArgs)
-            replicationThread.start()
-
+        connectionsStatusInfo = self._getDistributeDestinations()
+        log.debug("\nSource Node Info:\n{0}".format(pprint.pformat(sourceLRNode.distributeInfo)))
+        log.debug("\n\n Distribute connections:\n{0}\n\n".format(pprint.pformat(connectionsStatusInfo)))
+        
+        for connectionStatus in  connectionsStatusInfo['connections']:
+            if connectionStatus.has_key(self.__ERROR) == False:
+                replicationArgs = (connectionStatus['destinationNodeInfo'], 
+                                              defaultCouchServer, 
+                                              self.resource_data ,lock)
+                    # Use a thread to do the actual replication.
+                replicationThread = threading.Thread(target=doDistribution, args=replicationArgs)
+                replicationThread.start()
+            return json.dumps(connectionsStatusInfo)
