@@ -77,9 +77,9 @@ class TestDistribute(object):
         
         #add the destination node as connection to the source node.
         if isinstance(isGatewayConnection, bool):
-            sourceNode.addConnectionTo(destinationNode._getNodeUrl(). gatewayConnection)
+            sourceNode.addConnectionTo(destinationNode._getNodeUrl(), isGatewayConnection)
         else:
-            sourceNode.addConnectionTo(destinationNode._getNodeUrl(), (sourceIsGateway and destinationIsGateway))
+            sourceNode.addConnectionTo(destinationNode._getNodeUrl(), (sourceIsGateway or destinationIsGateway))
 
     def _doDistributeTest(self, sourceNode, destinationNode):
         #start the node nodes.
@@ -247,7 +247,7 @@ class TestDistribute(object):
             is not allowed between gateway nodes on closed network."""
 
 
-    def test_common_to_gateway_same_community_network(self):
+    def test_common_to_gateway_same_community_and_network(self):
         """ This tests distribute/replication between common node to a gateway 
             common node.  distribution/replication should work.
         """
@@ -255,7 +255,8 @@ class TestDistribute(object):
         sourceNode =self._NODES[0]
         destinationNode = self._NODES[1]
         self._setupNodePair(sourceNode, destinationNode, 
-                                        destinationIsGateway =True)
+                                        destinationIsGateway =True,
+                                        isGatewayConnection=True)
         
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
