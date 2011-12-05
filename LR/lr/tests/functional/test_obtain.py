@@ -214,5 +214,52 @@ class TestObtainController(TestController):
         params['request_ID'] = testId
         response = self.app.get(url(controller='obtain',**params))
         self._validateResponse(response,json.dumps(params),[testId])        
+
+    def test_request_ID_doc_get(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        del params['by_resource_ID']
+        params['request_ID'] = self.ids[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.ids[0]])
+
+    def test_request_id_doc_get(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        del params['by_resource_ID']
+        params['request_id'] = self.ids[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.ids[0]])
+        
+    def test_request_ID_resource_get(self):
+        params = self._getInitialPostData()
+        params['request_ID'] = self.resourceLocators[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+
+    def test_request_ID_resource_get(self):
+        params = self._getInitialPostData()
+        params['request_id'] = self.resourceLocators[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+    def test_get_fail_both_false(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = False
+        params['by_resource_ID'] = False
+        params['request_IDs'] = self.resourceLocators[0:1]
+        try:
+            response = self.app.get(url(controller='obtain',**params),headers=headers)
+        except AppError as ex:
+            self._validateError(ex.message[ex.message.rfind('{'):])        
+
+    def test_get_fail_both_true(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = True
+        params['request_IDs'] = self.resourceLocators[0:1]
+        try:
+            response = self.app.get(url(controller='obtain',**params),headers=headers)
+        except AppError as ex:
+            self._validateError(ex.message[ex.message.rfind('{'):])                    
     def test_empty(self):
             pass
