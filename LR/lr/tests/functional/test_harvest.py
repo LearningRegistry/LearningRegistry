@@ -5,13 +5,22 @@ from urllib import unquote_plus,quote_plus
 from pylons import config
 from datetime import datetime
 from lr.lib.harvest import harvest
+import threading
+import time
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 db = None
 def updateViews():
-    len(db.view('_design/learningregistry-resources/_view/docs'))
-    len(db.view('_design/learningregistry-resource-location/_view/docs'))
-    len(db.view('_design/learningregistry-by-date/_view/docs'))        
+    def updateView(viewName):        
+        len(db.view(viewName, limit=1))
+    views = ['_design/learningregistry-resources/_view/docs',
+             '_design/learningregistry-resource-location/_view/docs',
+             '_design/learningregistry-by-date/_view/docs']
+    for v in views:
+        threading.Thread(target=updateView,args=(v,)).start()
+    while threading.active_count() > 1:
+        log.debug("Updating View")
+        time.sleep(1)
 class TestHarvestController(TestController):
     @classmethod
     def setupClass(self):
