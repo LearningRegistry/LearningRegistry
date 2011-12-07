@@ -9,12 +9,12 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="SVC_DESCRIPTION_SCRIPT" elementType="Argument">
             <stringProp name="Argument.name">SVC_DESCRIPTION_SCRIPT</stringProp>
-            <stringProp name="Argument.value">C:\dev\flr\LearningRegistry\jmeter_tests\svc_desc.js</stringProp>
+            <stringProp name="Argument.value">/home/lreg/LearningRegistry/jmeter_tests/svc_desc.js</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="DATA_PATH" elementType="Argument">
             <stringProp name="Argument.name">DATA_PATH</stringProp>
-            <stringProp name="Argument.value">C:\dev\flr\LearningRegistry\jmeter_tests</stringProp>
+            <stringProp name="Argument.value">/home/lreg/LearningRegistry/jmeter_tests</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="" elementType="Argument">
@@ -156,7 +156,7 @@
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Resource Distribution Network Policy" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Resource Distribution Network Policy" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -194,8 +194,8 @@
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\resource_distribution_network_policy\\${ResourceDistributionNetworkPolicyVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/resource_distribution_network_policy/${ResourceDistributionNetworkPolicyVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -219,7 +219,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Network Node Services" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Network Node Services" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -257,8 +257,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\network_node_services\\${NetworkNodeServicesVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/network_node_services/${NetworkNodeServicesVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -320,8 +320,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\network_node_status\\${NetworkNodeStatusVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/network_node_status/${NetworkNodeStatusVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -383,8 +383,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\network_node_description\\${NetworkNodeDescriptionVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/network_node_description/${NetworkNodeDescriptionVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -408,7 +408,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Resource Distribution" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Resource Distribution" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -446,8 +446,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\resource_distribution_network\\${ResourceDistributionNetworkVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/resource_distribution_network/${ResourceDistributionNetworkVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 
 </stringProp>
@@ -472,7 +472,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Basic Publish" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Basic Publish" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -510,8 +510,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\basic_publish\\${BasicPublishVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/basic_publish/${BasicPublishVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -535,7 +535,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SWORD Publish" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SWORD Publish" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -573,8 +573,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\sword_publish\\${SwordPublishVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/sword_publish/${SwordPublishVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -598,7 +598,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Basic Obtain" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Basic Obtain" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -636,8 +636,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\basic_obtain\\${BasicObtainVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/basic_obtain/${BasicObtainVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -661,7 +661,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Basic Harvest" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Basic Harvest" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -699,8 +699,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\basic_harvest\\${BasicHarvestVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/basic_harvest/${BasicHarvestVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
@@ -724,7 +724,7 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="OAI-PMH Harvest" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="OAI-PMH Harvest" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -762,8 +762,8 @@ ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
         <hashTree>
           <BSFAssertion guiclass="TestBeanGUI" testclass="BSFAssertion" testname="BSF Assertion" enabled="true">
             <stringProp name="filename"></stringProp>
-            <stringProp name="parameters">${__FileToString(${DATA_PATH}\oai_harvest\\${OaiHarvestVersion}\svc_description.js)}</stringProp>
-            <stringProp name="script">${__FileToString(${DATA_PATH}\utils.js)};
+            <stringProp name="parameters">${__FileToString(${DATA_PATH}/oai_harvest/${OaiHarvestVersion}/svc_description.js)}</stringProp>
+            <stringProp name="script">${__FileToString(${DATA_PATH}/utils.js)};
 ${__FileToString(${SVC_DESCRIPTION_SCRIPT})};
 </stringProp>
             <stringProp name="scriptLanguage">javascript</stringProp>
