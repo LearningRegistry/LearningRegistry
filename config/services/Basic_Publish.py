@@ -54,6 +54,7 @@ class __BasicPublishServiceTemplate(ServiceTemplate):
             "service_name": "Basic Publish",
             "service_version": "0.23.0",
             "service_endpoint": "/publish",
+            "service_type":"publish",
             "service_key": "false", 
             "service_https": "false",
             "doc_limit": None ,

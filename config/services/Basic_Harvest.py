@@ -64,6 +64,7 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "service_endpoint": "/harvest",
             "service_key": "false", 
             "service_https": "false",
+            "service_type":"access",
             "spec_kv_only": None,
             "flow_control": False,
             "id_limit": False,
