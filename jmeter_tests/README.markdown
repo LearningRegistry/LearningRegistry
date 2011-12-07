@@ -39,9 +39,9 @@ A sample return would be as such:
 
 ```javascript
 return new FunctionalAssertionResult(
-	AssertionFunction,
-	[args],
-	"expected value"
+   AssertionFunction,
+   [args],
+   "expected value"
 )
 ```
 
@@ -52,11 +52,11 @@ like this:
 
 ```javascript
 function assertSomeCondition(val, exp) {
-	return new FunctionalAssertionResult(
-		function() { /* function body with val and exp context available */ },
-		[],
-		exp
-	)
+   return new FunctionalAssertionResult(
+      function() { /* function body with val and exp context available */ },
+      [],
+      exp
+   )
 }
 ```
 
@@ -89,26 +89,26 @@ As an example, in version 0.23 of the Technical Specification, we have the follo
      "service_data":
      {
 
- 		"granularity":        "string",         // literal fixed vocabulary
-			  											    // "YYYY-MM-DD" (day granularity)	
-                        					       // or "YYYY-MM-DDThh:mm:ssZ" (second granularity)
+      "granularity":        "string",         // literal fixed vocabulary
+                                              // "YYYY-MM-DD" (day granularity)	
+                                              // or "YYYY-MM-DDThh:mm:ssZ" (second granularity)
       "flow_control":        FALSE,           // flow control not supported
       "setSpec":        NULL,         // sets are not supported
       "spec_kv_only":    <T/F>        // T to return only spec-defined key-value pairs
-    					                    // F to return all stored key-value pairs
-                  				        // optional, default F
+                                      // F to return all stored key-value pairs
+                                      // optional, default F
 
       "metadataformats":            // array of supported metadata formats
       [
        {
        "metadataFormat":            // description of a metadata format
 
-  			{
-        		"metadataPrefix":     "LR_JSON_0.10.0"    // the only supported harvest form
-            								                  // the Full OAI-PMH service will define
-									                           // schema and metadataNamespace
-									                           // where appropriate
-       	}
+         {
+            "metadataPrefix":     "LR_JSON_0.10.0"    // the only supported harvest form
+                                                      // the Full OAI-PMH service will define
+                                                      // schema and metadataNamespace
+                                                      // where appropriate
+         }
        }
       ]
     }
