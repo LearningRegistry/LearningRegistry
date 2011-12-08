@@ -14,3 +14,7 @@ class BaseController(WSGIController):
         # available in environ['pylons.routes_dict']
         response.headers['content-type'] = 'application/json;charset=utf-8'
         return WSGIController.__call__(self, environ, start_response)
+    def options(self):
+    	response.headers['Access-Control-Allow-Origin'] = '*'
+    	response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    	response.headers['Access-Control-Max-Age'] = '1728000'
