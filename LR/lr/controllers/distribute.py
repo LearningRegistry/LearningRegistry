@@ -27,11 +27,13 @@ from lr.lib import helpers as h
 import base64
 import pprint
 
+import Queue
+
 log = logging.getLogger(__name__)
 
 class DistributeController(BaseController):
     __TARGET_NODE_INFO = 'taget_node_info'
-    __OK = 'OK'
+    __OK = 'ok'
     __ERROR = 'error'
     
     def __before__(self):
@@ -44,16 +46,14 @@ class DistributeController(BaseController):
     def destination(self):
         """GET /destination: return node information"""
         # url('distribute')
-        response = {'OK': True}
+        response = {self.__OK: True}
         
         try:
             response[self.__TARGET_NODE_INFO] = sourceLRNode.distributeInfo
-            if appConfig.has_key("distribute_sink_url"):
-                  response['target_node_info']['distribute_sink_url'] = appConfig["distribute_sink_url"]
         except Exception as ex:
             log.exception(ex)
             response["error":"Internal error"]
-        
+            
         log.info("received distribute request...returning: \n"+pprint.pformat(response, 4))
         return json.dumps(response)
         
@@ -144,22 +144,26 @@ class DistributeController(BaseController):
     def create(self):
         """POST / distribute start distribution"""
         
-        def doDistribution(destinationNodeInfo, server, sourceUrl, lock):
+        distributeResults = Queue.Queue()
+
+        def doDistribution(connectionInfo, server, sourceUrl):
             # We want to always use the replication filter function to replicate
             # only distributable doc and filter out any other type of documents.
             # However we don't have any query arguments until we test if there is any filter.
             replicationOptions={'filter':ResourceDataModel.REPLICATION_FILTER, 
+                                             'source':sourceUrl,
+                                             'connection_id':  connectionInfo['connection_id'],
                                              'query_params': None}
             # If the destination node is using an filter and is not custom use it
             # as the query params for the filter function
-            if ((destinationNodeInfo.filter_description is not None ) and 
-                 (destinationNodeInfo.filter_description.get('custom_filter') == False)):
-                     replicationOptions['query_params'] = destinationNodeInfo.filter_description
+            if ((connectionInfo['destinationNodeInfo'].filter_description is not None ) and 
+                 (connectionInfo['destinationNodeInfo'].filter_description.get('custom_filter') == False)):
+                     replicationOptions['query_params'] =connectionInfo['destinationNodeInfo'].filter_description
                      
             #if distinationNode['distribute service'] .service_auth["service_authz"] is not  None:
                 #log.info("Destination node '{}' require authentication".format(destinationUrl))
                 #Try to get the user name and password the url
-            destinationUrl = destinationNodeInfo.resource_data_url
+            destinationUrl = connectionInfo['destinationNodeInfo'].resource_data_url
 
             credential = sourceLRNode.getDistributeCredentialFor(destinationUrl)
             if credential is not None:
@@ -167,19 +171,23 @@ class DistributeController(BaseController):
                 destinationUrl = destinationUrl.replace(parsedUrl.netloc, "{0}:{1}@{2}".format(
                                                 credential['username'], credential['password'], parsedUrl.netloc))
             
-            log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
-                            sourceUrl, destinationUrl, str(replicationOptions)))
-
             if replicationOptions['query_params'] is  None: 
                 del replicationOptions['query_params']
-            results = server.replicate(sourceUrl, destinationNodeInfo.resource_data_url, **replicationOptions)
-            log.debug("Replication results: "+str(results))
-            with lock:
-                server = couchdb.Server(appConfig['couchdb.url'])
-                db = server[appConfig['couchdb.db.node']]
-                doc = db[appConfig['lr.nodestatus.docid']]
-                doc['last_out_sync'] = h.nowToISO8601Zformat()
-                db[appConfig['lr.nodestatus.docid']] = doc
+                
+            replicationOptions['target'] = destinationUrl
+            
+            request = urllib2.Request(urlparse.urljoin(appConfig['couchdb.url'], '_replicator'),
+                                    headers={'Content-Type':'application/json' },
+                                    data = json.dumps(replicationOptions))
+            
+            log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
+                            sourceUrl, destinationUrl, pprint.pformat(replicationOptions)))
+                            
+            results = json.load(urllib2.urlopen(request))
+            connectionInfo['replication_results'] = results
+            distributeResults.put(connectionInfo)
+            log.debug("Replication results: " + pprint.pformat(results))
+
         
         log.info("Distribute.......\n")
         ##Check if the distribte service is available on the node.
@@ -192,17 +200,24 @@ class DistributeController(BaseController):
             return json.dumps({self.__ERROR:''})
         log.info("Connections: \n{0}\n"+pprint.pformat([c.specData for c in sourceLRNode.connections]))
         
-        lock = threading.Lock()
         connectionsStatusInfo = self._getDistributeDestinations()
         log.debug("\nSource Node Info:\n{0}".format(pprint.pformat(sourceLRNode.distributeInfo)))
         log.debug("\n\n Distribute connections:\n{0}\n\n".format(pprint.pformat(connectionsStatusInfo)))
         
+      
         for connectionStatus in  connectionsStatusInfo['connections']:
-            if connectionStatus.has_key(self.__ERROR) == False:
-                replicationArgs = (connectionStatus['destinationNodeInfo'], 
-                                              defaultCouchServer, 
-                                              self.resource_data ,lock)
+            if connectionStatus.has_key(self.__ERROR) == True:
+                distributeResults.put(connectionStatus)
+            else:
+                replicationArgs = (connectionStatus, defaultCouchServer, self.resource_data )
                     # Use a thread to do the actual replication.
                 replicationThread = threading.Thread(target=doDistribution, args=replicationArgs)
                 replicationThread.start()
-            return json.dumps(connectionsStatusInfo)
+                replicationThread.join()
+            log.debug("\n\n\n---------------------distribute threads end--------------------\n\n\n")
+            
+            log.debug("\n\n\n----------Queue results Completed size: {0}--------------\n\n\n".format(distributeResults.qsize()))
+            connectionsStatusInfo['connections'] = []
+            while distributeResults.empty() == False:
+                 connectionsStatusInfo['connections'].append(distributeResults.get())
+            return json.dumps(connectionsStatusInfo, indent=4)

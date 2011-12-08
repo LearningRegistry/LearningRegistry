@@ -103,7 +103,7 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
     for dest_node_url in connectionList:
         connection = dict(t.connection_description)
-        connection['connection_id'] = "{0}_to_{1}_connection".format(nodeName, dest_node_url)
+        connection['connection_id'] = "{0}_to_{1}_connection".format(nodeUrl, dest_node_url).strip()
         connection['source_node_url']=nodeUrl
         connection['destination_node_url'] = dest_node_url
         PublishDoc(server, dbname, connection['connection_id'] , connection)

@@ -13,12 +13,17 @@ from os import path
 import ConfigParser
 import json
 from time import sleep
+import pprint
 
 _PWD = path.abspath(path.dirname(__file__))
 _TEST_DATA_PATH = path.abspath(path.join(_PWD, "../../data/nsdl_dc/data-000000000.json"))
 _TEST_NODE_CONFIG_DIR = path.abspath(path.join(_PWD, "config"))
 
 class TestDistribute(object):
+    __OK = 'ok'
+    __ERROR = 'error'
+    __REPLICATION_RESULTS = 'replication_results'
+    __CONNECTIONS = 'connections'
     
     @classmethod 
     def setupClass(cls):
@@ -80,18 +85,21 @@ class TestDistribute(object):
             sourceNode.addConnectionTo(destinationNode._getNodeUrl(), isGatewayConnection)
         else:
             sourceNode.addConnectionTo(destinationNode._getNodeUrl(), (sourceIsGateway or destinationIsGateway))
+            
+    
 
     def _doDistributeTest(self, sourceNode, destinationNode):
         #start the node nodes.
         sourceNode.start()
         destinationNode.start()
+        # Sleep for sometime to allow the change feed handlers to handler the time
+        # create the distributable docs.
         sleep(30)
         #Do the distribute
-        sourceNode.distribute()
-        # Wait for two minutes or that that all the document and be transfer to test that
-        # there are indeed distributed correctly
+        results = sourceNode.distribute()
         sleep(30)
-        
+        return results
+
     def test_common_nodes_same_network_community_no_filter(self):
         """ This tests distribute/replication between to common nodes on the same
             network.  There is no filter on the destination node. Distribution/replication 
@@ -104,7 +112,12 @@ class TestDistribute(object):
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
         sourceNode.publishResourceData(data["documents"])
-        self._doDistributeTest(sourceNode, destinationNode)
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert (response[self.__OK] and 
+                     response['connections'][0][self.__REPLICATION_RESULTS][self.__OK]),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
+        
         assert sourceNode.compareDistributedResources(destinationNode), \
                     """Distribute between two common nodes on the same network and 
                     community and no filter on the destination node."""
@@ -126,7 +139,12 @@ class TestDistribute(object):
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
         sourceNode.publishResourceData(data["documents"])
-        self._doDistributeTest(sourceNode, destinationNode)
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert (response[self.__OK] and 
+                      response[self.__CONNECTIONS][0][self.__REPLICATION_RESULTS][self.__OK]),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
+
         assert sourceNode.compareDistributedResources(destinationNode), \
                     """Distribute between two gateway nodes on different community
                     and network and no filter on the destination node."""
@@ -177,7 +195,12 @@ class TestDistribute(object):
                 data["documents"][i]["active"] = False
                 
         sourceNode.publishResourceData(data["documents"])
-        self._doDistributeTest(sourceNode, destinationNode)
+      
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert (response[self.__OK] and 
+                      response[self.__CONNECTIONS][0][self.__REPLICATION_RESULTS][self.__OK]),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
         
         assert sourceNode.compareDistributedResources(destinationNode, 
                                                                             destinationNode._nodeFilterDescription), \
@@ -217,7 +240,13 @@ class TestDistribute(object):
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
         sourceNode.publishResourceData(data["documents"])
-        self._doDistributeTest(sourceNode, destinationNode)
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert ( response[self.__OK] and 
+                      not response[self.__CONNECTIONS][0][self.__OK] and
+                      response[self.__CONNECTIONS][0][self.__ERROR] =='gateways can only distribute to gateways'),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
+        
         # There should be no replication. Destination node should be 
         # empty of resource_data docs
         assert len (destinationNode.getResourceDataDocs()) == 0, \
@@ -239,7 +268,14 @@ class TestDistribute(object):
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
         sourceNode.publishResourceData(data["documents"])
-        self._doDistributeTest(sourceNode, destinationNode)
+        
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert ( response[self.__OK] and 
+                      not response[self.__CONNECTIONS][0][self.__OK] and
+                      response[self.__CONNECTIONS][0][self.__ERROR] =='cannot distribute across non social communities'),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
+        
         # There should be no replication. Destination node should be 
         # empty of resource_data docs
         assert len (destinationNode.getResourceDataDocs()) == 0, \
@@ -261,8 +297,13 @@ class TestDistribute(object):
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
         sourceNode.publishResourceData(data["documents"])
-        self._doDistributeTest(sourceNode, destinationNode)
-        # There should be no replication. Destination node should be 
+        
+        response =self._doDistributeTest(sourceNode, destinationNode)
+        
+        assert (response[self.__OK] and 
+                      response[self.__CONNECTIONS][0][self.__REPLICATION_RESULTS][self.__OK]),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
+                # There should be no replication. Destination node should be 
         # empty of resource_data docs
         assert sourceNode.compareDistributedResources(destinationNode), \
                     """Distribution from a common node to gateway node should work"""
@@ -277,8 +318,16 @@ class TestDistribute(object):
         
         self._setupNodePair(sourceNode, destinationNode, 
                                         destinationIsGateway =True)
+                                        
         sourceNode.addConnectionTo(destinationNode._getNodeUrl(), True) 
         sourceNode.addConnectionTo("http://fake.node.org",  True)
+        
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert ( response[self.__OK] and 
+                      not response[self.__CONNECTIONS][0][self.__OK] and
+                      response[self.__CONNECTIONS][0][self.__ERROR].find('Cannot reach destination node')!=-1),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
         
         # There should be no replication. Destination node should be 
         # empty of resource_data docs

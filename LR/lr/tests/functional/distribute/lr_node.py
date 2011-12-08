@@ -30,8 +30,8 @@ import urlparse
 from services.Resource_Data_Distribution import __ResourceDataDistributionServiceTemplate as DistributeServiceTemplate
 import subprocess
 from lr.lib import helpers as h
-from datetime import datetime
 from time import sleep
+import pprint
 import signal
 
 import logging
@@ -76,7 +76,7 @@ class Node(object):
         return [self._nodeConfig.get("couch_info", db) for db in self._CONFIG_DATABASE_NAMES]
 
     def _getNodeUrl(self):
-        return self._nodeConfig.get("node_config", "node_url")
+        return self._nodeConfig.get("node_config", "node_url").strip()
 
     def _setupDescriptions(self):
         #  Set the node, network and community
@@ -231,13 +231,13 @@ class Node(object):
     
     def addConnectionTo(self, destinationUrl, gateway_connection=False):
         connection = dict(nodeTemplate.connection_description)
-        connection['connection_id'] = uuid.uuid4().hex
+        connection['connection_id'] = "{0}_to_{1}_connection".format(self._getNodeUrl(), destinationUrl).strip()
         connection['source_node_url']=self._getNodeUrl()
         connection['gateway_connection'] = gateway_connection
         connection['destination_node_url'] = destinationUrl
         setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node"),  
-                                "{0}_to_{1}_connection".format(self._nodeName, destinationUrl),
-                                 connection)
+                                            connection['connection_id'],
+                                            connection)
       
     
     def distribute(self):
@@ -246,17 +246,20 @@ class Node(object):
             request = urllib2.Request(urlparse.urljoin(self._getNodeUrl(), "distribute"), 
                                                     data,
                                                     {'Content-Type':'application/json; charset=utf-8'})
-            response = urllib2.urlopen(request) 
-
-    def getResourceDataDocs(self, filter_description=None):
+                                                    
+            response = json.load(urllib2.urlopen(request)) 
+            print("Distribute reponse: \n{0}".format(pprint.pformat(response)))
+            return response
+            
+    def getResourceDataDocs(self, filter_description=None, doc_type='resource_data', include_docs=True):
         
         db = self._server[self._nodeConfig.get("couch_info", "resourcedata")]
         
         #For source node get all the resource_data documents using the filter
         # that was using to distribute the document to destination node.
         options = { "filter": "filtered-replication/change_feed_filter",
-                            "include_docs":True,
-                            "doc_type":"resource_data"}
+                            "include_docs":include_docs,
+                            "doc_type":doc_type}
         if filter_description is not None:
             options["filter_description"] = json.dumps(filter_description)
         return db.changes(**options)["results"]
@@ -305,13 +308,24 @@ class Node(object):
             os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
         
     def start(self):
-        command = '(cd {0}; paster serve {1} --log-file {2}.log)'.format(
+        command = '(cd {0}; paster serve {1} --log-file {2})'.format(
                                         path.abspath(path.dirname(self._pylonsConfigPath)),
                                         self._pylonsConfigPath, _DISTRIBUTE_TEST_LOG) 
+                                        
         #Create a process group name as so that the shell and all its process
         # are terminated when stop is called.
         self._pylonsProcess = subprocess.Popen(command, shell=True, 
                                                             preexec_fn=os.setsid)
+                                                            
+        #wait for the node to start before returning.
+        while True:
+            sleep(5)
+            try:
+                response = urllib2.urlopen(self._getNodeUrl())
+                if (response.code /100 ) < 4:
+                    break
+            except:
+                continue
     
     def resetResourceData(self):
         del self._server[ self._nodeConfig.get("couch_info", "resourcedata")]
