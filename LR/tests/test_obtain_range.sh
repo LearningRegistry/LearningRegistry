@@ -1,1 +1,0 @@
-curl -v -H "Content-Type: application/json" -XPOST -d '{"by_resource_ID":true,"by_doc_ID":false,"ids_only":false,"request_IDs" : [{"request_ID":"http://aeiou.iicm.tugraz.at/aeiou.encyclop.r/r825259_ge.htm"},{"request_ID":"http://www.edu3.cat/Edu3tv/Fitxa?p_id=26350"}]}' http://lrdev05.learningregistry.org/obtain > range.json && firefox range.json &
