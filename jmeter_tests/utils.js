@@ -131,11 +131,12 @@ function s_is_subset(arr1, arr2) {
 	
 	Also checks for extra keys in the first object.
 */
-function assert_r(obj, exp) {
-	detect_extra_keys(obj, exp);
+function assert_r(obj, exp, detectExtraKeys) {
+	if(detectExtraKeys)
+		detect_extra_keys(obj, exp);
 	for (var prop in exp)
 		if ( typeOf(exp[prop]) == "object" )
-			assert_r(obj[prop], exp[prop]);
+			assert_r(obj[prop], exp[prop], detectExtraKeys);
 		else {
 			var passed = false;
 			var funResult = null;
@@ -149,7 +150,7 @@ function assert_r(obj, exp) {
 		   	/* If exp[prop] is an array, then assert each object in that array
 		   		TODO: Make it work for arrays that contain primitive values (none currently defined in spec) */
 				for(var i = 0; i < exp[prop].length; i++) 
-					assert_r(obj[prop][i], exp[prop][i]);
+					assert_r(obj[prop][i], exp[prop][i], detectExtraKeys);
 				passed = true;
 			} else 
 				passed = obj[prop] == exp[prop];					

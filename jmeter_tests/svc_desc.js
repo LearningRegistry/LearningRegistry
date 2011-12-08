@@ -113,7 +113,7 @@ try {
 			if (serviceName == expected["service_name"])
 			{
 				foundService = true;
-				assert_r(serviceDocument, expected);
+				assert_r(serviceDocument, expected, false);
 			}			
 		}
 		if (!testPassed || !foundService)
