@@ -1,1 +1,0 @@
-curl -v -H "Content-Type: application/json" -X POST  -d '{"keys" : ["16a158dce1baf4903872f11450004431","16a158dce1baf4903872f114500037c4","16a158dce1baf4903872f11450003550"]}' http://localhost:5984/resource_data/_all_docs?include_docs=true > range.htm && firefox range.htm

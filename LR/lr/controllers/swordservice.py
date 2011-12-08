@@ -5,6 +5,7 @@ from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
 from lr.lib.base import BaseController, render
 import lr.model as m
+from lr.controllers.publish import PublishController
 from lr.lib.harvest import harvest
 import json
 from lr.model import LRNode as sourceLRNode
@@ -16,7 +17,7 @@ class SwordError(Exception):
       self.value = value
     def __str__(self):
       return repr(self.value)
-class SwordserviceController(BaseController):
+class SwordserviceController(PublishController):
     def __init__(self):
         self.h = harvest()
     def __before__(self):
@@ -51,11 +52,12 @@ class SwordserviceController(BaseController):
         c.generator_url = self.baseUrl
     @restrict("POST")
     def create(self):		
+        log.debug(request.body)
         if c.no_op:
             result = {'OK':True}
             c.doc = {'doc_ID':12345}
         else:
-            result = m.publish(json.loads(request.body))
+            result = self._publish(json.loads(request.body))
         if result['OK']:
             c.content_url = urlparse.urljoin(self.baseUrl,'obtain') + '?request_id=%s&by_doc_ID=true' % result['doc_ID']
             c.doc = self.h.get_record(result['doc_ID'])			
