@@ -24,9 +24,9 @@ def deploy(branch, runTests=False):
                    'git checkout origin/%s' % branch]
     updateLRInstall = [activateLrVirtualEnv,
                        changeToLRProjectDir,
-                       'pip uninstall LR',
-                       'yes | pip -q install .',
-                       'yes | pip install -q uwsgi',
+                       'yes |pip uninstall LR',
+                       'yes | pip install .',
+                       'yes | pip install uwsgi',
                        deactivate]
     startLRServer = [activateLrVirtualEnv,
                      changeToLRProjectDir,
