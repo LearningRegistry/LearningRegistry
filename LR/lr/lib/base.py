@@ -24,5 +24,3 @@ class BaseController(WSGIController):
     def setOrigin(self):
         if 'origin' in request.headers:
            response.headers['Access-Control-Allow-Origin'] = request.headers['origin']
-        else:
-            response.headers['Access-Control-Allow-Origin'] = None        
