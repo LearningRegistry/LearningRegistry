@@ -25,13 +25,13 @@ SetupCommand('setup-app').run([pylons.test.pylonsapp.config['__file__']])
 
 environ = {}
 class LRTestApp(TestApp):
-	def options(self,url):
-		return self._gen_request('OPTIONS', url)		
+    def options(self,url,headers=None):
+        return self._gen_request('OPTIONS', url,headers=headers)        
 
 class TestController(TestCase):
 
     def __init__(self, *args, **kwargs):
-    	self.controllerName = None
+        self.controllerName = None
         wsgiapp = pylons.test.pylonsapp
         config = wsgiapp.config
         self.app = LRTestApp(wsgiapp)
@@ -41,8 +41,9 @@ class TestController(TestCase):
         self.until_date = datetime.utcnow().isoformat()+"Z"
        
     def test_options(self):
-    	if self.controllerName:
-    		res = self.app.options(url(controller=self.controllerName))
-    		assert res.headers['Access-Control-Allow-Origin'] == '*'
-    		assert res.headers['Access-Control-Allow-Methods'] == 'GET, POST, OPTIONS'
-    		assert res.headers['Access-Control-Max-Age'] == '1728000'
+        if self.controllerName:
+            res = self.app.options(url(controller=self.controllerName),headers={'origin':'http://foo.bar'})
+            assert res.headers['Access-Control-Allow-Origin'] == 'http://foo.bar'
+            assert res.headers['Access-Control-Allow-Methods'] == 'GET, POST, OPTIONS'
+            assert res.headers['Access-Control-Max-Age'] == '1728000'
+            assert res.headers['Access-Control-Allow-Headers'] == 'Content-Type,Origin,Accept'
