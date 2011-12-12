@@ -15,10 +15,14 @@ class BaseController(WSGIController):
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
         response.headers['content-type'] = 'application/json;charset=utf-8'
+        self.setOrigin()
         return WSGIController.__call__(self, environ, start_response)
-    def options(self):
-        log.debug(dir(request))
-    	response.headers['Access-Control-Allow-Origin'] = '*, null'
+    def options(self):        
     	response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     	response.headers['Access-Control-Max-Age'] = '1728000'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Origin,Accept'
+    def setOrigin(self):
+        if 'origin' in request.headers:
+           response.headers['Access-Control-Allow-Origin'] = request.headers['origin']
+        else:
+            response.headers['Access-Control-Allow-Origin'] = None        
