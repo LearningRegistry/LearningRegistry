@@ -4,7 +4,9 @@ Provides the BaseController class for subclassing.
 """
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
-from pylons import response
+from pylons import response, request
+import logging
+log = logging.getLogger(__name__)
 class BaseController(WSGIController):
 
     def __call__(self, environ, start_response):
@@ -15,6 +17,8 @@ class BaseController(WSGIController):
         response.headers['content-type'] = 'application/json;charset=utf-8'
         return WSGIController.__call__(self, environ, start_response)
     def options(self):
-    	response.headers['Access-Control-Allow-Origin'] = '*'
+        log.debug(dir(request))
+    	response.headers['Access-Control-Allow-Origin'] = '*, null'
     	response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     	response.headers['Access-Control-Max-Age'] = '1728000'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Origin,Accept'
