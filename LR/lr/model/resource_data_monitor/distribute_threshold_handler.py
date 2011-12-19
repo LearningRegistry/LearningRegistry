@@ -12,7 +12,7 @@ import urllib2
 from lr.lib.couch_change_monitor import BaseChangeThresholdHandler
 from pylons import config
 import logging
-
+import json
 appConfig = config['app_conf']
 
 log = logging.getLogger(__name__)
