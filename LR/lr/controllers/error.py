@@ -1,7 +1,7 @@
 import cgi
 
 from paste.urlparser import PkgResourcesParser
-from pylons import request
+from pylons import request,respose
 from pylons.controllers.util import forward
 from pylons.middleware import error_document_template
 from webhelpers.html.builder import literal
@@ -33,6 +33,7 @@ class ErrorController(BaseController):
             import json
             return json.dumps({'OK':False, 'message':request.environ['pylons.controller.exception'].message})
         else:
+            response.headers['Content-Type'] = 'application/json'
             return page
     def img(self, id):
         """Serve Pylons' stock images"""
