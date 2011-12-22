@@ -1,5 +1,5 @@
 from lr.tests import *
-
+import json
 class TestPublisherController(TestController):
     def __init__(self, *args, **kwargs):
         TestController.__init__(self,*args,**kwargs)
@@ -11,7 +11,7 @@ class TestPublisherController(TestController):
         assert res.headers['Access-Control-Max-Age'] == '1728000'
         assert res.headers['Access-Control-Allow-Headers'] == 'Content-Type,Origin,Accept'
         with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
-        	res = self.app.publich(url(controller=self.controllerName),params=json.dump(f),headers={'origin':'http://foo.bar','Content-Type': 'application/json'})
+        	res = self.app.post(url(controller=self.controllerName),params=f.read(),headers={'origin':'http://foo.bar','Content-Type': 'application/json'})
         publishResult = json.loads(res.body)
         assert publishResult['OK']
         for result in publishResult['document_results']:
