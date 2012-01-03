@@ -42,7 +42,7 @@ class harvest:
     return self.getViewRows(False,until_date,from_date,limit,resumption_token)
   def getViewRows(self,includeDocs, untilDate,fromDate,limit=None,resumption_token=None):    
     params = {
-        'stale':'ok',
+        'stale':appConfig['couchdb.stale.flag'],
         'include_docs':includeDocs,
         'endkey':h.convertToISO8601Zformat(untilDate),
         'startkey':h.convertToISO8601Zformat(fromDate),

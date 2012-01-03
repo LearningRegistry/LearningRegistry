@@ -157,7 +157,7 @@ class oaipmh(harvest):
     
     def list_identifiers_or_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None, include_docs=False):
         '''Returns the list_records as a generator based upon OAI-PMH query'''
-        opts = { "stale": "ok" };
+        opts = { "stale": appConfig['couchdb.stale.flag'] };
         if include_docs:
             opts["include_docs"] = True
         
@@ -243,7 +243,7 @@ class oaipmh(harvest):
             opts = {
                     "group": True,
                     "limit": 1,
-                    "stale": "ok"
+                    "stale": appConfig['couchdb.stale.flag']
                     }
             
             view_data = self.db.view('oai-pmh-identify-timestamp/docs', **opts)

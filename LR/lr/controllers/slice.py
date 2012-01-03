@@ -152,7 +152,7 @@ class SliceController(BaseController):
     def _get_view_total(self,view_name = '_design/learningregistry-slice/_view/docs',keys=[], resumptionToken=None):
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         
-        opts = {"stale": "ok", "reduce": True, "group": True }
+        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": True, "group": True }
         
         if self.enable_flow_control and resumptionToken != None:
             opts["keys"] = resumptionToken["keys"]
