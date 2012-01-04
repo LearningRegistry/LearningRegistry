@@ -126,13 +126,17 @@ class DistributeController(BaseController):
             # Make sure that the connection is active
             connectionsStatusInfo['connections'].append(self._canDistributeTo(connection, sourceLRNode.distributeInfo))
         
-            if connectionsStatusInfo['connections'][-1][self.__OK] and connection.gateway_connection == True:
+            if (connectionsStatusInfo['connections'][-1][self.__OK] and 
+                sourceLRNode.distributeInfo['gateway_node'] and
+                connectionsStatusInfo['connections'][-1]['destinationNodeInfo'].gateway_node and
+                connection.gateway_connection):
                 gatewayConnectionList.append(connection)
               # Only one gateway  connection is allowed, faulty network description
             if len(gatewayConnectionList) > 1:
                 log.info("***Abort distribution. More than one gateway node connection")
                 connectionsStatusInfo[self.__ERROR] ="only one active gateway connection is allowed, faulty network description"
                 break
+        
         if len (sourceLRNode.connections) == 0:
             connectionsStatusInfo[self.__ERROR] ="No connection present for distribution"
 
@@ -206,7 +210,7 @@ class DistributeController(BaseController):
         
       
         for connectionStatus in  connectionsStatusInfo['connections']:
-            if connectionStatus.has_key(self.__ERROR) == True:
+            if connectionsStatusInfo.has_key(self.__ERROR) or connectionStatus.has_key(self.__ERROR) == True:
                 distributeResults.put(connectionStatus)
             else:
                 replicationArgs = (connectionStatus, defaultCouchServer, self.resource_data )
@@ -216,8 +220,12 @@ class DistributeController(BaseController):
                 replicationThread.join()
             log.debug("\n\n\n---------------------distribute threads end--------------------\n\n\n")
             
-            log.debug("\n\n\n----------Queue results Completed size: {0}--------------\n\n\n".format(distributeResults.qsize()))
-            connectionsStatusInfo['connections'] = []
-            while distributeResults.empty() == False:
-                 connectionsStatusInfo['connections'].append(distributeResults.get())
-            return json.dumps(connectionsStatusInfo, indent=4)
+            
+        log.debug("\n\n\n----------Queue results Completed size: {0}--------------\n\n\n".format(distributeResults.qsize()))
+        connectionsStatusInfo['connections'] = []
+
+        while distributeResults.empty() == False:
+            connectionsStatusInfo['connections'].append(distributeResults.get())
+        log.debug("\n\n======== DISTRIBUTE RESULTS ============\n\n")
+        log.debug(pprint.pformat(connectionsStatusInfo))
+        return json.dumps(connectionsStatusInfo, indent=4)
