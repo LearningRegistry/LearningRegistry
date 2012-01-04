@@ -334,3 +334,5 @@ class TestDistribute(object):
         assert len (destinationNode.getResourceDataDocs()) == 0, \
                 """There  should be NO distribution/replication.  Source node connections
                 are invalid"""
+    
+    

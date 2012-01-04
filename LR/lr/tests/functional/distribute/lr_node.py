@@ -41,9 +41,12 @@ log = logging.getLogger(__name__)
 
 _PYLONS_CONFIG = path.abspath(path.join(_PWD, "../../../../development.ini.orig"))
 _RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchdb/resource_data/apps/filtered-replication"))
-_DISTRIBUTE_TEST_LOG = "test_distribute.log"
+_TEST_DISTRIBUTE_DIR_LOG = path.abspath(path.join(path.dirname(_PYLONS_CONFIG), "test_distribute_logs"))
 
-
+if not path.exists(_TEST_DISTRIBUTE_DIR_LOG):
+    os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
+        
+        
 class Node(object):
     _CONFIG_DATABASE_NAMES=["community", "network", "node", "resourcedata"]
     _RESOURCE_DATA_FILTER = """
@@ -59,8 +62,7 @@ class Node(object):
     def __init__(self, nodeConfig, nodeName, communityId=None, networkId=None):
         self._nodeConfig = nodeConfig
         self._nodeName = nodeName
-        self._pylonsConfigPath = path.abspath(path.join(path.dirname(_PYLONS_CONFIG),
-                                                                        self._nodeName+"_config.ini"))
+        self._setupFilePaths()
         self._setupPylonsConfig()
         self._setupDescriptions()
         self._setupNode()
@@ -71,7 +73,14 @@ class Node(object):
         if networkId is not None:
             self.setNetworkInfo(networkId)
         self.removeTestLog()
-
+        
+    def _setupFilePaths(self):
+        
+        self._pylonsConfigPath = path.abspath(path.join(path.dirname(_PYLONS_CONFIG),
+                                                                        self._nodeName+"_config.ini"))
+        self._logFilePath = path.abspath(path.join(_TEST_DISTRIBUTE_DIR_LOG,
+                                                                      self._nodeName+".log"))
+                                                                      
     def _getNodeDatabaseList(self):
         return [self._nodeConfig.get("couch_info", db) for db in self._CONFIG_DATABASE_NAMES]
 
@@ -97,7 +106,7 @@ class Node(object):
     
     def removeTestLog(self):
         try:
-            os.remove(path.abspath(path.join(self._pylonsConfig, _DISTRIBUTE_TEST_LOG)))
+            os.remove(self._logFilePath)
         except:
             pass
 
@@ -150,8 +159,6 @@ class Node(object):
         configFile = open(self._pylonsConfigPath, 'w')
         pylonsConfig.write(configFile)
         configFile.close()
-        
-        
         
     
     def setCommunityInfo(self, community, isSocialCommunity=True):
@@ -263,9 +270,9 @@ class Node(object):
         if filter_description is not None:
             options["filter_description"] = json.dumps(filter_description)
         return db.changes(**options)["results"]
-        
+    
     def compareDistributedResources(self, destination, filter_description=None):
-        """This method considered this node as source node.
+        """This method considers this node as source node.
         It compares its resource_data document with the destionation node to
         verify that data was distributed.  This comparison assumes that distribute/
         replication is done and that there is no other additions or deletions the
@@ -310,7 +317,7 @@ class Node(object):
     def start(self):
         command = '(cd {0}; paster serve {1} --log-file {2})'.format(
                                         path.abspath(path.dirname(self._pylonsConfigPath)),
-                                        self._pylonsConfigPath, _DISTRIBUTE_TEST_LOG) 
+                                        self._pylonsConfigPath, self._logFilePath)
                                         
         #Create a process group name as so that the shell and all its process
         # are terminated when stop is called.
@@ -331,13 +338,23 @@ class Node(object):
         del self._server[ self._nodeConfig.get("couch_info", "resourcedata")]
         self._setupResourceData()
         
-    
+    def restart(self):
+        self.stop()
+        self.start()
+        
     def tearDown(self):
         self.stop()
-        #Delete the generated pylons configuration files
-        os.remove(self._pylonsConfigPath)
+        try:
+            #Delete the generated pylons configuration files
+            os.remove(self._pylonsConfigPath)
+        except Exception as e:
+            log.exception(e)
+        
         #Delete the generated database.
         for database in self._getNodeDatabaseList():
-            del self._server[database]
+            try:
+                del self._server[database]
+            except Exception as e:
+                log.execption(e)
 
 
