@@ -18,7 +18,7 @@ _DEFAULT_CHANGE_OPTIONS = {'feed': 'continuous',
 
 log = logging.getLogger(__name__)
 
-class MonitorChanges(Process):
+class MonitorChanges(Thread):
     """Class that monitors continously a couchdb database changes to apply a list
     of handlers the changes of the database"""
     # Number time the run will try to restart listening to the feed after an error without
@@ -30,7 +30,7 @@ class MonitorChanges(Process):
             be pickeable and not tied in any way to the calling process otherwise to application
             may get unstable.
         """
-        Process.__init__(self, None, None, "learningRegistryChangeMonitor", args, kwargs)
+        Thread.__init__(self, None, None, "learningRegistryChangeMonitor", args, kwargs)
         self._database = couchdb.Server(serverUrl)[databaseName]
         self._callerThread = None
         self._addHandlerQueue = Queue()
@@ -129,7 +129,7 @@ class MonitorChanges(Process):
     def run(self):
         # As long as we are running keep monitoring the change feed for changes.
         log.debug("Start monitoring database : {0} changes PID: {1} since:{2}\n\n".format(
-                    str(self._database), self.pid, self._lastChangeSequence))
+                    str(self._database), self.name, self._lastChangeSequence))
         self._errorCount = 0
         while(self.is_alive() and self._errorCount < self._MAX_ERROR_RESTART):
             try:
@@ -145,14 +145,14 @@ class MonitorChanges(Process):
             log.error("Change monitor for database {0} exceeded max errors\n\n".format(str(self._database)))
     
     def terminate(self):
-        Process.terminate(self)
+        Thread.terminate(self)
         log.debug("\n\n------------I got terminated ...---------------\n\n")
     
     def start(self, callerThread=None):
         if isinstance(callerThread, Thread):
             self._callerThread = callerThread
         self._selfTerminatorThread()
-        Process.start(self)
+        Thread.start(self)
 
 
 if __name__=="__main__":
