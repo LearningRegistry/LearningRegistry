@@ -160,11 +160,18 @@ if __name__ == "__main__":
 
     #Update pylons config file to use the couchdb url
     _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
+    server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
+    varsionParts = [int(x) for x in server.version().split('.')]
+    oldVersion = False    
+    for version in varsionParts:
+        oldVersion |= version < 1
+    if oldVersion:
+        _config.set("app:main", "couchdb.stale.flag", "OK")
     destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
     _config.write(destConfigfile)
     destConfigfile.close()
 
-    server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
+    
 
     #Create the databases.
     CreateDB(server, dblist=[_RESOURCE_DATA])
