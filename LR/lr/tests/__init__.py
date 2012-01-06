@@ -36,8 +36,8 @@ class TestController(TestCase):
         TestCase.__init__(self, *args, **kwargs)
         self.from_date = datetime(1990,1,1).isoformat() + "Z"
         self.until_date = datetime.utcnow().isoformat()+"Z"
-    @raises(AppError)
-    def test_error(self):    	
-		resp = self.app.get(url(controller='foo'))
-		assert resp.headers['Content-Type'] == 'text/html'
-
+    
+    def test_error(self):       
+        resp = self.app.get(url(controller='foo'), status=404)
+        assert resp.headers['Content-Type'] == 'text/html; charset=utf-8'
+            
