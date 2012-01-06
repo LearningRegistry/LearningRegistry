@@ -33,7 +33,7 @@ class ErrorController(BaseController):
             import json
             return json.dumps({'OK':False, 'message':request.environ['pylons.controller.exception'].message})
         else:
-            response.headers['Content-Type'] = 'application/json; charset=utf-8'
+            response.headers['Content-Type'] = 'text/html; charset=utf-8'
             return page
     def img(self, id):
         """Serve Pylons' stock images"""
