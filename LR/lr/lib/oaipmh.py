@@ -151,7 +151,7 @@ class oaipmh(harvest):
 #        return map(lambda row: row["value"], view_data)
 
     def get_records_by_resource(self,resource_locator):
-        view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST", documentHandler=OAIPMHDocumentResolver(), include_docs=True,keys=[resource_locator], stale='ok')
+        view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST", documentHandler=OAIPMHDocumentResolver(), include_docs=True,keys=[resource_locator], stale=appConfig['couchdb.stale.flag'])
         for doc in view_data:
             yield doc  
     
@@ -195,7 +195,7 @@ class oaipmh(harvest):
     
     def list_metadata_formats(self, identity=None, by_doc_ID=False, verb="ListMetadataFormats"):
         try:
-            opts = { "stale": "ok" }
+            opts = { "stale": appConfig['couchdb.stale.flag'] }
             if identity != None:
                 opts["include_docs"] = "true"
                 

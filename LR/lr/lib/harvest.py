@@ -23,7 +23,7 @@ class harvest:
           return None   
 
   def get_records_by_resource(self,resource_locator):
-    view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST",include_docs=True,keys=[resource_locator], stale='ok')
+    view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST",include_docs=True,keys=[resource_locator], stale=appConfig['couchdb.stale.flag'])
     for doc in view_data:
         yield doc["doc"]      
     
@@ -33,7 +33,7 @@ class harvest:
   def list_metadata_formats(self):
      return [{'metadataFormat':{'metadataPrefix':'dc'}}]
   def earliestDate(self):
-    view = self.db.view('_design/learningregistry-by-date/_view/docs',limit=1,stale='ok')
+    view = self.db.view('_design/learningregistry-by-date/_view/docs',limit=1,stale=appConfig['couchdb.stale.flag'])
     if len(view.rows) > 0:
       return view.rows[0].key
     else:
