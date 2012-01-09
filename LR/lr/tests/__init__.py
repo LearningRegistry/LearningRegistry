@@ -13,10 +13,11 @@ from paste.deploy import loadapp
 from paste.script.appinstall import SetupCommand
 from pylons import url
 from routes.util import URLGenerator
-from webtest import TestApp
+from webtest import TestApp,AppError
 from datetime import datetime
 import pylons.test
 import logging
+from nose.tools import raises
 log = logging.getLogger(__name__)
 __all__ = ['environ', 'url', 'TestController']
 time_format = '%Y-%m-%d %H:%M:%SZ'
@@ -35,3 +36,8 @@ class TestController(TestCase):
         TestCase.__init__(self, *args, **kwargs)
         self.from_date = datetime(1990,1,1).isoformat() + "Z"
         self.until_date = datetime.utcnow().isoformat()+"Z"
+    @raises(AppError)
+    def test_error(self):    	
+		resp = self.app.get(url(controller='foo'))
+		assert resp.headers['Content-Type'] == 'text/html'
+

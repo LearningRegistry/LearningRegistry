@@ -1,4 +1,4 @@
-/var/log/learningregistry/paster.log {
+/var/log/learningregistry/uwsgi.log {
         daily
         missingok
         rotate 31
