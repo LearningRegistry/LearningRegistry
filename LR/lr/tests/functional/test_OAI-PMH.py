@@ -178,6 +178,9 @@ class TestOaiPmhControllerSpecialData(TestController):
 
 class TestOaiPmhController(TestController):
 
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "OAI-PMH"   
     @classmethod
     def setUpClass(self):
 

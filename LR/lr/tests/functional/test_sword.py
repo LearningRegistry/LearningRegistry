@@ -3,7 +3,9 @@ import logging, json
 log = logging.getLogger(__name__)
 file_path = '../data/oai_dc/data-0.json'
 class TestSwordController(TestController):
-
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "swordservice"    
     def test_index(self):
         response = self.app.get(url(controller='sword', action='index'),headers={'content-type': 'application/json', 'user-agent':'python','X-On-Behalf-Of':'wegrata','X-Verbose':'False' })
         # Test response...

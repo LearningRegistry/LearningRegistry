@@ -241,7 +241,9 @@ class TestSlicesController(TestController):
     db = server[database]
     
     setupCount=0
-    
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "slice"        
     #slice for test docs containing the signature test key
     def _sliceForAllTestDocs(self):
         parameters = {}

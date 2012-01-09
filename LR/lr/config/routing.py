@@ -26,6 +26,7 @@ def make_map(config):
             service_doc = h.getServiceDocument(service_doc_id)
             if service_doc is not None and service_doc["active"]:
                 map.resource(member_name, collection_name)
+                map.connect("/"+collection_name,controller=collection_name,action='options',conditions=dict(method=['OPTIONS']))
                 if member_name == 'swordservice':
                     map.connect("/swordpub",controller='swordservice',action='create')
                 log.info("Enabling service route for: {0} member: {1} collection: {2}".format(service_doc_id, member_name, collection_name))
@@ -49,7 +50,7 @@ def make_map(config):
         # Value added services
         mapResource('lr.oaipmh.docid', 'OAI-PMH', 'OAI-PMH')
         mapResource('lr.slice.docid', 'slice', 'slice')
-        mapResource('lr.sword.docid', 'swordservice','swordservice')    
+        mapResource('lr.sword.docid', 'swordservice','swordservice')        
     map.minimization = False
     map.explicit = False
 

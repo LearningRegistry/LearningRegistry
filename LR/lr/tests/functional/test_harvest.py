@@ -13,6 +13,9 @@ def updateViews():
     len(db.view('_design/learningregistry-resource-location/_view/docs'))
     len(db.view('_design/learningregistry-by-date/_view/docs'))        
 class TestHarvestController(TestController):
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "harvest"        
     @classmethod
     def setupClass(self):
         self.setup = True
