@@ -1,0 +1,1 @@
+curl -v -H "Content-Type: application/json" -X POST  -d '{ "request_id":"0002d23015b34b018f378e9027af5abf","by_doc_ID":true,"by_resource_ID":false }' http://lrdev1.learningregistry.org/harvest/getrecord > harvest.htm && firefox harvest.htm
