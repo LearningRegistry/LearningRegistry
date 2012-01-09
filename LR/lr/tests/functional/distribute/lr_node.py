@@ -48,6 +48,7 @@ if not path.exists(_TEST_DISTRIBUTE_DIR_LOG):
         
         
 class Node(object):
+    _REPLICATOR_DB = '_replicator'
     _CONFIG_DATABASE_NAMES=["community", "network", "node", "resourcedata"]
     _RESOURCE_DATA_FILTER = """
         function(doc , req)
@@ -73,6 +74,9 @@ class Node(object):
         if networkId is not None:
             self.setNetworkInfo(networkId)
         self.removeTestLog()
+        # Keep around the replication documents that are store in the replication 
+        # database so that they can be deleted when the node is teared down.
+        self._distributeResultsList = []
         
     def _setupFilePaths(self):
         
@@ -254,9 +258,9 @@ class Node(object):
                                                     data,
                                                     {'Content-Type':'application/json; charset=utf-8'})
                                                     
-            response = json.load(urllib2.urlopen(request)) 
-            print("Distribute reponse: \n{0}".format(pprint.pformat(response)))
-            return response
+            self._distributeResultsList.append(json.load(urllib2.urlopen(request))) 
+            print("Distribute reponse: \n{0}".format(pprint.pformat(self._distributeResultsList[-1])))
+            return self._distributeResultsList[-1]
             
     def getResourceDataDocs(self, filter_description=None, doc_type='resource_data', include_docs=True):
         
@@ -341,7 +345,35 @@ class Node(object):
     def restart(self):
         self.stop()
         self.start()
-        
+     
+    def removeReplicationDocs(self):
+        '''Method to delete replication document results documents from the couchdb
+         _replicator database.  Its seems like replication will not work if there is an existing
+         replication document stated as completed with the same source and target
+         database name eventhough those the document is about database thas been
+         deleted and recreated. '''
+        replicatorUrl = urlparse.urljoin(self._nodeConfig.get("couch_info", "server"), '_replicator')
+        for distributeResults in self._distributeResultsList:
+            for connectionResults in distributeResults['connections']:
+                if 'replication_results' in connectionResults:
+                    try:
+                        #Use urllib request to remove the replication documents, the python
+                        #couchdb interface has a bug at time of this write that prevents access
+                        # to the _replicator database.
+                        
+                        #first get the lastest version of the doc
+                        url = replicatorUrl+'/'+connectionResults['replication_results']['id']
+                        doc = json.load(urllib2.urlopen(url))
+            
+                        request = urllib2.Request(replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev']), 
+                                                                headers={'Content-Type':'application/json' })
+                
+                        request.get_method = lambda: "DELETE"
+                        
+                        urllib2.urlopen(request)
+                    except Exception as e:
+                        log.exception(e)
+            
     def tearDown(self):
         self.stop()
         try:
@@ -355,6 +387,9 @@ class Node(object):
             try:
                 del self._server[database]
             except Exception as e:
-                log.execption(e)
+                log.exception(e)
+                
+        #Delete the replication documents
+        self.removeReplicationDocs()
 
 
