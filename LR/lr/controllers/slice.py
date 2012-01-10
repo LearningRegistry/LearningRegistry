@@ -304,7 +304,7 @@ class SliceController(BaseController):
 
         
 
-        yield '\n],'+rt+'"resultCount":'+str(maxResults) +'}'
+        yield '\n],'+rt+'"resultCount":'+str(num_sent) +'}'
         
 # if __name__ == '__main__':
 # param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
