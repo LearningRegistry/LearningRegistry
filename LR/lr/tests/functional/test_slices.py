@@ -221,6 +221,9 @@ class TestSlicesSmallController(TestController):
 #the main suite of tests
 class TestSlicesController(TestController):
 
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "slice"
     testKeys = ['alphaTestKey', 'betaTestKey', 'gammaTestKey']
     otherKeys = ['deltaTestKey', 'epsilonTestKey', 'zetaTestKey']
     testDataKey = 'lr-test-data-slice-jbrecht'
