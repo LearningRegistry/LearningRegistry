@@ -42,9 +42,6 @@ log = logging.getLogger(__name__)
 _PYLONS_CONFIG = path.abspath(path.join(_PWD, "../../../../development.ini.orig"))
 _RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchdb/resource_data/apps/filtered-replication"))
 _TEST_DISTRIBUTE_DIR_LOG = path.abspath(path.join(path.dirname(_PYLONS_CONFIG), "test_distribute_logs"))
-
-if not path.exists(_TEST_DISTRIBUTE_DIR_LOG):
-    os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
         
         
 class Node(object):
@@ -63,6 +60,7 @@ class Node(object):
     def __init__(self, nodeConfig, nodeName, communityId=None, networkId=None):
         self._nodeConfig = nodeConfig
         self._nodeName = nodeName
+        self._replicatorUrl = urlparse.urljoin(self._nodeConfig.get("couch_info", "server"), self._REPLICATOR_DB)
         self._setupFilePaths()
         self._setupPylonsConfig()
         self._setupDescriptions()
@@ -250,8 +248,45 @@ class Node(object):
                                             connection['connection_id'],
                                             connection)
       
+    def waitOnReplication(self,  distributeResults):
+        """Wait for the replication to complete on the all node connections specifed
+        by dsistributeResults """
+        if distributeResults is None or 'connections' not in distributeResults:
+            print ("node {0}  has no replication results ....".format(self._nodeName))
+            return
+            
+        waiting = True  
+        while(waiting):
+             # Set waiting to false and check to the replication document to see
+             # if replication not completed for any of the connections, if not then
+            # reset waiting to true.
+            waiting =False
+            for connectionResults in distributeResults['connections']:
+                if 'replication_results' not in connectionResults:
+                    continue
+                #Get the replication document.
+                response = urllib2.urlopen(self._replicatorUrl+'/'+connectionResults['replication_results']['id'])
+                doc = json.load(response)
+                response.close()
+                
+                print('\n\n---------------Replication  Status-----------')
+                print('<=From node: {0}\n=>To node:{1}\n <=>complention status: \n{2}\n\n'.format(
+                                self._nodeName,  
+                                pprint.pformat(connectionResults['destinationNodeInfo'],4),
+                                pprint.pformat(doc, 4)))
+                if '_replication_state' not in doc or doc['_replication_state'] != 'completed':
+                    waiting = True
+                    sleep(30)
+                    continue
+        # We still need to wait for the changes monitor to process the replicated 
+        # documents and create the local copies. so wait for little bit more. 
+        # hopefully 30 additional seconds is good enough
+        sleep(10)
     
-    def distribute(self):
+    def distribute(self, waitOnReplication=True):
+        """ Distribute to all the node connections.  When waited for completion is
+        true the this method will that distribution is completed before returning 
+        the results. """
         if hasattr(self, '_pylonsProcess'):
             data = json.dumps({"dist":"dist"})
             request = urllib2.Request(urlparse.urljoin(self._getNodeUrl(), "distribute"), 
@@ -260,6 +295,10 @@ class Node(object):
                                                     
             self._distributeResultsList.append(json.load(urllib2.urlopen(request))) 
             print("Distribute reponse: \n{0}".format(pprint.pformat(self._distributeResultsList[-1])))
+            
+            if waitOnReplication:
+                self.waitOnReplication(self._distributeResultsList[-1])
+        
             return self._distributeResultsList[-1]
             
     def getResourceDataDocs(self, filter_description=None, doc_type='resource_data', include_docs=True):
@@ -319,6 +358,15 @@ class Node(object):
             os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
         
     def start(self):
+        
+        # remove any existing log file to start from scratch to avoid ever 
+        # growing log file.
+        self.removeTestLog()
+        
+        #Create the log file directory if it does not exists.
+        if not path.exists(_TEST_DISTRIBUTE_DIR_LOG):
+            os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
+            
         command = '(cd {0}; paster serve {1} --log-file {2})'.format(
                                         path.abspath(path.dirname(self._pylonsConfigPath)),
                                         self._pylonsConfigPath, self._logFilePath)
@@ -337,6 +385,7 @@ class Node(object):
                     break
             except:
                 continue
+        print("node '{0}' started ....\n".format(self._nodeName) )
     
     def resetResourceData(self):
         del self._server[ self._nodeConfig.get("couch_info", "resourcedata")]
@@ -352,8 +401,9 @@ class Node(object):
          replication document stated as completed with the same source and target
          database name eventhough those the document is about database thas been
          deleted and recreated. '''
-        replicatorUrl = urlparse.urljoin(self._nodeConfig.get("couch_info", "server"), '_replicator')
         for distributeResults in self._distributeResultsList:
+            if ('connections'  in distributeResults) == False:
+                continue
             for connectionResults in distributeResults['connections']:
                 if 'replication_results' in connectionResults:
                     try:
@@ -362,10 +412,14 @@ class Node(object):
                         # to the _replicator database.
                         
                         #first get the lastest version of the doc
-                        url = replicatorUrl+'/'+connectionResults['replication_results']['id']
-                        doc = json.load(urllib2.urlopen(url))
-            
-                        request = urllib2.Request(replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev']), 
+                        response = urllib2.urlopen(self._replicatorUrl+'/'+connectionResults['replication_results']['id'])
+                        doc = json.load(response)
+                        response.close()
+                        print ("\n\n--node {0} deleting replication doc: {1}".format(
+                                    self._nodeName, 
+                                    self._replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev'])))
+                                    
+                        request = urllib2.Request(self._replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev']), 
                                                                 headers={'Content-Type':'application/json' })
                 
                         request.get_method = lambda: "DELETE"
