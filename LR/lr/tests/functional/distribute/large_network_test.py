@@ -25,6 +25,8 @@ _NODES = []
 _COMMUNITIES = {}
 _GATEWAYS =[]
 _CONNECTIONS = []
+_DISTRIBUTE_ORDER = []
+_DATA = None
 
 def generateNodeConfig(numberOfNodes):
     
@@ -77,7 +79,7 @@ def setCommunity(community):
 
 def createNetwork():
     nodes = createNodes(15)
-    global _NODES, _COMMUNITIES, _GATEWAYS, _CONNECTIONS
+    global _NODES, _COMMUNITIES, _GATEWAYS, _CONNECTIONS, _DISTRIBUTE_ORDER, _DATA
     n = _NODES
     openCommunityOne = {"communityId": "Open Community One",
                                             "networks":
@@ -128,7 +130,10 @@ def createNetwork():
                             n[14]:[n[13]]
                             }
     _CONNECTIONS = connections
-
+    #Use the distribute order to have the gateway nodes starts for so that
+    # the data can get propagated throughout the network
+    _DISTRIBUTE_ORDER =[2, 0, 3, 4, 5, 7, 6,  8, 12, 13, 9, 10, 14, 11, 1]
+    
     for community in communities:
         setCommunity(community)
     
@@ -139,14 +144,14 @@ def createNetwork():
     #create node connections.
     for node in connections:
         for destination in connections[node]:
-            gatewayConnection = destination  in gateways
+            gatewayConnection = ((destination  in gateways) or (node in gateways))
             node.addConnectionTo(destination._getNodeUrl(), gatewayConnection)
     
     #Poluate node[2] as the seed node.
-    data = json.load(file(_TEST_DATA_PATH))
-    n[2].publishResourceData(data["documents"])
-
-def firstLevelTest():
+    _DATA = json.load(file(_TEST_DATA_PATH))
+    n[2].publishResourceData(_DATA["documents"])
+    
+def firstLevelDistribute():
     #Start the test by starting with the source 
     _NODES[2].start()
     #sleep for little  to let the node create teh distributable data
@@ -174,16 +179,33 @@ def firstLevelTest():
             assert result.has_key('replication_results') and  result['replication_results']['ok'], "Replication to node{0} failed".format(_NODES[node_index]._nodeName)
             assert _NODES[2].compareDistributedResources(_NODES[node_index]), "Documents distribute to node {0} failed".format(_NODES[node_index]._nodeName)
 
-def secondLevelPass():
-    for c in _NODES[_NODES[2]]:
-        for d in _NODES[c]:
-            d.start()
-            
-    for c in _NODES[_NODES[2]]:
-        c.distribute()
-        sleep(30)
+def secondLevelDistribute():
+    for node in _CONNECTIONS[_NODES[2]]:
+        for destinationNode in   _CONNECTIONS[node]:
+            destinationNode.start()
+
+    for node in _CONNECTIONS[_NODES[2]]:
+        node.distribute(True)
     
+def  startNodes():
+    for node in _NODES:
+        node.start()
+
+def doNodesDistribute():
+    for n in _DISTRIBUTE_ORDER:
+        print("\n\n==========Node {0} distribute results==========".format(_NODES[n]._nodeName))
+        _NODES[n].distribute()
+        sleep(5)
+
 def destroyNetwork():
     for node in _NODES:
         node.tearDown()
+    _NODES.clear()
+    #keep around the replication document so that I can all the replication info can
+    # be deleted.  It seems like the replicator database will not do replication if the
+    # source and target node is already in the dabatase as completed document,
+    # eventhough source and target are new document.
 
+def testLargeNetwork():
+    createNetwork()
+    firstLevelDistribute()
