@@ -92,12 +92,10 @@ class TestDistribute(object):
         #start the node nodes.
         sourceNode.start()
         destinationNode.start()
-        # Sleep for sometime to allow the change feed handlers to handler the time
-        # create the distributable docs.
+        #Wait for the changes monitor to create the distributable docs.
         sleep(30)
         #Do the distribute
-        results = sourceNode.distribute()
-        sleep(30)
+        results = sourceNode.distribute(True)
         return results
 
     def test_common_nodes_same_network_community_no_filter(self):
