@@ -12,6 +12,9 @@ log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 db = None
 class TestHarvestController(TestController):
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "obtain"
     @classmethod
     def setupClass(self):
         self.setup = True

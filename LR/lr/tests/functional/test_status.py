@@ -4,7 +4,9 @@ import logging
 log = logging.getLogger(__name__)
 
 class TestStatusController(TestController):
-
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+	self.controllerName = "status"
     def test_index(self):
         response = self.app.get('/status')
         #log.info(str(response))
