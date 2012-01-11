@@ -25,19 +25,28 @@ time_format = '%Y-%m-%d %H:%M:%SZ'
 SetupCommand('setup-app').run([pylons.test.pylonsapp.config['__file__']])
 
 environ = {}
-
+class OptionsTestApp(TestApp):
+    def options(self,url,headers):
+        return self._gen_request(method='OPTIONS', url=url,headers=headers)        
 class TestController(TestCase):
 
     def __init__(self, *args, **kwargs):
         wsgiapp = pylons.test.pylonsapp
         config = wsgiapp.config
-        self.app = TestApp(wsgiapp)
+        self.app = OptionsTestApp(wsgiapp)
         url._push_object(URLGenerator(config['routes.map'], environ))
         TestCase.__init__(self, *args, **kwargs)
         self.from_date = datetime(1990,1,1).isoformat() + "Z"
         self.until_date = datetime.utcnow().isoformat()+"Z"
+        self.controllerName = None
     @raises(AppError)
     def test_error(self):    	
 		resp = self.app.get(url(controller='foo'))
 		assert resp.headers['Content-Type'] == 'text/html'
-
+    def test_options(self):
+        if self.controllerName is not None:
+            res = self.app.options(url(controller=self.controllerName),headers={'origin':'http://foo.bar'})
+            assert res.headers['Access-Control-Allow-Origin'] == 'http://foo.bar'
+            assert res.headers['Access-Control-Allow-Methods'] == 'GET, POST, OPTIONS'
+            assert res.headers['Access-Control-Max-Age'] == '1728000'
+            assert res.headers['Access-Control-Allow-Headers'] == 'Content-Type,Origin,Accept'

@@ -36,7 +36,10 @@ class SwordserviceController(PublishController):
             c.community_name = sourceLRNode.communityDescription.community_id
         return render('sword.mako')	
     def parse_params(self):
-        c.user_agent = request.headers['user-agent']
+        if 'user-agent' in request.headers:
+            c.user_agent = request.headers['user-agent']
+        else:
+            c.user_agane = ""
         c.no_op = False
         c.verbose = False
         #for some reason request.url has an extra '/' in it
