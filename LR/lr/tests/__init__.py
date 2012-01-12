@@ -39,10 +39,12 @@ class TestController(TestCase):
         self.from_date = datetime(1990,1,1).isoformat() + "Z"
         self.until_date = datetime.utcnow().isoformat()+"Z"
         self.controllerName = None
-    @raises(AppError)
-    def test_error(self):    	
-		resp = self.app.get(url(controller='foo'))
-		assert resp.headers['Content-Type'] == 'text/html'
+
+	@raises(AppError)
+    def test_error(self):       
+        resp = self.app.get(url(controller='foo'), status=404)
+        assert resp.headers['Content-Type'] == 'text/html; charset=utf-8'
+            
     def test_options(self):
         if self.controllerName is not None:
             res = self.app.options(url(controller=self.controllerName),headers={'origin':'http://foo.bar'})
