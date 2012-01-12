@@ -251,8 +251,10 @@ class Node(object):
     def waitOnReplication(self,  distributeResults):
         """Wait for the replication to complete on the all node connections specifed
         by dsistributeResults """
-        if distributeResults is None or 'connections' not in distributeResults:
-            print ("node {0}  has no replication results ....".format(self._nodeName))
+        if (distributeResults is None or 
+            ('connections' in distributeResults) == False or 
+            len (self.getResourceDataDocs(doc_type='resource_data_distributable', include_docs=False) ) == 0):
+            print ("node {0}  has no replication results or distributable docs ....".format(self._nodeName))
             return
             
         waiting = True  
@@ -270,11 +272,12 @@ class Node(object):
                 response.close()
                 
                 print('\n\n---------------Replication  Status-----------')
-                print('<=From node: {0}\n=>To node:{1}\n <=>complention status: \n{2}\n\n'.format(
+                print('<=From node:\t{0}\n=>To node:\t{1}\n<=>completion status: \t{2}\n'.format(
                                 self._nodeName,  
-                                pprint.pformat(connectionResults['destinationNodeInfo'],4),
-                                pprint.pformat(doc, 4)))
-                if '_replication_state' not in doc or doc['_replication_state'] != 'completed':
+                                connectionResults['destinationNodeInfo']['resource_data_url'].split('/')[-1].split('_resource_data')[0],
+                                doc.get('_replication_state')))
+                                
+                if  doc.get('_replication_state') != 'completed':
                     waiting = True
                     sleep(30)
                     continue
