@@ -9,6 +9,7 @@ Created on August 31, 2011
 @author: jpoyau
 '''
 import urllib2
+import pprint
 from lr.lib.couch_change_monitor import BaseChangeThresholdHandler
 from pylons import config
 import logging
