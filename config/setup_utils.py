@@ -50,8 +50,11 @@ def CreateDB(couchServer = _DEFAULT_COUCHDB_URL,  dblist=[], deleteDB=False):
 
 def PublishDoc(couchServer, dbname, name, doc_data):
     try:
-        db = couchServer[dbname]
         #delete existing document.
+        db = couchServer[dbname]
+        if "_rev" in doc_data:
+            del doc_data["_rev"]
+       
         try:
             del db[name]
         except:
@@ -136,14 +139,17 @@ def getSetupInfo():
     nodeSetup['node_description'] = nodeDescription
 
     adminUrl = getInput("Enter node admin indentity",
-                                    "{0}.node.admin@learningregistry.org".format(nodeUrl))
+                                    "admin@learningregistry.org".format(nodeUrl))
     nodeSetup['node_admin_identity'] = adminUrl
 
     distributeTargets = getInput("Enter the URLs of nodes that you wish to distribute to",
                                                  "")
     nodeSetup['connections'] = distributeTargets.split()
 
-    isNodeOpen = getInput('Is the  node "open" (T/F)', 'T')
+    isGatewayNode = getInput('Is the node a gateway node" (T/F)', 'F')
+    nodeSetup['gateway_node'] = (isGatewayNode == 'T')
+    
+    isNodeOpen = getInput('Is the node "open" (T/F)', 'T')
     nodeSetup['open_connect_source']  = (isNodeOpen=='T')
 
     isDistributeDest = getInput("Does the node want to be the destination for replication (T/F)", 'T')

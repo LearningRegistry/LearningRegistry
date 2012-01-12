@@ -3,7 +3,7 @@ Created on Aug 16, 2011
 
 @author: jklo
 '''
-from services import ServiceTemplate
+from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
 import pystache, uuid
 import json
@@ -59,6 +59,7 @@ class __OaiServiceTemplate(ServiceTemplate):
             "service_endpoint": "/OAI-PMH",
             "service_key": "false", 
             "service_https": "false",
+            "service_type": "access",
             "spec_kv_only": None,
             "flow_control": "false",
             "id_limit": None,

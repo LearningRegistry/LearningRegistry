@@ -3,7 +3,9 @@ function(doc) {
 		if (doc.payload_placement && doc.payload_placement == "inline" && doc.resource_data) {
 			
 			try {
-				var e4x = new XML(doc.resource_data.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""));
+				var data = doc.resource_data.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, "");
+				data = data.replace(/\s*<!DOCTYPE\s[^>]*>/m,"");
+				var e4x = new XML(data);
 				if (e4x) {
 					emit(doc.node_timestamp, 1);
 				}

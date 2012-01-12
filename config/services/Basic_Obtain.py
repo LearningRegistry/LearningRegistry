@@ -3,7 +3,7 @@ Created on Aug 16, 2011
 
 @author: jklo
 '''
-from services import ServiceTemplate
+from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
 import pystache, uuid
 import json
@@ -53,10 +53,11 @@ class __BasicObtainServiceTemplate(ServiceTemplate):
         opts = {
             "active": "false",
             "service_name": "Basic Obtain",
-            "service_version": "0.10.0",
+            "service_version": "0.21",
             "service_endpoint": "/obtain",
             "service_key": "false", 
             "service_https": "false",
+            "service_type": "access",   
             "spec_kv_only": False,
             "flow_control": False,
             "id_limit": None,

@@ -20,8 +20,9 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 import logging
+from urllib import unquote_plus
 log = logging.getLogger(__name__)  
-trues = ['T','t','True','true']
+trues = ['T','t','True','true', True]
 class ObtainController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -104,13 +105,13 @@ class ObtainController(BaseController):
             yield '], "resumption_token":"%s"}' % token
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""        
-        data = self._parseParams()
+        data = self._parseParams(request.params)
         self._validateParams(data)
         return self._performObtain(data)
         # url('obtain')
     def _validateParams(self,data):
-        by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
-        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])
+        by_doc_ID =data['by_doc_ID']
+        by_resource_ID = data['by_resource_ID']
         if not data.has_key("request_IDs"):        
             data['request_IDs'] = []
         if by_doc_ID and by_resource_ID:
@@ -144,7 +145,7 @@ class ObtainController(BaseController):
             yield ')'
     def create(self):
         """POST /obtain: Create a new item"""                
-        data = json.loads(request.body)
+        data = self._parseParams(json.loads(request.body))
         self._validateParams(data)
         return self._performObtain(data)
 
@@ -172,33 +173,39 @@ class ObtainController(BaseController):
 
     def show(self, id, format='html'):
         """GET /obtain/id: Show a specific item"""        
-        data = self._parseParams()
+        data = self._parseParams(request.params)
         keys=[id]
         data['request_IDs'] = keys        
         return self._performObtain(data)
         # url('obtain', id=ID)
-    def _parseParams(self):
+    def _parseParams(self,params):
         data = {
             'by_doc_ID':False,
             'by_resource_ID':True,
             'ids_only': False,
             'request_IDs': [],            
         }
-        if request.params.has_key('by_doc_ID') and request.params['by_doc_ID'] in trues:
+        if params.has_key('by_doc_ID') and params['by_doc_ID'] in trues:
             data['by_doc_ID'] = True
-            data['by_resource_ID'] = False
-                    
-        if request.params.has_key('by_resource_ID'):            
-            data['by_resource_ID'] = request.params['by_resource_ID'] in trues
-        if request.params.has_key('ids_only'):
-            data['ids_only'] = request.params['ids_only'] in trues
-        if request.params.has_key('resumption_token'):
-            data['resumption_token'] = rt.parse_token('obtain',request.params['resumption_token'])
+            data['by_resource_ID'] = False                    
+        if params.has_key('by_resource_ID'):            
+            data['by_resource_ID'] = params['by_resource_ID'] in trues
+        if params.has_key('ids_only'):
+            data['ids_only'] = params['ids_only'] in trues
+        if params.has_key('resumption_token'):
+            data['resumption_token'] = rt.parse_token('obtain',params['resumption_token'])
             log.debug(data['resumption_token'])
-        if request.params.has_key('callback'):
-            data['callback'] = request.params['callback']
-        if request.params.has_key('request_id'):
-            data['request_IDs'].append(request.params['request_id'])
+        if params.has_key('callback'):
+            data['callback'] = params['callback']
+        if params.has_key('request_ID'):
+            data['request_IDs'].append(params['request_ID'])
+        elif params.has_key('request_id'):
+            data['request_IDs'].append(params['request_id'])            
+        if params.has_key('request_IDs'):
+            data['request_IDs'].extend(params['request_IDs'])
+        if data['by_resource_ID']:
+            data['request_IDs'] = [unquote_plus(id) for id in data['request_IDs']]        
+        log.debug(data)
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""

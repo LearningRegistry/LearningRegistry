@@ -223,6 +223,9 @@ class TestSlicesSmallController(TestController):
 #the main suite of tests
 class TestSlicesController(TestController):
 
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "slice"
     testKeys = ['alphaTestKey', 'betaTestKey', 'gammaTestKey']
     otherKeys = ['deltaTestKey', 'epsilonTestKey', 'zetaTestKey']
     testSchema = 'NSDL'
@@ -530,7 +533,18 @@ class TestSlicesController(TestController):
             for doc in docs :
                 assert self._checkTag(doc['resource_data_description'], self.testKeys[0]+"test_by_identity_and_key")
                 assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_by_identity_and_key")
-        
+
+    @DataCleaner("test_by_identity_and_key_check_resultCount") 
+    def test_by_identity_and_key_check_resultCount(self):
+        print 'test_by_identity_and_key_check_resultCount'
+        parameters = {}
+        parameters[ANY_TAGS] = [self.testKeys[0]+"test_by_identity_and_key_check_resultCount"]
+        parameters[IDENTITY] = self.identities[1]+"test_by_identity_and_key_check_resultCount"
+        parameters[IDS_ONLY] = False
+        response = self._slice(parameters)
+        data = json.loads(response.body)
+        docsCount = len(self._loadAllDocs(parameters, response))
+        assert data['resultCount'] == docsCount
         
     @DataCleaner("test_by_date_and_identity") 
     def test_by_date_and_identity(self):

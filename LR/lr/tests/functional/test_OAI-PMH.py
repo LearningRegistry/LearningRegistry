@@ -1,7 +1,7 @@
 from StringIO import StringIO
 from iso8601.iso8601 import ParseError
 from lr.lib import helpers
-from lr.lib.oaipmh import oaipmh
+from lr.lib.oaipmh import oaipmh, getMetadataPrefix
 from lr.tests import *
 from lxml import etree
 from pylons import config
@@ -22,6 +22,9 @@ import time
 import unittest
 import urllib2
 import uuid
+from lr.util.testdata import getDC_v1_1, getTestDataForMetadataFormats, getTestDataForEmbeddedXMLDOCTYPEHeaders
+from lr.util.decorators import PublishTestDocs, ForceCouchDBIndexing
+from lr.util.validator import XercesValidator, validate_xml_content_type, validate_json_content_type, parse_response, validate_lr_oai_etree, validate_lr_oai_response
 
 json_headers={'content-type': 'application/json'}
 
@@ -48,38 +51,135 @@ dc_data = { "documents" : [], "ids": [] }
 sorted_dc_data = { "documents" : [], "ids": [] }
 sorted_nsdl_data = { "documents" : [], "ids": [] }
 
+class TestOaiPmhControllerSpecialData(TestController):
+    @classmethod
+    def setUpClass(self):
+        self.o = oaipmh()
+        self.server = self.o.server
+        self.db = self.o.db
 
-class XercesValidator():
-    def __init__(self):
-        def is_exe(fpath):
-            return os.path.exists(fpath) and os.access(fpath, os.X_OK)
-        
-        if "xerces-c.StdInParse" in config and is_exe(config["xerces-c.StdInParse"]):
-            self.stdinparse = [config["xerces-c.StdInParse"], '-n', '-f', '-s']
-            self.enabled = True
-        else:
-            self.enabled = False
+    @classmethod
+    def tearDownClass(self):
+        pass
+
+    @PublishTestDocs(getTestDataForEmbeddedXMLDOCTYPEHeaders(), "XML-HEADERS-AND-DOCTYPES")
+    def test_documents_with_xml_header_or_doctype_declarations(self):
+        ''''verify that xml resource_data with embedded <?xml?> and <!DOCTYPE> declarations can be retrieved.'''
+
+        test_docs = self.test_data_sorted["XML-HEADERS-AND-DOCTYPES"]
+
+        assert len(test_docs) > 0, "missing test documents"
+
+        def validateRecord(doc, record):
+            try:
+                ident = record.xpath("./oai:header/oai:identifier/text()", namespaces=namespaces)[0]
+            except:
+                ident = None
+
+            assert ident == doc["doc_ID"], "unexpected doc_ID returned, expected {0}, got {1}".format(doc["doc_ID"], ident)
+
+            try:
+                data = record.xpath("./oai:metadata/*", namespaces=namespaces)[0]
+            except:
+                data = None
             
-    def validate(self, contents=""):
-        errors = []
-        if self.enabled:
-            process = subprocess.Popen(self.stdinparse, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            xmlin = contents 
-            (_, stderr) = process.communicate(input=xmlin.encode("utf8"))
-            if stderr != None or stderr != "":
-                err_lines = stderr.splitlines()
-                for err in err_lines:
-                    m = re.match('''.*\s+line\s+([0-9]+),\s+char\s+([0-9]+)\):\s*(.*)$''', err)
-                    if m is not None:
-                        errors.append({ "line": m.group(1), 'char': m.group(2), 'msg': m.group(3) })
-        else:
-            log.info("Xerces not available for validation.")
-        return errors 
+            assert data != None, "unexpected resource data in metadata field"
 
+        def processRecord(doc):
+            response = self.app.get("/OAI-PMH", params={"verb":"GetRecord", "metadataPrefix":"DC_XML_HEADERS", "identifier":doc["doc_ID"], "by_doc_ID": "true"})
+            validate_xml_content_type(response)
+            obj = parse_response(response)
+            records = obj["etree"].xpath("/lr:OAI-PMH/lr:GetRecord/lr:record", namespaces=namespaces)
+            assert len(records) == 1, "wrong number of records returned, expected 1 got {0}".format(len(records))
+            validateRecord(doc, records[0])
+            
+
+        def processRecords(docs):
+            response = self.app.get("/OAI-PMH", params={"verb":"ListRecords", "metadataPrefix":"DC_XML_HEADERS" })
+            validate_xml_content_type(response)
+            obj = parse_response(response)
+            records = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:record", namespaces=namespaces)
+            assert len(records) == len(docs), "wrong number of records returned, expected {1} got {0}".format(len(records), len(docs))
+
+        for doc in test_docs:
+            processRecord(doc)
+
+        processRecords(test_docs)
+    
+
+    @PublishTestDocs(getTestDataForMetadataFormats(1), "LMF-schema-syntax")
+    def test_listMetadataFormats_schema_format_syntax(self):
+        '''validates that the schema format provided by the response to verb ListMetadataFormats is of the acceptable OAI-PMH format.'''
+        validPrefix = '''^[A-Za-z0-9\-_\.!~\*'\(\)]+$'''
+        
+        doc = self.test_data_sorted["LMF-schema-syntax"][0]
+        
+        def checkFormats(response):
+            validate_xml_content_type(response)
+            obj = parse_response(response)
+            metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix/text()", namespaces=namespaces)
+            
+            assert len(metadataPrefixes) > 0, "Missing payload schemas in response:\n%s" % obj["raw"]
+            
+            for prefix in metadataPrefixes:
+                assert re.match(validPrefix, prefix) != None, "test_listMetadataFormats_schema_format_syntax: Bad metadataPrefix '%s'" % prefix
+            
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
+        checkFormats(response)
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': doc["resource_locator"], 'by_doc_ID': 'false'})
+        checkFormats(response)
+        
+        response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': doc["doc_ID"], 'by_doc_ID': 'true'})
+        checkFormats(response)
+        
+    @PublishTestDocs(getTestDataForMetadataFormats(1), "GR-schema-syntax")
+    def test_getRecord_schema_format_syntax(self):
+        '''validate that both good and bad metadataPrefixes are used when requesting GetRecord the appropriate response is returned'''
+        validPrefix = '''^[A-Za-z0-9\-_\.!~\*'\(\)]+$'''
+        
+        doc = self.test_data_sorted["GR-schema-syntax"][0]
+        
+        def checkFormats(response, expectValid):
+            validate_xml_content_type(response)
+            obj = parse_response(response)
+            if expectValid:
+                identifier = obj["etree"].xpath("/lr:OAI-PMH/lr:GetRecord/lr:record/oai:header/oai:identifier/text()", namespaces=namespaces)
+                assert len(identifier) > 0, "Expected a valid response, got this instead:\n%s" % obj["raw"]
+            else:
+                errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
+                assert len(errors) > 0, "Expected an error, got this instead:\n%s" % obj["raw"]
+        
+        assert len(doc["payload_schema"]) > 0, "test_getRecord_schema_format_syntax: Test data is missing payload_schema"
+        
+        for schema in doc["payload_schema"]:
+            if re.match(validPrefix, schema) == None:
+                valid = False
+                goodPrefix = getMetadataPrefix(schema)
+                assert re.match(validPrefix, goodPrefix) != None, "Prefix cleaner produced an invalid prefix: '%s'" % goodPrefix
+            else:
+                valid = True
+                goodPrefix = None
+            
+            response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': schema, 'identifier': doc["doc_ID"], 'by_doc_ID': 'true'})
+            checkFormats(response, valid)
+            
+            response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': schema, 'identifier': doc["resource_locator"], 'by_doc_ID': 'false'})
+            checkFormats(response, valid)
+            
+            if goodPrefix:
+                response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': goodPrefix, 'identifier': doc["doc_ID"], 'by_doc_ID': 'true'})
+                checkFormats(response, True)
+                
+                response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix': goodPrefix, 'identifier': doc["resource_locator"], 'by_doc_ID': 'false'})
+                checkFormats(response, True)
+                
 
 
 class TestOaiPmhController(TestController):
-
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "OAI-PMH"
     @classmethod
     def setUpClass(self):
 
@@ -164,24 +264,6 @@ class TestOaiPmhController(TestController):
         for sort in sorted_nsdl_data["documents"]:
             sorted_nsdl_data["ids"].append(sort["doc_ID"])
             
-            
-        opts = {
-                "startkey":"_design/",
-                "endkey": "_design0",
-                "include_docs": True
-        }
-        
-        # Force indexing in oai views 
-        design_docs = self.db.view('_all_docs', **opts)
-        for row in design_docs:
-#            if re.match("^_design/oai-pmh-", row.key) != None and "views" in row.doc and len(row.doc["views"].keys()) > 0:
-            if "views" in row.doc and len(row.doc["views"].keys()) > 0:
-                view_name = "{0}/_view/{1}".format( row.key, row.doc["views"].keys()[0])
-                log.error("Indexing: {0}".format( view_name))
-                self.db.view(view_name, limit=1, descending=True)
-            else:
-                log.error("Not Indexing: {0}".format( row.key))
-        
         
     @classmethod       
     def tearDownClass(self):
@@ -243,61 +325,13 @@ class TestOaiPmhController(TestController):
         
         return (from_, until_)
     
-    
-    def validate_xml_content_type(self, res):
-        content_type = None
-        
-        try:
-            content_type = res.headers['Content-Type']
-        except:
-            try:
-                content_type = res.headers['content-type']
-            except:
-                pass
-            
-        assert re.match("""text/xml;\s*charset=utf-8""", content_type) != None , '''Expected Content Type: "text/xml; charset=utf-8"  Got: "%s"''' % content_type
-        
-    def validate_json_content_type(self, res):
-        content_type = None
-        
-        try:
-            content_type = res.headers['Content-Type']
-        except:
-            try:
-                content_type = res.headers['content-type']
-            except:
-                pass
-            
-        assert re.match("""application/json;\s*charset=utf-8""", content_type) != None , '''Expected Content Type: "application/json; charset=utf-8"  Got: "%s"''' % content_type
-    
-    def parse_response(self, response):
-        body = response.body
-        xmlcontent = etree.fromstring(body)
-        
-        return { "raw": body, "etree": xmlcontent }
-    
-    def validate_lr_oai_etree(self, xmlcontent, errorExists=False, checkSchema=False, errorCodeExpected=None):
-        
-        error = xmlcontent.xpath("//*[local-name()='error']", namespaces=namespaces)
-        if errorExists == False:
-            if len(error) > 0:
-                self.assertEqual(0, len(error), "validate_lr_oai_etree FAIL: Error code:{0} mesg:{1}".format(error[0].xpath("@code", namespaces=namespaces)[0], error[0].xpath("text()", namespaces=namespaces)[0]))
-        elif errorExists and errorCodeExpected != None:
-            codeReceived = error[0].xpath("@code", namespaces=namespaces)[0]
-            if errorCodeExpected != codeReceived:
-                self.assertEqual(0, len(error), "validate_lr_oai_etree FAIL: Expected:{2}, Got Error code:{0} mesg:{1}".format(error[0].xpath("@code", namespaces=namespaces)[0], error[0].xpath("text()", namespaces=namespaces)[0], errorCodeExpected))
-        else:
-            self.assertEqual(1, len(error), "validate_lr_oai_etree FAIL: Expected error, none found.")
-        
-        
-        
         
     def validate_lr_oai_response(self, response, errorExists=False, checkSchema=False, errorCodeExpected=None):
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         
-        obj = self.parse_response(response)
+        obj = parse_response(response)
         xmlcontent = obj["etree"]
-        self.validate_lr_oai_etree(xmlcontent, errorExists, checkSchema, errorCodeExpected)
+        validate_lr_oai_etree(xmlcontent, errorExists, checkSchema, errorCodeExpected)
 
         schemaErrors = self.validator.validate(obj["raw"])
         assert len(schemaErrors) == 0, "validate_lr_oai_response: Schema validation error:\n%s" % '\n'.join(map(lambda x: "\t(line: {0}, char: {1}): {2}".format(x["line"], x["char"], x["msg"]), schemaErrors))
@@ -308,44 +342,36 @@ class TestOaiPmhController(TestController):
     def test_empty(self):
             pass
     
-#    @unittest.skip("lxml/libxml can't load XMLSchema!!!")
     def test_get_oai_lr_schema(self):
         try:
-#            res = urllib2.urlopen("http://www.w3.org/2001/XMLSchema.xsd")
-#            xmlSchema = etree.XMLSchema(etree.parse(res))
-#    #        xmlSchema = etree.XMLSchema(etree.parse(StringIO(res.read().strip())))
-#            
-#            res2 = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
-#            oaiLRSchema = etree.fromstring(res2.body)
-            
             res2 = self.app.get("/schemas/OAI/2.0/OAI-PMH-LR.xsd")
             schemaErrors = self.validator.validate(res2.body)
             assert len(schemaErrors) == 0, "Schema validation error:\n%s" % '\n'.join(map(lambda x: "\t(line: {0}, char: {1}): {2}".format(x["line"], x["char"], x["msg"]), schemaErrors))
 
-            
-#            assert xmlSchema.validate(oaiLRSchema)
             log.info("test_get_oai_lr_schema: pass")
         except Exception as e:
             test_data_delete = False
             raise e
         
-        
+    @ForceCouchDBIndexing()    
     def test_identify_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'Identify'})
-        self.validate_lr_oai_response(response)
+        validate_lr_oai_response(response)
         log.info("test_identify_get: pass")
-        
+   
+    @ForceCouchDBIndexing()    
     def test_identify_post(self):
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        self.validate_lr_oai_response(response)
+        validate_lr_oai_response(response)
         log.info("test_identify_post: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_identify_earliest_datestamp(self):
         '''test_identify_earliest_datestamp: 
         verify that the network node maintains a value for the earliest publication 
         time for documents harvestable from the node (earliestDatestamp)'''
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         root = etree.fromstring(response.body)
         earliestDatestamp = root.xpath('/lr:OAI-PMH/lr:Identify/oai:earliestDatestamp/text()', namespaces=namespaces)
         
@@ -357,13 +383,14 @@ class TestOaiPmhController(TestController):
             self.fail("Identify: earliestDatestamp does not parse as iso8601")
         
         log.info("test_identify_earliest_datestamp: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_identify_timestamp_granularity(self):
         '''test_identify_timestamp_granularity: 
         verify that the granularity of the timestamp exists in Identify.'''
 
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         root = etree.fromstring(response.body)
         identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/oai:granularity/text()', namespaces=namespaces)
         
@@ -371,7 +398,7 @@ class TestOaiPmhController(TestController):
         
         log.error("test_identify_timestamp_granularity: pass")
         
-
+    @ForceCouchDBIndexing()
     def test_identify_timestamp_granularity_service_doc(self):
         '''test_identify_timestamp_granularity_service_doc: 
         verify that the granularity of the timestamp is stored in the service 
@@ -385,7 +412,7 @@ class TestOaiPmhController(TestController):
             self.fail("%s: granularity setting missing from service document." % config["lr.oaipmh.docid"])
             
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         root = etree.fromstring(response.body)
         identifyGranularity = root.xpath('/lr:OAI-PMH/lr:Identify/oai:granularity/text()', namespaces=namespaces)
         
@@ -398,16 +425,16 @@ class TestOaiPmhController(TestController):
         
     def test_ListSets_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListSets'})
-        self.validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
+        validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
         log.info("test_ListSets_get: pass")
         
     def test_ListSets_post(self):
         response = self.app.post("/OAI-PMH", params={'verb': 'ListSets'})
-        self.validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
+        validate_lr_oai_response(response, errorExists=True, errorCodeExpected="noSetHierarchy")
         log.info("test_ListSets_post: pass")
         
         
-        
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_with_doc_id_identifier_get(self):
         '''test_listMetadataFormats_with_doc_id_identifier_get: 
         verify that if an identifier is provided, the metadata formats are 
@@ -416,9 +443,9 @@ class TestOaiPmhController(TestController):
         randomDoc = choice(sorted_dc_data["documents"])
         
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': 'true'})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)
+            obj = parse_response(response)
             
             metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix/text()", namespaces=namespaces)
             assert len(metadataPrefixes) == len(randomDoc["payload_schema"]), "test_listMetadataFormats_with_doc_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
@@ -433,7 +460,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_with_doc_id_identifier_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_with_resource_id_identifier_get(self):
         '''test_listMetadataFormats_with_resource_id_identifier_get: 
         verify that if an identifier is provided, the metadata formats are 
@@ -456,9 +484,9 @@ class TestOaiPmhController(TestController):
             
         
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats', 'identifier': resource_locator, 'by_doc_ID': 'false'})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)
+            obj = parse_response(response)
             
             metadataPrefixes = obj["etree"].xpath("/lr:OAI-PMH/lr:ListMetadataFormats/oai:metadataFormat/oai:metadataPrefix/text()", namespaces=namespaces)
             assert len(metadataPrefixes) == len(schema_formats), "test_listMetadataFormats_with_resource_id_identifier_get: the count of payload_schema does not match the number of metadataPrefixes"
@@ -472,13 +500,13 @@ class TestOaiPmhController(TestController):
             global test_data_delete
             test_data_delete = False
             raise e
-        log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")
-        
-        
+        log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")        
+
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_listMetadataFormats_get: fail")
             log.exception("test_listMetadataFormats_get: fail")
@@ -486,11 +514,12 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_post(self):
         response = self.app.post("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_listMetadataFormats_post: fail")
             log.exception("test_listMetadataFormats_post: fail")
@@ -499,6 +528,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listMetadataFormats_post: pass")
     
+    @ForceCouchDBIndexing()
     def test_namespaceDeclarations(self):
         # according to the spec, all namespace used in the metadata
         # element should be declared on the metadata element,
@@ -509,7 +539,7 @@ class TestOaiPmhController(TestController):
         global sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         tree = etree.fromstring(response.body)
         
         metadata = tree.xpath("//oai_dc:dc", namespaces=namespaces)
@@ -523,7 +553,7 @@ class TestOaiPmhController(TestController):
                 self.assertTrue(str(re.match(pat, etree.tostring(meta), flags=re.MULTILINE)!=None), "test_namespaceDeclarations: fail - namespace declaration not present")
         
 
-
+    @ForceCouchDBIndexing()
     def test_getRecord_by_doc_ID_match_requested_dissemination_get(self):
         '''test_getRecord_by_doc_ID_match_requested_dissemination_get: 
         verify that the returned resource data matches the requested dissemination 
@@ -543,9 +573,9 @@ class TestOaiPmhController(TestController):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)           
+            obj = parse_response(response)           
             
             assert len(randomDoc["payload_schema"]) > 0, "test_getRecord_match_requested_dissemination_get: Test document missing payload_schema"
             
@@ -569,7 +599,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_getRecord_match_requested_dissemination_get: pass")
 
-    
+    @ForceCouchDBIndexing()
     def test_getRecord_by_doc_ID_JSON_metadataPrefix_get(self):
         '''test_getRecord_by_doc_ID_JSON_metadataPrefix_get: 
         verify that if the requested dissemination format in metadataPrefix 
@@ -579,7 +609,7 @@ class TestOaiPmhController(TestController):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'LR_JSON_0.10.0', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
-        self.validate_json_content_type(response)
+        validate_json_content_type(response)
         try:
             json_obj = json.loads(response.body)
             
@@ -592,14 +622,14 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_JSON_metadataPrefix_get: pass")
-        
-        
+    
+    @ForceCouchDBIndexing()    
     def test_getRecord_by_doc_ID_get(self):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
@@ -607,13 +637,14 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_getRecord_by_doc_ID_post(self):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.post("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["doc_ID"], 'by_doc_ID': True})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
@@ -621,13 +652,14 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_post: pass")
-        
+    
+    @ForceCouchDBIndexing()
     def test_getRecord_by_resource_ID_get(self):
         global nsdl_data, sorted_dc_data, test_data_delete
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except AssertionError:
             log.exception("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             test_data_delete = False
@@ -638,13 +670,14 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_resource_ID_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_getRecord_by_resource_ID_post(self):
         global nsdl_data, sorted_dc_data, test_data_delete
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.post("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except AssertionError:
             log.exception("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             test_data_delete = False
@@ -656,7 +689,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_getRecord_by_resource_ID_post: pass")
 
-
+    @ForceCouchDBIndexing()
     def test_listRecords_post(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -666,7 +699,7 @@ class TestOaiPmhController(TestController):
             
         response = self.app.post("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
@@ -674,7 +707,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listRecords_post: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listRecords_match_requested_disseminaton_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -683,9 +717,9 @@ class TestOaiPmhController(TestController):
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)
+            obj = parse_response(response)
             oaipmh_root = obj["etree"]
             
             response_ids = oaipmh_root.xpath("./lr:ListRecords/oai:record/oai:header/oai:identifier/text()", namespaces=namespaces)
@@ -707,6 +741,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_match_requested_disseminaton_get: pass")
 
+    @ForceCouchDBIndexing()
     def test_listRecords_noRecordsMatch_get(self):
         '''test_listRecords_noRecordsMatch_get:
         verify that if no records match the requested metadata dissemination 
@@ -724,9 +759,9 @@ class TestOaiPmhController(TestController):
         time.sleep(10)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'oai_dc', 'from': from_ })
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)
+            obj = parse_response(response)
             
             errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
             
@@ -746,6 +781,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_noRecordsMatch_get: pass")
     
+    @ForceCouchDBIndexing()
     def test_listRecords_JSON_metadataPrefix_get(self):
         '''test_listRecords_JSON_metadataPrefix_get:
         verify that if the requested dissemination format in metadataPrefix 
@@ -759,7 +795,7 @@ class TestOaiPmhController(TestController):
         (from_, until_) = self._get_timestamps(doc1, doc2)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'LR_JSON_0.10.0', 'from': from_, 'until': until_})
-        self.validate_json_content_type(response)
+        validate_json_content_type(response)
         try:
             json_obj = json.loads(response.body)
             
@@ -783,6 +819,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_JSON_metadataPrefix_get: pass")
     
+    @ForceCouchDBIndexing()
     def test_listRecords_flow_control_get(self):
         global nsdl_data, dc_data, sorted_nsdl_data
         doc1 = sorted_nsdl_data["documents"][0]
@@ -803,16 +840,16 @@ class TestOaiPmhController(TestController):
             (from_, until_) = self._get_timestamps(doc1, doc2)
                 
             response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
-            self.validate_xml_content_type(response)
+            validate_xml_content_type(response)
             try:
-                obj = self.parse_response(response)
+                obj = parse_response(response)
                 resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:resumptionToken/text()", namespaces=namespaces)
                 
                 assert len(resumptionToken) == 1, "test_listRecords_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
                 
                 response2 = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
-                self.validate_xml_content_type(response2)
-                obj2 = self.parse_response(response2)
+                validate_xml_content_type(response2)
+                obj2 = parse_response(response2)
                 
                 resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListRecords/oai:resumptionToken", namespaces=namespaces)
                 
@@ -831,6 +868,7 @@ class TestOaiPmhController(TestController):
             service_doc_copy["service_data"] = service_doc_org["service_data"]
             node_db[service_doc_copy.id] = service_doc_copy
     
+    @ForceCouchDBIndexing()
     def test_listRecords_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -840,7 +878,7 @@ class TestOaiPmhController(TestController):
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
@@ -850,7 +888,7 @@ class TestOaiPmhController(TestController):
         log.info("test_listRecords_get: pass")
 
         
-        
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_post(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -860,7 +898,7 @@ class TestOaiPmhController(TestController):
             
         response = self.app.post("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
@@ -868,7 +906,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_post: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -878,7 +917,7 @@ class TestOaiPmhController(TestController):
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
         try:
-            self.validate_lr_oai_response(response)
+            validate_lr_oai_response(response)
         except Exception as e:
 #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
@@ -886,7 +925,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_flow_control_get(self):
         global nsdl_data, dc_data, sorted_nsdl_data
         doc1 = sorted_nsdl_data["documents"][0]
@@ -907,16 +947,16 @@ class TestOaiPmhController(TestController):
             (from_, until_) = self._get_timestamps(doc1, doc2)
                 
             response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
-            self.validate_xml_content_type(response)
+            validate_xml_content_type(response)
             try:
-                obj = self.parse_response(response)
+                obj = parse_response(response)
                 resumptionToken = obj["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:resumptionToken/text()", namespaces=namespaces)
                 
                 assert len(resumptionToken) == 1, "test_listIdentifiers_flow_control_get: Expected 1 resumption token, got %s." % len(resumptionToken)
                 
                 response2 = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_, 'resumptionToken': resumptionToken[0]})
-                self.validate_xml_content_type(response2)
-                obj2 = self.parse_response(response2)
+                validate_xml_content_type(response2)
+                obj2 = parse_response(response2)
                 
                 resumptionToken2 = obj2["etree"].xpath("/lr:OAI-PMH/lr:ListIdentifiers/oai:resumptionToken", namespaces=namespaces)
                 
@@ -934,7 +974,8 @@ class TestOaiPmhController(TestController):
             service_doc_copy = node_db[service_doc_copy.id]
             service_doc_copy["service_data"] = service_doc_org["service_data"]
             node_db[service_doc_copy.id] = service_doc_copy
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_timestamp_headers_match_response_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -946,9 +987,9 @@ class TestOaiPmhController(TestController):
         until_tstamp = iso8601.parse_date(until_)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)
+            obj = parse_response(response)
             
             req = obj["etree"].xpath("/lr:OAI-PMH/lr:request", namespaces=namespaces)
             
@@ -972,7 +1013,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listIdentifiers_timestamp_headers_match_response_get: pass")
         
-
+    @ForceCouchDBIndexing()
     def test_listIdentifiers_noRecordsMatch_get(self):
         '''test_listIdentifiers_noRecordsMatch_get:
         verify that if no records match the requested metadata dissemination 
@@ -990,9 +1031,9 @@ class TestOaiPmhController(TestController):
         time.sleep(10)
             
         response = self.app.get("/OAI-PMH", params={'verb': 'ListIdentifiers', 'metadataPrefix': 'oai_dc', 'from': from_ })
-        self.validate_xml_content_type(response)
+        validate_xml_content_type(response)
         try:
-            obj = self.parse_response(response)
+            obj = parse_response(response)
             
             errors = obj["etree"].xpath("/lr:OAI-PMH//lr:error/@code", namespaces=namespaces)
             
@@ -1012,66 +1053,4 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listIdentifiers_noRecordsMatch_get: pass")
 
-#    def test_index(self):
-#        response = self.app.get(url('OAI-PMH'))
-#        # Test response...
-#
-#    def test_GET(self):
-#        response = self.app.get(url('formatted_OAI-PMH', format='xml'))
-#
-#    def test_POST(self):
-#        response = self.app.post(url('OAI-PMH'))
-
-###############################
-
-#    def test_getRecord(self):
-#        tree = self._server.getRecord(
-#            metadataPrefix='oai_dc', identifier='hdl:1765/315')
-#        self.assert_(oaischema.validate(tree))
-#        
-#    def test_identify(self):
-#        tree = self._server.identify()
-#        self.assert_(oaischema.validate(tree))
-#
-#    def test_listIdentifiers(self):
-#        tree = self._server.listIdentifiers(
-#            from_=datetime(2003, 4, 10),
-#            metadataPrefix='oai_dc')
-#        self.assert_(oaischema.validate(tree))
-#        
-#    def test_listMetadataFormats(self):
-#        tree = self._server.listMetadataFormats()
-#        self.assert_(oaischema.validate(tree))
-#
-#    def test_listRecords(self):
-#        tree = self._server.listRecords(
-#            from_=datetime(2003, 4, 10),
-#            metadataPrefix='oai_dc')
-#        self.assert_(oaischema.validate(tree))
-#
-#    def test_listSets(self):
-#        tree = self._server.listSets()
-#        self.assert_(oaischema.validate(tree))
-#
-#    def test_namespaceDeclarations(self):
-#        # according to the spec, all namespace used in the metadata
-#        # element should be declared on the metadata element,
-#        # and not on root or ancestor elements (big sigh..)
-#        # this works, except for the xsi namespace which is allready declared
-#        # on the root element, which means lxml will not declare it again on
-#        # the metadata element
-#
-#        tree = self._server.getRecord(
-#            metadataPrefix='oai_dc', identifier='hdl:1765/315')
-#        # ugly xml manipulation, this is probably why the requirement is in
-#        # the spec (yuck!)
-#        xml = etree.tostring(tree)
-#        xml = xml.split('<metadata>')[-1].split('</metadata>')[0]
-#        first_el = xml.split('>')[0]
-#        self.assertTrue(first_el.startswith('<oai_dc:dc'))
-#        self.assertTrue(
-#            'xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"'
-#            in first_el) 
-#        self.assertTrue(
-#            'xmlns:dc="http://purl.org/dc/elements/1.1/"'
-#            in first_el)
+        
