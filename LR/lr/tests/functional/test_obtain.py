@@ -7,9 +7,13 @@ import lr.lib.helpers as h
 from webtest import AppError
 import time
 from pylons import config
+from lr.util.decorators import ForceCouchDBIndexing
 log = logging.getLogger(__name__)
 headers={'Content-Type': 'application/json'}
 class TestObtainController(TestController):
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "obtain"    
     @classmethod
     def setupClass(self):
         self.setup = True
@@ -37,8 +41,6 @@ class TestObtainController(TestController):
             view = self.db.view('_all_docs',keys=distributableIds)                
             done = len(distributableIds) == len(view.rows)
             time.sleep(0.5)
-        len(self.db.view('_design/learningregistry-resources/_view/docs'))
-        len(self.db.view('_design/learningregistry-resource-location/_view/docs'))
     @classmethod
     def tearDownClass(self):
         for doc in self.ids:
@@ -81,19 +83,21 @@ class TestObtainController(TestController):
     def _validateError(self,error):
         data = json.loads(error)
         assert(data["OK"] == False)
+    @ForceCouchDBIndexing()        
     def test_create(self):        
         params = self._getInitialPostData()
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
         # Test response...
+    @ForceCouchDBIndexing()        
     def test_create_ids_only(self):
         params = self._getInitialPostData()
         params['ids_only'] = True
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
-
+    @ForceCouchDBIndexing()
     def test_flow_control_enabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.obtain.docid"]]
@@ -119,6 +123,7 @@ class TestObtainController(TestController):
         nodeDb[config["lr.obtain.docid"]] = serviceDoc
         assert result.has_key('resumption_token')
         assert len(result['documents']) == 100
+    @ForceCouchDBIndexing()        
     def test_flow_control_disabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.obtain.docid"]]
@@ -136,6 +141,7 @@ class TestObtainController(TestController):
         serviceDoc['service_data']['flow_control'] = flowControlCurrent
         nodeDb[config["lr.obtain.docid"]] = serviceDoc
         assert not result.has_key('resumption_token')
+    @ForceCouchDBIndexing()        
     def test_create_by_doc_id(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
@@ -143,12 +149,14 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.db)
+    @ForceCouchDBIndexing()        
     def test_create_by_resource_id(self):
         params = self._getInitialPostData()
         del params['by_doc_ID']
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
+    @ForceCouchDBIndexing()        
     def test_create_by_doc_id_and_by_resource_id(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
@@ -157,6 +165,7 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.db)
+    @ForceCouchDBIndexing()        
     def test_create_by_doc_id_and_by_resource_id_fail(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = False
@@ -165,6 +174,7 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.resourceLocators)
+    @ForceCouchDBIndexing()        
     def test_create_by_doc_id_subset_of_ids(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
@@ -175,6 +185,7 @@ class TestObtainController(TestController):
         params = json.dumps(params)        
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.ids[0:2])
+    @ForceCouchDBIndexing()        
     def test_create_by_doc_id_and_by_resource_id_both_true(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
@@ -185,7 +196,8 @@ class TestObtainController(TestController):
             response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         except AppError as ex:
             self._validateError(ex.message[ex.message.rfind('{'):])
-            pass#expected error
+
+    @ForceCouchDBIndexing()            
     def test_create_by_doc_id_and_by_resource_id_fail_both_false(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = False
@@ -197,7 +209,7 @@ class TestObtainController(TestController):
         except AppError as ex:
             self._validateError(ex.message[ex.message.rfind('{'):])
             pass#expected error        
-
+    @ForceCouchDBIndexing()
     def test_create_by_doc_id_and_by_resource_id_empty(self):
         params = self._getInitialPostData()
         del params['by_doc_ID']
@@ -206,6 +218,7 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,self.resourceLocators)        
+    @ForceCouchDBIndexing()        
     def test_request_id_with_uri_escaped_characters(self):
         params = self._getInitialPostData()
         params['by_doc_ID'] = False
@@ -214,5 +227,53 @@ class TestObtainController(TestController):
         params['request_ID'] = testId
         response = self.app.get(url(controller='obtain',**params))
         self._validateResponse(response,json.dumps(params),[testId])        
+    @ForceCouchDBIndexing()
+    def test_request_ID_doc_get(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        del params['by_resource_ID']
+        params['request_ID'] = self.ids[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.ids[0]])
+    @ForceCouchDBIndexing()
+    def test_request_id_doc_get(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        del params['by_resource_ID']
+        params['request_id'] = self.ids[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.ids[0]])
+    @ForceCouchDBIndexing()        
+    def test_request_ID_resource_get(self):
+        params = self._getInitialPostData()
+        params['request_ID'] = self.resourceLocators[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+    @ForceCouchDBIndexing()
+    def test_request_ID_resource_get(self):
+        params = self._getInitialPostData()
+        params['request_id'] = self.resourceLocators[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+    @ForceCouchDBIndexing()        
+    def test_get_fail_both_false(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = False
+        params['by_resource_ID'] = False
+        params['request_IDs'] = self.resourceLocators[0:1]
+        try:
+            response = self.app.get(url(controller='obtain',**params),headers=headers)
+        except AppError as ex:
+            self._validateError(ex.message[ex.message.rfind('{'):])        
+    @ForceCouchDBIndexing()
+    def test_get_fail_both_true(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = True
+        params['request_IDs'] = self.resourceLocators[0:1]
+        try:
+            response = self.app.get(url(controller='obtain',**params),headers=headers)
+        except AppError as ex:
+            self._validateError(ex.message[ex.message.rfind('{'):])                    
     def test_empty(self):
             pass

@@ -5,14 +5,16 @@ from urllib import unquote_plus,quote_plus
 from pylons import config
 from datetime import datetime
 from lr.lib.harvest import harvest
+import threading
+import time
+from lr.util.decorators import ForceCouchDBIndexing
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 db = None
-def updateViews():
-    len(db.view('_design/learningregistry-resources/_view/docs'))
-    len(db.view('_design/learningregistry-resource-location/_view/docs'))
-    len(db.view('_design/learningregistry-by-date/_view/docs'))        
 class TestHarvestController(TestController):
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "obtain"
     @classmethod
     def setupClass(self):
         self.setup = True
@@ -41,8 +43,7 @@ class TestHarvestController(TestController):
         while not done:      
             view = self.db.view('_all_docs',keys=distributableIds)                
             done = len(distributableIds) == len(view.rows)
-            time.sleep(0.5)        
-        updateViews()
+            time.sleep(0.5)                
     def test_empty(self):
         pass
     @classmethod
@@ -56,8 +57,6 @@ class TestHarvestController(TestController):
                 del self.db[id+'-distributable']
             except:
                 pass
-        updateViews()
-        pass
     def validate_getrecord_response_base(self, response):
         data = json.loads(response.body)   
         assert data.has_key('OK') and data['OK']
@@ -82,42 +81,43 @@ class TestHarvestController(TestController):
         doc = json.loads(resp.body)
         assert doc.has_key("OK") and not doc["OK"]
         assert doc.has_key("error") and doc['error'] == "idDoesNotExist"        
+    @ForceCouchDBIndexing()
     def test_getrecord_get_by_doc_id(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID=self.ids[0], by_doc_ID=True))
         self.validate_getrecord_response(response,self.ids[0])
-
+    @ForceCouchDBIndexing()
     def test_getrecord_get_by_resource_id(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID=self.resourceLocators[0], by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_response_resource_id(response,self.resourceLocators[0])
-
+    @ForceCouchDBIndexing()
     def test_getrecord_get_by_resource_id_url_quoted(self):
         testID = quote_plus(self.resourceLocators[0])
         response = self.app.get(url('harvest', id='getrecord',request_ID=testID, by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_response_resource_id(response,testID)
-
+    @ForceCouchDBIndexing()
     def test_getrecord_post_by_resource_id(self):
         data = json.dumps({'request_ID':self.resourceLocators[0],'by_resource_ID':True,'by_doc_ID':False})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
         self.validate_getrecord_response_resource_id(response,self.resourceLocators[0])
-
+    @ForceCouchDBIndexing()
     def test_getrecord_post_by_doc_id(self):
         data = json.dumps({'request_ID':self.ids[0],'by_doc_ID':True})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
         self.validate_getrecord_response(response,self.ids[0])
-
+    @ForceCouchDBIndexing()
     def test_getrecord_get_by_doc_id_fail(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID="blah", by_doc_ID=True))
         self.validate_getrecord_id_doesnot_exist(response)
-
+    @ForceCouchDBIndexing()
     def test_getrecord_get_by_resource_id_fail(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID="blah", by_doc_ID=False,by_resource_id=True))
         self.validate_getrecord_id_doesnot_exist(response)
-
+    @ForceCouchDBIndexing()
     def test_getrecord_post_by_doc_id_fail(self):
         data = json.dumps({'request_ID':"blah",'by_resource_ID':True,'by_doc_ID':False})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
         self.validate_getrecord_id_doesnot_exist(response)
-
+    @ForceCouchDBIndexing()
     def test_getrecord_post_by_resource_id_fail(self):
         data = json.dumps({'request_ID':"blah",'by_doc_ID':True})
         response = self.app.post(url(controller='harvest',action='getrecord'), params=data ,headers=headers)
@@ -139,25 +139,26 @@ class TestHarvestController(TestController):
           nodeTimestamp = resource['node_timestamp']
           assert nodeTimestamp[:nodeTimestamp.rfind('.')] >= self.from_date[:self.from_date.rfind('.')]
           assert nodeTimestamp[:nodeTimestamp.rfind('.')] <= self.until_date[:self.until_date.rfind('.')]
+    @ForceCouchDBIndexing()          
     def test_listrecords_get(self):
         response = self.app.get(url('harvest', id='listrecords'),params={'from':self.from_date,'until':self.until_date})
         self.validate_listrecords_response(response)
-
+    @ForceCouchDBIndexing()
     def test_listrecords_post(self):
         data = json.dumps({'from':self.from_date,'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
         self.validate_listrecords_response(response)
-
+    @ForceCouchDBIndexing()
     def test_listrecords_post_bad_from(self):
         data = json.dumps({'from':"aaa",'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
         self._validate_error_message(response)
-
+    @ForceCouchDBIndexing()
     def test_listrecords_post_bad_until(self):
         data = json.dumps({'from':self.from_date,'until':'self.until_date'})
         response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
         self._validate_error_message(response)
-
+        
     def validate_listidentifiers_response(self, response):
         data = json.loads(response.body)
         if not data['OK']:
@@ -169,26 +170,26 @@ class TestHarvestController(TestController):
           assert doc.has_key('header')
           record = doc['header']          
           assert record.has_key('identifier')
-
+    @ForceCouchDBIndexing()
     def test_listidentifiers_get(self):
         response = self.app.get(url('harvest', id='listidentifiers'),params={'from':self.from_date,'until':self.until_date})
         self.validate_listidentifiers_response(response)
-
+    @ForceCouchDBIndexing()
     def test_listidentifiers_post(self):
         data = json.dumps({'from':self.from_date,'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self.validate_listidentifiers_response(response)
-
+    @ForceCouchDBIndexing()
     def test_listidentifiers_post_bad_from(self):
         data = json.dumps({'from':'self.from_date','until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self._validate_error_message(response)
-
+    @ForceCouchDBIndexing()
     def test_listidentifiers_post_bad_until(self):
         data = json.dumps({'from':self.from_date,'until':'self.until_date'})
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self._validate_error_message(response)
-
+    @ForceCouchDBIndexing()
     def test_listidentifiers_flow_control_enabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.harvest.docid"]]
@@ -209,6 +210,7 @@ class TestHarvestController(TestController):
         nodeDb[config["lr.harvest.docid"]] = serviceDoc
         assert result.has_key('resumption_token')
         assert len(result['documents']) == 100
+    @ForceCouchDBIndexing()        
     def test_listidentifiers_flow_control_enabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.harvest.docid"]]
@@ -221,7 +223,7 @@ class TestHarvestController(TestController):
         serviceDoc['service_data']['flow_control'] = flowControlCurrent
         nodeDb[config["lr.harvest.docid"]] = serviceDoc
         assert not result.has_key('resumption_token')
-
+    @ForceCouchDBIndexing()
     def test_listrecords_flow_control_enabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.harvest.docid"]]
@@ -242,6 +244,7 @@ class TestHarvestController(TestController):
         nodeDb[config["lr.harvest.docid"]] = serviceDoc
         assert result.has_key('resumption_token')
         assert len(result['documents']) == 100
+    @ForceCouchDBIndexing()        
     def test_listrecords_flow_control_enabled(self):
         nodeDb = self.server[config["couchdb.db.node"]]
         serviceDoc = nodeDb[config["lr.harvest.docid"]]
@@ -268,11 +271,11 @@ class TestHarvestController(TestController):
         assert data['identify'].has_key('deletedRecord')
         assert data['identify'].has_key('granularity')
         assert data['identify'].has_key('adminEmail')
-        
+    @ForceCouchDBIndexing()        
     def test_identify_get(self):
         response = self.app.get(url(controller='harvest', action='identify'))
         self.validate_identify_response(response)
-
+    @ForceCouchDBIndexing()
     def test_identify_post(self):
         response = self.app.post(url(controller='harvest',action='identify'), params={} ,headers=headers)
         self.validate_identify_response(response)
@@ -287,11 +290,11 @@ class TestHarvestController(TestController):
         for format in metadata_formats: 
           assert format.has_key('metadataformat')
           assert format['metadataformat'].has_key('metadataPrefix')
-
+    @ForceCouchDBIndexing()
     def test_listmetadataformats_get(self):
         response = self.app.get(url('harvest', id='listmetadataformats'))
         self.validate_listmetadataformats_response(response)
-
+    @ForceCouchDBIndexing()
     def test_listmetadataformats_post(self):
         response = self.app.post(url(controller='harvest',action='listmetadataformats'), params={} ,headers=headers)
         self.validate_listmetadataformats_response(response)
@@ -300,11 +303,11 @@ class TestHarvestController(TestController):
     def validate_listsets_response(self, response):
         data = json.loads(response.body)
         assert data.has_key('OK') and not data['OK']
-
+    @ForceCouchDBIndexing()
     def test_listsets_get(self):
         response = self.app.get(url('harvest', id='listsets'))
         self.validate_listsets_response(response)
-
+    @ForceCouchDBIndexing()
     def test_listsets_post(self):
         response = self.app.post(url(controller='harvest',action='listsets'), params={} ,headers=headers)
         self.validate_listsets_response(response)

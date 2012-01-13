@@ -26,6 +26,7 @@ def make_map(config):
             service_doc = h.getServiceDocument(service_doc_id)
             if service_doc is not None and service_doc["active"]:
                 map.resource(member_name, collection_name)
+                map.connect("/"+collection_name,controller=collection_name,action='options',conditions=dict(method=['OPTIONS']))
                 if member_name == 'swordservice':
                     map.connect("/swordpub",controller='swordservice',action='create')
                 

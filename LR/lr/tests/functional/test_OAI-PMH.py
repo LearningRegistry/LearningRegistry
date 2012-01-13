@@ -23,7 +23,7 @@ import unittest
 import urllib2
 import uuid
 from lr.util.testdata import getDC_v1_1, getTestDataForMetadataFormats, getTestDataForEmbeddedXMLDOCTYPEHeaders
-from lr.util.decorators import PublishTestDocs
+from lr.util.decorators import PublishTestDocs, ForceCouchDBIndexing
 from lr.util.validator import XercesValidator, validate_xml_content_type, validate_json_content_type, parse_response, validate_lr_oai_etree, validate_lr_oai_response
 
 json_headers={'content-type': 'application/json'}
@@ -177,7 +177,9 @@ class TestOaiPmhControllerSpecialData(TestController):
 
 
 class TestOaiPmhController(TestController):
-
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "OAI-PMH"
     @classmethod
     def setUpClass(self):
 
@@ -262,24 +264,6 @@ class TestOaiPmhController(TestController):
         for sort in sorted_nsdl_data["documents"]:
             sorted_nsdl_data["ids"].append(sort["doc_ID"])
             
-            
-        opts = {
-                "startkey":"_design/",
-                "endkey": "_design0",
-                "include_docs": True
-        }
-        
-        # Force indexing in oai views 
-        design_docs = self.db.view('_all_docs', **opts)
-        for row in design_docs:
-#            if re.match("^_design/oai-pmh-", row.key) != None and "views" in row.doc and len(row.doc["views"].keys()) > 0:
-            if "views" in row.doc and len(row.doc["views"].keys()) > 0:
-                view_name = "{0}/_view/{1}".format( row.key, row.doc["views"].keys()[0])
-                log.error("Indexing: {0}".format( view_name))
-                self.db.view(view_name, limit=1, descending=True)
-            else:
-                log.error("Not Indexing: {0}".format( row.key))
-        
         
     @classmethod       
     def tearDownClass(self):
@@ -369,17 +353,19 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         
-        
+    @ForceCouchDBIndexing()    
     def test_identify_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'Identify'})
         validate_lr_oai_response(response)
         log.info("test_identify_get: pass")
-        
+   
+    @ForceCouchDBIndexing()    
     def test_identify_post(self):
         response = self.app.post("/OAI-PMH", params={'verb': 'Identify'})
         validate_lr_oai_response(response)
         log.info("test_identify_post: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_identify_earliest_datestamp(self):
         '''test_identify_earliest_datestamp: 
         verify that the network node maintains a value for the earliest publication 
@@ -397,7 +383,8 @@ class TestOaiPmhController(TestController):
             self.fail("Identify: earliestDatestamp does not parse as iso8601")
         
         log.info("test_identify_earliest_datestamp: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_identify_timestamp_granularity(self):
         '''test_identify_timestamp_granularity: 
         verify that the granularity of the timestamp exists in Identify.'''
@@ -411,7 +398,7 @@ class TestOaiPmhController(TestController):
         
         log.error("test_identify_timestamp_granularity: pass")
         
-
+    @ForceCouchDBIndexing()
     def test_identify_timestamp_granularity_service_doc(self):
         '''test_identify_timestamp_granularity_service_doc: 
         verify that the granularity of the timestamp is stored in the service 
@@ -447,7 +434,7 @@ class TestOaiPmhController(TestController):
         log.info("test_ListSets_post: pass")
         
         
-        
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_with_doc_id_identifier_get(self):
         '''test_listMetadataFormats_with_doc_id_identifier_get: 
         verify that if an identifier is provided, the metadata formats are 
@@ -473,7 +460,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_with_doc_id_identifier_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_with_resource_id_identifier_get(self):
         '''test_listMetadataFormats_with_resource_id_identifier_get: 
         verify that if an identifier is provided, the metadata formats are 
@@ -514,7 +502,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")        
 
-        
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_get(self):
         response = self.app.get("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
         try:
@@ -526,7 +514,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listMetadataFormats_post(self):
         response = self.app.post("/OAI-PMH", params={'verb': 'ListMetadataFormats'})
         try:
@@ -539,6 +528,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listMetadataFormats_post: pass")
     
+    @ForceCouchDBIndexing()
     def test_namespaceDeclarations(self):
         # according to the spec, all namespace used in the metadata
         # element should be declared on the metadata element,
@@ -563,7 +553,7 @@ class TestOaiPmhController(TestController):
                 self.assertTrue(str(re.match(pat, etree.tostring(meta), flags=re.MULTILINE)!=None), "test_namespaceDeclarations: fail - namespace declaration not present")
         
 
-
+    @ForceCouchDBIndexing()
     def test_getRecord_by_doc_ID_match_requested_dissemination_get(self):
         '''test_getRecord_by_doc_ID_match_requested_dissemination_get: 
         verify that the returned resource data matches the requested dissemination 
@@ -609,7 +599,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_getRecord_match_requested_dissemination_get: pass")
 
-    
+    @ForceCouchDBIndexing()
     def test_getRecord_by_doc_ID_JSON_metadataPrefix_get(self):
         '''test_getRecord_by_doc_ID_JSON_metadataPrefix_get: 
         verify that if the requested dissemination format in metadataPrefix 
@@ -632,7 +622,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_JSON_metadataPrefix_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_getRecord_by_doc_ID_get(self):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
@@ -646,7 +637,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_getRecord_by_doc_ID_post(self):
         global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
@@ -660,7 +652,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_post: pass")
-        
+    
+    @ForceCouchDBIndexing()
     def test_getRecord_by_resource_ID_get(self):
         global nsdl_data, sorted_dc_data, test_data_delete
         randomDoc = choice(sorted_dc_data["documents"])
@@ -677,7 +670,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_getRecord_by_resource_ID_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_getRecord_by_resource_ID_post(self):
         global nsdl_data, sorted_dc_data, test_data_delete
         randomDoc = choice(sorted_dc_data["documents"])
@@ -695,7 +689,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_getRecord_by_resource_ID_post: pass")
 
-
+    @ForceCouchDBIndexing()
     def test_listRecords_post(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -713,7 +707,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listRecords_post: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listRecords_match_requested_disseminaton_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -746,6 +741,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_match_requested_disseminaton_get: pass")
 
+    @ForceCouchDBIndexing()
     def test_listRecords_noRecordsMatch_get(self):
         '''test_listRecords_noRecordsMatch_get:
         verify that if no records match the requested metadata dissemination 
@@ -785,6 +781,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_noRecordsMatch_get: pass")
     
+    @ForceCouchDBIndexing()
     def test_listRecords_JSON_metadataPrefix_get(self):
         '''test_listRecords_JSON_metadataPrefix_get:
         verify that if the requested dissemination format in metadataPrefix 
@@ -822,6 +819,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listRecords_JSON_metadataPrefix_get: pass")
     
+    @ForceCouchDBIndexing()
     def test_listRecords_flow_control_get(self):
         global nsdl_data, dc_data, sorted_nsdl_data
         doc1 = sorted_nsdl_data["documents"][0]
@@ -870,6 +868,7 @@ class TestOaiPmhController(TestController):
             service_doc_copy["service_data"] = service_doc_org["service_data"]
             node_db[service_doc_copy.id] = service_doc_copy
     
+    @ForceCouchDBIndexing()
     def test_listRecords_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -889,7 +888,7 @@ class TestOaiPmhController(TestController):
         log.info("test_listRecords_get: pass")
 
         
-        
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_post(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -907,7 +906,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_post: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -925,7 +925,8 @@ class TestOaiPmhController(TestController):
             test_data_delete = False
             raise e
         log.info("test_listIdentifiers_get: pass")
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_flow_control_get(self):
         global nsdl_data, dc_data, sorted_nsdl_data
         doc1 = sorted_nsdl_data["documents"][0]
@@ -973,7 +974,8 @@ class TestOaiPmhController(TestController):
             service_doc_copy = node_db[service_doc_copy.id]
             service_doc_copy["service_data"] = service_doc_org["service_data"]
             node_db[service_doc_copy.id] = service_doc_copy
-        
+    
+    @ForceCouchDBIndexing()    
     def test_listIdentifiers_timestamp_headers_match_response_get(self):
         global sorted_nsdl_data, dc_data
         doc1 = choice(sorted_nsdl_data["documents"])
@@ -1011,7 +1013,7 @@ class TestOaiPmhController(TestController):
             raise e
         log.info("test_listIdentifiers_timestamp_headers_match_response_get: pass")
         
-
+    @ForceCouchDBIndexing()
     def test_listIdentifiers_noRecordsMatch_get(self):
         '''test_listIdentifiers_noRecordsMatch_get:
         verify that if no records match the requested metadata dissemination 
