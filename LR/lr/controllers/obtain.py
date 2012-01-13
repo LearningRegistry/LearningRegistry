@@ -33,7 +33,7 @@ class ObtainController(BaseController):
         args = {}
         if len(keys) > 0:
             args['keys'] = keys
-        args['stale'] = 'ok'
+        args['stale'] = appConfig['couchdb.stale.flag']
         if self.limit is not None:
             args['limit'] = self.limit
         args['include_docs'] = include_docs

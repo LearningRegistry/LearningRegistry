@@ -128,7 +128,7 @@ class SliceController(BaseController):
     def _get_view(self,view_name = '_design/learningregistry-slice/_view/docs',keys=[], include_docs = False, resumptionToken=None, limit=None):
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         
-        opts = {"stale": "ok", "reduce": False }
+        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": False }
         
         if include_docs:
             opts["include_docs"] = True
@@ -157,7 +157,7 @@ class SliceController(BaseController):
         
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         
-        opts = {"stale": "ok", "reduce": True, "group": True }
+        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": True, "group": True }
         
         if self.enable_flow_control and resumptionToken != None:
             opts["keys"] = resumptionToken["keys"]

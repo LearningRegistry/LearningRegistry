@@ -13,7 +13,6 @@ import lr.lib.resumption_token as rt
 log = logging.getLogger(__name__)
 import ast
 import string
-
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
 BASIC_HARVEST_SERVICE_DOC = appConfig['lr.harvest.docid']

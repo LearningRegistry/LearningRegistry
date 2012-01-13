@@ -151,13 +151,13 @@ class oaipmh(harvest):
 #        return map(lambda row: row["value"], view_data)
 
     def get_records_by_resource(self,resource_locator):
-        view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST", documentHandler=OAIPMHDocumentResolver(), include_docs=True,keys=[resource_locator], stale='ok')
+        view_data = h.getView(database_url=self.db_url,view_name='_design/learningregistry-resource-location/_view/docs',method="POST", documentHandler=OAIPMHDocumentResolver(), include_docs=True,keys=[resource_locator], stale=appConfig['couchdb.stale.flag'])
         for doc in view_data:
             yield doc  
     
     def list_identifiers_or_records(self,metadataPrefix,from_date=None, until_date=None, rt=None, fc_limit=None, serviceid=None, include_docs=False):
         '''Returns the list_records as a generator based upon OAI-PMH query'''
-        opts = { "stale": "ok" };
+        opts = { "stale": appConfig['couchdb.stale.flag'] };
         if include_docs:
             opts["include_docs"] = True
         
@@ -195,7 +195,7 @@ class oaipmh(harvest):
     
     def list_metadata_formats(self, identity=None, by_doc_ID=False, verb="ListMetadataFormats"):
         try:
-            opts = { "stale": "ok" }
+            opts = { "stale": appConfig['couchdb.stale.flag'] }
             if identity != None:
                 opts["include_docs"] = "true"
                 
@@ -243,7 +243,7 @@ class oaipmh(harvest):
             opts = {
                     "group": True,
                     "limit": 1,
-                    "stale": "ok"
+                    "stale": appConfig['couchdb.stale.flag']
                     }
             
             view_data = self.db.view('oai-pmh-identify-timestamp/docs', **opts)
