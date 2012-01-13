@@ -301,8 +301,7 @@ class TestDistribute(object):
         assert (response[self.__OK] and 
                       response[self.__CONNECTIONS][0][self.__REPLICATION_RESULTS][self.__OK]),  \
         "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
-                # There should be no replication. Destination node should be 
-        # empty of resource_data docs
+        
         assert sourceNode.compareDistributedResources(destinationNode), \
                     """Distribution from a common node to gateway node should work"""
 

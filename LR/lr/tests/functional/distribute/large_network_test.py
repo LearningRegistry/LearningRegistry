@@ -112,27 +112,55 @@ def createNetwork():
     
     gateways =[n[0], n[3], n[4],n[5], n[7], n[8], n[9], n[12],n[13]]
     _GATEWAYS = gateways
-    
-    connections ={n[0]:[n[1]],
-                            n[1]:[],
-                            n[2]:[n[0], n[3], n[4], n[5]],
-                            n[3]:[n[13], n[0], n[6]],
-                            n[4]:[n[7], n[3]],
-                            n[5]:[n[5], n[0]],
-                            n[6]:[n[8], n[9], n[10]],
-                            n[7]:[n[4], n[6]],
-                            n[8]:[n[6], n[12]],
-                            n[9]:[n[13]],
-                            n[10]:[],
-                            n[11]:[n[10]],
-                            n[12]:[n[10]],
-                            n[13]:[n[14]],
-                            n[14]:[n[13]]
+    F= assertNoDistribute
+    S=assertSucessDistribute
+    #Add the essert test function to each of the connection destination to test.
+    connections ={n[0]:{n[1]: F},
+                            
+                            n[1]:{},
+                            
+                            n[2]:{n[0]:F, 
+                                     n[3]:S, 
+                                     n[4]:S, 
+                                     n[5]:S},
+                                     
+                            n[3]:{n[13]:F,
+                                     n[0]:S, 
+                                     n[6]:F},
+                            
+                            n[4]:{n[7]:S, 
+                                    n[3]:F},
+                                    
+                            n[5]:{n[5]:F, 
+                                     n[0]:S},
+                            
+                            n[6]:{n[8]:S, 
+                                    n[9]:S, 
+                                    n[1]:F
+                                    },
+                            
+                            n[7]:{n[4]:S, 
+                                     n[6]:S},
+                                     
+                            n[8]:{n[6]:F, 
+                                    n[12]:S},
+                                    
+                            n[9]:{n[13]:F},
+                            
+                            n[10]:{},
+                            
+                            n[11]:{n[10]:S,},
+                            
+                            n[12]:{n[10]:F},
+                            
+                            n[13]:{n[14]:F},
+                            
+                            n[14]:{n[13]:S}
                             }
     _CONNECTIONS = connections
     #Use the distribute order to have the gateway nodes starts for so that
     # the data can get propagated throughout the network
-    _DISTRIBUTE_ORDER =[2, 0, 3, 4, 5, 7, 6,  8, 12, 13, 9, 10, 14, 11, 1]
+    _DISTRIBUTE_ORDER =[2, 0, 3, 4, 5, 7, 6,  8, 12, 13, 9, 14, 11, 10, 1]
     
     for community in communities:
         setCommunity(community)
@@ -147,45 +175,41 @@ def createNetwork():
             gatewayConnection = ((destination  in gateways) or (node in gateways))
             node.addConnectionTo(destination._getNodeUrl(), gatewayConnection)
     
-    #Poluate node[2] as the seed node.
+    #Populate node[2, 6, 9] as the seed nodes.
     _DATA = json.load(file(_TEST_DATA_PATH))
     n[2].publishResourceData(_DATA["documents"])
-    
-def firstLevelDistribute():
-    #Start the test by starting with the source 
-    _NODES[2].start()
-    #sleep for little  to let the node create teh distributable data
-    sleep(20)
-    #Start the nodes that are connectioned to  the first started node.
-    for n in _CONNECTIONS[_NODES[2]]:
-        n.start()
-    
-    #Now distribute
-    results = _NODES[2].distribute()
-    sleep(30)
-    #First check to make sure the number of connections results matches the
-    #number of connections.
-    assert len(results['connections']) == len(_CONNECTIONS[_NODES[2]]), "Missing connection results"
-    assert results['ok'] == True, "Distribute Failed"
-    for result in results['connections']:
-        #Node[0] is gateway node in a different network distribute should fail
-        node_index = int(result['connection_id'].split(':')[-1].split('_')[0])-5001
-        if result['destinationNodeInfo']['resource_data_url'].find(_NODES[0]._nodeName) != -1:
-            assert not result['ok'], "Fail,  should be no distribute  to node {0}..." .format(_NODES[node_index]._nodeName)
-            assert not result.has_key('replication_results'), "Fail there should be no replication".format(_NODES[node_index]._nodeName)
-            assert result.has_key('error') and result['error'] == 'cannot distribute across networks (or communities) unless gateway', "Fail, {0} there should and error ...".format(_NODES[node_index]._nodeName)
-        else:
-            assert result['ok'], "Distribute to node {0} failed".format(_NODES[node_index]._nodeName)
-            assert result.has_key('replication_results') and  result['replication_results']['ok'], "Replication to node{0} failed".format(_NODES[node_index]._nodeName)
-            assert _NODES[2].compareDistributedResources(_NODES[node_index]), "Documents distribute to node {0} failed".format(_NODES[node_index]._nodeName)
+    n[6].publishResourceData(_DATA["documents"])
 
-def secondLevelDistribute():
-    for node in _CONNECTIONS[_NODES[2]]:
-        for destinationNode in   _CONNECTIONS[node]:
-            destinationNode.start()
+ 
+def getNodeDistributeResults(sourceNode, destinationNode):
+    distributeResultsList = []
+    for distributeResults in sourceNode._distributeResultsList:
+            if ('connections'  in distributeResults) == False:
+                continue
+            for connectionResults in distributeResults['connections']:
+                if destinationNode._getNodeUrl() in connectionResults:
+                    distributeResultList.append(connectionResults)
+    return distributeResultsList
+    
+    
+def assertSucessDistribute(sourceNode, destinationNode):
+    for results in getNodeDistributeResults(sourceNode, destinationNode):
+        assert (results[sourceNode.__OK] and 
+                      results[sourceNode.__REPLICATION_RESULTS][self.__OK]),  \
+                      "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response))
+        assert sourceNode.compareDistributedResources(destinationNode), \
+                    """Distribute failed all source node documents are at destination node."""
 
-    for node in _CONNECTIONS[_NODES[2]]:
-        node.distribute(True)
+def assertNoDistribute(sourceNode, destinationNode):
+    for results in getNodeDistributeResults(sourceNode, destinationNode):
+        assert (not results[sourceNode.__OK] and 
+                    not (sourceNode.__REPLICATION_RESULTS in results)),  \
+                    "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response))
+
+def assertNodeDistributeResults(sourceNode):
+    for destinationNode in _CONNECTIONS[sourceNode].keys():
+        _CONNECTIONS[sourceNode][destinationNode](sourceNode, destinationNode)
+
     
 def  startNodes():
     for node in _NODES:
@@ -194,18 +218,20 @@ def  startNodes():
 def doNodesDistribute():
     for n in _DISTRIBUTE_ORDER:
         print("\n\n==========Node {0} distribute results==========".format(_NODES[n]._nodeName))
-        _NODES[n].distribute()
+        results = _NODES[n].distribute()
+        assert (len(_CONNECTIONS[_NODES[n]]) == 0 or 
+                      len(results['connections']) == len(_CONNECTIONS[_NODES[n]])), "Missing connection results"
+        assertNodeDistributeResults(_NODES[n])
         sleep(5)
-
-def destroyNetwork():
-    for node in _NODES:
-        node.tearDown()
-    _NODES.clear()
-    #keep around the replication document so that I can all the replication info can
-    # be deleted.  It seems like the replicator database will not do replication if the
-    # source and target node is already in the dabatase as completed document,
-    # eventhough source and target are new document.
 
 def testLargeNetwork():
     createNetwork()
-    firstLevelDistribute()
+    startNodes()
+    doNodesDistribute()
+    
+
+def teardown():
+    for node in _NODES:
+        node.tearDown()
+        
+
