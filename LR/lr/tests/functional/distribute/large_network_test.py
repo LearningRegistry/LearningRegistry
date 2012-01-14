@@ -208,6 +208,7 @@ def assertNoDistribute(sourceNode, destinationNode):
 
 def assertNodeDistributeResults(sourceNode):
     for destinationNode in _CONNECTIONS[sourceNode].keys():
+        destinationNode.waitOnChangeMonitor()
         _CONNECTIONS[sourceNode][destinationNode](sourceNode, destinationNode)
 
     

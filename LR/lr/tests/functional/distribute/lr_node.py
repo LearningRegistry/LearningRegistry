@@ -57,6 +57,7 @@ class Node(object):
             return false;
         }
     """
+
     def __init__(self, nodeConfig, nodeName, communityId=None, networkId=None):
         self._nodeConfig = nodeConfig
         self._nodeName = nodeName
@@ -68,7 +69,7 @@ class Node(object):
         self._setupDistributeService()
         self.setNodeInfo(nodeName)
         if communityId is not None:
-            self.setCommunityInfo(community)
+            self.setCommunityInfo(communityId)
         if networkId is not None:
             self.setNetworkInfo(networkId)
         self.removeTestLog()
@@ -121,8 +122,7 @@ class Node(object):
                                             self._nodeConfig.get("couch_info", "network"), 
                                             'network_policy_description', policy)
         self._setupResourceData()
-     
-    
+
     def _setupDistributeService(self):
         custom_opts = {}
         custom_opts["node_endpoint"] = self._getNodeUrl()
@@ -161,8 +161,7 @@ class Node(object):
         configFile = open(self._pylonsConfigPath, 'w')
         pylonsConfig.write(configFile)
         configFile.close()
-        
-    
+
     def setCommunityInfo(self, community, isSocialCommunity=True):
         self._communityDescription["community_id"]= community
         self._communityDescription["community_name"] = community
@@ -237,6 +236,7 @@ class Node(object):
             doc['create_timestamp'] = now
             doc['update_timestamp']  = now
             resourceDatabase[doc['doc_ID']] = doc
+        self.waitOnChangeMonitor()
     
     def addConnectionTo(self, destinationUrl, gateway_connection=False):
         connection = dict(nodeTemplate.connection_description)
@@ -247,7 +247,48 @@ class Node(object):
         setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node"),  
                                             connection['connection_id'],
                                             connection)
-      
+
+    def _getResourceDataChangeUrl(self):
+        return "{0}/{1}/{2}".format(self._server.resource.url,
+                                            self._nodeConfig.get("couch_info", "resourcedata"),
+                                            "_changes")
+
+    def waitOnChangeMonitor(self):
+        """" Wait that for change monitor the recreate all the local copies of a document
+        after the distribution has been completed."""
+        if hasattr(self, '_pylonsProcess') == False:
+            return
+    
+        try:
+            # Get both distributable and local copies of the document compare their 
+            # numbers and wait until they are equal.
+            while (True) :
+                distributableDocs = self.getResourceDataDocs(include_docs= False, 
+                                                                            doc_type='resource_data_distributable')
+                resourceDataDocs = self.getResourceDataDocs(include_docs=False)
+                remaining =  len(distributableDocs) - len(resourceDataDocs)
+                
+                print("\n....{0} difference {1} for change monitor to catchup {2}\n".format(
+                          self._nodeName, remaining, 
+                          "\nResourceData Count:\t{0}\nDistributatableData Count: {1}".format(
+                        len(resourceDataDocs),  len(distributableDocs))))
+        
+                if remaining == 0:
+                    return;
+                #Assume that it takes about .01 seconds to generate the  new copy.
+                sleepTime = int(10+abs(remaining)*.01)
+            
+                print("\n....{0}, Waiting {1} seconds for change monitor to catchup {2}".format(
+                          self._nodeName, sleepTime, 
+                          "\nResourceData Count:\t{0}\nDistributatableData Count: {1}".format(
+                           len(resourceDataDocs),  len(distributableDocs))))
+    
+                sleep(sleepTime)
+            pass
+        except Exception as e:
+            log.exception(e)
+            print(e)
+
     def waitOnReplication(self,  distributeResults):
         """Wait for the replication to complete on the all node connections specifed
         by dsistributeResults """
@@ -281,11 +322,7 @@ class Node(object):
                     waiting = True
                     sleep(30)
                     continue
-        # We still need to wait for the changes monitor to process the replicated 
-        # documents and create the local copies. so wait for little bit more. 
-        # hopefully 30 additional seconds is good enough
-        sleep(10)
-    
+
     def distribute(self, waitOnReplication=True):
         """ Distribute to all the node connections.  When waited for completion is
         true the this method will that distribution is completed before returning 
@@ -303,11 +340,10 @@ class Node(object):
                 self.waitOnReplication(self._distributeResultsList[-1])
         
             return self._distributeResultsList[-1]
-            
+    
     def getResourceDataDocs(self, filter_description=None, doc_type='resource_data', include_docs=True):
         
-        db = self._server[self._nodeConfig.get("couch_info", "resourcedata")]
-        
+        db = self._server[self._nodeConfig.get("couch_info", "resourcedata")]        
         #For source node get all the resource_data documents using the filter
         # that was using to distribute the document to destination node.
         options = { "filter": "filtered-replication/change_feed_filter",
@@ -316,7 +352,8 @@ class Node(object):
         if filter_description is not None:
             options["filter_description"] = json.dumps(filter_description)
         return db.changes(**options)["results"]
-    
+
+
     def compareDistributedResources(self, destination, filter_description=None):
         """This method considers this node as source node.
         It compares its resource_data document with the destionation node to
@@ -357,9 +394,24 @@ class Node(object):
         return True
         
     def stop(self):
-        if hasattr(self, '_pylonsProcess'):
-            os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
-        
+        if hasattr(self, '_pylonsProcess') == False:
+            return
+            
+        os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
+        # Make sure that process is really dead and the port is releaseed.  This done
+        # avoid bug when the node the stop and start methods are called quickly,
+        # the dead node is still holding  port which sometimes tricks 
+        # the start code thinking the node is up and running already.
+        while True:
+            try:
+                response = urllib2.urlopen(self._getNodeUrl())
+                if response.code :
+                      os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
+                      sleep(5)
+            except:
+                break;
+        del self._pylonsProcess
+
     def start(self):
         
         # remove any existing log file to start from scratch to avoid ever 
@@ -368,6 +420,7 @@ class Node(object):
         
         #Create the log file directory if it does not exists.
         if not path.exists(_TEST_DISTRIBUTE_DIR_LOG):
+            print("create dir")
             os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
             
         command = '(cd {0}; paster serve {1} --log-file {2})'.format(
@@ -388,6 +441,8 @@ class Node(object):
                     break
             except:
                 continue
+        #Wait the change monitor to cat
+        self.waitOnChangeMonitor()
         print("node '{0}' started ....\n".format(self._nodeName) )
     
     def resetResourceData(self):
@@ -448,5 +503,4 @@ class Node(object):
                 
         #Delete the replication documents
         self.removeReplicationDocs()
-
 
