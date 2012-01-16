@@ -3,7 +3,7 @@ Created on Aug 16, 2011
 
 @author: jklo
 '''
-from services import ServiceTemplate
+from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
 import pystache, uuid
 import json
@@ -41,7 +41,8 @@ class __OaiServiceTemplate(ServiceTemplate):
         ServiceTemplate.__init__(self)
         self.service_data_template = '''{
             "version": "OAI-PMH 2.0",
-            "schemalocation": "http://www.learningregistry.org/OAI/2.0/OAI-PMH-LR.xsd"{{#spec_kv_only}},
+            "granularity": "YYYY-MM-DDThh:mm:ssZ",
+            "schemalocation": "http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd"{{#spec_kv_only}},
             "spec_kv_only": {{spec_kv_only}}{{/spec_kv_only}}{{#flow_control}},
             "flow_control": {{flow_control}}{{/flow_control}}{{#id_limit}},
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
@@ -58,6 +59,7 @@ class __OaiServiceTemplate(ServiceTemplate):
             "service_endpoint": "/OAI-PMH",
             "service_key": "false", 
             "service_https": "false",
+            "service_type": "access",
             "spec_kv_only": None,
             "flow_control": "false",
             "id_limit": None,

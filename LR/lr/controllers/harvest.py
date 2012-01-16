@@ -1,6 +1,7 @@
 import logging, json
 from lr.lib.harvest import harvest
 import lr.lib.helpers as helpers
+from urllib import unquote_plus
 import iso8601
 from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
@@ -12,19 +13,21 @@ import lr.lib.resumption_token as rt
 log = logging.getLogger(__name__)
 import ast
 import string
+
 from lr.model import LRNode as sourceLRNode, \
             NodeServiceModel, ResourceDataModel, LRNodeModel, defaultCouchServer, appConfig
+BASIC_HARVEST_SERVICE_DOC = appConfig['lr.harvest.docid']
 class HarvestController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('harvest', 'harvest')call
+    REQUESTID = "request_ID"
     def _getServiceDocment(self,full_docs):
         self.enable_flow_control = False
         self.limit = None        
         self.service_id = None
-        serviceDoc = helpers.getServiceDocument(appConfig['lr.harvest.docid'])
-
+        serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
         if serviceDoc != None:
             if 'service_id' in serviceDoc:
                 self.service_id = serviceDoc['service_id']
@@ -37,13 +40,15 @@ class HarvestController(BaseController):
                 if full_docs:
                     limit_type = "doc_limit"
                 if self.enable_flow_control and limit_type in serviceData:
-                    self.limit = serviceData['id_limit']
-                elif enable_flow_control:
-                    self.limit = 100    
+                    self.limit = serviceData[limit_type]
+                elif self.enable_flow_control:
+                    self.limit = 100
+                if 'metadataformats' in serviceData:    
+                    self.metadataFormats = serviceData['metadataformats']
     def __parse_date(self,date):
+        last_update = helpers.convertToISO8601UTC(date)    
         last_update_date = iso8601.parse_date(date)
-        last_update = helpers.convertToISO8601UTC(last_update_date)    
-        return last_update
+        return helpers.harvestTimeFormat(last_update)
     def _check_bool_param(self,params,key):
         if params.has_key(key):
             raw_value = string.lower(str(params[key]))
@@ -62,50 +67,61 @@ class HarvestController(BaseController):
           data = self.get_base_response(verb,body)
           by_doc_ID = self._check_bool_param(params,'by_doc_ID')
           by_resource_ID = self._check_bool_param(params,'by_resource_ID') 
-          if not params.has_key('request_id'):
+          if not params.has_key(self.REQUESTID) and not params.has_key(self.REQUESTID.lower()):
             data['OK'] = False
             data['error'] = 'badArgument'
             return json.dumps(data)
           if by_doc_ID and by_resource_ID:
             data['OK'] = False
             data['error'] = 'badArgument'
-            return json.dumps(data)
-
-          request_id = params['request_id']
+            return json.dumps(data)          
+          if params.has_key(self.REQUESTID):
+            request_id = params[self.REQUESTID]
+          elif params.has_key(self.REQUESTID.lower()):
+            request_id = params[self.REQUESTID.lower()]
           if by_doc_ID:
             document = h.get_record(request_id)
             if document is not None:
-                records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},[document])
+                records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},[document])
             else:
                 records = []
           else:
-            records = map(lambda doc: {'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'}},'resource_data':doc},h.get_records_by_resource(request_id))
+            request_id = unquote_plus(request_id)
+            records = map(lambda doc: {"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc},h.get_records_by_resource(request_id))
+          if len(records) == 0:
+            data['OK'] = False
+            data['error'] = 'idDoesNotExist'
+            return json.dumps(data)            
           data['getrecord'] ={
             'record': records
-            }
+          }
+          data['request']['identifier']  = request_id
+          data['request']['by_doc_ID'] = by_doc_ID
+          data['request']['by_resource_ID'] = by_resource_ID
           return json.dumps(data)
         def listidentifiers():
-            return self.list_identifiers(h,body,params,verb)            
-        def listrecords():
-            return self.list_records(h,body,params,verb)
+            return self.listGeneral(h,body,params,False,verb)            
+        def listrecords():            
+            return self.listGeneral(h,body,params,True,verb)
         def identify():
             data = self.get_base_response(verb,body)
             serviceDoc = helpers.getServiceDocument(BASIC_HARVEST_SERVICE_DOC)
             data['identify']={
                 "node_id":sourceLRNode.nodeDescription.node_name,
                 "repositoryName":sourceLRNode.communityDescription.community_name,
-                "baseU":serviceDoc['service_endpoint'],
+                "baseURL":serviceDoc['service_endpoint'],
                 "protocolVersion":"2.0",
                 "service_version":serviceDoc['service_version'],
                 "earliestDatestamp":h.earliestDate(),
                 "deletedRecord":sourceLRNode.nodeDescription.node_policy['deleted_data_policy'],
-                "granularity":helpers.getDatetimePrecision(),
+                "granularity":helpers.getDatetimePrecision(serviceDoc),
                 "adminEmail":sourceLRNode.nodeDescription.node_admin_identity
             }
             return json.dumps(data)
         def listmetadataformats():
+            self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=h.list_metadata_formats()
+            data['listmetadataformats']=map(lambda format: {'metadataformat':{"metadataPrefix":format['metadataFormat']}},self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
@@ -126,90 +142,66 @@ class HarvestController(BaseController):
             abort(500,"Invalid Verb")
     def _test_time_params(self, params):
         
-        if not params.has_key('from'):
+        if not params.has_key('from') or (params.has_key('from') and params['from'] is None):
             from_date = self.__parse_date('1990-10-10 12:12:12.0Z')
         else:
             from_date = self.__parse_date(params['from'])
-        if not params.has_key('until'):
+        if not params.has_key('until') or (params.has_key('until') and params['until'] is None):
             until_date = self.__parse_date(datetime.utcnow().isoformat()+ "Z")
         else:
             until_date = self.__parse_date(params['until'])
         return from_date,until_date         
-    def list_records(self, h , body , params, verb = 'GET' ):                
+    def listGeneral(self, h , body , params, includeDocs,verb = 'GET'):                        
         data = self.get_base_response(verb,body)
-        if params.has_key('from'):
-            data['request']['from'] = params['from']
-        if params.has_key('until'):
-            data['request']['until'] = params['until']
-        from_date, until_date = self._test_time_params(params)
-        data['listrecords'] =  []
-        self._getServiceDocment(False)        
-        resumption_token = None
-        count = 0
-        lastID = None
-        lastKey = None
-        if self.enable_flow_control and params.has_key('resumption_token'):
-            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                        
-        base_response =  json.dumps(data).split('[')
-        yield base_response[0] +'['
-        def debug_map(doc):
-            data ={'record':{"header":{'identifier':doc['_id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()),'status':'active'},'resource_data':doc}}
-            return data
+        try:
+            from_date, until_date = self._test_time_params(params)
+        except:
+            data['OK'] = False
+            data['error'] = 'badArgument'
+            yield json.dumps(data)
+            return
+        data['request']['from'] = from_date
+        data['request']['until'] = until_date             
         if from_date > until_date:
           data['OK'] = False
           data['error'] = 'badArgument'
+          yield json.dumps(data)
         else:
+            self._getServiceDocment(includeDocs)        
+            resumption_token = None
+            count = 0
+            lastID = None
+            lastKey = None
+            if self.enable_flow_control and params.has_key('resumption_token'):
+                resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                                    
+            if includeDocs:       
+                data['listrecords'] =  []   
+                viewResults = h.list_records(from_date,until_date,resumption_token=resumption_token, limit=self.limit)                
+                debug_map = lambda doc: {'record':{"header":{'identifier':doc['id'], 'datestamp':doc['key']+"Z",'status':'active'},'resource_data':doc['doc']}}                
+            else:
+                data['listidentifiers'] =  []   
+                viewResults = h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit)
+                debug_map = lambda doc:{"header":{'identifier':doc['id'], 'datestamp':doc['key']+"Z",'status':'active'}}                
+            base_response =  json.dumps(data).split('[')            
+            yield base_response[0] +'['
             first = True
-            for data in h.list_records(from_date,until_date,resumption_token=resumption_token, limit=self.limit):                        
+            for data in viewResults:                        
                 lastID = data['id']
                 lastKey = data['key']
-                doc = data['doc']
                 count += 1
                 if not first:
                     yield ',\n'
                 first = False
-                yield json.dumps(debug_map(doc))
-        if self.enable_flow_control and self.limit <= count:
-            token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
-            resp = base_response[1]
-            yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
-        else:
-            yield base_response[1]
-
-    def list_identifiers(self,h, body ,params, verb = 'GET'):        
-
-        data = self.get_base_response(verb,body)
-        if params.has_key('from'):
-            data['request']['from'] = params['from']
-        if params.has_key('until'):
-            data['request']['until'] = params['until']
-        from_date, until_date = self._test_time_params(params)
-        data['listidentifiers'] =  []
-        base_response =  json.dumps(data).split('[')
-        self._getServiceDocment(False)        
-        resumption_token = None
-        if self.enable_flow_control and params.has_key('resumption_token'):
-            resumption_token = rt.parse_token(self.service_id,params['resumption_token'])                
-        yield base_response[0] +'['
-        first = True;
-        count = 0
-        lastID = None
-        lastKey = None
-        for d in h.list_identifiers(from_date,until_date,resumption_token=resumption_token, limit=self.limit):
-            count += 1
-            lastID = d['id']
-            lastKey = d['key']
-            if not first:
-                yield ',\n'
-            first = False            
-            return_value = {"header":{'identifier':d['id'], 'datestamp':helpers.convertToISO8601Zformat(datetime.today()) ,'status':'active'}}
-            yield json.dumps(return_value)
-        if self.enable_flow_control and self.limit <= count:
-            token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
-            resp = base_response[1]
-            yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
-        else:
-            yield base_response[1]
+                yield json.dumps(debug_map(data))
+            if self.enable_flow_control and self.limit <= count:
+                token = rt.get_token(serviceid=self.service_id,startkey=lastKey,endkey=helpers.convertToISO8601Zformat(until_date),startkey_docid=lastID,from_date=helpers.convertToISO8601Zformat(from_date),until_date=helpers.convertToISO8601Zformat(until_date))
+                resp = base_response[1]
+                yield resp[:-1] +(',"resumption_token":"%s"' %token) +resp[-1:]
+            elif self.limit > count:
+                resp = base_response[1]
+                yield resp[:-1] +(',"resumption_token":"%s"' %'null') +resp[-1:]    
+            else:
+                yield base_response[1]
         
 
     def get_base_response(self, verb, body):

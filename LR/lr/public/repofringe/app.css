@@ -1,0 +1,33 @@
+#related-keys {
+    position:relative;
+    width:600px;
+    height:700px;
+    margin:auto;
+    overflow:hidden;
+    background-color:#000;
+    float: left;
+}
+
+#results {
+    height:700px;
+    overflow: auto;	
+}
+
+body {
+    background-color:#000;
+    color:#fff;	
+}
+
+#title {
+    float: right;	
+}
+
+a:link    {color:#fff;}
+a:visited {color:#fff;}
+a:hover   {color:#fff;}
+a:active  {color:#fff;}
+
+.tip { background-color: #fff;
+       padding: 4px; }
+.tip-text {color:#000;}
+.tip-title {color:#000;}

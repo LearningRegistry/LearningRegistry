@@ -20,6 +20,7 @@ from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 import logging
+from urllib import unquote_plus
 log = logging.getLogger(__name__)  
 trues = ['T','t','True','true', True]
 class ObtainController(BaseController):
@@ -95,8 +96,10 @@ class ObtainController(BaseController):
                         yield json.dumps({'doc_ID': doc.key})
         if full_docs and byIDResponseChunks is not None:             
             yield ']' + byIDResponseChunks[1]                        
-        if count < self.limit or not self.enable_flow_control:			
+        if  not self.enable_flow_control:			
             yield "]}"
+        elif count < self.limit:
+            yield '], "resumption_token":%s}' % 'null'
         else:
             token = rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId)
             yield '], "resumption_token":"%s"}' % token
@@ -107,8 +110,10 @@ class ObtainController(BaseController):
         return self._performObtain(data)
         # url('obtain')
     def _validateParams(self,data):
-        by_doc_ID =(data.has_key('by_doc_ID') and data['by_doc_ID'])
-        by_resource_ID = (data.has_key('by_resource_ID') and data['by_resource_ID'])        
+        by_doc_ID =data['by_doc_ID']
+        by_resource_ID = data['by_resource_ID']
+        if not data.has_key("request_IDs"):        
+            data['request_IDs'] = []
         if by_doc_ID and by_resource_ID:
             abort(500,"by_doc_ID and by_resource_ID cannot both be True")
         if not by_doc_ID and not by_resource_ID:
@@ -128,7 +133,10 @@ class ObtainController(BaseController):
         if data.has_key(callbackKey):
             yield "{0}(".format(data[callbackKey])                    
         if  by_doc_ID:
-            view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
+            if len(keys) == 0:
+                view = self.get_view(keys=keys, include_docs=full_docs,resumption_token=resumption_token)
+            else:
+                view = self.get_view('_all_docs',keys, include_docs=full_docs,resumption_token=resumption_token)            
         elif by_resource_ID:
             view = self.get_view('_design/learningregistry-resource-location/_view/docs',keys, include_docs=full_docs,resumption_token=resumption_token)        
         for i in  self.format_data(full_docs,view, resumption_token):        
@@ -137,7 +145,7 @@ class ObtainController(BaseController):
             yield ')'
     def create(self):
         """POST /obtain: Create a new item"""                
-        data = self._parseParams(json.loads(request.body))        
+        data = self._parseParams(json.loads(request.body))
         self._validateParams(data)
         return self._performObtain(data)
 
@@ -170,28 +178,34 @@ class ObtainController(BaseController):
         data['request_IDs'] = keys        
         return self._performObtain(data)
         # url('obtain', id=ID)
-    def _parseParams(self,inputParams):
+    def _parseParams(self,params):
         data = {
             'by_doc_ID':False,
             'by_resource_ID':True,
             'ids_only': False,
             'request_IDs': [],            
         }
-        if inputParams.has_key('by_doc_ID'):
-            data['by_doc_ID'] = inputParams['by_doc_ID'] in trues
-            if data['by_doc_ID']:
-                data['by_resource_ID'] = False
-        if inputParams.has_key('by_resource_ID'):            
-            data['by_resource_ID'] = inputParams['by_resource_ID'] in trues
-        if inputParams.has_key('ids_only'):
-            data['ids_only'] = inputParams['ids_only'] in trues
-        if inputParams.has_key('resumption_token'):
-            data['resumption_token'] = rt.parse_token('obtain',inputParams['resumption_token'])
+        if params.has_key('by_doc_ID') and params['by_doc_ID'] in trues:
+            data['by_doc_ID'] = True
+            data['by_resource_ID'] = False                    
+        if params.has_key('by_resource_ID'):            
+            data['by_resource_ID'] = params['by_resource_ID'] in trues
+        if params.has_key('ids_only'):
+            data['ids_only'] = params['ids_only'] in trues
+        if params.has_key('resumption_token'):
+            data['resumption_token'] = rt.parse_token('obtain',params['resumption_token'])
             log.debug(data['resumption_token'])
-        if inputParams.has_key('request_IDs'):
-            data['request_IDs'] = inputParams['request_IDs']
-        if inputParams.has_key('callback'):
-            data['callback'] = inputParams['callback']
+        if params.has_key('callback'):
+            data['callback'] = params['callback']
+        if params.has_key('request_ID'):
+            data['request_IDs'].append(params['request_ID'])
+        elif params.has_key('request_id'):
+            data['request_IDs'].append(params['request_id'])            
+        if params.has_key('request_IDs'):
+            data['request_IDs'].extend(params['request_IDs'])
+        if data['by_resource_ID']:
+            data['request_IDs'] = [unquote_plus(id) for id in data['request_IDs']]        
+        log.debug(data)
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""

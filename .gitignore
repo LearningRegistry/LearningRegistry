@@ -5,6 +5,7 @@
 *paster.pid
 LR/tests/*.htm
 geanyproject
+*.log
 
 # these files are altered when installing the package, so ignore them
 MANIFEST

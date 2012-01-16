@@ -3,7 +3,7 @@ Created on Aug 16, 2011
 
 @author: jklo
 '''
-from services import ServiceTemplate
+from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
 import pystache, uuid
 import json
@@ -46,12 +46,12 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "flow_control": {{flow_control}}{{#id_limit}},
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}},
-            "metadataformats": [
-                {
-                    "metadataFormat": "LR Resource Data Description Data Model",
+            "metadataformats": [{"metadataFormat":
+                {                    
                     "metadataPrefix": "LR_JSON_0.10.0"
                 }
-            ]
+
+            }]
         }'''
     
     
@@ -64,6 +64,7 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "service_endpoint": "/harvest",
             "service_key": "false", 
             "service_https": "false",
+            "service_type": "access",
             "spec_kv_only": None,
             "flow_control": False,
             "id_limit": False,

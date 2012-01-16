@@ -9,14 +9,14 @@
  <sword:noOp>true</sword:noOp>
  <workspace>
    <atom:title>${c.community_name}</atom:title>
-   <collection href="${c.collection_url}" >
+   <collection href="${c.collection_url | n}" >
      <atom:title>${c.node_name}</atom:title>
      <accept>application/json</accept>
      <sword:mediation>true</sword:mediation>
      % if c.node_description is not None:
      <dcterms:abstract>${c.node_description}</dcterms:abstract>
      % endif
-     <sword:collectionPolicy>${c.tos_url}</sword:collectionPolicy>
+     <sword:collectionPolicy>${c.tos_url | n}</sword:collectionPolicy>
    </collection>
  </workspace>
 </service>

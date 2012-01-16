@@ -17,9 +17,8 @@
      % endif
      <updated>${c.doc['update_timestamp']}</updated>
 
-     <author><name>Learning Registry</name></author>
+     <author><name>${c.doc['identity']['submitter']}</name></author>
      <summary type="text">A summary</summary>
      <sword:userAgent>${c.user_agent}</sword:userAgent>
-     <generator uri="${c.generator_url}" version="1.0"/>
-     <content type="application/json" src="${c.content_url}"/>	
+     <content type="application/json" src="${c.content_url | n}"/>	
   </entry>
