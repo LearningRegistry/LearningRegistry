@@ -150,6 +150,11 @@ class SliceController(BaseController):
         return view
     
     def _get_view_total(self,view_name = '_design/learningregistry-slice/_view/docs',keys=[], resumptionToken=None):
+        
+        if resumptionToken and "maxResults" in resumptionToken and resumptionToken["maxResults"] != None :
+            return resumptionToken["maxResults"];
+            
+        
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
         
         opts = {"stale": "ok", "reduce": True, "group": True }
@@ -168,6 +173,8 @@ class SliceController(BaseController):
         for row in view:
             if "value" in row:
                 totalDocs += row["value"]
+        
+        #resumptionToken["maxResults"] = totalDocs;
         return totalDocs
     
     def _get_keys(self, params):
@@ -267,6 +274,7 @@ class SliceController(BaseController):
         prefix = '{"documents":[\n'
         num_sent = 0
         doc_count = 0
+        update_resumption_max_results = current_rt and "maxResults" in current_rt and current_rt["maxResults"] != None
         if docs is not None:
             for row in docs:
                 doc_count += 1
@@ -286,6 +294,8 @@ class SliceController(BaseController):
                     prefix = ",\n"
                 else:
                     log.debug("{0} skipping: alreadySent {1} / forceUnique {2}".format(doc_count, repr(alreadySent), forceUnique))
+                    if update_resumption_max_results:
+                        current_rt["maxResults"] = current_rt["maxResults"] - 1
         
         if doc_count == 0:
             yield prefix
@@ -300,11 +310,11 @@ class SliceController(BaseController):
                 offset = 0
                 
             if offset+doc_count < maxResults:
-                rt = ''' "resumption_token":"{0}", '''.format(resumption_token.get_offset_token(self.service_id, offset=offset+doc_count, keys=keys))
+                rt = ''' "resumption_token":"{0}", '''.format(resumption_token.get_offset_token(self.service_id, offset=offset+doc_count, keys=keys, maxResults=maxResults))
 
         
 
-        yield '\n],'+rt+'"resultCount":'+str(num_sent) +'}'
+        yield '\n],'+rt+'"resultCount":'+str(maxResults) +'}'
         
 # if __name__ == '__main__':
 # param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
