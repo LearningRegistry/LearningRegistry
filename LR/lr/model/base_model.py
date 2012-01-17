@@ -37,9 +37,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
         modelParsers = {}
 
         for path in modelsPath.split(','):
-            print ("\n\n\n........Loading parser model at {0}........\n\n\n".format(path.strip()))
             parser = ModelParser(path.strip())
-            print ("\n\n\n........doc version {0}........{1}\n\n\n".format(str(parser.docVersion), str(type(parser))))
             modelParsers[parser.docVersion] = parser
 
         return modelParsers
