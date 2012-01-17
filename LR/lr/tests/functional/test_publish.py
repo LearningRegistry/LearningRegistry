@@ -39,8 +39,8 @@ class TestPublisherController(TestController):
                      "owner": "Smithsonian American Art Museum"}}]}
 
         result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
-        #assert(result['OK']), " Publish was not successfully"
-        #assert(result['document_results']['OK']), "Publish should have failed to on empty value for required field"
-        #assert('error' in result['document_results'][0] and
-        #           "Required value for 'resource_locator' cannot be an empty string" in result['document_results'][0]['error'])
+        assert(result['OK']), " Publish was not successfully"
+        assert(result['document_results'][0]['OK'] == False), "Publish should have failed to on empty value for required field"
+        assert('error' in result['document_results'][0] and
+                  "Required value for 'resource_locator' cannot be an empty string" in result['document_results'][0]['error'])
         
