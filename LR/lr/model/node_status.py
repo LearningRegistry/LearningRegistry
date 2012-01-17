@@ -25,5 +25,8 @@ DB_NODE = appConfig['couchdb.db.node']
 class NodeStatusModel(createBaseModel(SPEC_STATUS_DESCRIPTION, DB_NODE)):
     
     def __init__(self, data=None):
+        # Node status is model that create and   does not have any doc_version.
+        # so set its doc_version to node.  This model should probably be removed,
+        # alternate method should be implemented.
+        self.__dict__['doc_version'] = None
         super(NodeStatusModel, self).__init__(data)
-        

@@ -526,10 +526,14 @@ class ModelParser(object):
         self._extractData()
         return self._modelInfo
     
-    
+    def _getDocVersion(self):
+        if 'doc_version' in self.modelInfo:
+            return self.modelInfo.doc_version.value
+        return None
     
     modelInfo = property(_getModelInfo, None, None, None)
     modelName = property(lambda self: self._modelName, None, None, None)
+    docVersion = property(_getDocVersion, None, None, None)
     
     def asJSON(self):
         """Transforms the parsed model to a valid JSON representation."""
