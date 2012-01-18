@@ -20,7 +20,7 @@ def install(server, dbname, setupInfo):
     custom_opts["doc_limit"] = int(active)
 
     active = getInput("Enter message size limit in octet. \n"+
-                    "This should the maximum data size  the the node  will accept ", None, isInt)
+                    "This should the maximum data size the the node will accept", None, isInt)
 
     custom_opts["msg_size_limit"] = int(active)
 
@@ -34,8 +34,6 @@ def install(server, dbname, setupInfo):
     doc = json.loads(config_doc)
     PublishDoc(server, dbname,doc["service_type"]+":Basic Publish service", doc)
     print("Configured Basic Publish service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
-
 
 
 class __BasicPublishServiceTemplate(ServiceTemplate):
