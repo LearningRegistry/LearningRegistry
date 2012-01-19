@@ -266,7 +266,7 @@ class TestObtainController(TestController):
         except AppError as ex:
             self._validateError(ex.message[ex.message.rfind('{'):])        
     @ForceCouchDBIndexing()        
-    def test_obtain_empty_resourece_locator(self):
+    def test_obtain_empty_resource_locator(self):
         import uuid
         params = self._getInitialPostData()
         params['by_doc_ID'] = False
