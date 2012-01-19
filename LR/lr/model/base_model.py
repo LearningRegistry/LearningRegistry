@@ -33,6 +33,15 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             #log.exception(ex)
         return server[name]
     
+    def getModelPasers(modelsPath):
+        modelParsers = {}
+
+        for path in modelsPath.split(','):
+            parser = ModelParser(path.strip())
+            modelParsers[parser.docVersion] = parser
+
+        return modelParsers
+        
     class BaseModel(object):
         """Base model class for Learning Registry data models"""
         
@@ -41,8 +50,8 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
         _SPEC_DATA = '_specData'
         
         _defaultDB = createDB(defaultDBName, server)
-        _modelParser = ModelParser(modelSpec)
-        
+        _modelParsers = getModelPasers(modelSpec)
+    
         @classmethod
         def get(cls, doc_id, db=None):
             sourcDB = db
@@ -84,7 +93,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
                         spec_data = json.loads(getFileString(data))
                     else:
                         spec_data = json.loads(data)
-                spec_data = {}                
+                spec_data = {}
                 spec_data.update(data)
                 # Remove _id an _rev in data if t there are present so that we can have
                 # a clean specData for validation
@@ -102,8 +111,8 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             # spec data attribute.
             if name == self._SPEC_DATA:
                 self.__dict__[self._SPEC_DATA] = value
-            elif name in self._modelParser.modelInfo.keys():
-                self._modelParser.validateField(name, value, self._specData)
+            elif self._isSpecDataFieldKey(name):
+                self._validateField(name, value)
                 self.__dict__[self._SPEC_DATA][name] = value
             elif name in self.__dict__.keys():
                 self.__dict__[name] = value
@@ -113,7 +122,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
         
         def __getattr__(self, name):
             # Check if the attribute name is a spec attribute.
-            if name in self._modelParser.modelInfo.keys():
+            if self._isSpecDataFieldKey(name):
                 # If it is a spec attribute  and  it is set in the _specData  
                 # return it otherwise return None
                 return self.__dict__[self._SPEC_DATA].get(name)
@@ -123,18 +132,33 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
                 raise AttributeError("'"+self.__class__.__name__+
                                                 "' object has no attribute'"+name+"'")
     
-
+        def _isSpecDataFieldKey(self, keyName):
+            #look through all the models spec for field name.
+            for specModel in self._modelParsers.values():
+                if keyName in specModel.modelInfo:
+                    return True
+            return False
+        
+        def _validateField(self, fieldName, value):
+            # Look for a parser to validate the field against.  This done by using the
+            # version to look for the parser. If doc_version is not set already don't 
+            # don't anything.  The filed cannot be validate if we don't know what 
+            # doc_version to use
+            if self.doc_version in self._modelParsers:
+                self._modelParsers[self.doc_version].validateField(fieldName, value, self._specData) 
+            
         def _preValidation(self):
             pass
             
         def _validate(self):
-            self._modelParser.validate(self._specData)
+           self._modelParsers[self.doc_version].validate(self._specData)
             
         def _postValidation(self):
             pass
             
         def toJSON(self):
             """Returns JSON object of the spec data"""
+            
             return json.dumps(self._specData)
             
         def validate(self):
