@@ -9,6 +9,9 @@ Created on August 31, 2011
 @author: jpoyau
 '''
 import logging
+import json
+import urllib2
+import multiprocessing
 from base_change_threshold_handler import BaseChangeThresholdHandler
 
 log = logging.getLogger(__name__)
@@ -28,15 +31,16 @@ class BaseViewsUpdateHandler(BaseChangeThresholdHandler):
             designDocs = database.view('_all_docs',include_docs=True,
                                                         startkey='_design%2F',endkey='_design0')
             for designDoc in designDocs:
-                viewInfo = "{0}{1}/{2}/_info".format(appConfig['couchdb.url'],
-                                                                            appConfig['couchdb.db.resourcedata'],
-                                                                            designDoc.id)
+                viewInfo = "{0}/{1}/_info".format(database.resource.url, designDoc.id)
                 viewInfo = json.load(urllib2.urlopen(viewInfo))
                 
                 if (not viewInfo['view_index']['updater_running'] and 
                     designDoc.doc.has_key('views') and len(designDoc.doc['views']) > 0):
+
                     viewName = "{0}/_view/{1}".format(designDoc.id,designDoc.doc['views'].keys()[0])
-                    viewUrl = "{0}{1}/{2}?limit=1".format(appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata'],viewName)
-                    multiprocessing.Process(target=_updateView,args=(viewUrl,)).start()
+                    viewUrl = "{0}/{1}?limit=1".format(database.resource.url,viewName)
+
+                    multiprocessing.Process(target=self._updateView, args=(viewUrl,)).start()
+    
         except Exception as e:
             log.error(e)
