@@ -140,8 +140,10 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             return False
         
         def _validateField(self, fieldName, value):
-            # Look for a parser to validate the valid against.  This done by using the
-            # version to look for the parser
+            # Look for a parser to validate the field against.  This done by using the
+            # version to look for the parser. If doc_version is not set already don't 
+            # don't anything.  The filed cannot be validate if we don't know what 
+            # doc_version to use
             if self.doc_version in self._modelParsers:
                 self._modelParsers[self.doc_version].validateField(fieldName, value, self._specData) 
             

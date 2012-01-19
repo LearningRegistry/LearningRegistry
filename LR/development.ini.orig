@@ -85,9 +85,9 @@ lr.distribute.docid = distribute:Resource Data Distribution service
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 
-spec.models.resource_data =%(specs_dir)s/v_0_23/models/resource_data,
-                                                 %(specs_dir)s/v_0_21/models/resource_data,
-                                                 %(specs_dir)s/v_0_17/models/resource_data,
+spec.models.resource_data =%(specs_dir)s/v_0_23/models/resource_data_description,
+                                                %(specs_dir)s/v_0_21/models/resource_data_description,
+                                                %(specs_dir)s/v_0_17/models/resource_data_description
                                                  
 spec.models.network_policy_description =%(specs_dir)s/v_0_23/models/policy_description
 spec.models.status_description =%(specs_dir)s/v_0_23/models/status_description
