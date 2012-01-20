@@ -129,6 +129,26 @@ def setNetworkId():
     t.network_policy_description['network_id'] = network
     t.network_policy_description['policy_id'] =network+" policy"
         
+def setConfigFile(nodeSetup):
+    
+    #create a copy of the existing config file as to not overide it.
+    if os.path.exists(_PYLONS_CONFIG_DEST):
+        backup = _PYLONS_CONFIG_DEST+".backup"
+        print("\nMove existing {0} to {1}".format(_PYLONS_CONFIG_DEST, backup))
+        shutil.copyfile(_PYLONS_CONFIG_DEST, backup)
+
+    #Update pylons config file to use the couchdb url
+    _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
+    # set the url to for destribute/replication (that is the url that a source couchdb node
+    # will use for replication.
+    _config.set("app:main", "lr.distribute_resource_data_url",  nodeSetup['distributeResourceDataUrl'])
+    
+    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
+    _config.write(destConfigfile)
+    destConfigfile.close()
+
+
+
 if __name__ == "__main__":
 
     from optparse import OptionParser
@@ -152,19 +172,16 @@ if __name__ == "__main__":
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
 
-    #create a copy of the existing config file as to not overide it.
-    if os.path.exists(_PYLONS_CONFIG_DEST):
-        backup = _PYLONS_CONFIG_DEST+".backup"
-        print("\nMove existing {0} to {1}".format(_PYLONS_CONFIG_DEST, backup))
-        shutil.copyfile(_PYLONS_CONFIG_DEST, backup)
-
-    #Update pylons config file to use the couchdb url
-    _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
+    setConfigFile(nodeSetup)
+    
+    server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
+    if server.version() < "1.1.0":
+        _config.set("app:main", "couchdb.stale.flag", "OK")
     destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
     _config.write(destConfigfile)
     destConfigfile.close()
 
-    server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
+    
 
     #Create the databases.
     CreateDB(server, dblist=[_RESOURCE_DATA])

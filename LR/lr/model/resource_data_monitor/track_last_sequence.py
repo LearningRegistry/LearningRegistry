@@ -26,7 +26,7 @@ class TrackLastSequence(BaseChangeThresholdHandler):
                     countThreshold=25, timeThreshold=timedelta(seconds=60)):
         BaseChangeThresholdHandler.__init__(self, countThreshold, timeThreshold)
         self._sequenceChangeDocId =sequenceChangeDocId
-     
+
     def _saveSequence(self, sequence, database):
         log.debug("Last process change sequence: {0}".format(sequence))
         doc ={"_id":self._sequenceChangeDocId,

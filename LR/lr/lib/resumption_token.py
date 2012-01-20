@@ -39,21 +39,23 @@ def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, u
     
     return payload
 
-def get_offset_payload(offset=None, keys=None):
+def get_offset_payload(offset=None, keys=None, maxResults=None):
     payload = {}
     
     if offset:
         payload["offset"] = offset
     if keys:
         payload["keys"] = keys
+    if maxResults:
+        payload["maxResults"] = maxResults
     
     return payload
 
 def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
     return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date), serviceid, __JWT_ALG)
 
-def get_offset_token(serviceid, offset=None, keys=None):
-    return jwt.encode(get_offset_payload(offset, keys), serviceid, __JWT_ALG)
+def get_offset_token(serviceid, offset=None, keys=None, maxResults=None):
+    return jwt.encode(get_offset_payload(offset, keys, maxResults), serviceid, __JWT_ALG)
 
 
 if __name__ == "__main__":

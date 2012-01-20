@@ -460,6 +460,14 @@ class ModelParser(object):
                 +fieldName+"' of type "+
                 modelProp[self._VALUE_TYPE]+"\n\n"+description)
                 
+        #Check that required string are not empty.
+        if (self._IS_REQUIRED in modelProp.keys() and 
+            isOfSpecType(value, 'string') and 
+            len(value.strip()) == 0):
+                raise SpecValidationException(
+                    "Required value for '"+fieldName+"' cannot be an empty string\n\n"
+                    +description)
+                    
          # Check for matching defined value
         if (self._VALUE_DEFINED in modelProp.keys() and
             modelProp[self._VALUE_DEFINED] != value):
@@ -526,10 +534,14 @@ class ModelParser(object):
         self._extractData()
         return self._modelInfo
     
-    
+    def _getDocVersion(self):
+        if 'doc_version' in self.modelInfo:
+            return self.modelInfo.doc_version.value
+        return None
     
     modelInfo = property(_getModelInfo, None, None, None)
     modelName = property(lambda self: self._modelName, None, None, None)
+    docVersion = property(_getDocVersion, None, None, None)
     
     def asJSON(self):
         """Transforms the parsed model to a valid JSON representation."""
@@ -610,28 +622,21 @@ if __name__== "__main__":
     
     parser = OptionParser()
     parser.add_option("-f", "--file", dest="filepath", 
-                      help="The full path of the data model spec definition.",
-                      metavar="FILE")
+                      help="The full path of the data model spec definition.",  metavar="FILE")
                     
-    parser.add_option("-s", "--string", dest="string",
-                      help="String representation of the data model spec definition")
+    parser.add_option("-s", "--string", dest="string",  help="String representation of the data model spec definition")
                 
     parser.add_option("-j", "--json", dest="json", action = "store_true", 
-                      default=False,
-                      help="Show a json representation of data model spec.")
+                      default=False,  help="Show a json representation of data model spec.")
                     
-    parser.add_option("-v", "--validate", dest="source",
-                      help="""Validates a JSON object against the spec data model
+    parser.add_option("-v", "--validate", dest="source",  help="""Validates a JSON object against the spec data model
                             The source JSON object can be a file or a string 
                             representation of the JSON object.
                             """
                         )
-    parser.add_option("-e", "--extract", dest="specFile",
-                      help="extracts data models from the spec file.",
-                      metavar="FILE")
+    parser.add_option("-e", "--extract", dest="specFile",  help="extracts data models from the spec file.",  metavar="FILE")
     
-    parser.add_option("-d", "--destination", dest="modelDestination",
-                      help="""Destination path to put data model file specs 
+    parser.add_option("-d", "--destination", dest="modelDestination",  help="""Destination path to put data model file specs 
                             that are extracted from the main spec.""")
 
 
