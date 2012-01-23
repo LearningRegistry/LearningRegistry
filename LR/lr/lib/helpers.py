@@ -50,7 +50,12 @@ def fixUtf8(input):
         return input.encode('utf-8')
     else:
         return input
-
+def isViewUpdated(db,designDocName):
+    dbInfo = db.info()
+    viewInfoUrl = "{0}/{1}/_info".format(db.resource.url, designDocName)
+    log.debug(viewInfoUrl)
+    viewInfo = json.load(urllib2.urlopen(viewInfoUrl))
+    return json.dumps(dbInfo['update_seq'] == viewInfo['view_index']['update_seq'])
 def getServiceDocument(serviceName):
     from lr.model.base_model import appConfig
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
