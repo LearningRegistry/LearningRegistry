@@ -8,10 +8,10 @@ The [Learning Registry in 20 Minutes or Less guide](https://docs.google.com/docu
 
 ##Setting Up a Learning Registry Node
 
-* [Linux Installation](https://github.com/LearningRegistry/LearningRegistry/wiki/Proposed-Readme) - Instructions for setting up a node on Ubuntu 10.04 LTS onwards.
-
 * [AMI Installation](http://goo.gl/fhdg3) - Instructions for setting up a node using an existing Amazon Machine Instance.
-  	
+
+* [Linux Installation](https://github.com/LearningRegistry/LearningRegistry/wiki/Linux-Installation-Guide) - Instructions for setting up a node on Ubuntu 10.04 LTS onwards.
+ 	
 * [OS X Installation](https://github.com/LearningRegistry/LearningRegistry/wiki/Proposed-OS-X-Installation-Instructions) - Instructions for setting up a node on Mac OS X.
 	  	
 * [Windows Installation](https://github.com/LearningRegistry/LearningRegistry/wiki/Windows-Installation-Guide) - Instructions for setting up a node on a Windows 7 64-bit environment.
