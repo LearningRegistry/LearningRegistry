@@ -53,7 +53,7 @@ class PublishController(BaseController):
                 results[self.__DOCUMENT_RESULTS ] = map(self._publish, data[self.__DOCUMENTS])
         except Exception as ex:
             log.exception(ex)
-            results[self.__ERROR] = "internal error"
+            results[self.__ERROR] = str(ex)
         
         if results.has_key(self.__ERROR):
            results[self.__OK] = False
