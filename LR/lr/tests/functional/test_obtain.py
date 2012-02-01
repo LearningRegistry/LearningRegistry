@@ -265,6 +265,25 @@ class TestObtainController(TestController):
             response = self.app.get(url(controller='obtain',**params),headers=headers)
         except AppError as ex:
             self._validateError(ex.message[ex.message.rfind('{'):])        
+    @ForceCouchDBIndexing()        
+    def test_obtain_empty_resource_locator(self):
+        import uuid
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = False
+        params['by_resource_ID'] = True
+        for id in self.ids:
+            doc = self.db[id]
+            del doc['_id'] 
+            del doc['_rev'] 
+            doc['resource_locator'] = ""
+            doc['doc_ID'] = uuid.uuid1().hex   
+            self.db.save(doc)
+        response = self.app.get(url(controller='obtain',**params),headers=headers)
+        self.resourceLocators.append("")
+        results = self.db.view('_design/learningregistry-resource-location/_view/docs',keys=[""])
+        self._validateResponse(response,json.dumps(params),self.resourceLocators)
+        for i in results:
+            del self.db[i.id]
     @ForceCouchDBIndexing()
     def test_get_fail_both_true(self):
         params = self._getInitialPostData()
