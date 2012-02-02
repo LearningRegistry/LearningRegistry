@@ -1,8 +1,9 @@
 from lr.tests import *
 import codecs
+import os
 import logging, json
 log = logging.getLogger(__name__)
-file_path = 'lr/tests/data/paradata-0.json'
+file_path = os.path.join("lr","tests","data","paradata-0.json")
 class TestSwordController(TestController):
     def __init__(self, *args, **kwargs):
         TestController.__init__(self,*args,**kwargs)

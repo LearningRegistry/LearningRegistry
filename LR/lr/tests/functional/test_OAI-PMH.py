@@ -183,7 +183,9 @@ class TestOaiPmhController(TestController):
     @classmethod
     def setUpClass(self):
 
-        schema_file = file("lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd", "r")
+        #schema_file = file("lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd", "r")
+        #schema_file = file(os.path.join("lr","public","schemas","OAI","2.0","OAI-PMH-LR.xsd"), "r")
+        schema_file = file(os.path.join(os.getcwd(),"lr","public","schemas","OAI","2.0","OAI-PMH-LR.xsd"), "r")
         schema_doc = etree.parse(schema_file)
         self.oailrschema = etree.XMLSchema(schema_doc)
         
