@@ -66,7 +66,7 @@ class ObtainController(BaseController):
     def format_data(self, full_docs, data, currentResumptionToken):
         yield '{"documents":['
         num_sent = 0
-        currentID = ""
+        currentID = None
         byIDResponseChunks = None
         count = 0
         lastStartKey = None
