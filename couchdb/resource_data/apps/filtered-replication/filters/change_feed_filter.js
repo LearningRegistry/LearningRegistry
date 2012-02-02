@@ -16,14 +16,43 @@ function(doc, req){
         }
     
         // If there is no filter in the parameter just send the document.
-        if (!req.query.filter_description){
-            log("No filter available...");
+        if (!req.query.filter_description && !req.query.predicate){
+            log("No filter or predicate available...");
             return true;
         }
-        filter_description = JSON.parse(req.query.filter_description);
+     
+        
+        //check if there is filter predicate function.
+        var predicate_test = true;
+        if (req.query.predicate){
+            try{
+                predicate_func = eval(req.query.predicate);
+                predicate_test = predicate_func(doc);
+            }
+            catch (err){
+                log("predicate fuction error"+err);
+                predicate_test = false;
+            }
+        }
+        if (predicate_test == false)
+        {
+            log("doc failed predicate test ... returning false")
+            return false;
+        }
+          
+        var filter_description;
+        if (req.query.filter_description){
+            filter_description = JSON.parse(req.query.filter_description);
+        }
+        else
+        {
+            log("no filter ... returning predicate result"+predicate_test)
+            return predicate_test
+        }
         // Check to see the query parameter is valid  node filter description. if not
         // we can filter anything out so send it.
-        if(("custom_filter" in filter_description) && filter_description.custom_filter == true){
+        if(("custom_filter" in filter_description) && filter_description.custom_filter == true &&
+            predicate_test == true){
             log("No filtering needed custom filter is being used");
             return true;
         }
@@ -88,6 +117,11 @@ function(doc, req){
         if( (include_doc == false) &&(match_all_filters == true))
         {
             log("rejecting document because it matches exclude filter...\n")
+            return false;
+        }
+        if (predicate_test == false)
+        {
+            log("rejecting document because it failed predicate test ...\n");
             return false;
         }
         log("The document just match everything...\n");

@@ -20,7 +20,7 @@ def make_map(config):
                  always_scan=config['debug'])
     
     
-    def mapResource(config_key, member_name, collection_name):
+    def mapResource(config_key, member_name, collection_name, action=None):
         try:
             service_doc_id = config[config_key]
             service_doc = h.getServiceDocument(service_doc_id)
@@ -29,8 +29,9 @@ def make_map(config):
                 map.connect("/"+collection_name,controller=collection_name,action='options',conditions=dict(method=['OPTIONS']))
                 if member_name == 'swordservice':
                     map.connect("/swordpub",controller='swordservice',action='create')
-                
-                if member_name == 'distribute':
+                elif member_name == 'push_to':
+                      map.connect("/push_to", controller='distribute', action='push_to')
+                elif member_name == 'distribute':
                     map.connect("/destination", controller='distribute', action='destination',
                                           conditions=dict(method='GET'))
                 log.info("Enabling service route for: {0} member: {1} collection: {2}".format(service_doc_id, member_name, collection_name))
@@ -44,6 +45,7 @@ def make_map(config):
         path_prefix='/contrib', name_prefix='contrib_')
     mapResource('lr.status.docid', 'status','status')
     mapResource('lr.distribute.docid','distribute','distribute')
+    mapResource('lr.push_to.docid', 'push_to', 'distribute')
     if not LRNode.nodeDescription.gateway_node:
         mapResource('lr.publish.docid', 'publish','publish')
         mapResource('lr.obtain.docid', 'obtain','obtain')        

@@ -28,6 +28,7 @@ import json
 import urllib2
 import urlparse
 from services.Resource_Data_Distribution import __ResourceDataDistributionServiceTemplate as DistributeServiceTemplate
+from services.Push_To_Distribution import __PushToDistributionServiceTemplate as PushToServiceTemplate
 import subprocess
 from lr.lib import helpers as h
 from time import sleep
@@ -67,6 +68,7 @@ class Node(object):
         self._setupDescriptions()
         self._setupNode()
         self._setupDistributeService()
+        self._setupPushToService()
         self.setNodeInfo(nodeName)
         if communityId is not None:
             self.setCommunityInfo(communityId)
@@ -75,7 +77,8 @@ class Node(object):
         self.removeTestLog()
         # Keep around the replication documents that are store in the replication 
         # database so that they can be deleted when the node is teared down.
-        self._distributeResultsList = []
+        self._replicationIdList = []
+        
         
     def _setupFilePaths(self):
         
@@ -113,6 +116,9 @@ class Node(object):
         except:
             pass
 
+    def getResourceDataDbUrl(self):
+        return  urlparse.urljoin(self._nodeConfig.get("couch_info", "server"),
+                                              self._nodeConfig.get("couch_info", "resourcedata"))
     def _setupNode(self):
         #create the couch db databases
         self._server = couchdb.Server(url=self._nodeConfig.get("couch_info", "server"))
@@ -135,6 +141,20 @@ class Node(object):
         doc = json.loads(config_doc)
         setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node") ,
                           doc["service_type"]+":Resource Data Distribution service", doc)
+
+    def _setupPushToService(self):
+        custom_opts = {}
+        custom_opts["node_endpoint"] = self._getNodeUrl()
+        custom_opts["service_id"] = uuid.uuid4().hex
+        custom_opts["active"] = True
+        
+        must = PushToServiceTemplate()
+        config_doc = must.render(**custom_opts)
+
+        doc = json.loads(config_doc)
+        setup_utils.PublishDoc(self._server, self._nodeConfig.get("couch_info", "node") ,
+                          doc["service_type"]+":Push To Distribution service", doc)
+
 
     def _setupPylonsConfig(self):
         #Read the original configuration and update with the test node data.
@@ -288,6 +308,19 @@ class Node(object):
         except Exception as e:
             log.exception(e)
             print(e)
+            
+    def waitOnReplicationById(self, replicationId, destinationNode=None):
+        while(True):
+            response = urllib2.urlopen(self._replicatorUrl+'/'+replicationId)
+            doc = json.load(response)
+            response.close()
+            print('\n\n---------------Replication  Status-----------')
+            print('--Replication:{1}\n<=From node:\t{0}\n=>To node:\t{2}\n<=>completion status: \t{3}\n'.format(
+                            self._nodeName,  replicationId, str(destinationNode), doc.get('_replication_state')))
+            if  doc.get('_replication_state') == 'completed':
+                break
+            sleep(30)
+
 
     def waitOnReplication(self,  distributeResults):
         """Wait for the replication to complete on the all node connections specifed
@@ -298,30 +331,35 @@ class Node(object):
             print ("node {0}  has no replication results or distributable docs ....".format(self._nodeName))
             return
             
-        waiting = True  
-        while(waiting):
-             # Set waiting to false and check to the replication document to see
-             # if replication not completed for any of the connections, if not then
-            # reset waiting to true.
-            waiting =False
-            for connectionResults in distributeResults['connections']:
-                if 'replication_results' not in connectionResults:
-                    continue
-                #Get the replication document.
-                response = urllib2.urlopen(self._replicatorUrl+'/'+connectionResults['replication_results']['id'])
-                doc = json.load(response)
-                response.close()
-                
-                print('\n\n---------------Replication  Status-----------')
-                print('<=From node:\t{0}\n=>To node:\t{1}\n<=>completion status: \t{2}\n'.format(
-                                self._nodeName,  
-                                connectionResults['destinationNodeInfo']['resource_data_url'].split('/')[-1].split('_resource_data')[0],
-                                doc.get('_replication_state')))
-                                
-                if  doc.get('_replication_state') != 'completed':
-                    waiting = True
-                    sleep(30)
-                    continue
+        for connectionResults in distributeResults['connections']:
+            if 'replication_results' not in connectionResults:
+                continue
+            self._replicationIdList.append(connectionResults['replication_results']['id'])
+            self.waitOnReplicationById(connectionResults['replication_results']['id'],
+                                                      connectionResults['destinationNodeInfo']['resource_data_url'].split('/')[-1].split('_resource_data')[0])
+        
+    def pushTo(self, destinationNode, predicateFunc=None):
+        """Push to destination node.  Use destination node filter if it has a filter"""
+        
+        pushToOptions = {"destination_database_url": destinationNode.getResourceDataDbUrl()}
+            
+        if (destinationNode._nodeFilterDescription is None) == False:
+            pushToOptions['filter'] = destinationNode._nodeFilterDescription["filter"]
+            pushToOptions['include_exclude'] =destinationNode._nodeFilterDescription["include_exclude"]
+        
+        if (predicateFunc is None) == False:
+             pushToOptions['predicate'] = predicateFunc
+        
+        request = urllib2.Request(self._getNodeUrl()+"/push_to", 
+                                                headers={'Content-Type':'application/json' },
+                                                data = json.dumps(pushToOptions))
+        
+        results = json.load(urllib2.urlopen(request))
+        self._replicationIdList.append(results['id'])
+        self.waitOnReplicationById(results['id'], destinationNode._nodeName)
+        print("Push to  reponse: \n{0}".format(pprint.pformat(results)))
+         
+        return results
 
     def distribute(self, waitOnReplication=True):
         """ Distribute to all the node connections.  When waited for completion is
@@ -333,15 +371,16 @@ class Node(object):
                                                     data,
                                                     {'Content-Type':'application/json; charset=utf-8'})
                                                     
-            self._distributeResultsList.append(json.load(urllib2.urlopen(request))) 
-            print("Distribute reponse: \n{0}".format(pprint.pformat(self._distributeResultsList[-1])))
+            results = json.load(urllib2.urlopen(request))
+            print("Distribute reponse: \n{0}".format(pprint.pformat(results)))
             
             if waitOnReplication:
-                self.waitOnReplication(self._distributeResultsList[-1])
-        
-            return self._distributeResultsList[-1]
+                self.waitOnReplication(results)
+
+            return results
     
-    def getResourceDataDocs(self, filter_description=None, doc_type='resource_data', include_docs=True):
+    def getResourceDataDocs(self, filter_description=None, predicate=None, 
+                        doc_type='resource_data', include_docs=True):
         
         db = self._server[self._nodeConfig.get("couch_info", "resourcedata")]        
         #For source node get all the resource_data documents using the filter
@@ -351,17 +390,19 @@ class Node(object):
                             "doc_type":doc_type}
         if filter_description is not None:
             options["filter_description"] = json.dumps(filter_description)
+        if predicate  is not None:
+            options["predicate"] = predicate
         return db.changes(**options)["results"]
 
 
-    def compareDistributedResources(self, destination, filter_description=None):
+    def compareDistributedResources(self, destination, filter_description=None, predicate=None):
         """This method considers this node as source node.
         It compares its resource_data document with the destionation node to
         verify that data was distributed.  This comparison assumes that distribute/
         replication is done and that there is no other additions or deletions the
         nodes that are being compared"""
 
-        sourceResults = self.getResourceDataDocs(filter_description)
+        sourceResults = self.getResourceDataDocs(filter_description, predicate)
         destinationResults = destination.getResourceDataDocs() 
         
         #check the number of source document is the same at destination.
@@ -459,32 +500,28 @@ class Node(object):
          replication document stated as completed with the same source and target
          database name eventhough those the document is about database thas been
          deleted and recreated. '''
-        for distributeResults in self._distributeResultsList:
-            if ('connections'  in distributeResults) == False:
-                continue
-            for connectionResults in distributeResults['connections']:
-                if 'replication_results' in connectionResults:
-                    try:
-                        #Use urllib request to remove the replication documents, the python
-                        #couchdb interface has a bug at time of this write that prevents access
-                        # to the _replicator database.
-                        
-                        #first get the lastest version of the doc
-                        response = urllib2.urlopen(self._replicatorUrl+'/'+connectionResults['replication_results']['id'])
-                        doc = json.load(response)
-                        response.close()
-                        print ("\n\n--node {0} deleting replication doc: {1}".format(
-                                    self._nodeName, 
-                                    self._replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev'])))
-                                    
-                        request = urllib2.Request(self._replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev']), 
-                                                                headers={'Content-Type':'application/json' })
+        for replicationId in self._replicationIdList:
+            try:
+                #Use urllib request to remove the replication documents, the python
+                #couchdb interface has a bug at time of this write that prevents access
+                # to the _replicator database.
                 
-                        request.get_method = lambda: "DELETE"
-                        
-                        urllib2.urlopen(request)
-                    except Exception as e:
-                        log.exception(e)
+                #first get the lastest version of the doc
+                response = urllib2.urlopen(self._replicatorUrl+'/'+replicationId)
+                doc = json.load(response)
+                response.close()
+                print ("\n\n--node {0} deleting replication doc: {1}".format(
+                            self._nodeName, 
+                            self._replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev'])))
+                            
+                request = urllib2.Request(self._replicatorUrl+'/{0}?rev={1}'.format(doc['_id'], doc['_rev']), 
+                                                        headers={'Content-Type':'application/json' })
+        
+                request.get_method = lambda: "DELETE"
+                
+                urllib2.urlopen(request)
+            except Exception as e:
+                log.exception(e)
             
     def tearDown(self):
         self.stop()

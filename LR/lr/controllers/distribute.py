@@ -56,7 +56,31 @@ class DistributeController(BaseController):
             
         log.info("received distribute request...returning: \n"+pprint.pformat(response, 4))
         return json.dumps(response)
+
+    def push_to(self):
+
+        log.debug("\n\nPush request: {0}\n\n".format(pprint.pformat(request.body, indent=2)))
+        pushOptions = json.loads(request.body)
         
+        replicationOptions={'filter':ResourceDataModel.REPLICATION_FILTER, 
+                                         'source':self.resource_data,
+                                         'target': pushOptions['destination_database_url'],
+                                         'query_params': pushOptions}
+                                         
+        req= urllib2.Request(urlparse.urljoin(appConfig['couchdb.url'], '_replicator'),
+                                                headers={'Content-Type':'application/json' },
+                                                data = json.dumps(replicationOptions))
+            
+        log.info("\n\nPush started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
+                    self.resource_data,  pushOptions['destination_database_url'], 
+                    pprint.pformat(replicationOptions)))
+    
+        results = json.load(urllib2.urlopen(req))
+        log.debug("Replication results: " + pprint.pformat(results))
+        
+        return json.dumps(results)
+
+
     def _getDistinationInfo(self, connection):
         # Make sure we only have one slash in the url path. More than one 
         #confuses pylons routing libary.

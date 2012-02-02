@@ -58,7 +58,9 @@ _DEFAULT_SERVICES = {"administrative":
                                                      "SWORD APP Publish V1.3"],
                                         "broker":[],
                                         "distribute":
-                                                    ["Resource Data Distribution"],
+                                                    ["Resource Data Distribution",
+                                                     "Push To Distribution",
+                                                    ],
                                         "publish":
                                                     ["Basic Publish"]}
                                                     
@@ -72,7 +74,9 @@ _GATEWAY_NODE_SERVICES ={"administrative":
                                                      "Network Node Status", 
                                                      "Resource Distribution Network Policy"],
                                         "distribute":
-                                                    ["Resource Data Distribution"]
+                                                    ["Resource Data Distribution",
+                                                     "Push To Distribution"
+                                                    ]
                                     }
 def makePythonic(text):
     return re.sub('''[ \.]''', "_", text)

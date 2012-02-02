@@ -14,6 +14,7 @@ import ConfigParser
 import json
 from time import sleep
 import pprint
+import urllib2
 
 _PWD = path.abspath(path.dirname(__file__))
 _TEST_DATA_PATH = path.abspath(path.join(_PWD, "../../data/nsdl_dc/data-000000000.json"))
@@ -49,8 +50,7 @@ class TestDistribute(object):
         for node in self._NODES:
             node.stop()
             node.resetResourceData()
-       
-        
+
     def _setupNodePair(self, sourceNode, destinationNode, 
                                     sourceCommunityId="DistributeTestCommunity",
                                     destinationCommunityId="DistributeTestCommunity",
@@ -63,7 +63,8 @@ class TestDistribute(object):
                                     sourceIsActive = True,
                                     destinationIsActive = True,
                                     destinationFilter = None,
-                                    isGatewayConnection=None):
+                                    isGatewayConnection=None,
+                                    addConnection = True):
         #Set the community id
         sourceNode.setCommunityInfo(sourceCommunityId, sourceIsSocialCommunity)
         destinationNode.setCommunityInfo(destinationCommunityId, destinationIsSocialCommunity)
@@ -81,13 +82,22 @@ class TestDistribute(object):
             destinationNode.setFilterInfo(**destinationFilter)
         
         #add the destination node as connection to the source node.
-        if isinstance(isGatewayConnection, bool):
-            sourceNode.addConnectionTo(destinationNode._getNodeUrl(), isGatewayConnection)
-        else:
-            sourceNode.addConnectionTo(destinationNode._getNodeUrl(), (sourceIsGateway or destinationIsGateway))
-            
+        if addConnection:
+            if isinstance(isGatewayConnection, bool):
+                sourceNode.addConnectionTo(destinationNode._getNodeUrl(), isGatewayConnection)
+            else:
+                sourceNode.addConnectionTo(destinationNode._getNodeUrl(), (sourceIsGateway or destinationIsGateway))
+                
     
+    def _doPushToTest(self, sourceNode, destinationNode, predicateFunc=None):
+        
+        sourceNode.start()
+        destinationNode.start()
+        results = sourceNode.pushTo(destinationNode, predicateFunc)
+        destinationNode.waitOnChangeMonitor()
 
+        return results
+        
     def _doDistributeTest(self, sourceNode, destinationNode):
         #start the node nodes.
         sourceNode.start()
@@ -169,21 +179,7 @@ class TestDistribute(object):
                     """Distribute between two gateway nodes on the same community but
                     different network and no filter on the destination node."""
 
-
-    def _setup_common_nodes_same_network_and_community_filter(self, 
-            include_exclude=True, 
-            count=50,
-            mode=5):
-        sourceNode =self._NODES[0]
-        destinationNode = self._NODES[1]
-        filterDescription = {"include_exclude": include_exclude,
-                                        "filter":[{"filter_key":"keys", 
-                                                    "filter_value":"Filter Me In"},
-                                                    {"filter_key":"active", 
-                                                    "filter_value":"True"},
-                                                    ]}
-        self._setupNodePair(sourceNode, destinationNode, destinationFilter=filterDescription)
-        
+    def _pushMarkedData(self, sourceNode, count, mode):
         #populate the node with test data.
         data = json.load(file(_TEST_DATA_PATH))
         #Add some marker documents that will be filter in.
@@ -191,8 +187,36 @@ class TestDistribute(object):
             data["documents"][i]["keys"].append("Filter Me In")
             if i % mode == 0:
                 data["documents"][i]["active"] = False
-                
+    
         sourceNode.publishResourceData(data["documents"])
+        
+    def _setup_with_filter(self, include_exclude=True, count=50, mode=5, addConnection=True):
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+
+        filterDescription = {"include_exclude": include_exclude,
+                                        "filter":[{"filter_key":"keys", 
+                                                    "filter_value":"Filter Me In"},
+                                                    {"filter_key":"active", 
+                                                    "filter_value":"True"},
+                                                    ]}
+        self._setupNodePair(sourceNode, destinationNode, destinationFilter=filterDescription, 
+                                        addConnection=addConnection)
+
+        self._pushMarkedData(sourceNode, count, mode)
+
+
+    def _setup_common_nodes_same_network_and_community_filter(self, 
+            include_exclude=True, 
+            count=50,
+            mode=5,
+            addConnection=True):
+
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        
+        self._setup_with_filter(include_exclude, count, mode, addConnection)
       
         response =self._doDistributeTest(sourceNode, destinationNode)
     
@@ -332,4 +356,98 @@ class TestDistribute(object):
                 """There  should be NO distribution/replication.  Source node connections
                 are invalid"""
     
+    def test_push_distribute_no_filter_or_predicate(self):
+        """Test push to distribution with no filter or predicate function """
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        
+        self._setupNodePair(sourceNode, destinationNode, addConnection=False)
+           
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        
+        response = self._doPushToTest(sourceNode, destinationNode)
+        assert (response[self.__OK]), "Replication failed..."
+        assert sourceNode.compareDistributedResources(destinationNode), \
+        """Fail to push document to destination node."""
+
+    def test_push_distribute_with_filter_in(self):
+        """ Test push to distribution with filter in and no predicate function """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        
+        self._setup_with_filter(addConnection=False)
+        response = self._doPushToTest(sourceNode, destinationNode)
+        
+        assert (response[self.__OK]), "Replication failed..."
+        assert sourceNode.compareDistributedResources(destinationNode, 
+                                                                                destinationNode._nodeFilterDescription), \
+                """Push to distribution with filter in failed ... """
     
+    def test_push_distribute_with_filter_out(self):
+        """ Test push to distribution with filter out and no predicate function """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        
+        self._setup_with_filter(addConnection=False, include_exclude=False, count=100,  mode=2)
+        response = self._doPushToTest(sourceNode, destinationNode)
+        
+        assert (response[self.__OK]), "Replication failed..."
+        assert sourceNode.compareDistributedResources(destinationNode, 
+                                                                                destinationNode._nodeFilterDescription), \
+                """Push to distribution with filter out failed ... """
+                
+    def test_push_distribute_with_predicate(self):
+        """ Test push to distribution with filter and predicate function """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, addConnection=False)
+        self._pushMarkedData(sourceNode, 50, 5)
+        
+        predicate = """function(doc){
+            if(doc.active)
+            {
+                return true;
+            }
+            return false;
+        }
+        """
+        destinationNode._nodeFilterDescription = None
+        response = self._doPushToTest(sourceNode, destinationNode, predicate)
+        
+        assert (response[self.__OK]), "Replication failed..."
+        assert sourceNode.compareDistributedResources(destinationNode, 
+                                                                                destinationNode._nodeFilterDescription, predicate), \
+                """Push to distribution with filter in failed ... """
+
+    def test_push_distribute_with_filter_and_predicate(self):
+        """ Test push to distribution with predicate function """
+            
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, addConnection=False)
+        self._pushMarkedData(sourceNode, 50, 5)
+        
+        destinationFilter = {"include_exclude": False,
+                                          "filter":[{"filter_key":"keys", "filter_value":"Filter Me In"}],
+                                        }
+        destinationNode.setFilterInfo(**destinationFilter )
+        
+        predicate = """function(doc){
+            if(doc.active)
+            {
+                return true;
+            }
+            return false;
+        }
+        """
+        response = self._doPushToTest(sourceNode, destinationNode, predicate)
+        
+        assert (response[self.__OK]), "Replication failed..."
+        assert sourceNode.compareDistributedResources(destinationNode, 
+                                                                                destinationNode._nodeFilterDescription, predicate), \
+                """Push to distribution with filter and predicate failed ... """
