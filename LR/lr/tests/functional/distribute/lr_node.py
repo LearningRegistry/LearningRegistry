@@ -33,7 +33,7 @@ from lr.lib import helpers as h
 from time import sleep
 import pprint
 import signal
-
+import platform
 import logging
 
 log = logging.getLogger(__name__)
@@ -42,8 +42,9 @@ log = logging.getLogger(__name__)
 _PYLONS_CONFIG = path.abspath(path.join(_PWD, "../../../../development.ini.orig"))
 _RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchdb/resource_data/apps/filtered-replication"))
 _TEST_DISTRIBUTE_DIR_LOG = path.abspath(path.join(path.dirname(_PYLONS_CONFIG), "test_distribute_logs"))
+_WINDOWS_NODE_RUN = path.abspath(path.join(_PWD, 'windows_run_node.bat'))        
         
-        
+    
 class Node(object):
     _REPLICATOR_DB = '_replicator'
     _CONFIG_DATABASE_NAMES=["community", "network", "node", "resourcedata"]
@@ -82,7 +83,7 @@ class Node(object):
         self._pylonsConfigPath = path.abspath(path.join(path.dirname(_PYLONS_CONFIG),
                                                                         self._nodeName+"_config.ini"))
         self._logFilePath = path.abspath(path.join(_TEST_DISTRIBUTE_DIR_LOG,
-                                                                      self._nodeName+".log"))
+                                                   self._nodeName+".log"))
                                                                       
     def _getNodeDatabaseList(self):
         return [self._nodeConfig.get("couch_info", db) for db in self._CONFIG_DATABASE_NAMES]
@@ -254,7 +255,7 @@ class Node(object):
                                             "_changes")
 
     def waitOnChangeMonitor(self):
-        """" Wait that for change monitor the recreate all the local copies of a document
+        """Wait that for change monitor the recreate all the local copies of a document
         after the distribution has been completed."""
         if hasattr(self, '_pylonsProcess') == False:
             return
@@ -397,17 +398,26 @@ class Node(object):
         if hasattr(self, '_pylonsProcess') == False:
             return
             
-        os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
+        def stopProcess():
+            if platform.system() == 'Windows':
+                command = 'taskkill /F /T /FI "Windowtitle eq {0}"'.format(self._pylonsProcess)
+                print("\n\nTerminate command {0}\n\n".format(command))
+                subprocess.Popen(command, shell=True)
+            else:  
+                os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
+         
+                
         # Make sure that process is really dead and the port is releaseed.  This done
         # avoid bug when the node the stop and start methods are called quickly,
         # the dead node is still holding  port which sometimes tricks 
         # the start code thinking the node is up and running already.
+        stopProcess()
         while True:
             try:
                 response = urllib2.urlopen(self._getNodeUrl())
                 if response.code :
-                      os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
-                      sleep(5)
+                    stopProcess()
+                    sleep(5)
             except:
                 break;
         del self._pylonsProcess
@@ -423,14 +433,27 @@ class Node(object):
             print("create dir")
             os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
             
-        command = '(cd {0}; paster serve {1} --log-file {2})'.format(
+       
+        if platform.system() == "Windows":
+           # Save the command  as title fo the windows that will be used to start test nodes.
+           # It will be use last in stop node using the taskkill command filtering on the 
+           # the windows title.
+           self._pylonsProcess = '{0}_{1}'.format(self._nodeName, id(self))
+           
+           command = 'START "{0}" /MIN /d {1} paster serve {2} --log-file {3}'.format(
+                                          self._pylonsProcess,
+                                          path.abspath(path.dirname(self._pylonsConfigPath)),
+                                          self._pylonsConfigPath, 
+                                          self._logFilePath)
+           print("\n\nWindows command: {0}\n\n".format(command))
+           subprocess.Popen(command, shell=True)
+        else:
+            #Create a process group name as so that the shell and all its process
+            # are terminated when stop is called.
+            command = '(cd {0}; paster serve {1} --log-file {2})'.format(
                                         path.abspath(path.dirname(self._pylonsConfigPath)),
                                         self._pylonsConfigPath, self._logFilePath)
-                                        
-        #Create a process group name as so that the shell and all its process
-        # are terminated when stop is called.
-        self._pylonsProcess = subprocess.Popen(command, shell=True, 
-                                                            preexec_fn=os.setsid)
+            self._pylonsProcess = subprocess.Popen(command, shell=True,preexec_fn=os.setsid)
                                                             
         #wait for the node to start before returning.
         while True:
