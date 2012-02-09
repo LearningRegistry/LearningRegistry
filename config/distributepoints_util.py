@@ -1,16 +1,22 @@
-import setup_utils as su
-
-
+#import setup_utils as su
+from setup_utils import getDocFromExistingCouchDB
+from setup_node import publishNodeConnections
+import os
+import couchdb
+import ConfigParser
+	
+'''Prompt user through list of distribution points'''
 def setupDistributionConnections(currentList):
 	
 	newList = []
 
+	'''Prompt to add or remove points'''
 	flag = True
 	while flag:
 		print("\nCurrent distribution connections:")
 		if len(currentList) > 0:
 			for item in currentList:
-				print item
+				print item + '\n'
 		else:
 			print("No distribution connections")		
 
@@ -20,6 +26,7 @@ def setupDistributionConnections(currentList):
 			for item in currentList:
 				print item
 
+			'''Get input from user, split into different targets and add to existing distribution list'''	
 			inputTargets = raw_input("Please enter any distrubtion targets you would like to add separated by a space: ")
 
 			if inputTargets:
@@ -29,18 +36,21 @@ def setupDistributionConnections(currentList):
 					currentList.append(item)
 			
 		elif result == 'R' or result == 'r':
+			if not len(currentList) > 0:
+				print("\nThere are no distribution targets to remove\n")
+			else:	
+				for index, item in enumerate(currentList):
+					print '[' + str(index) +'] ' + item
 
-			for index, item in enumerate(currentList):
-				print '[' + str(index) +'] ' + item
-
-			inputTarget = raw_input("Please enter the corresponding number to remove the distribution target:")
-
-			if inputTarget:
-				try:
-					del currentList[int(inputTarget)]
-				except Exception, e:
-					print(e)
-					print("Cannot delete specified connection")
+				'''Get user input on which points to remove from the list'''	
+				inputTarget = raw_input("Please enter the corresponding number to remove the distribution target:")
+			
+				if inputTarget:
+					try:
+						del currentList[int(inputTarget)]
+					except Exception, e:
+						print('\n'+e)
+						print("Cannot delete specified connection\n")
 
 		elif result == 'E' or result == 'e':
 			flag = False
@@ -49,12 +59,15 @@ def setupDistributionConnections(currentList):
 	
 	return currentList	
 	
+'''Find all distribution connection documents'''	
 def getExistingDistrubutionConnections(couchdbURL, dbName, nodeName):
+    '''Create filter to find distribution connection docs'''
     connFilter = nodeName + "_to_"
     connDocList = []
 
+    '''Grab all docs from database and only grab those that contain the filter'''
     try:
-        connDocs = su.getDocFromExistingCouchDB(dbName, couchdbURL,allDocs=True)
+        connDocs = getDocFromExistingCouchDB(dbName, couchdbURL,allDocs=True)
         
         for connDoc in connDocs['rows']:
             if connFilter in connDoc['id']:
@@ -64,18 +77,20 @@ def getExistingDistrubutionConnections(couchdbURL, dbName, nodeName):
         print(e)
         print('Connection to Node database not established, using default distribution connections')        
 
+    '''If there are no distribution connection documents, return an empty list'''    
     if not connDocList:
         return []
     else:    
         return getExistingDistrubtionURLs(couchdbURL, dbName, connDocList)    
 
-
+'''Fetch the distribution URLs from each distribution connection doc'''
 def getExistingDistrubtionURLs(couchdbURL, dbName, connDocList):
     connUrlList = []
 
+    '''For each distribution connection doc, retrieve and append the destination_node_url to the list and return it'''
     for connDoc in connDocList:
         try:
-            connURL = su.getDocFromExistingCouchDB(dbName, couchdbURL, connDoc)
+            connURL = getDocFromExistingCouchDB(dbName, couchdbURL, connDoc)
             connUrlList.append(connURL['destination_node_url'])
 
         except Exception, e:
@@ -85,15 +100,12 @@ def getExistingDistrubtionURLs(couchdbURL, dbName, connDocList):
     return connUrlList
 
 
-'''
-if __name__ == "__main__":
-	import os
-	import couchdb
-	import ConfigParser
 
+if __name__ == "__main__":
+	
 
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
-	_PYLONS_CONFIG =  os.path.join(scriptPath, '..', 'LR', 'development.ini')
+	_PYLONS_CONFIG =  os.path.join(scriptPath, '..', 'LR', 'development.ini.orig')
 	_config = ConfigParser.ConfigParser()
 	_config.read(_PYLONS_CONFIG)
 
@@ -115,4 +127,4 @@ if __name__ == "__main__":
 	existingDistributionList = getExistingDistrubutionConnections(_DEFAULT_COUCHDB_URL, _NODE, existingNodeName)
 	newDistributionList = setupDistributionConnections(existingDistributionList)
 	publishNodeConnections(_DEFAULT_ENDPOINT, server, _NODE, existingNodeName, newDistributionList)
-'''	
+	

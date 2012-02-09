@@ -14,15 +14,15 @@ import ConfigParser
 import os
 import urllib2
 import json
-import distributepoints_util as dp
- 
+#import distributepoints_util as dp
+import distributepoints_util
 
 scriptPath = os.path.dirname(os.path.abspath(__file__))
 _PYLONS_CONFIG =  os.path.join(scriptPath, '..', 'LR', 'development.ini.orig')
 _config = ConfigParser.ConfigParser()
 _config.read(_PYLONS_CONFIG)
 
-#Default values
+'''Default values read in from development.ini.orig'''
 _DEFAULT_COUCHDB_URL = "http://localhost:5984/"
 try:
     _DEFAULT_COUCHDB_URL = _config.get("app:main", "couchdb.url")
@@ -35,7 +35,7 @@ try:
 except Exception, e:
     print('Cannot find couchdb node from config file')
 
-_DEFAULT_ENDPOINT = "http://localhost"
+_DEFAULT_ENDPOINT = "http://localhost/"
 try:
     _DEFAULT_ENDPOINT = _config.get("app:main", "node.endpoint.url")
 except Exception, e:
@@ -154,6 +154,7 @@ def isInt(userInput):
     except ValueError:
         return False
 
+'''Connect to CouchDB and retrieve wanted document'''
 def getDocFromExistingCouchDB(dbName, couchdbURL=_DEFAULT_COUCHDB_URL, docID='', allDocs=False):
     resp = {}
 
@@ -173,9 +174,17 @@ def getDocFromExistingCouchDB(dbName, couchdbURL=_DEFAULT_COUCHDB_URL, docID='',
 
     return resp    
 
+'''If user is updating, retrieve existing node values from CouchDB'''
 def getExistingNodeDescriptionValues(couchdbURL, dbName, docID, endpointURL):
-    
-    newNodeDescriptionValues = {}
+    newNodeDescriptionValues = {'_DEFAULT_NODE_NAME' : "Node@" + _DEFAULT_ENDPOINT,
+                                    '_DEFAULT_NODE_ADMIN_IDENTITY' : "admin@learningregistry.org",  
+                                    '_DEFAULT_NODE_DESCRIPTION' : "Node@" + _DEFAULT_ENDPOINT,   
+                                    '_DEFAULT_GATEWAY_NODE' : "F",
+                                    '_DEFAULT_OPEN_CONNECT_SOURCE' : "T",   
+                                    '_DEFAULT_OPEN_CONNECT_DEST' : "T",
+                                    '_DEFAULT_CONNECTIONS' : []
+                                    }
+
     try:
         node_desc = getDocFromExistingCouchDB(dbName, couchdbURL, docID)
         
@@ -187,7 +196,7 @@ def getExistingNodeDescriptionValues(couchdbURL, dbName, docID, endpointURL):
         newNodeDescriptionValues['_DEFAULT_OPEN_CONNECT_DEST'] = str(node_desc['open_connect_dest'])[:1]
             
     except Exception, e:
-        raise(e)
+        print(e)
         print('Connection to Node database not established, using default setup values')
 
     return newNodeDescriptionValues
@@ -205,7 +214,7 @@ def getSetupInfo():
         if newOrUpdate == 'U' or newOrUpdate == 'u':
             '''Set the node values the user will be prompted with'''
             nodeDescriptionValues = getExistingNodeDescriptionValues(_DEFAULT_COUCHDB_URL, _NODE, _NODE_DESCRIPTION, _DEFAULT_ENDPOINT) 
-            nodeDescriptionValues['_DEFAULT_CONNECTIONS'] =  dp.getExistingDistrubutionConnections(_DEFAULT_COUCHDB_URL,_NODE,nodeDescriptionValues['_DEFAULT_NODE_NAME'])   
+            nodeDescriptionValues['_DEFAULT_CONNECTIONS'] =  getExistingDistrubutionConnections(_DEFAULT_COUCHDB_URL,_NODE,nodeDescriptionValues['_DEFAULT_NODE_NAME'])   
             nodeSetup['newNode'] = False
             flag = False
 
@@ -224,9 +233,6 @@ def getSetupInfo():
 
         else:
             print('\nNot an option, try again\n')    
-    
-
-
     
     
     nodeUrl = getInput("\nEnter the node service endpoint URL", 
@@ -275,7 +281,7 @@ def getSetupInfo():
     if not (manageDistributeTargets == 'Edit' or manageDistributeTargets == 'edit') :
         nodeSetup['connections'] = nodeDescriptionValues['_DEFAULT_CONNECTIONS']
     else:
-        nodeSetup['connections'] = dp.setupDistributionConnections(nodeDescriptionValues['_DEFAULT_CONNECTIONS'])
+        nodeSetup['connections'] = setupDistributionConnections(nodeDescriptionValues['_DEFAULT_CONNECTIONS'])
 
 
     

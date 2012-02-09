@@ -17,6 +17,7 @@ from uuid import uuid4
 import shutil
 import logging
 from setup_utils import *
+#from setup_utils import getDocFromExistingCouchDB, publishDoc, publishService
 import re
 log = logging.getLogger(__name__)
 scriptPath = os.path.dirname(os.path.abspath(__file__))
