@@ -11,11 +11,11 @@ from multiprocessing import Process
 from threading import Thread
 import platform
 
-class BaseDefaultMonitor(Process):
+class __BaseDefaultMonitor(Process):
     monitorId = property(lambda self: self.pid, None, None, None)
 
     
-class BaseWindowsMonitor(Thread):
+class __BaseWindowsMonitor(Thread):
     """Thread based class for the monitoring couchdb database change feed.
        Process does not seem to work on windows """
     def terminate(self):
@@ -28,8 +28,8 @@ class BaseWindowsMonitor(Thread):
     monitorId = property(lambda self :self.name, None, None, None)
  
    
-BaseChangeMonitor = BaseDefaultMonitor
+BaseChangeMonitor = __BaseDefaultMonitor
 
 if platform.system() == 'Windows':
-    BaseChangeMonitor = BaseWindowsMonitor
+    BaseChangeMonitor = __BaseWindowsMonitor
  
