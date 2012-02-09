@@ -43,7 +43,7 @@ log = logging.getLogger(__name__)
 _PYLONS_CONFIG = path.abspath(path.join(_PWD, "../../../../development.ini.orig"))
 _RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchdb/resource_data/apps/filtered-replication"))
 _TEST_DISTRIBUTE_DIR_LOG = path.abspath(path.join(path.dirname(_PYLONS_CONFIG), "test_distribute_logs"))
-_WINDOWS_NODE_RUN = path.abspath(path.join(_PWD, 'windows_run_node.bat'))        
+        
         
     
 class Node(object):
