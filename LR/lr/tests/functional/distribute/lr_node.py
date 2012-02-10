@@ -33,8 +33,9 @@ from lr.lib import helpers as h
 from time import sleep
 import pprint
 import signal
-
+import platform
 import logging
+from lr_node_process import NodeProcess
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ _RESOURCE_DATA_FILTER_APP = path.abspath(path.join(_PWD,  "../../../../../couchd
 _TEST_DISTRIBUTE_DIR_LOG = path.abspath(path.join(path.dirname(_PYLONS_CONFIG), "test_distribute_logs"))
         
         
+    
 class Node(object):
     _REPLICATOR_DB = '_replicator'
     _CONFIG_DATABASE_NAMES=["community", "network", "node", "resourcedata"]
@@ -76,13 +78,15 @@ class Node(object):
         # Keep around the replication documents that are store in the replication 
         # database so that they can be deleted when the node is teared down.
         self._distributeResultsList = []
+        self._nodeProcess = NodeProcess(self._nodeName, self._pylonsConfigFilePath, self._logFilePath)
+        self._isRunning = False
         
     def _setupFilePaths(self):
         
-        self._pylonsConfigPath = path.abspath(path.join(path.dirname(_PYLONS_CONFIG),
+        self._pylonsConfigFilePath = path.abspath(path.join(path.dirname(_PYLONS_CONFIG),
                                                                         self._nodeName+"_config.ini"))
         self._logFilePath = path.abspath(path.join(_TEST_DISTRIBUTE_DIR_LOG,
-                                                                      self._nodeName+".log"))
+                                                   self._nodeName+".log"))
                                                                       
     def _getNodeDatabaseList(self):
         return [self._nodeConfig.get("couch_info", db) for db in self._CONFIG_DATABASE_NAMES]
@@ -158,7 +162,7 @@ class Node(object):
         #change the logging level to the highest level to avoid spamming log.
         #pylonsConfig.set("logger_lr", "level", "CRITICAL") 
         
-        configFile = open(self._pylonsConfigPath, 'w')
+        configFile = open(self._pylonsConfigFilePath, 'w')
         pylonsConfig.write(configFile)
         configFile.close()
 
@@ -254,9 +258,9 @@ class Node(object):
                                             "_changes")
 
     def waitOnChangeMonitor(self):
-        """" Wait that for change monitor the recreate all the local copies of a document
+        """Wait that for change monitor the recreate all the local copies of a document
         after the distribution has been completed."""
-        if hasattr(self, '_pylonsProcess') == False:
+        if self._isRunning == False:
             return
     
         try:
@@ -327,7 +331,7 @@ class Node(object):
         """ Distribute to all the node connections.  When waited for completion is
         true the this method will that distribution is completed before returning 
         the results. """
-        if hasattr(self, '_pylonsProcess'):
+        if self._isRunning:
             data = json.dumps({"dist":"dist"})
             request = urllib2.Request(urlparse.urljoin(self._getNodeUrl(), "distribute"), 
                                                     data,
@@ -392,28 +396,47 @@ class Node(object):
                  log.debug("{0} and {1} error".format(sourceDoc['doc_ID'], destDoc['doc_ID']))
                  return False
         return True
-        
-    def stop(self):
-        if hasattr(self, '_pylonsProcess') == False:
-            return
-            
-        os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
-        # Make sure that process is really dead and the port is releaseed.  This done
-        # avoid bug when the node the stop and start methods are called quickly,
-        # the dead node is still holding  port which sometimes tricks 
-        # the start code thinking the node is up and running already.
+    
+    def _waitOnNodeStop(self):
+        """ Make sure that process is really dead and the port is releaseed.  This done
+         avoid bug when the node the stop and start methods are called quickly,
+         the dead node is still holding  port which sometimes tricks 
+         the start code thinking the node is up and running already. """
+         
         while True:
             try:
                 response = urllib2.urlopen(self._getNodeUrl())
                 if response.code :
-                      os.killpg(self._pylonsProcess.pid, signal.SIGTERM)
-                      sleep(5)
+                    self._nodeProcess.stop()
+                    sleep(5)
             except:
-                break;
-        del self._pylonsProcess
-
+                break;  
+                
+    def stop(self):
+        if self._isRunning == False:
+            return
+        self._nodeProcess.stop()
+        self._waitOnNodeStop()
+        self._isRunning = False    
+       
+       
+    def _waitOnNodeStart(self):
+        """Wait for the node to start before returning"""
+        while True:
+            try:
+                response = urllib2.urlopen(self._getNodeUrl())
+                if (response.code /100 ) < 4:
+                    break
+            except:
+                sleep(5)
+                continue
+  
+        
     def start(self):
         
+        if self._isRunning == True:
+           return
+            
         # remove any existing log file to start from scratch to avoid ever 
         # growing log file.
         self.removeTestLog()
@@ -423,31 +446,20 @@ class Node(object):
             print("create dir")
             os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
             
-        command = '(cd {0}; paster serve {1} --log-file {2})'.format(
-                                        path.abspath(path.dirname(self._pylonsConfigPath)),
-                                        self._pylonsConfigPath, self._logFilePath)
-                                        
-        #Create a process group name as so that the shell and all its process
-        # are terminated when stop is called.
-        self._pylonsProcess = subprocess.Popen(command, shell=True, 
-                                                            preexec_fn=os.setsid)
-                                                            
-        #wait for the node to start before returning.
-        while True:
-            sleep(5)
-            try:
-                response = urllib2.urlopen(self._getNodeUrl())
-                if (response.code /100 ) < 4:
-                    break
-            except:
-                continue
-        #Wait the change monitor to cat
+        self._nodeProcess.start()
+        #wait for the node to start before returning. 
+        self._waitOnNodeStart()       
+        self._isRunning = True
+        
+        #Wait the change monitor to catch up
         self.waitOnChangeMonitor()
         print("node '{0}' started ....\n".format(self._nodeName) )
+        
     
     def resetResourceData(self):
         del self._server[ self._nodeConfig.get("couch_info", "resourcedata")]
         self._setupResourceData()
+        
         
     def restart(self):
         self.stop()
@@ -490,7 +502,7 @@ class Node(object):
         self.stop()
         try:
             #Delete the generated pylons configuration files
-            os.remove(self._pylonsConfigPath)
+            os.remove(self._pylonsConfigFilePath)
         except Exception as e:
             log.exception(e)
         
