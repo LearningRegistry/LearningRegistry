@@ -52,7 +52,7 @@ use = egg:LR
 full_stack = true
 static_files = true
 cache_dir = %(here)s/data
-node.endpoint.url = http://localhost
+node.endpoint.url = http://localhost/
 node.name = testname
 
 
@@ -86,7 +86,7 @@ lr.services.docid = administrative:Network Node Services service
 lr.policy.docid = administrative:Resource Distribution Network Policy service
 lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
-lr.distribute_resource_data_url = %(node.endpoint.url)s/resource_data
+lr.distribute_resource_data_url = %(node.endpoint.url)sresource_data
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 

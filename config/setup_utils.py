@@ -14,8 +14,8 @@ import ConfigParser
 import os
 import urllib2
 import json
-#import distributepoints_util as dp
-import distributepoints_util
+from distributepoints_util import setupDistributionConnections, getDocFromExistingCouchDB, getExistingDistributionConnections
+
 
 scriptPath = os.path.dirname(os.path.abspath(__file__))
 _PYLONS_CONFIG =  os.path.join(scriptPath, '..', 'LR', 'development.ini.orig')
@@ -154,25 +154,112 @@ def isInt(userInput):
     except ValueError:
         return False
 
-'''Connect to CouchDB and retrieve wanted document'''
-def getDocFromExistingCouchDB(dbName, couchdbURL=_DEFAULT_COUCHDB_URL, docID='', allDocs=False):
-    resp = {}
+def setupServices(nodeSetup, newNode, gatewayNode='F'):
+    '''Add service values to nodeSetup'''
+    nodeSetup['activeObtain'] = 'T'
+    nodeSetup['flowControlObtain'] = 'F'
+    nodeSetup['maxIDObtain'] = '100'
+    nodeSetup['maxDocObtain'] = '100'
 
-    if allDocs:
-        path = '/'.join([dbName,"_all_docs"])
-    else:
-        path = '/'.join([dbName, urllib2.quote(docID,'')])
+    nodeSetup['activeHarvest'] = 'T'
+    nodeSetup['flowControlHarvest'] = 'F'
+    nodeSetup['maxIDHarvest'] = '100'
+    nodeSetup['maxDocHarvest'] = '100'
 
-    URI = couchdbURL + path
+    nodeSetup['activeOAIPMHHarvest'] = 'T'
+    nodeSetup['flowControlOAIPMHHarvest'] = 'F'
+    nodeSetup['maxIDOAIPMHHarvest'] = '100'
+    nodeSetup['maxDocOAIPMHHarvest'] = '100'
 
-    try:
-        req = urllib2.Request(URI)
-        resp = json.loads(urllib2.urlopen(req).read())
-    except Exception, e:
-        raise e
-        print("Could not establish couchDB connection")
+    nodeSetup['activeSlice'] = 'T'
+    nodeSetup['flowControlSlice'] = 'F'
+    nodeSetup['maxIDSlice'] = '100'
+    nodeSetup['maxDocSlice'] = '100'
+    
+    nodeSetup['activePublish'] = 'T'
+    nodeSetup['maxSizePublish'] = '1000'
+    nodeSetup['maxDocPublish'] = '1000'
+            
+    nodeSetup['activeSWORD'] = 'T'        
+    nodeSetup['activeResourceDataDistribution'] = 'T'
+    nodeSetup['activeResourceDistributionNetworkPolicy'] = 'T'
+    nodeSetup['activeNetworkNodeDescription'] = 'T'
+    nodeSetup['activeNetworkNodeService'] = 'T'
+    nodeSetup['activeNetworkNodeStatus'] = 'T'
+    
+    '''List of service docs'''
+    serviceDocs = ['access:Basic Obtain service',
+                        'access:Basic Harvest service',                    
+                        'access:OAI-PMH service',
+                        'access:slice',
+                        'publish:Basic Publish service',
+                        'publish:SWORD APP Publish V1.3 service',
+                        'distribute:Resource Data Distribution service',
+                        'administrative:Resource Distribution Network Policy service',
+                        'administrative:Network Node Description service',
+                        'administrative:Network Node Services service',
+                        'administrative:Network Node Status service'
+                        ]
+           
+    '''If user is updating node and it is not a gateway node then retrieve existing service values'''                    
+    if not newNode and gatewayNode == 'F':
+        for doc in serviceDocs:
+            try:
+                nodeDoc = getDocFromExistingCouchDB(_NODE, _DEFAULT_COUCHDB_URL, doc)
 
-    return resp    
+                if doc == 'access:Basic Obtain service':
+                    nodeSetup['activeObtain'] = str(nodeDoc['active'])[:1]
+                    nodeSetup['flowControlObtain'] = str(nodeDoc['service_data']['flow_control'])[:1]      
+                    if nodeSetup['flowControlObtain'] == 'T':    
+                        nodeSetup['maxIDObtain'] = str(nodeDoc['service_data']['id_limit'])
+                        nodeSetup['maxDocObtain'] = str(nodeDoc['service_data']['doc_limit'])            
+                
+                elif doc == 'access:Basic Harvest service':
+                    nodeSetup['activeHarvest'] = str(nodeDoc['active'])[:1]
+                    nodeSetup['flowControlHarvest'] = str(nodeDoc['service_data']['flow_control'])[:1]   
+                    if nodeSetup['flowControlHarvest'] == 'T':    
+                        nodeSetup['maxIDHarvest'] = str(nodeDoc['service_data']['id_limit'])
+                        nodeSetup['maxDocHarvest'] = str(nodeDoc['service_data']['doc_limit'])
+
+                elif doc == 'access:OAI-PMH service':        
+                    nodeSetup['activeOAIPMHHarvest'] = str(nodeDoc['active'])[:1]
+                    nodeSetup['flowControlOAIPMHHarvest'] = str(nodeDoc['service_data']['flow_control'])[:1] 
+                    if nodeSetup['flowControlOAIPMHHarvest'] == 'T':    
+                        nodeSetup['maxIDOAIPMHHarvest'] = str(nodeDoc['service_data']['id_limit'])
+                        nodeSetup['maxDocOAIPMHHarvest'] = str(nodeDoc['service_data']['doc_limit'])
+                
+                elif doc == 'access:slice':        
+                    nodeSetup['activeSlice'] = str(nodeDoc['active'])[:1]
+                    nodeSetup['flowControlSlice'] = str(nodeDoc['service_data']['flow_control'])[:1]
+                    if nodeSetup['flowControlSlice'] == 'T':    
+                        nodeSetup['maxIDSlice'] = str(nodeDoc['service_data']['id_limit'])
+                        nodeSetup['maxDocSlice'] = str(nodeDoc['service_data']['doc_limit'])
+
+                elif doc == 'publish:Basic Publish service':       
+                    nodeSetup['activePublish'] = str(nodeDoc['active'])[:1]
+                    nodeSetup['maxSizePublish'] = str(nodeDoc['service_data']['msg_size_limit'])
+                    nodeSetup['maxDocPublish'] = str(nodeDoc['service_data']['doc_limit'])        
+
+                elif doc == 'publish:SWORD APP Publish V1.3 service':
+                    nodeSetup['activeSWORD'] = str(nodeDoc['active'])[:1]
+                    
+                elif doc == 'distribute:Resource Data Distribution service':            
+                    nodeSetup['activeResourceDataDistribution'] = str(nodeDoc['active'])[:1]
+
+                elif doc == 'administrative:Resource Distribution Network Policy service':   
+                    nodeSetup['activeResourceDistributionNetworkPolicy'] = str(nodeDoc['active'])[:1]    
+
+                elif doc == 'administrative:Network Node Description service':   
+                    nodeSetup['activeNetworkNodeDescription'] = str(nodeDoc['active'])[:1]
+
+                elif doc == 'administrative:Network Node Services service':   
+                    nodeSetup['activeNetworkNodeService'] = str(nodeDoc['active'])[:1]
+                    
+                elif doc == 'administrative:Network Node Status service':
+                    nodeSetup['activeNetworkNodeStatus'] = str(nodeDoc['active'])[:1]                   
+
+            except Exception, e:
+                print('Could not retrieve ' + doc)
 
 '''If user is updating, retrieve existing node values from CouchDB'''
 def getExistingNodeDescriptionValues(couchdbURL, dbName, docID, endpointURL):
@@ -214,12 +301,15 @@ def getSetupInfo():
         if newOrUpdate == 'U' or newOrUpdate == 'u':
             '''Set the node values the user will be prompted with'''
             nodeDescriptionValues = getExistingNodeDescriptionValues(_DEFAULT_COUCHDB_URL, _NODE, _NODE_DESCRIPTION, _DEFAULT_ENDPOINT) 
-            nodeDescriptionValues['_DEFAULT_CONNECTIONS'] =  getExistingDistrubutionConnections(_DEFAULT_COUCHDB_URL,_NODE,nodeDescriptionValues['_DEFAULT_NODE_NAME'])   
+            nodeDescriptionValues['_DEFAULT_CONNECTIONS'] =  getExistingDistributionConnections(_DEFAULT_COUCHDB_URL,_NODE,nodeDescriptionValues['_DEFAULT_NODE_NAME'])   
+            '''Will not be a new node'''
             nodeSetup['newNode'] = False
+            '''Setup node services from existing values'''            
+            setupServices(nodeSetup, nodeSetup['newNode'], nodeDescriptionValues['_DEFAULT_GATEWAY_NODE'])
             flag = False
 
         elif newOrUpdate == 'N' or newOrUpdate == 'n':
-        
+            '''Default node description values'''
             nodeDescriptionValues = {'_DEFAULT_NODE_NAME' : "Node@" + _DEFAULT_ENDPOINT,
                                     '_DEFAULT_NODE_ADMIN_IDENTITY' : "admin@learningregistry.org",  
                                     '_DEFAULT_NODE_DESCRIPTION' : "Node@" + _DEFAULT_ENDPOINT,   
@@ -228,7 +318,11 @@ def getSetupInfo():
                                     '_DEFAULT_OPEN_CONNECT_DEST' : "T",
                                     '_DEFAULT_CONNECTIONS' : []
                                     }
+
+            '''Will be a new node'''                        
             nodeSetup['newNode'] = True
+            '''Setup node services with default values'''
+            setupServices(nodeSetup, nodeSetup['newNode'])
             flag = False
 
         else:
@@ -306,4 +400,5 @@ def getSetupInfo():
                                             nodeDescriptionValues['_DEFAULT_OPEN_CONNECT_DEST'])
     nodeSetup['open_connect_dest'] = (isDistributeDest == 'T' or isDistributeDest == 't')
 
+    
     return nodeSetup

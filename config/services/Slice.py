@@ -11,16 +11,16 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Slice?", "T", isBoolean)
+    active = getInput("Enable Slice?", setupInfo['activeSlice'], isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable Flow Control for Slice?", "F", isBoolean)
+    active = getInput("Enable Flow Control for Slice?", setupInfo['flowControlSlice'], isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:
-        active = getInput("Maximum IDs to Return?", "100", isInt)
+        active = getInput("Maximum IDs to Return?", setupInfo['maxIDSlice'], isInt)
         custom_opts["id_limit"] = int(active)
-        active = getInput("Maximum Docs to Return?", "100", isInt)
+        active = getInput("Maximum Docs to Return?", setupInfo['maxDocSlice'], isInt)
         custom_opts["doc_limit"] = int(active)
         
         
