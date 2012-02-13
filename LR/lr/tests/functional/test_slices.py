@@ -37,7 +37,7 @@ def DataCleaner(testName, type="Basic"):
                 for testIdentity in obj.identities :
                     obj.setupCount = obj.setupCount + 1
                     setupCountFlag = testName + "setupCount" + str(obj.setupCount)
-                    testDoc = buildTestDoc(testIdentity+testName, [setupCountFlag, obj.testDataKey, testKey+testName, obj.otherKeys[0], obj.otherKeys[1]], "metadata", [obj.testSchema])
+                    testDoc = buildTestDoc(testIdentity+testName, [setupCountFlag, obj.testDataKey, testKey+testName, obj.otherKeys[0], obj.otherKeys[1]], "metadata", [obj.testSchema+testName])
                     test_data["documents"].append(testDoc)
                 
         docs_json = json.dumps(test_data)
@@ -73,7 +73,7 @@ def DataCleaner(testName, type="Basic"):
         for testIdentity in obj.identities :
             obj.setupCount = obj.setupCount + 1
             setupCountFlag = testName + "setupCount" + str(obj.setupCount)
-            testDoc = buildTestDoc(testIdentity+testName, [setupCountFlag, obj.testDataKey, obj.testKeys[0]+testName, obj.testKeys[1]+testName, obj.testKeys[2]+testName, obj.otherKeys[0], obj.otherKeys[1]], "metadata", [obj.testSchema])
+            testDoc = buildTestDoc(testIdentity+testName, [setupCountFlag, obj.testDataKey, obj.testKeys[0]+testName, obj.testKeys[1]+testName, obj.testKeys[2]+testName, obj.otherKeys[0], obj.otherKeys[1]], "metadata", [obj.testSchema+testName])
             test_data["documents"].append(testDoc)
                 
         docs_json = json.dumps(test_data)
@@ -90,7 +90,7 @@ def DataCleaner(testName, type="Basic"):
         for x in xrange(0,num_docs):
             obj.setupCount = obj.setupCount + 1
             setupCountFlag = testName + "setupCount" + str(obj.setupCount)
-            testDoc = buildTestDoc(obj.identities[1]+testName, [setupCountFlag, obj.testDataKey, obj.testKeys[0]+testName, obj.testKeys[1]+testName, obj.testKeys[2]+testName, obj.otherKeys[0], obj.otherKeys[1]], "metadata", [obj.testSchema])
+            testDoc = buildTestDoc(obj.identities[1]+testName, [setupCountFlag, obj.testDataKey, obj.testKeys[0]+testName, obj.testKeys[1]+testName, obj.testKeys[2]+testName, obj.otherKeys[0], obj.otherKeys[1]], "metadata", [obj.testSchema+testName])
             test_data["documents"].append(testDoc)
             #i = i+1
                 
@@ -451,7 +451,7 @@ class TestSlicesController(TestController):
     @DataCleaner("test_by_paradata_schema")
     def test_by_paradata_schema(self):
         parameters = {}
-        parameters[ANY_TAGS] = [self.testSchema]
+        parameters[ANY_TAGS] = [self.testSchema+"test_by_paradata_schema"]
         parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         docs = self._loadAllDocs(parameters, response)
@@ -464,9 +464,9 @@ class TestSlicesController(TestController):
                 print json.dumps(couchdoc)
         assert len(docs)==9*DATA_MULTIPLIER
         if len(docs)==9*DATA_MULTIPLIER :
-            assert self._checkSchema(docs[0]['resource_data_description'], self.testSchema)
-            assert self._checkSchema(docs[1]['resource_data_description'], self.testSchema)
-            assert self._checkSchema(docs[2]['resource_data_description'], self.testSchema)
+            assert self._checkSchema(docs[0]['resource_data_description'], self.testSchema+"test_by_paradata_schema")
+            assert self._checkSchema(docs[1]['resource_data_description'], self.testSchema+"test_by_paradata_schema")
+            assert self._checkSchema(docs[2]['resource_data_description'], self.testSchema+"test_by_paradata_schema")
         
     @DataCleaner("test_by_multiple_keys", "Multi")  
     def test_by_multiple_keys(self):

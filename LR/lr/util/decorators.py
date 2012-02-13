@@ -40,14 +40,14 @@ def ForceCouchDBIndexing():
                     index_opts = { "limit": 1, "descending": 'true'}
                     if "reduce" in row.doc["views"][view]:
                         index_opts["reduce"] = 'false'
-                    log.error("Indexing: {0}".format( view_name))
+                    # log.error("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
                     res = urllib2.urlopen(req)
 #                    view_result = obj.db.view(view_name, **index_opts)
-                    log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
+                    # log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
             else:
-                log.error("Not Indexing: {0}".format( row.key))
+                pass#log.error("Not Indexing: {0}".format( row.key))
     
     def test_decorator(fn):
         def test_decorated(self, *args, **kw):
@@ -108,14 +108,14 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
                     index_opts = { "limit": 1, "descending": 'true'}
                     if "reduce" in row.doc["views"][view]:
                         index_opts["reduce"] = 'false'
-                    log.error("Indexing: {0}".format( view_name))
+                    # log.error("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
                     res = urllib2.urlopen(req)
 #                    view_result = obj.db.view(view_name, **index_opts)
-                    log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
+                    # log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
             else:
-                log.error("Not Indexing: {0}".format( row.key))
+                pass# log.error("Not Indexing: {0}".format( row.key))
     
     def cacheTestData(obj):
         req = urllib2.Request("{url}/{resource_data}/_all_docs?include_docs=true".format(**couch), 
