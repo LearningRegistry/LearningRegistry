@@ -27,14 +27,8 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    
-    must = __BasicPublishServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    print config_doc
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Basic Publish service", doc)
-    print("Configured Basic Publish service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
+    return __BasicPublishServiceTemplate().install(server, dbname, custom_opts)
+  
 
 class __BasicPublishServiceTemplate(ServiceTemplate):
     def __init__(self):
@@ -42,9 +36,7 @@ class __BasicPublishServiceTemplate(ServiceTemplate):
         self.service_data_template = '''{
             "msg_size_limit": {{msg_size_limit}}{{/msg_size_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}}
-        }'''    
-    
-    
+        }'''
     
     def _optsoverride(self):
         opts = {

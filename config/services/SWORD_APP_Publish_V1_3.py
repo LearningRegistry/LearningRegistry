@@ -15,30 +15,27 @@ def install(server, dbname, setupInfo):
     active = getInput("Enable SWORD Service?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
 
-    
-
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    
-    must = __BasicSwordServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    print config_doc
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":SWORD APP Publish V1.3 service", doc)
-    print("Configured SWORD APP Publish service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
-
+    return __BasicSwordServiceTemplate().install(server, dbname, custom_opts)
 
 
 class __BasicSwordServiceTemplate(ServiceTemplate):
     def __init__(self):
         ServiceTemplate.__init__(self)    
-        self.service_data_template = '''{
-        }'''    
-    
-    
-    
+        self.service_data_template = '''{}'''
+        
+        # Returns keys/pair where the keys is the destination database name
+        # and value is the couchapp directory name.  This assumes a central
+        # location for all couchapps.
+        self._couchapps ={'resource_data': ['learningregistry-resources',
+                                                                   'learningregistry-resource-location']
+                                     }
+        
+    def _couchapps(self):
+        return self._couchapps
+        
     def _optsoverride(self):
         opts = {
             "active": "false",

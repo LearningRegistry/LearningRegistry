@@ -52,12 +52,18 @@ def fixUtf8(input):
         return input
 
 def getServiceDocument(serviceName):
-    from lr.model.base_model import appConfig
+    from pylons import config
+    res = None
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
-    url = "{0}/{1}/{2}".format(appConfig['couchdb.url'],appConfig['couchdb.db.node'],urllib.quote(serviceName))
-    req = urllib2.Request(url=url, headers=json_headers)
-    res = urllib2.urlopen(req)
-    return json.load(res)
+    url = "{0}/{1}/{2}".format(config['app_conf']['couch_url'],config['app_conf']['couchdb.db.node'],urllib.quote(serviceName))
+    try:
+        req = urllib2.Request(url=url, headers=json_headers)
+        res = json.load(urllib2.urlopen(req))
+    except urllib2.URLError as e:
+        #Ignore exception that happens with the service document is just not there.
+        if (e.code != 404):
+            raise(e)
+    return res
 
 
 def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):    

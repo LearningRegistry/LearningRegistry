@@ -22,16 +22,11 @@ def install(server, dbname, setupInfo):
         custom_opts["id_limit"] = int(active)
         active = getInput("Maximum Docs to Return?", "100", isInt)
         custom_opts["doc_limit"] = int(active)
-        
-        
+
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
-    
-    must = __SliceServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":slice", doc)
-    print("Configured Slice service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+
+    return __SliceServiceTemplate().install(server, dbname, custom_opts)
 
 
 
@@ -44,8 +39,12 @@ class __SliceServiceTemplate(ServiceTemplate):
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}}
         }'''
-    
-    
+        
+        # Returns keys/pair where the keys is the destination database name
+        # and value is the couchapp directory name.  This assumes a central
+        # location for all couchapps.
+        self.couchapps ={'resource_data': ['apps/learningregistry-slice'] }
+
     
     def _optsoverride(self):
         opts = {
