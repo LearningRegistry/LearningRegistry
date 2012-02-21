@@ -55,7 +55,7 @@ def getServiceDocument(serviceName):
     from pylons import config
     res = None
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
-    url = "{0}/{1}/{2}".format(config['app_conf']['couch_url'],config['app_conf']['couchdb.db.node'],urllib.quote(serviceName))
+    url = "{0}/{1}/{2}".format(config['app_conf']['couchdb.url'],config['app_conf']['couchdb.db.node'],urllib.quote(serviceName))
     try:
         req = urllib2.Request(url=url, headers=json_headers)
         res = json.load(urllib2.urlopen(req))
