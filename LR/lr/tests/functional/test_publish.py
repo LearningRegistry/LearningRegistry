@@ -12,6 +12,58 @@ class TestPublisherController(TestController):
     def test_index(self):
         pass
 
+    def test_invalid_doc_version(self):
+        data = { 
+                "documents": 
+                     [
+                        { # Invalid doc_version
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": "zzzz",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0
+                        },
+                        { # Invalid doc_version type
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": True,
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0
+                        },
+                        { # Missing doc_version
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0
+                        } 
+                     ]
+                }
+        result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+        assert(result['OK'] == True)
+        for doc in result['document_results']:
+                assert(doc['OK'] == False), "Should catch missing/invalid doc version"
+
     def test_multiple_version(self):
         data = {
             "documents": 
@@ -82,7 +134,7 @@ class TestPublisherController(TestController):
                 }
 
         result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
-        assert(result['OK']), " Publish was not successfully"
+        assert(result['OK']), " Publish was not successful"
         
         index = 0
         for docResults in result['document_results']:
