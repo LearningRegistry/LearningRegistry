@@ -78,6 +78,7 @@ class ModelParser(object):
     _VALUE = '_Me_value'
     _VALUE_DEFINED = 'value'
     _VALUE_TYPE = 'type'
+    _ARRAY_TYPE = 'arrayType'
     _VALUE_RANGE = 'valueRange'
     _VALUE_TYPE_ARRAY = 'valueTypeArray'
     _VALUE_TYPE_INLINE = 'valueTypeInline'
@@ -483,8 +484,18 @@ class ModelParser(object):
                 "Invalid value for'"+fieldName+"'expecting one of:\n '"+
                 str(modelProp[self._VALUE_RANGE]) +"' instead of '"+str(value)+
                 "'\n\n:"+description)
-                    
         
+        # Check arrays to make sure the elements are of the 
+        # proper type. Made easy by current spec because
+        # all arrays contain only string values.
+        # Could change in future if extensions are allowed to include non-string arrays
+        if isOfSpecType(value, 'array'):
+            for val in value:
+                if isOfSpecType(val, 'string'):
+                    continue
+                else:
+                    raise SpecValidationException(fieldName+": Invalid array value type for '"+str(val)+"'; expecting type 'string'")
+
     def _validate(self, parseResults, jsonObject, validateExtensionField=False):
         """Validates recursively the jsonObject against the spec model"""
         modelKeySet = set(parseResults.keys())

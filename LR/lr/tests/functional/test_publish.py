@@ -64,6 +64,31 @@ class TestPublisherController(TestController):
         for doc in result['document_results']:
                 assert(doc['OK'] == False), "Should catch missing/invalid doc version"
 
+    def test_invalid_array_value(self):
+        data = { 
+                "documents": 
+                     [
+                        { # 'keys' contains integers instead of strings
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": "0.23.0",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0,
+                        "keys" : [1, 2, 3]
+                        }
+                     ]
+                }
+        result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+        assert(result['OK'] == True)
+        assert(result['document_results'][0]['OK'] == False)
+
     def test_multiple_version(self):
         data = {
             "documents": 
