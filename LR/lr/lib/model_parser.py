@@ -485,9 +485,7 @@ class ModelParser(object):
                 str(modelProp[self._VALUE_RANGE]) +"' instead of '"+str(value)+
                 "'\n\n:"+description)
         
-        # Check arrays to make sure the elements are of the 
-        # proper type. Made easy by current spec because
-        # all arrays contain only string values.
+        # Check arrays to make sure the elements are of the proper type. 
         # Could change in future if extensions are allowed to include non-string arrays
         if isOfSpecType(value, 'array'):
             for val in value:
