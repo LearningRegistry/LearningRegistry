@@ -23,7 +23,7 @@ scriptPath = os.path.dirname(os.path.abspath(__file__))
 
 _PYLONS_CONFIG_SRC =  os.path.join(scriptPath, '..', 'LR', 'development.ini.orig')
 _PYLONS_CONFIG_DEST = os.path.join(scriptPath, '..', 'LR', 'development.ini')
-_COUCHAPP_PATH = os.path.join(scriptPath, '..', 'couchdb')
+
 
 # add path to virtualenv if the environment variable is set
 if os.getenv('VIRTUAL_ENV') is not None:
@@ -31,8 +31,7 @@ if os.getenv('VIRTUAL_ENV') is not None:
 else:
     _VIRTUAL_ENV_PATH = ''
 
-print ("\n{0}\n{1}\n{2}".format(
-                _PYLONS_CONFIG_SRC, _PYLONS_CONFIG_DEST, _COUCHAPP_PATH))
+print ("\n{0}\n{1}".format(_PYLONS_CONFIG_SRC, _PYLONS_CONFIG_DEST))
 
 #Read the pylons configuration to get the database names.
 _config = ConfigParser.ConfigParser()
@@ -45,7 +44,7 @@ _NETWORK = _config.get("app:main", "couchdb.db.network")
 
 # Dictionary of types services and the corresponding services that are added 
 # by default to the node.  The format is 
-# "<serviceType>":["<list of services of serviceType>"]
+# "<serviceType>":["<list of services of Name>"]
 _DEFAULT_SERVICES = {"administrative":
                                                     ["Network Node Description", 
                                                      "Network Node Services", 
@@ -53,7 +52,8 @@ _DEFAULT_SERVICES = {"administrative":
                                                      "Resource Distribution Network Policy"],
                                         "access":
                                                     ["Basic Obtain", 
-                                                     "OAI-PMH Harvest", "Slice", 
+                                                     "OAI-PMH Harvest", 
+                                                     "Slice", 
                                                      "Basic Harvest", 
                                                      "SWORD APP Publish V1.3"],
                                         "broker":[],
@@ -63,8 +63,8 @@ _DEFAULT_SERVICES = {"administrative":
                                                     ["Basic Publish"]}
                                                     
 #Create specific gateway node service list.  It saves the user from setting up 
-# services that will be available on gateway nodes.  This also avoid the confusion 
-# of setting up services asavailable yet cannot be use since the node was setup 
+# services that are not available on gateway nodes.  This also avoid the confusion 
+# of setting up services as available yet cannot be use since the node was setup 
 # as gateway node.
 _GATEWAY_NODE_SERVICES ={"administrative":
                                                     ["Network Node Description", 
@@ -98,7 +98,10 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
             except Exception as e:
                 if plugin != None:
                     log.exception("Error occurred with %s plugin." % serviceName)
-                publishService(nodeUrl, server, dbname, serviceType, serviceName)
+                    raise(e)
+                else:
+                    print ("\n\n--Cannot find custom plugin for: '{0}:{1}'".format(serviceType, serviceName))
+                    publishService(nodeUrl, server, dbname, serviceType, serviceName)
 
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
     for dest_node_url in connectionList:
@@ -142,11 +145,22 @@ def setConfigFile(nodeSetup):
     # set the url to for destribute/replication (that is the url that a source couchdb node
     # will use for replication.
     _config.set("app:main", "lr.distribute_resource_data_url",  nodeSetup['distributeResourceDataUrl'])
-    
+
+    if server.version() < "1.1.0":
+        _config.set("app:main", "couchdb.stale.flag", "OK")
+        
     destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
     _config.write(destConfigfile)
     destConfigfile.close()
-
+      
+      #Re-read the database info to make we have the correct urls
+    global _RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK
+    _config.read(_PYLONS_CONFIG_DEST)
+    _RESOURCE_DATA = _config.get("app:main", "couchdb.db.resourcedata")
+    _NODE = _config.get("app:main", "couchdb.db.node")
+    _COMMUNITY = _config.get("app:main", "couchdb.db.community")
+    _NETWORK = _config.get("app:main", "couchdb.db.network")
+    
 
 
 if __name__ == "__main__":
@@ -172,15 +186,8 @@ if __name__ == "__main__":
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
 
-    setConfigFile(nodeSetup)
-    
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
-    if server.version() < "1.1.0":
-        _config.set("app:main", "couchdb.stale.flag", "OK")
-    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
-    _config.write(destConfigfile)
-    destConfigfile.close()
-
+    setConfigFile(nodeSetup)
     
 
     #Create the databases.
@@ -209,11 +216,3 @@ if __name__ == "__main__":
     publishNodeConnections(nodeSetup["nodeUrl"], server, _NODE,  
                                             nodeSetup["node_name"],  nodeSetup['connections'])
 
-
-    #Push the couch apps
-    #Commands to go the couchapp directory and push all the apps.
-    print("\n============================\n")
-    print("Pushing couch apps ...")
-#    resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
-    publishCouchApps(nodeSetup['couchDBUrl'],  _COUCHAPP_PATH)
-    print("All CouchApps Pushed")

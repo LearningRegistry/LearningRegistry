@@ -18,13 +18,8 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
 
-    must = __NetworkNodeServicesServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    print config_doc
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Network Node Services service", doc)
-    print("Configured Network Node Services service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
+    return __NetworkNodeServicesServiceTemplate().install(server, dbname, custom_opts)
+ 
 
 
 class __NetworkNodeServicesServiceTemplate(ServiceTemplate):
@@ -54,12 +49,12 @@ if __name__ == "__main__":
     
     def doesNotEndInSlash(input=None):
         return input is not None and input[-1] != "/"
-    
+
     def notExample(input=None):
         return input is not None and input != nodeSetup["nodeUrl"]
-    
+
     nodeSetup["couchDBUrl"] = getInput("Enter the CouchDB URL:", nodeSetup["couchDBUrl"], doesNotEndInSlash)
     nodeSetup["nodeUrl"] = getInput("Enter the public URL of the LR Node", nodeSetup["nodeUrl"], notExample)
-    
+
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
     install(server, "node", nodeSetup)
