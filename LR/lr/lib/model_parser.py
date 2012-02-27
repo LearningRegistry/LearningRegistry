@@ -78,7 +78,6 @@ class ModelParser(object):
     _VALUE = '_Me_value'
     _VALUE_DEFINED = 'value'
     _VALUE_TYPE = 'type'
-    _ARRAY_TYPE = 'arrayType'
     _VALUE_RANGE = 'valueRange'
     _VALUE_TYPE_ARRAY = 'valueTypeArray'
     _VALUE_TYPE_INLINE = 'valueTypeInline'
