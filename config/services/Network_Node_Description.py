@@ -12,7 +12,7 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Network Node Description?", "T", isBoolean)
+    active = getInput("Enable Network Node Description?", setupInfo['activeNetworkNodeDescription'], isBoolean)
     custom_opts["active"] = active.lower() in YES
     
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]

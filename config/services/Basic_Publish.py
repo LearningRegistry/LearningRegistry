@@ -12,15 +12,15 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Basic Publish?", "T", isBoolean)
+    active = getInput("Enable Basic Publish?", setupInfo['activePublish'], isBoolean)
     custom_opts["active"] = active.lower() in YES
 
     
-    active = getInput("Maximum documents the node will accepts?", "1000", isInt)
+    active = getInput("Maximum documents the node will accept?", setupInfo['maxDocPublish'], isInt)
     custom_opts["doc_limit"] = int(active)
 
     active = getInput("Enter message size limit in octet. \n"+
-                    "This should the maximum data size the the node will accept", None, isInt)
+                    "This should the maximum data size the the node will accept", setupInfo['maxSizePublish'], isInt)
 
     custom_opts["msg_size_limit"] = int(active)
 

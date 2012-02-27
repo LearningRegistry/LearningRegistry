@@ -4,23 +4,24 @@ Created on Aug 16, 2011
 @author: jklo
 '''
 from service_template import ServiceTemplate
-from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
+from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt, getDocFromExistingCouchDB
 import pystache, uuid
 import json
 
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Basic Harvest?", "T", isBoolean)
+
+    active = getInput("Enable Basic Harvest?", setupInfo['activeHarvest'], isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable Basic Harvest Flow Control?", "F", isBoolean)
+    active = getInput("Enable Basic Harvest Flow Control?", setupInfo['flowControlHarvest'], isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:
-        active = getInput("Maximum IDs to Return?", "100", isInt)
+        active = getInput("Maximum IDs to Return?", setupInfo['maxIDHarvest'], isInt)
         custom_opts["id_limit"] = int(active)
-        active = getInput("Maximum Docs to Return?", "100", isInt)
+        active = getInput("Maximum Docs to Return?", setupInfo['maxDocHarvest'], isInt)
         custom_opts["doc_limit"] = int(active)
         
         

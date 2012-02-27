@@ -7,20 +7,22 @@ from service_template import ServiceTemplate
 from setup_utils import getInput, PublishDoc, isBoolean, YES, isInt
 import pystache, uuid
 import json
+from distributepoints_util import getDocFromExistingCouchDB 
 
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable Basic Obtain?", "T", isBoolean)
+
+    active = getInput("Enable Basic Obtain?", setupInfo['activeObtain'], isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable Basic Obtain Flow Control?", "F", isBoolean)
+    active = getInput("Enable Basic Obtain Flow Control?", setupInfo['flowControlObtain'], isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:
-        active = getInput("Maximum IDs to Return?", "100", isInt)
+        active = getInput("Maximum IDs to Return?", setupInfo['maxIDObtain'], isInt)
         custom_opts["id_limit"] = int(active)
-        active = getInput("Maximum Docs to Return?", "100", isInt)
+        active = getInput("Maximum Docs to Return?", setupInfo['maxDocObtain'], isInt)
         custom_opts["doc_limit"] = int(active)
         
         

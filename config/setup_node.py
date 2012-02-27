@@ -77,7 +77,13 @@ _GATEWAY_NODE_SERVICES ={"administrative":
 def makePythonic(text):
     return re.sub('''[ \.]''', "_", text)
 
+def updateNodeDescription():
+    t.node_description['node_name'] = nodeSetup['node_name']
+    t.node_description['node_description'] = nodeSetup['node_description']
+    t.node_description['node_admin_identity'] = nodeSetup['node_admin_identity']
+
 def publishNodeDescription(server, dbname):
+    
     node_description = {}
     node_description.update(t.node_description)
     node_description['node_name'] = nodeSetup['node_name']
@@ -85,9 +91,11 @@ def publishNodeDescription(server, dbname):
     node_description['node_admin_identity'] = nodeSetup['node_admin_identity']
     node_description["open_connect_source"] = nodeSetup["open_connect_source"]
     node_description["open_connect_dest"] = nodeSetup["open_connect_dest"]
+    node_description["gateway_node"] = nodeSetup["gateway_node"]
     node_description['node_id'] = uuid4().hex
     PublishDoc(server, dbname, 'node_description', node_description)
     
+
 def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
     for serviceType in services.keys():
         for serviceName in services[serviceType]:
@@ -100,20 +108,57 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
                     log.exception("Error occurred with %s plugin." % serviceName)
                 publishService(nodeUrl, server, dbname, serviceType, serviceName)
 
+
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
+    connection = dict(t.connection_description)
+    connection['source_node_url']=nodeUrl
+
     for dest_node_url in connectionList:
         connection = dict(t.connection_description)
         connection['connection_id'] = uuid4().hex
         connection['source_node_url']=nodeUrl
         connection['destination_node_url'] = dest_node_url
-        PublishDoc(server, dbname, "{0}_to_{1}_connection".format(nodeName, dest_node_url), connection)
+        PublishDoc(server, dbname, "{0}_to_{1}_connection".format(nodeName, dest_node_url), connection) 
 
 def publishCouchApps(databaseUrl, appsDirPath):
     import couch_utils
     couch_utils.pushAllCouchApps(appsDirPath, databaseUrl)
 
+
+def getCommunityId(couchdbURL, dbName, docID, newNode):   
+    communityID = t.community_description['community_id']
+
+    if not newNode:
+        try:
+            comm_id = getDocFromExistingCouchDB(dbName, couchdbURL, docID)
+
+            communityID = comm_id['community_id']
+        
+        except Exception, e:
+            print(e)
+            print('Connection to Community database not established, using default community ID')
+
+    return communityID
+
+def getNetworkId(couchdbURL, dbName, docID, newNode):
+    networkID = t.network_description['network_id']
+    
+    if not newNode:
+        try:
+            net_id = getDocFromExistingCouchDB(dbName, couchdbURL, docID)
+        
+            networkID = net_id['network_id']
+
+        except Exception, e:
+            print(e)
+            print('Connection to Network database not established, using default network ID\n')
+
+    return networkID
+
+
 def setCommunityId():
-    community = getInput("Enter the community id")
+    community = getInput("Enter the community id", "{0}".format(getCommunityId(nodeSetup['couchDBUrl'], 
+                                                                _COMMUNITY,'community_description',nodeSetup['newNode'])))
     t.community_description['community_id'] = community
     t.community_description['community_name'] = community
     t.community_description['community_description'] = community
@@ -121,8 +166,10 @@ def setCommunityId():
     t.node_description['community_id'] = community
     
 def setNetworkId():
-    network = getInput("Enter the network id")
+    network = getInput("Enter the network id", "{0}".format(getNetworkId(nodeSetup['couchDBUrl'],
+                                                            _NETWORK, 'network_description',nodeSetup['newNode'])))
     t.network_description['network_id'] = network
+    print(str(t.network_description['network_id']))
     t.network_description['network_name'] = network
     t.network_description['network_description'] = network
     t.node_description['network_id'] = network
@@ -130,19 +177,20 @@ def setNetworkId():
     t.network_policy_description['policy_id'] =network+" policy"
         
 def setConfigFile(nodeSetup):
-    
     #create a copy of the existing config file as to not overide it.
     if os.path.exists(_PYLONS_CONFIG_DEST):
         backup = _PYLONS_CONFIG_DEST+".backup"
         print("\nMove existing {0} to {1}".format(_PYLONS_CONFIG_DEST, backup))
         shutil.copyfile(_PYLONS_CONFIG_DEST, backup)
 
+    #Update pylons config file to store the endpoint url
+    _config.set("app:main", "node.endpoint.url", nodeSetup['nodeUrl'])
     #Update pylons config file to use the couchdb url
     _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
     # set the url to for destribute/replication (that is the url that a source couchdb node
     # will use for replication.
     _config.set("app:main", "lr.distribute_resource_data_url",  nodeSetup['distributeResourceDataUrl'])
-    
+
     destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
     _config.write(destConfigfile)
     destConfigfile.close()
@@ -161,19 +209,22 @@ if __name__ == "__main__":
                       help="Development mode allows the setting of network and community.",
                     )
     (options, args) = parser.parse_args()
+    
+    
+    nodeSetup = getSetupInfo()
+    
     print("\n\n=========================\nNode Configuration\n")
     if options.devel:
         setCommunityId()
         setNetworkId()
     
-    
-    nodeSetup = getSetupInfo()
     print("\n\n=========================\nNode Configuration\n")
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
+    
 
     setConfigFile(nodeSetup)
-    
+
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
     if server.version() < "1.1.0":
         _config.set("app:main", "couchdb.stale.flag", "OK")
@@ -217,3 +268,4 @@ if __name__ == "__main__":
 #    resourceDataUrl = urlparse.urljoin( nodeSetup['couchDBUrl'], _RESOURCE_DATA)
     publishCouchApps(nodeSetup['couchDBUrl'],  _COUCHAPP_PATH)
     print("All CouchApps Pushed")
+    

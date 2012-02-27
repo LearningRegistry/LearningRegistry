@@ -47,7 +47,7 @@ class LRNodeModel(object):
  
         if isinstance(data, dict):
             config = h.dictToObject(data)
-            
+    
         # Check first if node description is set. if not look for in the DB if not in the db
         # create it from the config data.
         

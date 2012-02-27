@@ -12,7 +12,7 @@ import json
 
 def install(server, dbname, setupInfo):
     custom_opts = {}
-    active = getInput("Enable SWORD Service?", "T", isBoolean)
+    active = getInput("Enable SWORD Service?", setupInfo['activeSWORD'], isBoolean)
     custom_opts["active"] = active.lower() in YES
 
     

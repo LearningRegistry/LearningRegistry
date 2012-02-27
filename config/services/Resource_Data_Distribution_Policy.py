@@ -11,8 +11,9 @@ import json
 
 
 def install(server, dbname, setupInfo):
+    
     custom_opts = {}
-    active = getInput("Enable Resource Data Distribution Policy?", "T", isBoolean)
+    active = getInput("Enable Resource Data Distribution Policy?", setupInfo['activeResourceDistributionNetworkPolicy'], isBoolean)
     custom_opts["active"] = active.lower() in YES
     
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
