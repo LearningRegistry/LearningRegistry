@@ -6,11 +6,118 @@ import json
 headers={'Content-Type': 'application/json'}
 
 class TestPublisherController(TestController):
+
+    _PUBLISH_UNSUCCESSFUL_MSG = "Publish was not successful"
+
     def __init__(self, *args, **kwargs):
         TestController.__init__(self,*args,**kwargs)
         self.controllerName = "publish"
     def test_index(self):
         pass
+
+    def test_invalid_doc_version(self):
+        data = { 
+                "documents": 
+                     [
+                        { # Invalid doc_version value
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": "zzzz",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0
+                        },
+                        { # Invalid doc_version type
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": 0.23,
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0
+                        },
+                        { # Missing doc_version
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0
+                        } 
+                     ]
+                }
+        result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+        assert(result['OK'] == True), self._PUBLISH_UNSUCCESSFUL_MSG
+        for doc in result['document_results']:
+                assert(doc['OK'] == False), "Should catch missing/invalid doc version"
+
+    def test_invalid_array_value(self):
+        data = { 
+                "documents": 
+                     [
+                        { # 'keys' contains integers instead of strings
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": "0.23.0",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://google.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0,
+                        "keys" : [1, 2, 3]
+                        }
+                     ]
+                }
+        result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+        assert(result['OK'] == True), self._PUBLISH_UNSUCCESSFUL_MSG
+        assert(result['document_results'][0]['OK'] == False), "Should catch document with invalid array values"
+
+    def test_empty_document_array(self):
+        data = { "documents": [] }
+        result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+        assert(result['OK'] == False), "Should catch empty documents array on publish, no error returned"
+        assert(result['error'] == "List of documents is empty"), "Incorrect error message returned"
+
+    # Handles case where documents field is missing
+    # Example here is trying to publish a document without the wrapper
+    def test_missing_document_body(self):
+        data = { 
+                    "active" : True,
+                    "doc_type" : "resource_data",
+                    "doc_version": "0.23.0",
+                    "payload_schema": ["none"],
+                    "resource_data_type": "metadata",
+                    "resource_locator" : "http://example.com",
+                    "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                    "payload_placement": "inline",
+                    "resource_data" : "something",
+                    "TOS" : { "submission_TOS" : "http://google.com" },
+                    "weight" : 0,
+                    "resource_TTL" : 0,
+                }
+        result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+        assert(result['OK'] == False), "Accepted invalid json object on publish"
+        assert(result['error'] == "Missing field 'documents' in post body"), "Incorrect error message returned"
 
     def test_multiple_version(self):
         data = {
@@ -82,7 +189,7 @@ class TestPublisherController(TestController):
                 }
 
         result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
-        assert(result['OK']), " Publish was not successfully"
+        assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
         
         index = 0
         for docResults in result['document_results']:

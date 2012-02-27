@@ -44,7 +44,13 @@ class PublishController(BaseController):
             data = json.loads(request.body)
             doc_limit =  h.getServiceDocument(config['lr.publish.docid'])['service_data']['doc_limit']
             
-            if len(data[self.__DOCUMENTS]) > doc_limit:
+            if not self.__DOCUMENTS in data.keys():
+                # Comply with LR-RQST-009 'Missing documents in POST'
+                results[self.__ERROR] = "Missing field 'documents' in post body"
+            elif len(data[self.__DOCUMENTS]) < 1:
+                # Comply with LR-API-PUBLISH-001 'List of documents is empty'
+                results[self.__ERROR] = "List of documents is empty"
+            elif len(data[self.__DOCUMENTS]) > doc_limit:
                 error_message = "number of posted docs {0} exceeds doc limit: {1}".format(
                                                len(data['documents']), str(doc_limit))
                 log.debug(error_message)
@@ -136,7 +142,7 @@ class PublishController(BaseController):
             result[self.__ERROR]  = "\n"+pprint.pformat(str(ex), indent=4)
         except Exception as ex:
             log.exception(ex)
-            result[self.__ERROR]  = "internal error"
+            result[self.__ERROR]  = 'internal error'
             
         if result.has_key(self.__ERROR):
             result[self.__OK] = False
