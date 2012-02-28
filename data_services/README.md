@@ -7,14 +7,14 @@ A data service is a design pattern within Learning Registry that when followed, 
 * Define custom logic to select resource data of interest. 
 * Request resource data to get:
 
-> * Resource Locator by Key
-> * Resource Locator by start of Key
+> * Resource Locator by Discriminator
+> * Resource Locator by start of Discriminator
 > * Resource Locator by Timestamp
-> * Key by Resource Locator
-> * Key by start of Resource Locator
-> * Key by Timestamp
-> * Keyed Resource Locator by Timestamp
-> * All Keyed Resources
+> * Discriminator by Resource Locator
+> * Discriminator by start of Resource Locator
+> * Discriminator by Timestamp
+> * Discriminated Resource Locator by Timestamp
+> * All Discriminated Resources
 
 The Prototype implementation is designed to use the _extract_ service to retrieve Resource Data that contains **Alignment to Standards** resource data. In this prototype, we are using the following criteria to determine if a Resource Data Description Document contains _Alignment to Standards_ data:
 
@@ -29,7 +29,7 @@ The Prototype implementation is designed to use the _extract_ service to retriev
 > >            /https?:\/\/asn\.jesandco\.org\/resources\/[A-Z0-9]+/g     // new Jes&Co Achievement Standards Network (ASN) ID
 > >        ];
 
-The **Alignment to Standards** prototype implementation cat provide a Data Service that will allow use of the _extract_ service to request resource data and aggregations where ASN's are Keys, `resource_locator`'s are Resource resource_locator, and `node_timestamp`'s are Timestamps, which will enable us to get:
+The **Alignment to Standards** prototype implementation cat provide a Data Service that will allow use of the _extract_ service to request resource data and aggregations where ASN's are Discriminators, `resource_locator`'s are Resource resource_locator, and `node_timestamp`'s are Timestamps, which will enable us to get:
 
 > * `resource_locator` by ASN
 > * `resource_locator` by start of ASN
@@ -45,26 +45,26 @@ The **Alignment to Standards** prototype implementation cat provide a Data Servi
 For the following, we will define as example data:
 
 >     Resource Locator : "http://www.example.com/educational/resource" (`resource_locator`)
->     Key              : "http://purl.com/ASN/resources/S000000" (ASN)
+>     Discriminator    : "http://purl.com/ASN/resources/S000000" (ASN)
 >     Timestamp        : "2010-02-27T00:30:00.000000Z" (`node_timestamp`)
 
 You will need to define MapReduce views in CouchDB the emit keys in the following convention:
 
-        "key-by-resource" : [ Resource Locator, Key, Timestamp ]
-        "resource-by-key  : [ Key, Resource Locator, Timestamp ]
-        "all-resources"   : [ Timestamp, Resource Locator ]
-        "all-keys"        : [ Timestamp, Key ]
+        "discriminator-by-resource" : [ Resource Locator, Discriminator, Timestamp ]
+        "resource-by-discriminator" : [ Discriminator, Resource Locator, Timestamp ]
+        "all-resources"             : [ Timestamp, Resource Locator ]
+        "all-discriminators"        : [ Timestamp, Discriminator ]
 
 Each view **must** implement a `reduce` function.
 
 Using example data:
 
-        "key-by-resource" : key=[ "http://www.example.com/educational/resource", "http://purl.com/ASN/resources/S000000", "2010-02-27T00:30:00.000000Z" ] value=null
-        "resource-by-key  : key=[ "http://purl.com/ASN/resources/S000000", "http://www.example.com/educational/resource", "2010-02-27T00:30:00.000000Z" ] value=null
+        "discriminator-by-resource" : key=[ "http://www.example.com/educational/resource", "http://purl.com/ASN/resources/S000000", "2010-02-27T00:30:00.000000Z" ] 
+        "resource-by-discriminator  : key=[ "http://purl.com/ASN/resources/S000000", "http://www.example.com/educational/resource", "2010-02-27T00:30:00.000000Z" ] 
         "all-resources"   : key=[ "2010-02-27T00:30:00.000000Z", "http://www.example.com/educational/resource" ]
-        "all-keys"        : key=[ "2010-02-27T00:30:00.000000Z", "http://purl.com/ASN/resources/S000000" ]
+        "all-discriminators"        : key=[ "2010-02-27T00:30:00.000000Z", "http://purl.com/ASN/resources/S000000" ]
 
-Definition of keys is this manner will allow one to query CouchDB in the following manner:
+Definition of CouchDB keys in this manner will allow one to query CouchDB in the following manner:
 
 * To get "All ASNs by Resource Locator":
 
