@@ -27,3 +27,6 @@ var Alignment = {
     }
 
 };
+function convertDateToSeconds(doc){
+    return Math.floor(Date.parse(doc.node_timestamp)/1000);
+}

@@ -6,11 +6,12 @@ function(doc) {
         if (doc.doc_type == "resource_data" && doc.resource_data && doc.resource_locator && doc.node_timestamp) {
             var parser = function (conformsToText) {
                 var seen = {};
+                var nodeTimestamp = convertDateToSeconds(doc);
                 for (re in ASNPatterns){
                     var stds = conformsToText.match(ASNPatterns[re]);
                     for (s in stds) {
                         if (!seen[s]) {
-                            emit([doc.resource_locator, doc.node_timestamp, stds[s]], null);
+                            emit([doc.resource_locator, nodeTimestamp, stds[s]], null);
                             seen[s] = 1;
                         }
                     }
