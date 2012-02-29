@@ -40,61 +40,59 @@ The **Alignment to Standards** prototype implementation cat provide a Data Servi
 > * ASN `resource_locator`s by `node_timestamp`
 > * All ASN `resource_locator`s
 
+Timestamps SHALL be a long integer value representing seconds since epoch from UTC+0 timezone.
+
 ## Design Pattern
 
 For the following, we will define as example data:
 
 >     Resource Locator : "http://www.example.com/educational/resource" (`resource_locator`)
 >     Discriminator    : "http://purl.com/ASN/resources/S000000" (ASN)
->     Timestamp        : "2010-02-27T00:30:00.000000Z" (`node_timestamp`)
+>     Timestamp        : 1330552901 (`node_timestamp` is "2012-02-29T22:01:32Z")
 
 You will need to define MapReduce views in CouchDB the emit keys in the following convention:
 
-        "discriminator-by-resource" : [ Resource Locator, Discriminator, Timestamp ]
-        "resource-by-discriminator" : [ Discriminator, Resource Locator, Timestamp ]
-        "all-resources"             : [ Timestamp, Resource Locator ]
-        "all-discriminators"        : [ Timestamp, Discriminator ]
+        "discriminator-by-resource"    : [ Resource Locator, Discriminator ]
+        "discriminator-by-resource-ts" : [ Resource Locator, Timestamp, Discriminator ]
+        "resource-by-discriminator"    : [ Discriminator, Resource Locator ]
+        "resource-by-discriminator-ts" : [ Discriminator, Timestamp, Resource Locator ]
+        "all-resources"                : [ Timestamp, Resource Locator ]
+        "all-discriminators"           : [ Timestamp, Discriminator ]
 
 Each view **must** implement a `reduce` function.
 
 Using example data:
 
-        "discriminator-by-resource" : key=[ "http://www.example.com/educational/resource", "http://purl.com/ASN/resources/S000000", "2010-02-27T00:30:00.000000Z" ] 
-        "resource-by-discriminator  : key=[ "http://purl.com/ASN/resources/S000000", "http://www.example.com/educational/resource", "2010-02-27T00:30:00.000000Z" ] 
-        "all-resources"   : key=[ "2010-02-27T00:30:00.000000Z", "http://www.example.com/educational/resource" ]
-        "all-discriminators"        : key=[ "2010-02-27T00:30:00.000000Z", "http://purl.com/ASN/resources/S000000" ]
+        "discriminator-by-resource"    : key=[ "http://www.example.com/educational/resource", "http://purl.com/ASN/resources/S000000" ] 
+        "discriminator-by-resource-ts" : key=[ "http://www.example.com/educational/resource", 1330552901, "http://purl.com/ASN/resources/S000000" ] 
+        "resource-by-discriminator"    : key=[ "http://purl.com/ASN/resources/S000000", "http://www.example.com/educational/resource" ] 
+        "resource-by-discriminator-ts" : key=[ "http://purl.com/ASN/resources/S000000", 1330552901, "http://www.example.com/educational/resource" ] 
+        "all-resources"                : key=[ 1330552901, "http://www.example.com/educational/resource" ]
+        "all-discriminators"           : key=[ 1330552901, "http://purl.com/ASN/resources/S000000" ]
 
 Definition of CouchDB keys in this manner will allow one to query CouchDB in the following manner:
 
 * To get "All ASNs by Resource Locator":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
 
 * To get "All ASNs by Resource Locator from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource-ts?startkey=["<resource_locator>",<timestamp1>]&endkey=["<resource_locator>",<timestamp2>,null]&reduce=true&group_level=2'
 
 * To get "All ASNs by Resource Locator prefix":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
-
-* To get "All ASNs by Resource Locator prefix from Timestamp1 to until Timestamp2":
-
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
 
 * To get "All Resource Locators by ASN":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>\uD7AF"]&reduce=true&group_level=2'
 
 * To get "All Resource Locators by ASN from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator-ts?startkey=["<asn>",<timestamp1>]&endkey=["<asn>",<timestamp2>,null]&reduce=true&group_level=2'
 
 * To get "All Resource Locators by ASN prefix":
-
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
-
-* To get "All Resource Locators by ASN prefix from Timestamp1 to until Timestamp2":
 
 >       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/key-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
 

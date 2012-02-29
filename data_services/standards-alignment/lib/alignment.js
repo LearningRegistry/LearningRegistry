@@ -15,8 +15,11 @@ var Alignment = {
 
                 for (idx in conformsToElems) {
                     if (!stds[conformsToElems[idx].toString().trim()]) {
-                        parser(conformsToElems[idx].toString().trim());
+                        var shouldBreak = parser(conformsToElems[idx].toString().trim());
                         stds[conformsToElems[idx].toString().trim()] = 1;
+                        if (shouldBreak) {
+                            break;
+                        }
                     } 
                 }
 
