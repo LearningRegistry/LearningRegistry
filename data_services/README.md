@@ -142,3 +142,41 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 * What's with the wierd UTF-8 character in the 'prefix' query endkey?
 
 > CouchDB follows UCS collation rules for UTF-8 strings, and different ranges within the 0x0 - 0xFFFF char code range that is _somewhat_ fully supported in Spidermonkey makes the last character in the collation sequence `\uD7AF`.  Since it's non-printable, it should be okay to be non-inclusive. See this Gist: https://gist.github.com/1904807 if you want to understand this better.
+
+
+## Possible OUTPUT
+
+                {
+                        "documents":[
+                        
+                                {
+                                        "result_data": {
+                                                /* paradata */
+                                        },
+                                        "resource_data": [
+                                                /* doc ids of full docs */
+                                        ]
+
+                                },
+                                {
+                                        "result_data": {
+                                                /* paradata */
+                                        },
+                                        "resource_data": [
+                                                /* doc ids of full docs */
+                                        ]
+
+                                },
+                                {
+                                        "result_data": {
+                                                /* paradata */
+                                        },
+                                        "resource_data": [
+                                                /* doc ids of full docs */
+                                        ]
+
+                                }
+
+                        ]
+                }
+
