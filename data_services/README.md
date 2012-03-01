@@ -111,3 +111,34 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 * To get "All ASNs from Timestamp1 to until Timestamp2":
 
 >       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'
+
+
+## TODO / Notes
+
+* How to deal with _list_ functions
+
+> The current thinking is that we will use list functions initially to only handle result format.  Using a naming convention like:
+
+>        list_func_name := <viewname>-<format>
+
+> An example of this would be: `discriminator-by-resource-paradata`. Advanced implementations in the future could take account of query parameters to perform more advanced filtering.
+
+* Indentification of data service design documents.
+
+> Add a extra map field onto the root of the design doc named `dataservices` that contains extended information about the data service (name, description, spec, etc.) See dataservices.json in standards-alignment design document, and in the data-services design document, the view named `list`, which might be used to discover data services.
+
+* Convention driven design.
+
+> We've identified a range of supported queries that would be supported in a generic fashion through the presence of specific views; it would make sense that a custom node may only need a limited set, so they should be able to reduce the number of views implemented, and the service api calling the views should detect what type of views are present, and only allow the subset queries.
+
+* Why aren't there 'prefix' queries by date?
+
+> These can't be done with a CouchDB view only, and the date filtering functionality would need to be encapsulated in a _list_ function.  See _How to deal with list functions_ above regarding advanced stuff.  To do this is possible, but just throws a wrench into complexity - this is supposed to be a K.I.S.S. solution towards extraction, follow the recipies and stuff should just work with batteries included.
+
+* Why 'prefix' queries instead of regex?
+
+> CouchDB views don't support regex.  You'd have to do the regex pattern match within a list function, which would eliminate the efficiency of the b-tree index.  So this falls into one of those advanced list function use cases.  It could be done, but to make it work more efficiently, you'd have to combine the regex with a range query so you're not iterating over the entire list. Based upon the type of things we heard the community ask for; all YouTube aligned resources, a sub-set of some site based upon URL paths; we think 'prefixes' work relatively well.
+
+* What's with the wierd UTF-8 character in the 'prefix' query endkey?
+
+> CouchDB follows UCS collation rules for UTF-8 strings, and different ranges within the 0x0 - 0xFFFF char code range that is _somewhat_ fully supported in Spidermonkey makes the last character in the collation sequence `\uD7AF`.  Since it's non-printable, it should be okay to be non-inclusive. See this Gist: https://gist.github.com/1904807 if you want to understand this better.
