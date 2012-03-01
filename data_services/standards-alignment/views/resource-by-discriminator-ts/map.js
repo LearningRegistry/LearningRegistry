@@ -11,7 +11,7 @@ function(doc) {
                 for (s in stds) {
                     if (!seen[s]) {
 
-                        emit([stds[s], doc.resource_locator], nodeTimestamp);
+                        emit([stds[s], nodeTimestamp, doc.resource_locator], null);
                         seen[s] = 1;
                     }
                 }

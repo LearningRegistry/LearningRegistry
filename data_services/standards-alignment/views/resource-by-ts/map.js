@@ -5,16 +5,20 @@ function(doc) {
     try {
         if (doc.doc_type == "resource_data" && doc.resource_data && doc.resource_locator && doc.node_timestamp) {
             var nodeTimestamp = convertDateToSeconds(doc);
-            var parser = function (conformsToText) {
-                var seen = {};
+            var seen = false;
+            var parser = function (conformsToText) { 
+                if (seen) return;
+                
                 for (re in ASNPatterns){
                     var stds = conformsToText.match(ASNPatterns[re]);
                     for (s in stds) {
-                        if (!seen[s]) {
-                            emit([doc.resource_locator, stds[s]], nodeTimestamp);
-                            seen[s] = 1;
+                        if (!seen) {
+                            emit([nodeTimestamp, doc.resource_locator], null);
+                            seen = true;
+                            break;
                         }
                     }
+                    if (seen) break;
                 }
             };
 

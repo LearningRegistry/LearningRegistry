@@ -4,19 +4,17 @@ function(doc) {
 
     try {
         if (doc.doc_type == "resource_data" && doc.resource_data && doc.resource_locator && doc.node_timestamp) {
+            var nodeTimestamp = convertDateToSeconds(doc);
             var parser = function (conformsToText) {
-                var nodeTimestamp = convertDateToSeconds(doc);
-                var seen = false;
+                var seen = {};
                 for (re in ASNPatterns){
                     var stds = conformsToText.match(ASNPatterns[re]);
                     for (s in stds) {
-                        if (!seen[doc.resource_locator]) {
-                            emit([nodeTimestamp, doc.resource_locator], null);
-                            seen = true;
-                            break;
+                        if (!seen[s]) {
+                            emit([doc.resource_locator, nodeTimestamp, stds[s]], null);
+                            seen[s] = 1;
                         }
                     }
-                    if (seen) break;
                 }
             };
 

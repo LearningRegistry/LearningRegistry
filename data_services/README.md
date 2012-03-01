@@ -56,8 +56,8 @@ You will need to define MapReduce views in CouchDB the emit keys in the followin
         "discriminator-by-resource-ts" : [ Resource Locator, Timestamp, Discriminator ]
         "resource-by-discriminator"    : [ Discriminator, Resource Locator ]
         "resource-by-discriminator-ts" : [ Discriminator, Timestamp, Resource Locator ]
-        "all-resources"                : [ Timestamp, Resource Locator ]
-        "all-discriminators"           : [ Timestamp, Discriminator ]
+        "resource-by-ts"               : [ Timestamp, Resource Locator ]
+        "discriminator-by-ts"          : [ Timestamp, Discriminator ]
 
 Each view **must** implement a `reduce` function.
 
@@ -67,18 +67,18 @@ Using example data:
         "discriminator-by-resource-ts" : key=[ "http://www.example.com/educational/resource", 1330552901, "http://purl.com/ASN/resources/S000000" ] 
         "resource-by-discriminator"    : key=[ "http://purl.com/ASN/resources/S000000", "http://www.example.com/educational/resource" ] 
         "resource-by-discriminator-ts" : key=[ "http://purl.com/ASN/resources/S000000", 1330552901, "http://www.example.com/educational/resource" ] 
-        "all-resources"                : key=[ 1330552901, "http://www.example.com/educational/resource" ]
-        "all-discriminators"           : key=[ 1330552901, "http://purl.com/ASN/resources/S000000" ]
+        "resource-by-ts"               : key=[ 1330552901, "http://www.example.com/educational/resource" ]
+        "discriminator-by-ts"          : key=[ 1330552901, "http://purl.com/ASN/resources/S000000" ]
 
 Definition of CouchDB keys in this manner will allow one to query CouchDB in the following manner:
 
 * To get "All ASNs by Resource Locator":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>",{}]&reduce=true&group_level=2'
 
 * To get "All ASNs by Resource Locator from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource-ts?startkey=["<resource_locator>",<timestamp1>]&endkey=["<resource_locator>",<timestamp2>,null]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource-ts?startkey=["<resource_locator>",<timestamp1>]&endkey=["<resource_locator>",<timestamp2>,{}]&reduce=true&group_level=2'
 
 * To get "All ASNs by Resource Locator prefix":
 
@@ -86,11 +86,11 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 
 * To get "All Resource Locators by ASN":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>\uD7AF"]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>",{}]&reduce=true&group_level=2'
 
 * To get "All Resource Locators by ASN from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator-ts?startkey=["<asn>",<timestamp1>]&endkey=["<asn>",<timestamp2>,null]&reduce=true&group_level=2'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator-ts?startkey=["<asn>",<timestamp1>]&endkey=["<asn>",<timestamp2>,null]&reduce=true&group_level=3'
 
 * To get "All Resource Locators by ASN prefix":
 
@@ -98,11 +98,11 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 
 * To get "All ASN Resource Locators":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?reduce=true&group_level=1'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?group_level=1'
 
 * To get "All ASN Resource Locators from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/all-resources?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'
 
 * To get "All ASNs":
 
@@ -110,4 +110,4 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 
 * To get "All ASNs from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/all-discriminators?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'

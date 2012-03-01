@@ -11,7 +11,7 @@ function(doc) {
                     var stds = conformsToText.match(ASNPatterns[re]);
                     for (s in stds) {
                         if (!seen[s]) {
-                            emit([doc.resource_locator, stds[s]], nodeTimestamp);
+                            emit([nodeTimestamp, stds[s]], null);
                             seen[s] = 1;
                         }
                     }
