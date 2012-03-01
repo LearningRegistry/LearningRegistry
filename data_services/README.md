@@ -146,37 +146,51 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 
 ## Possible OUTPUT
 
-                {
-                        "documents":[
-                        
-                                {
-                                        "result_data": {
-                                                /* paradata */
-                                        },
-                                        "resource_data": [
-                                                /* doc ids of full docs */
-                                        ]
+        {
+                "documents":[
+                
+                        {
+                                "result_data": {
+                                        /* 
+                                                MapReduce aggregation formatted, could be in a paradata 'assertion' 
+                                        */
+                                },
+                                "supplemental_data" : {
 
                                 },
-                                {
-                                        "result_data": {
-                                                /* paradata */
-                                        },
-                                        "resource_data": [
-                                                /* doc ids of full docs */
-                                        ]
+                                "resource_data": [
+                                        /* doc ids of full docs */
+                                ]
+
+                        },
+                        {
+                                "result_data": {
+                                        /* paradata */
+                                },
+                                "supplemental_data" : {
 
                                 },
-                                {
-                                        "result_data": {
-                                                /* paradata */
-                                        },
-                                        "resource_data": [
-                                                /* doc ids of full docs */
-                                        ]
+                                "resource_data": [
+                                        /* doc ids of full docs */
+                                ]
 
-                                }
+                        },
+                        {
+                                "result_data": {
+                                        /* paradata */
+                                },
+                                "supplemental_data" : {
 
-                        ]
-                }
+                                },
+                                "resource_data": [
+                                        /* doc ids of full docs */
+                                ]
+
+                        }
+
+                ]
+        }
+
+
+
 
