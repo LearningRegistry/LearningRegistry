@@ -1,3 +1,0 @@
-[submodule "includes/deck.js"]
-	path = includes/deck.js
-	url = git@github.com:jimklo/deck.js.git
