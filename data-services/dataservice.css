@@ -1,3 +1,47 @@
+
+
+.topic {
+  width: 400px;
+  float: left;
+}
+
+.subject {
+  width: 400px;
+  height: 400px;
+  overflow: auto;
+  float: right;
+}
+
+.foot {
+  clear: both;
+}
+
+
+.slide code > pre {
+  font-size: 12px;
+}
+
+code .json, 
+.on-slide-10 code .ds-val, .on-slide-11 code .ds-val, .on-slide-12 code .ds-val, .on-slide-13 code .ds-val {
+  display: none;
+} 
+
+.on-slide-9 code .ds, 
+.on-slide-10 code .ds-views, 
+.on-slide-11 code .key, 
+.on-slide-12 code .ts,
+.on-slide-13 code .reduce,
+.on-slide-14 code .lists  {
+  color: #c00;
+}
+
+.on-slide-9 code .ds, 
+.on-slide-9 code .ds-val, 
+.on-slide-10 code .ds-views, .on-slide-11 code .ds-views,  .on-slide-12 code .ds-views,
+.on-slide-11 code .json, .on-slide-12 code .json, .on-slide-13 code .json  {
+  display: inline;
+}
+
 .introduction .deck-container {
   width: auto;
   max-width: 864px;
@@ -34,6 +78,17 @@
   vertical-align: baseline;
   margin: 0 4px 0 15px;
 }
+
+.csstransitions.csstransforms .deck-container:not(.deck-menu) > .slide .wide .deck-next, .csstransitions.csstransforms .deck-container:not(.deck-menu) > .slide .wide .deck-after {
+  visibility: visible;
+  -webkit-transform: translate3d(400%, 0, 0);
+  -moz-transform: translate(400%, 0);
+  -ms-transform: translate(400%, 0);
+  -o-transform: translate(400%, 0);
+  transform: translate3d(400%, 0, 0);
+}
+
+
 
 @media print {
   header, footer {

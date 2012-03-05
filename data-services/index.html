@@ -21,14 +21,22 @@
     <link rel="stylesheet" href="../includes/deck.js/extensions/navigation/deck.navigation.css">
     <link rel="stylesheet" href="../includes/deck.js/extensions/status/deck.status.css">
     <link rel="stylesheet" href="../includes/deck.js/extensions/hash/deck.hash.css">
-    
+    <link rel="stylesheet" href="../includes/deck.js/extensions/codemirror/deck.codemirror.css">
+
     <!-- Theme CSS files (menu swaps these out) -->
-    <link rel="stylesheet" id="style-theme-link" href="../includes/deck.js/themes/style/web-2.0.css">
+    <link rel="stylesheet" id="style-theme-link" href="../includes/deck.js/themes/style/swiss.css">
     <link rel="stylesheet" id="transition-theme-link" href="../includes/deck.js/themes/transition/horizontal-slide.css">
     
-        <!-- Custom CSS just for this page -->
-    <link rel="stylesheet" href="dataservice.css">
+
+    <!-- Codemirror CSS -->
+    <link rel="stylesheet" href="../includes/deck.js/extensions/codemirror/themes/default.css">
+
+    <!-- Custom CSS just for this page -->
     <link rel="stylesheet" href="../includes/css/common.css">
+    <link rel="stylesheet" href="dataservice.css">
+    
+    
+
     
     <script src="../includes/deck.js/modernizr.custom.js"></script>
 </head>
@@ -44,17 +52,17 @@
         <div class="theme-menu">
             <label for="style-themes">Style Theme:</label>
             <select id="style-themes">
-                <option selected value="../themes/style/web-2.0.css">Web 2.0</option>
-                <option value="../themes/style/swiss.css">Swiss</option>
-                <option value="../themes/style/neon.css">Neon</option>
+                <option value="../includes/deck.js/themes/style/web-2.0.css">Web 2.0</option>
+                <option selected value="../includes/deck.js/themes/style/swiss.css">Swiss</option>
+                <option value="../includes/deck.js/themes/style/neon.css">Neon</option>
                 <option value="">None</option>
             </select>
 
             <label for="transition-themes">Transition Theme:</label>
             <select id="transition-themes">
-                <option selected value="../themes/transition/horizontal-slide.css">Horizontal Slide</option>
-                <option value="../themes/transition/vertical-slide.css">Vertical Slide</option>
-                <option value="../themes/transition/fade.css">Fade</option>
+                <option selected value="../includes/deck.js/themes/transition/horizontal-slide.css">Horizontal Slide</option>
+                <option value="../includes/deck.js/themes/transition/vertical-slide.css">Vertical Slide</option>
+                <option value="../includes/deck.js/themes/transition/fade.css">Fade</option>
                 <option value="">None</option>
             </select>
         </div>
@@ -69,7 +77,7 @@
 
 <article class="deck-container">
     <section class="slide" id="title-slide">
-        <h1>Getting Started with LR Data Services</h1>
+        <h1>Getting Started<br/>with<br/>LR Data Services</h1>
     </section>
 
     <section class="slide" id="what-are-data-services">
@@ -127,21 +135,90 @@
     </section>
 
 
-<!--     <section class="slide" id="conventions">
+    <section class="slide" id="conventions">
         <h2>Conventions</h2>
-        <p>The prototype implementation can provide a Data Service that will allow use of the extract service to request resource data and aggregations where ASN's are Discriminators, `resource_locator`'s are Resource resource_locator, and `node_timestamp`'s are Timestamps, which will enable us to get:</p>
-        <ul>
-            <li>`resource_locator` by ASN</li>
-            <li>`resource_locator` by start of ASN</li>
-            <li>`resource_locator` by `node_timestamp`</li>
-            <li>ASN by `resource_locator`</li>
-            <li>ASN by start of `resource_locator`</li>
-            <li>ASN by `node_timestamp`</li>
-            <li>ASN `resource_locator`s by `node_timestamp`</li>
-            <li>All ASN `resource_locator`s</li>
-        </ul>
-    </section> -->
 
+        <p>To follow the K.I.S.S pricipal, we're adopting a set of conventions to make adding new data services simple. These conventions include.</p>
+
+        <ul class="topic wide">
+            <li class="slide" >All design documents implementing a data service will contain a field named <code>dataservice</code>. The field will contain a map that indicates the name and description of the data service. More details for this TBD!</li>
+            <li class="slide">Views must follow a specific naming convention and key format.</li>
+            <li class="slide">View functions must emit specific keys.</li>
+            <li class="slide">Timestamps must be represented as seconds from epoch.</li>
+            <li class="slide">Views must always implement a reduce function</li>
+            <li class="slide">List conventions TBD!</li>
+        </ul>
+
+
+        
+<code class="subject"><pre>{
+    "_id": "_design/standards-alignment",
+    <span class="ds">"dataservice": { <span class="ds-val">
+        "name": "Standards Alignment Data Service",
+        "description": "This is where I would document how this data service works."
+    </span>}</span>,
+    "views": { <span class="ds-views">
+        "discriminator-by-resource": { <span class="json">
+            "map": "function (doc) { emit(<span class="key">[doc.resource_locator, getDescriminator(doc)]</span>, null); }",
+            <span class="reduce">"reduce": "_count"</span>
+        </span>},
+        "discriminator-by-resource-ts": { <span class="json">
+            "map": "function (doc) { emit(<span class="key">[doc.resource_locator, <span class="ts">getEpochTimestamp(doc)</span>, getDescriminator(doc)]</span>, null); }",
+             <span class="reduce">"reduce": "_count"</span>
+        </span>},
+        "resource-by-discriminator": { <span class="json">
+            "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), doc.resource_locator]</span>, null); }",
+             <span class="reduce">"reduce": "_count"</span>
+        </span>},
+        "resource-by-discriminator-ts": {<span class="json">
+            "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), <span class="ts">getEpochTimestamp(doc)</span>, doc.resource_locator]</span>, null); }",
+             <span class="reduce">"reduce": "_count"</span>
+        </span>},
+        "resource-by-ts": {<span class="json">
+            "map": "function (doc) { emit(<span class="key">[<span class="ts">getEpochTimestamp(doc)</span>, doc.resource_locator]</span>, null); }",
+             <span class="reduce">"reduce": "_count"</span>
+        </span>},
+        "discriminator-by-ts": {<span class="json">
+            "map": "function (doc) { emit(<span class="key">[<span class="ts">getEpochTimestamp(doc)</span>, getDescriminator(doc)]</span>, null); }",
+             <span class="reduce">"reduce": "_count"</span>
+        </span>} 
+    </span>},
+    <span class="lists">"lists": { ... }</span>
+}</pre></code>
+        
+
+        <div class="foot"></div>
+    </section>
+
+
+    <section class="slide" id="extract-service">
+        <h2>The Extract Service Output</h2>
+        <p><strong>WIP</strong> Possible output format for the <code>extract</code> service:</p>
+        <div>
+<div id="code" name="code" class="code" mode="javascript" style="display: none;">
+{
+    "documents": [
+
+    {
+        "result_data": {
+            /* 
+                    MapReduce aggregation formatted, could be in a paradata 'assertion' 
+            */
+        },
+        "supplemental_data": {
+            /*
+                This is the value of the map/reduce?
+            */
+        },
+        "resource_data": [ /* doc ids of full docs */ ]
+
+    }
+
+    ]
+}
+</div>
+        </div>
+    </section>
 
 
  <!--    <section class="slide" id="themes">
@@ -269,6 +346,22 @@
 <script src="../includes/deck.js/extensions/goto/deck.goto.js"></script>
 <script src="../includes/deck.js/extensions/status/deck.status.js"></script>
 <script src="../includes/deck.js/extensions/navigation/deck.navigation.js"></script>
+
+
+<!-- Base codemiror code -->
+<script src="../includes/deck.js/extensions/codemirror/codemirror.js"></script>
+
+<!-- Syntax highlighting Modes -->
+<!-- javascript -->
+<script src="../includes/deck.js/extensions/codemirror/mode/javascript/javascript.js"></script>
+
+<!-- html mode (note html mode requires xml, css and javascript) -->
+<!-- <script src="../includes/deck.js/extensions/codemirror/mode/xml/xml.js"></script>
+<script src="../includes/deck.js/extensions/codemirror/mode/css/css.js"></script>
+<script src="../includes/deck.js/extensions/codemirror/mode/htmlmixed/htmlmixed.js"></script> -->
+
+<!-- Plugin code -->
+<script src="../includes/deck.js/extensions/codemirror/deck.codemirror.js"></script>
 
 <!-- Specific to this page -->
 <script src="dataservice.js"></script>
