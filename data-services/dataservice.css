@@ -22,7 +22,8 @@
 }
 
 code .json, 
-.on-slide-10 code .ds-val, .on-slide-11 code .ds-val, .on-slide-12 code .ds-val, .on-slide-13 code .ds-val {
+code .ds-val,
+code .ds-views {
   display: none;
 } 
 
@@ -37,7 +38,7 @@ code .json,
 
 .on-slide-9 code .ds, 
 .on-slide-9 code .ds-val, 
-.on-slide-10 code .ds-views, .on-slide-11 code .ds-views,  .on-slide-12 code .ds-views,
+.on-slide-10 code .ds-views, .on-slide-11 code .ds-views, .on-slide-12 code .ds-views, .on-slide-13 code .ds-views,
 .on-slide-11 code .json, .on-slide-12 code .json, .on-slide-13 code .json  {
   display: inline;
 }
