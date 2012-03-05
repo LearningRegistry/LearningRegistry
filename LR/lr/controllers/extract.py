@@ -47,7 +47,7 @@ class ExtractController(BaseController):
         for d in self._streamList(self._getView(includeDocs=False),json.dumps):
             yield d
         yield base[index:]
-    def show(self, id, format='html'):
+    def get(self, view='',param=''):
         """GET /extract/id: Show a specific item"""
         yield '{"documents":['
         first = True
