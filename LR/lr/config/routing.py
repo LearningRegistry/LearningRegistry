@@ -55,6 +55,7 @@ def make_map(config):
         mapResource('lr.oaipmh.docid', 'OAI-PMH', 'OAI-PMH')
         mapResource('lr.slice.docid', 'slice', 'slice')
         mapResource('lr.sword.docid', 'swordservice','swordservice')    
+    map.resource("extract", "extract")
     map.minimization = False
     map.explicit = False
 
