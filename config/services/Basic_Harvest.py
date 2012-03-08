@@ -52,7 +52,7 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
         # Returns keys/pair where the keys is the destination database name
         # and value is the couchapp directory name.  This assumes a central
         # location for all couchapps.
-        couchapps ={'resource_data': ['apps/learningregistry-resource-location',
+        self.couchapps ={'resource_data': ['apps/learningregistry-resource-location',
                                                            'apps/learningregistry-by-date'] 
                               }
                               
