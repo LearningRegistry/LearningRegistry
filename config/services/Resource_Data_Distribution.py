@@ -18,19 +18,17 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __ResourceDataDistributionServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    print config_doc
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Resource Data Distribution service", doc)
-    print("Configured Resource Data Distribution service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
-
-
+    return __ResourceDataDistributionServiceTemplate().install(server, dbname, custom_opts)
+    
 
 class __ResourceDataDistributionServiceTemplate(ServiceTemplate):
     def __init__(self):
-        ServiceTemplate.__init__(self)    
+        ServiceTemplate.__init__(self)
+        # Returns keys/pair where the keys is the destination database name
+        # and value is the couchapp directory name.  This assumes a central
+        # location for all couchapps.
+        self.couchapps ={'resource_data':['apps/filtered-replication']}
+
 
     def _optsoverride(self):
         opts = {
@@ -43,7 +41,8 @@ class __ResourceDataDistributionServiceTemplate(ServiceTemplate):
             "service_https": "false"
         }
         return opts
-        
+
+
 if __name__ == "__main__":
     import couchdb
     
@@ -57,10 +56,10 @@ if __name__ == "__main__":
     
     def notExample(input=None):
         return input is not None and input != nodeSetup["nodeUrl"]
-    
+
     nodeSetup["couchDBUrl"] = getInput("Enter the CouchDB URL:", nodeSetup["couchDBUrl"], doesNotEndInSlash)
     nodeSetup["nodeUrl"] = getInput("Enter the public URL of the LR Node", nodeSetup["nodeUrl"], notExample)
-    
+
     server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
     install(server, "node", nodeSetup)
     

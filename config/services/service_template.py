@@ -4,29 +4,37 @@ import pystache
 import types
 import urlparse
 import pprint
+from setup_utils import  PublishDoc
+from couch_utils import pushCouchApp
+import uuid
+import json
+from os import path
+from urlparse import urljoin
+
+_COUCHAPP_PATH = path.abspath(path.join(path.dirname(path.abspath(__file__)), '../..', 'couchdb'))
 
 class ServiceTemplate():
     __metaclass__ = abc.ABCMeta
     def __init__(self):
-        self.template = '''
-{
-    "doc_type": "service_description",
-    "doc_version": "0.20.0",
-    "doc_scope": "{{scope}}",
-    "active": {{active}},
-    "service_id": "{{service_id}}",
-    "service_type": "{{service_type}}",
-    "service_name": "{{service_name}}",        
-    "service_version": "{{service_version}}",
-    "service_endpoint": "{{node_endpoint}}{{service_endpoint}}",
-    "service_auth": {
-        "service_authz":    [
-            {{service_authz}}
-        ],
-        "service_key": {{service_key}},
-        "service_https": {{service_https}}
-    }{{#service_data}},"service_data":{{service_data}}{{/service_data}}
-}'''
+        self.template = '''{
+                "doc_type": "service_description",
+                "doc_version": "0.20.0",
+                "doc_scope": "{{scope}}",
+                "active": {{active}},
+                "service_id": "{{service_id}}",
+                "service_type": "{{service_type}}",
+                "service_name": "{{service_name}}",        
+                "service_version": "{{service_version}}",
+                "service_endpoint": "{{node_endpoint}}{{service_endpoint}}",
+                "service_auth": {
+                    "service_authz":    [
+                        {{service_authz}}
+                    ],
+                    "service_key": {{service_key}},
+                    "service_https": {{service_https}}
+                }{{#service_data}},"service_data":{{service_data}}{{/service_data}}
+            }'''
+        self.couchapps = {}
         self.service_data_template = None
         self.authz_data_template = '''{{authz}}'''
         self.opts = {
@@ -47,12 +55,12 @@ class ServiceTemplate():
 
     def _optsoverride(self):
         return {}
-    
+  
     def _servicedata(self, **kwargs):
         if self.service_data_template != None:
             return pystache.render(self.service_data_template, kwargs)
         return None
-    
+        
     def _authz(self, **kwargs):
         if self.authz_data_template != None:
             if 'authz' in kwargs and isinstance(kwargs['authz'], types.ListType):
@@ -60,15 +68,39 @@ class ServiceTemplate():
             
             return pystache.render(self.authz_data_template, kwargs)
         return None
+        
+    def _getId(self):
+        return "{0}:{1} service".format(self.opts['service_type'], self.opts['service_name'])
 
+    def install(self, server, dbname, customOpts):
+        
+        config_doc = self.render(**customOpts)
+        doc = json.loads(config_doc)
+        
+        PublishDoc(server, dbname, self._getId(), doc)
     
-    
- 
-    
+        print("Configured {0} :\n{1}\n".format(self.opts['service_name'],
+                                                json.dumps(doc, indent=4, sort_keys=True)))
+
+        self._installCouchApps(_COUCHAPP_PATH, server)
+        return self
+
+    def _installCouchApps(self, couchappsDir, server):
+        if (self.opts['active'] ==False) or (len(self.couchapps) == 0):
+            return
+
+        for db in self.couchapps.keys():
+            for app in  self.couchapps[db]:
+                appPath = path.abspath(path.join(path.join(couchappsDir, db), app))
+                dbUrl =  urljoin(server.resource.url, db)
+                
+                pushCouchApp(appPath, dbUrl)
+                #print("\nPushed couch app {0} to {1}".format(appPath, dbUrl))
+                
+
     def render(self, **kwargs):
         self.opts.update(self._optsoverride())
-       
-            
+
         funcs = []
         for key in self.opts.keys():
             if key in kwargs:
@@ -79,7 +111,7 @@ class ServiceTemplate():
                 
             if isinstance(self.opts[key], (types.FunctionType, types.MethodType) ):
                 funcs.append(key)
-       
+    
         for key in funcs:
             self.opts[key] = self.opts[key](**self.opts)
         # Check to see if the service is using https so the service_https is
