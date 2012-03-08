@@ -80,16 +80,31 @@
         <h1>Getting Started<br/>with<br/>LR Data Services</h1>
     </section>
 
+    <section class="slide" id="what-was-data-services">
+        <h2>What Was Data Services?</h2>
+        <div>
+            <img class="old-ds" src="./old-data-services.png">
+        </div>
+        <div class="footer"></div>
+    </section>
+
+
     <section class="slide" id="what-are-data-services">
-        <h2>What Are LR Data Services?</h2>
+        <h2>What Is LR Data Services Now?</h2>
         <ol>
             <li class="slide">
                 <h3>A Way to Get the Data You Want</h3>
                 <p>Only interested in one specific kind of data? Data Services aims to provide a way to extract the data that's relevant to you through simple customization.</p>
             </li>
             <li class="slide">
-                <h3>It's Not Just a Service, It's A Design Pattern</h3>
-                <p>Following some simple conventions and sample library reuse/extension to identify <strong>discriminators</strong>, you can create an extraction service from LR for your use case, batteries included.</p>
+                <h3>It's A Design Pattern, With Some "Batteries Included".</h3>
+                <ul>
+                    <li>Follow simple conventions to identify <strong>discriminators</strong> within the LR documents</li>
+                    <li>Reuse or modify community-sourced libraries to aid in extracting data for your use case</li>
+                    <li>Install your data service code into a LR Node's CouchDB</li>
+                    <li>Access your custom solution via the <code>extract</code> HTTP service API installed on the node.</li>
+           <!--        , you can create a harvest-like service from LR that can leverage a standardized extraction API.</p> -->
+                </ul>
             </li>
             <li class="slide">
                 <h3>A Path Towards Making LR use Fewer Resources</h3>
@@ -100,7 +115,10 @@
 
     <section class="slide" id="what-is-a-discriminator">
         <h2>What Is a Discriminator?</h2>
-        <p>A Discriminator in Data Services is the data that you've identified that you want extracted, thus allowing you to discriminate unrecognized data out of the request. For example, if you were only interested in ASN urls contained within the &lt;conformsTo&gt; element of XML metadata that uses a Dublin Core Terms schema, the identified ASN url becomes your discriminator.</p>
+        <p>Discriminators in Data Services are the characteristics of the data that you've identified that you want to capture.
+        <ul>
+            <li>This allows you to exclude data you do not know how to process or recognize as quality information.</li>
+            <li>For example, if you were only interested in ASN urls contained within the &lt;conformsTo&gt; element of XML metadata that uses a Dublin Core Terms schema, the identified ASN url becomes your discriminator.</li></ul></p>
     </section>
 
     <section class="slide" id="what-can-ds-do">
@@ -138,15 +156,15 @@
     <section class="slide" id="conventions">
         <h2>Conventions</h2>
 
-        <p>To follow the K.I.S.S pricipal, we're adopting a set of conventions to make adding new data services simple. These conventions include.</p>
+        <p>To follow the K.I.S.S principle, we're adopting a set of conventions to make adding new data services simple. These conventions are part of a CouchDB design documnent.</p>
 
         <ul class="topic wide">
-            <li class="slide" >All design documents implementing a data service will contain a field named <code>dataservice</code>. The field will contain a map that indicates the name and description of the data service. More details for this TBD!</li>
-            <li class="slide">Views must follow a specific naming convention and key format.</li>
-            <li class="slide">View functions must emit specific keys.</li>
+            <li class="slide" >A field named <code>dataservice</code> so the extract service can locate the implementation. The field will contain a map that indicates the name and description of the data service. More details for this TBD!</li>
+            <li class="slide">Views must follow a specific naming convention.</li>
+            <li class="slide">View functions must emit specific keys according to the view they implement.</li>
             <li class="slide">Timestamps must be represented as seconds from epoch.</li>
-            <li class="slide">Views must always implement a reduce function</li>
-            <li class="slide">List conventions TBD!</li>
+            <li class="slide">Views must always implement a reduce.</li>
+            <li class="slide"><strong>(WIP)</strong> List conventions are expected to be defined for formatting and advanced filtering. More TBD!</li>
         </ul>
 
 
@@ -193,7 +211,7 @@
 
     <section class="slide" id="extract-service">
         <h2>The Extract Service Output</h2>
-        <p><strong>WIP</strong> Possible output format for the <code>extract</code> service:</p>
+        <p><strong>(WIP)</strong> Possible output format for the <code>extract</code> service:</p>
         <div>
 <div id="code" name="code" class="code" mode="javascript" style="display: none;">
 {
@@ -224,7 +242,7 @@
 
     <section class="slide" id="extract-service-api">
         <h2>The Extract Service HTTP API</h2>
-        <p><strong>WIP</strong> Using a GET request:</p>
+        <p><strong>(WIP)</strong> Using a GET request:</p>
         <div>
             <code>GET /extract/&lt;data service name&gt;/&lt;view name&gt;/[&lt;parameter&gt;/&lt;value&gt;][?&lt;DS Query Params&gt;]</code>
         </div>

@@ -27,19 +27,23 @@ code .ds-views {
   display: none;
 } 
 
-.on-slide-9 code .ds, 
-.on-slide-10 code .ds-views, 
-.on-slide-11 code .key, 
-.on-slide-12 code .ts,
-.on-slide-13 code .reduce,
-.on-slide-14 code .lists  {
+img.old-ds {
+  height:450px;
+}
+
+.on-slide-10 code .ds, 
+.on-slide-11 code .ds-views, 
+.on-slide-12 code .key, 
+.on-slide-13 code .ts,
+.on-slide-14 code .reduce,
+.on-slide-15 code .lists  {
   color: #c00;
 }
 
-.on-slide-9 code .ds, 
-.on-slide-9 code .ds-val, 
-.on-slide-10 code .ds-views, .on-slide-11 code .ds-views, .on-slide-12 code .ds-views, .on-slide-13 code .ds-views,
-.on-slide-11 code .json, .on-slide-12 code .json, .on-slide-13 code .json  {
+.on-slide-10 code .ds, 
+.on-slide-11 code .ds-val, 
+.on-slide-12 code .ds-views, .on-slide-13 code .ds-views, .on-slide-14 code .ds-views, .on-slide-15 code .ds-views,
+.on-slide-12 code .json, .on-slide-13 code .json, .on-slide-14 code .json  {
   display: inline;
 }
 
