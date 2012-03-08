@@ -6,20 +6,26 @@
 }
 
 .subject {
+  overflow: auto;
+}
+
+.subject-noflow, .subject  {
   width: 400px;
   height: 400px;
-  overflow: auto;
   float: right;
 }
+
 
 .foot {
   clear: both;
 }
 
 
-.slide code > pre {
+.slide code > pre, #extract-service div.CodeMirror,
+#extract-service-api div > code {
   font-size: 12px;
 }
+
 
 code .json, 
 code .ds-val,
@@ -41,8 +47,8 @@ img.old-ds {
 }
 
 .on-slide-10 code .ds, 
-.on-slide-11 code .ds-val, 
-.on-slide-12 code .ds-views, .on-slide-13 code .ds-views, .on-slide-14 code .ds-views, .on-slide-15 code .ds-views,
+.on-slide-10 code .ds-val, 
+.on-slide-11 code .ds-views, .on-slide-12 code .ds-views, .on-slide-13 code .ds-views, .on-slide-14 code .ds-views,
 .on-slide-12 code .json, .on-slide-13 code .json, .on-slide-14 code .json  {
   display: inline;
 }

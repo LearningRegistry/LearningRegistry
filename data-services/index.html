@@ -82,9 +82,18 @@
 
     <section class="slide" id="what-was-data-services">
         <h2>What Was Data Services?</h2>
-        <div>
+        <div class="subject-noflow">
             <img class="old-ds" src="./old-data-services.png">
         </div>
+        <ul class="topic">
+            <li>Make it easier to get relevant data.</li>
+            <li>Get clean data.</li>
+            <ul>
+                <li>In depth scrutiny of the LR data.</li>
+                <li>I.E. Schemas &amp; Signatures validated, envelopes filtered.</li>
+            </ul>
+            <li>Mostly external, complementary to a LR Node.</li>
+        </ul>
         <div class="footer"></div>
     </section>
 
@@ -213,14 +222,15 @@
         <h2>The Extract Service Output</h2>
         <p><strong>(WIP)</strong> Possible output format for the <code>extract</code> service:</p>
         <div>
-<div id="code" name="code" class="code" mode="javascript" style="display: none;">
+<div class="code" mode="javascript" style="display: none;">
 {
     "documents": [
 
     {
         "result_data": {
             /* 
-                    MapReduce aggregation formatted, could be in a paradata 'assertion' 
+                    MapReduce aggregation formatted. 
+                    Could be a paradata 'assertion'
             */
         },
         "supplemental_data": {
