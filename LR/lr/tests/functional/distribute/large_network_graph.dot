@@ -1,17 +1,21 @@
 digraph largeNetworkTest{
     style = filled;
     node [fontsize=8]
-        
+     
+    //Subgraph definition for gateway nodes.   
     subgraph gatways{
         node [shape=doublecircle, color=blue, fontsize=12];
         n0; n3; n4; n5; n7; n8; n9; n12; n13
     };
-    
+    //Subgraph definition for seed nodes.  seeds node are the 
+    //nodes have populate with data initially.
     subgraph seed_nodes{ 
         node[fontcolor=cyan, fontsize=12, shape=Mcircle]
-        n6; n2
+        n2
     };
     
+    //Green arrow means distribute will happen.  
+    //Green connection arrow means no distribute
     subgraph cluster_1{
         label = "Open Community One";
         color = yellow;
@@ -19,19 +23,20 @@ digraph largeNetworkTest{
         subgraph cluster_11{
             label = "OC1_N1";
             color = goldenrod;
-            n0->n1[color=red];
+            n0->n1[color=green];
         };
         
         subgraph cluster_12 {
             label = "OC1_N2";
             color = gold;
 
-            n2->n0[color=red];
-            n2->n4->n3[color=green];
+            n2->n0[color=red]; //common node to gateway on different network
+            n2->n4[color=green];
             n3->n0[color=green];
             n2->n5->n0[color=green];
             n2->n3[color=green];
-            n5->n5[color=red];
+            n5->n5[color=red];  // Self repilicating ....
+            n4->n3[color=red]; //Gateway to gateway on same network.
         }
     };
     subgraph cluster_2{
@@ -42,21 +47,21 @@ digraph largeNetworkTest{
             label = "OC2_N1";
             color = "yellowgreen";
             
-            n3->n6[color=red];
+            n3->n6[color=red];  //Gateway to common node on different network
             n6->n9[color=green];
             n6->n8[color=green];
             n4->n7->n4[color=green];
-            n7->n6[color=red];
-            n8->n6[color=red];
+            n7->n6[color=green];
+            n8->n6[color=green];
         };
         
         subgraph cluster_22{
             label = "OC2_N2";
             color = darkseagreen;
             
-            n12->n11[color=red]
+            n12->n11[color=green]
             n11->n10[color=green];
-            n12->n10[color=red];
+            n12->n10[color=green];
             n8->n12->n8[color=green];
         }
     };
@@ -69,9 +74,9 @@ digraph largeNetworkTest{
             color = brown;
             
             n14->n13[color=green];
-            n13->n14[color=red];
-            n9->n13[color=red];
-            n3->n13[color=red];
+            n13->n14[color=green];
+            n9->n13[color=red]; // Close community
+            n3->n13[color=red];// Close community
         }
     }
 }

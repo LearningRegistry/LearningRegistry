@@ -484,15 +484,7 @@ class ModelParser(object):
                 str(modelProp[self._VALUE_RANGE]) +"' instead of '"+str(value)+
                 "'\n\n:"+description)
         
-        # Check arrays to make sure the elements are of the proper type. 
-        # Could change in future if extensions are allowed to include non-string arrays
-        if isOfSpecType(value, 'array'):
-            for val in value:
-                if isOfSpecType(val, 'string'):
-                    continue
-                else:
-                    raise SpecValidationException(fieldName+": Invalid array value type for '"+str(val)+"'; expecting type 'string'")
-
+      
     def _validate(self, parseResults, jsonObject, validateExtensionField=False):
         """Validates recursively the jsonObject against the spec model"""
         modelKeySet = set(parseResults.keys())
