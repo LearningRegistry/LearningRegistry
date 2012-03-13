@@ -20,8 +20,11 @@
 load("test-bootstrap.js")
 load("data.js");
 
-
+// assign assertion functions to convienience object.
 var t = {}; 
+jsUnity.attachAssertions(t);
+
+
 
 function AlignmentTestSuite() {
 
@@ -95,7 +98,7 @@ function AlignmentTestSuite() {
 
         t.assertEqual(2, matches);
 
-        log(JSON.stringify({"found":found}));
+        log(JSON.stringify({"found":found}), LOG_LEVEL.DEBUG);
 
         t.assertTrue(found["http://purl.org/ASN/resources/S1000E0F"] > 0, "http://purl.org/ASN/resources/S1000E0F not found in return value.");
     }
@@ -109,11 +112,11 @@ function AlignmentTestSuite() {
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
-        log(JSON.stringify(mock_emit));
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
         t.assertEqual(2, mock_emit.emitted.length, "There should only be 2 elements emitted")
 
         for (var idx in mock_emit.emitted) {
-            log(JSON.stringify(mock_emit.emitted[idx]));
+            log(JSON.stringify(mock_emit.emitted[idx]), LOG_LEVEL.DEBUG);
         }
 
     }
@@ -126,11 +129,11 @@ function AlignmentTestSuite() {
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
-        log(JSON.stringify(mock_emit));
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
 
         t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
         for (var idx in mock_emit.emitted) {
-            log(JSON.stringify(mock_emit.emitted[idx]));
+            log(JSON.stringify(mock_emit.emitted[idx]), LOG_LEVEL.DEBUG);
         }
     }
 
@@ -141,7 +144,7 @@ function AlignmentTestSuite() {
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
-        log(JSON.stringify(mock_emit));
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
 
         t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
         
@@ -158,47 +161,44 @@ function AlignmentTestSuite() {
 
 
     function test_map_resource_by_Discriminator() {
-        log_active = true;
         var map_fn = GetMap("resource-by-discriminator");
 
         mock_emit.clear();
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
-        log(JSON.stringify(mock_emit));
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
         t.assertEqual(2, mock_emit.emitted.length, "There should only be 2 elements emitted")
 
         for (var idx in mock_emit.emitted) {
-            log(JSON.stringify(mock_emit.emitted[idx]));
+            log(JSON.stringify(mock_emit.emitted[idx]), LOG_LEVEL.DEBUG);
         }
 
     }
 
     function test_map_resource_by_DiscriminatorTS() {
-        log_active = true;
         var map_fn = GetMap("resource-by-discriminator-ts");
 
         mock_emit.clear();
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
-        log(JSON.stringify(mock_emit));
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
 
         t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
         for (var idx in mock_emit.emitted) {
-            log(JSON.stringify(mock_emit.emitted[idx]));
+            log(JSON.stringify(mock_emit.emitted[idx]), LOG_LEVEL.DEBUG);
         }
     }
 
     function test_map_resourceByTS() {
-        log_active = true;
         var map_fn = GetMap("resource-by-ts");
 
         mock_emit.clear();
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
-        log(JSON.stringify(mock_emit));
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
 
         t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
         
@@ -213,7 +213,16 @@ function AlignmentTestSuite() {
     }
 }
 
-log_active = false;
-jsUnity.attachAssertions(t);
+// logging enabled or disabled
+log_active = true;
+
+// this is the current logging level 
+log_level = LOG_LEVEL.INFO;
+
+// when calling log without some level, this is the default level assigned the message, such as what might
+// appear in a map/reduce/show/list/filter function
+default_log_level = LOG_LEVEL.ERROR;
+
+// execute the tests
 var output = jsUnity.run(AlignmentTestSuite);
 // print(JSON.stringify(output));

@@ -16,12 +16,36 @@
 // # of trade names, commercial products, or organizations imply endorsement by the U.S. Government.
 
 
+
+
+var LOG_LEVEL = {
+    ERROR: 10,
+    WARN: 8,
+    INFO : 5,
+    DEBUG: 3,
+    TRACE: 0 
+}
+
+// loggineg enabled or disabled
 var log_active = true;
+
+// this is the current logging level 
+var log_level = LOG_LEVEL.INFO;
+
+// when calling log without some level, this is the default level assigned the message.
+var default_log_level = LOG_LEVEL.ERROR;
+
 jsUnity.log = function (obj) {
     print(obj);
 }
-var log = function (obj) {
-    if (log_active) {
+
+// couchdb map & list should only call this with 1 argument
+// tests can call with 2.
+var log = function (obj, level) {
+    if (!level) {
+        level = default_log_level;
+    }
+    if (log_active && level >= log_level) {
         jsUnity.log(obj);
     }
 }
