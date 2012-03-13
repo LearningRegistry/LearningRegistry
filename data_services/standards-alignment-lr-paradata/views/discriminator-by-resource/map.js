@@ -1,6 +1,5 @@
 function(doc) {
     // !code lib/alignment.js
-
     try {
         if (doc.doc_type == "resource_data" && doc.resource_data && doc.resource_locator && doc.node_timestamp) {
             var nodeTimestamp = convertDateToSeconds(doc);

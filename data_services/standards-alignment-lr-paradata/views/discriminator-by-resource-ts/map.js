@@ -11,7 +11,7 @@ function(doc) {
                     var stds = objStr.match(ASNPatterns[re]);
                     for (s in stds) {
                         if (!seen[s]) {
-                            emit([doc.resource_locator, nodeTimestamp, [verb, stds[s]]]);
+                            emit([doc.resource_locator, nodeTimestamp, [verb, stds[s]]], null);
                             seen[s] = 1;
                         }
                     }

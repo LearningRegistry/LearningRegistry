@@ -1,51 +1,23 @@
-load("../../lib/jsunity-0.6.js");
-jsUnity.log = function (obj) {
-    print(obj);
-}
+// # Copyright 2012 SRI International
 
-var log = jsUnity.log;
-function MockEmit() {
-    this.emitted = [];
-    this.cur_doc = null;
-    this.cur_doc_id = null;
-};
+// # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
+// # file except in compliance with the License. You may obtain a copy of the License at
 
-MockEmit.prototype.clear = function() {
-    this.emitted = [];
-    this.cur_doc = null;
-    this.cur_doc_id = null;
-};
+// # http://www.apache.org/licenses/LICENSE-2.0
 
-MockEmit.prototype.setDoc = function(doc, with_doc) {
-    if (with_doc) {
-        this.cur_doc = doc;
-    }
-    this.cur_doc_id = doc._id;
+// # Unless required by applicable law or agreed to in writing, software distributed under the License 
+// # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express 
+// # or implied. See the License for the specific language governing permissions and limitations under 
+// # the License.
 
-};
-
-MockEmit.prototype.emit = function(key, value){
-    var obj = {"key": key, "value": value};
-    if (this.cur_doc) {
-        obj["doc"] = this.cur_doc;
-    }
-    if (this.cur_doc_id) {
-        obj["id"] = this.cur_doc_id;
-    }
-    this.emitted.push(obj);
-};
-
-var mock_emit = new MockEmit();
-var emit = function (key, value) {
-    mock_emit.emit(key, value);
-}
-
-function LoadFn(path) {
-    return eval(snarf(path));
-}
+// # This project has been funded at least or in part with Federal funds from the U.S. Department of 
+// # Education under Contract Number ED-04-CO-0040/0010. The content of this publication does not 
+// # necessarily reflect the views or policies of the U.S. Department of Education nor does mention 
+// # of trade names, commercial products, or organizations imply endorsement by the U.S. Government.
 
 
 
+load("test-bootstrap.js")
 load("data.js");
 
 
@@ -131,14 +103,14 @@ function AlignmentTestSuite() {
 
     function test_map_discriminatorByResource() {
 
-        load("../lib/alignment.js");
-        var map_fn = LoadFn("../views/discriminator-by-resource/map.js");
+        var map_fn = GetMap("discriminator-by-resource");
 
         mock_emit.clear();
         mock_emit.setDoc(p_doc, false);
         map_fn(p_doc);
 
         log(JSON.stringify(mock_emit));
+        t.assertEqual(2, mock_emit.emitted.length, "There should only be 2 elements emitted")
 
         for (var idx in mock_emit.emitted) {
             log(JSON.stringify(mock_emit.emitted[idx]));
@@ -146,9 +118,102 @@ function AlignmentTestSuite() {
 
     }
 
+    function test_map_discriminatorByResourceTS() {
 
+        var map_fn = GetMap("discriminator-by-resource-ts");
+
+        mock_emit.clear();
+        mock_emit.setDoc(p_doc, false);
+        map_fn(p_doc);
+
+        log(JSON.stringify(mock_emit));
+
+        t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
+        for (var idx in mock_emit.emitted) {
+            log(JSON.stringify(mock_emit.emitted[idx]));
+        }
+    }
+
+    function test_map_discriminatorByTS() {
+        var map_fn = GetMap("discriminator-by-ts");
+
+        mock_emit.clear();
+        mock_emit.setDoc(p_doc, false);
+        map_fn(p_doc);
+
+        log(JSON.stringify(mock_emit));
+
+        t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
+        
+        var resource = p_doc.resource_locator;
+        var verb = p_doc.resource_data.activity.verb.action;
+        var asn = p_doc.resource_data.activity.related[0].id;
+        var ts = Utils.convertDateToSeconds(p_doc.node_timestamp);
+
+        var row = mock_emit.emitted[0];
+        t.assertEqual(ts, row.key[0], "Timestamp doesn't match expected format.");
+        t.assertEqual(verb, row.key[1][0], "Verb was expected");
+        t.assertEqual(asn, row.key[1][1], "ASN was expected");
+    }
+
+
+    function test_map_resource_by_Discriminator() {
+        log_active = true;
+        var map_fn = GetMap("resource-by-discriminator");
+
+        mock_emit.clear();
+        mock_emit.setDoc(p_doc, false);
+        map_fn(p_doc);
+
+        log(JSON.stringify(mock_emit));
+        t.assertEqual(2, mock_emit.emitted.length, "There should only be 2 elements emitted")
+
+        for (var idx in mock_emit.emitted) {
+            log(JSON.stringify(mock_emit.emitted[idx]));
+        }
+
+    }
+
+    function test_map_resource_by_DiscriminatorTS() {
+        log_active = true;
+        var map_fn = GetMap("resource-by-discriminator-ts");
+
+        mock_emit.clear();
+        mock_emit.setDoc(p_doc, false);
+        map_fn(p_doc);
+
+        log(JSON.stringify(mock_emit));
+
+        t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
+        for (var idx in mock_emit.emitted) {
+            log(JSON.stringify(mock_emit.emitted[idx]));
+        }
+    }
+
+    function test_map_resourceByTS() {
+        log_active = true;
+        var map_fn = GetMap("resource-by-ts");
+
+        mock_emit.clear();
+        mock_emit.setDoc(p_doc, false);
+        map_fn(p_doc);
+
+        log(JSON.stringify(mock_emit));
+
+        t.assertEqual(1, mock_emit.emitted.length, "There should only be 1 element emitted")
+        
+        var resource = p_doc.resource_locator;
+        var verb = p_doc.resource_data.activity.verb.action;
+        var asn = p_doc.resource_data.activity.related[0].id;
+        var ts = Utils.convertDateToSeconds(p_doc.node_timestamp);
+
+        var row = mock_emit.emitted[0];
+        t.assertEqual(ts, row.key[0], "Timestamp doesn't match expected format.");
+        t.assertEqual(resource, row.key[1], "Resource locator was expected");
+    }
 }
 
+log_active = false;
 jsUnity.attachAssertions(t);
 var output = jsUnity.run(AlignmentTestSuite);
 // print(JSON.stringify(output));
