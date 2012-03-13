@@ -61,24 +61,47 @@ class ExtractController(BaseController):
         for d in self._streamList(self._getView(urlBase,startKey=startKey,endKey=endKey,includeDocs=False),processFeed):
             yield d        
         yield ']}'        
-    def get(self, dataservice="",view=''):
-        """GET /extract/id: Show a specific item"""
-        
+    def _orderParmaByView(self,params,view):
         startKey=[]
-        endKey=[]
-        urlBase = "_design/{0}/_view/{1}".format(dataservice,view)
-        if 'from' in request.params:
-            startKey.append(self._convertDateTime(request.params['from']))
-        else:
-            startKey.append(self._convertDateTime(datetime.min))
-        if 'until' in request.params:
-            endKey.append(self._convertDateTime(request.params['until']))
-        else:
-            endKey.append(self._convertDateTime(datetime.max))
-        if 'disciminator' in request.params:
-            startKey.append(request.params['disciminator'])
-            endKey.append(response.params['disciminator']+'\ud7af')
-        else:
-            startKey.append('')
-            endKey.append('\ud7af')            
+        endKey=[] 
+        def populateTs():
+            if 'from' in params:
+                startKey.append(self._convertDateTime(params['from']))
+            else:
+                startKey.append(self._convertDateTime(datetime.min))
+            if 'until' in params:
+                endKey.append(self._convertDateTime(params['until']))
+            else:
+                endKey.append(self._convertDateTime(datetime.max))                
+        def populateDiscriminator():
+            if 'disciminator' in params:
+                startKey.append(params['disciminator'])
+                endKey.append(params['disciminator']+'\ud7af')
+            else:
+                startKey.append('')
+                endKey.append('\ud7af')            
+        def populateResource():
+            if 'resource' in params:
+                startKey.append(params['resource'])
+                endKey.append(params['resource']+'\ud7af')
+            else:
+                startKey.append('')
+                endKey.append('\ud7af')       
+        funcs = {
+            "discriminator":populateDiscriminator,
+            'resource':populateResource,
+            'ts'
+        }       
+        queryOrderParts = view.split('-by-')
+        aggregate = queryOrderParts[0]
+        queryParams= queryParams[1].split('-')       
+        for q in queryParams:
+            funcs[q]
+        funcs[aggregate]
+        return startKey,endKey        
+
+    def get(self, dataservice="",view=''):
+        """GET /extract/id: Show a specific item"""        
+        urlBase = "_design/{0}/_view/{1}".format(dataservice,view)        
+        startKey, endKey = self._orderParmaByView(request.params,view)
         return self._processRequest(startKey,endKey,urlBase)
