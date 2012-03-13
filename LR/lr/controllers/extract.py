@@ -77,9 +77,9 @@ class ExtractController(BaseController):
             else:
                 endKey.append(self._convertDateTime(datetime.max))                
         def populateDiscriminator():
-            if 'disciminator' in params:
-                startKey.append(params['disciminator'])
-                endKey.append(params['disciminator']+'\ud7af')
+            if 'discriminator' in params:
+                startKey.append(params['discriminator'])
+                endKey.append(params['discriminator']+'\ud7af')
             else:
                 startKey.append('')
                 endKey.append('\ud7af')            
