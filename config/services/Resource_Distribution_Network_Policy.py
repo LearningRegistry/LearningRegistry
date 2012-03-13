@@ -9,7 +9,6 @@ import pystache, uuid
 import json
 
 
-
 def install(server, dbname, setupInfo):
     custom_opts = {}
     active = getInput("Enable Resource Data Distribution Policy?", "T", isBoolean)
@@ -18,14 +17,8 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
 
-    must = __ResourceDataDistributionPolicyServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    print config_doc
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Resource Data Distribution Policy service", doc)
-    print("Configured Resource Data Distribution Policy service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
-
+    return  __ResourceDataDistributionPolicyServiceTemplate().install(server, dbname, custom_opts)
+   
 
 class __ResourceDataDistributionPolicyServiceTemplate(ServiceTemplate):
     def __init__(self):
@@ -36,7 +29,7 @@ class __ResourceDataDistributionPolicyServiceTemplate(ServiceTemplate):
         opts = {
             "active": "false",
             "service_type": "administrative",
-            "service_name": "Resource Data Distribution Policy",
+            "service_name": "Resource Distribution Network Policy",
             "service_version": "0.23.0",
             "service_endpoint": "/policy",
             "service_key": "false", 
@@ -51,7 +44,7 @@ if __name__ == "__main__":
                  'couchDBUrl': "http://localhost:5984",
                  'nodeUrl': "http://test.example.com"
     }
-    
+
     def doesNotEndInSlash(input=None):
         return input is not None and input[-1] != "/"
     

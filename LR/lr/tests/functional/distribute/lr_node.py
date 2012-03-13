@@ -93,6 +93,10 @@ class Node(object):
 
     def _getNodeUrl(self):
         return self._nodeConfig.get("node_config", "node_url").strip()
+    
+    nodeId = property(lambda self: self._nodeDescription.get("node_id"), None, None, None)
+    nodeURL = property(lambda self: self._nodeUrl(), None, None, None)
+    
 
     def _setupDescriptions(self):
         #  Set the node, network and community
@@ -384,17 +388,15 @@ class Node(object):
             sourceDoc.update(sourceDocs[i]["doc"])
             destDoc ={}
             destDoc.update(destinationDocs[i]["doc"])
-            if (h.convertToISO8601UTC(destDoc["node_timestamp"]) <= h.convertToISO8601UTC(sourceDoc["node_timestamp"])):
-                log.debug("{0} and {1} error".format(sourceDoc['doc_ID'], destDoc['doc_ID']))
-                return False
+            
             #remove the node_timestamp and _rev then compare  the docs
             del sourceDoc["node_timestamp"]
             del destDoc["node_timestamp"]
             del destDoc["_rev"]
             del sourceDoc["_rev"]
             if sourceDoc != destDoc:
-                 log.debug("{0} and {1} error".format(sourceDoc['doc_ID'], destDoc['doc_ID']))
-                 return False
+                print("{0} and {1} error".format(sourceDoc['doc_ID'], destDoc['doc_ID']))
+                return False
         return True
     
     def _waitOnNodeStop(self):

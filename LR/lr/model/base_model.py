@@ -8,7 +8,7 @@ Base model class for learning registry data model
 @author: jpoyau
 '''
 from pylons import config
-from lr.lib import ModelParser, getFileString
+from lr.lib import ModelParser, getFileString, SpecValidationException
 import couchdb, os, logging, datetime, re, pprint, json 
 from uuid import uuid4
 from os import path
@@ -151,7 +151,10 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             pass
             
         def _validate(self):
-           self._modelParsers[self.doc_version].validate(self._specData)
+            if self.doc_version in self._modelParsers:
+                self._modelParsers[self.doc_version].validate(self._specData)
+            else:
+                raise SpecValidationException("missing or invalid required key: 'doc_version'")
             
         def _postValidation(self):
             pass

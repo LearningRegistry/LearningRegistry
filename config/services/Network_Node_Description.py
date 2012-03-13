@@ -18,13 +18,7 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
 
-    must = __NetworkNodeDescriptionServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    print config_doc
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Network Node Description service", doc)
-    print("Configured Network Node Description service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
+    return __NetworkNodeDescriptionServiceTemplate().install(server, dbname, custom_opts)
 
 
 class __NetworkNodeDescriptionServiceTemplate(ServiceTemplate):
@@ -46,7 +40,7 @@ class __NetworkNodeDescriptionServiceTemplate(ServiceTemplate):
 
 if __name__ == "__main__":
     import couchdb
-    
+
     nodeSetup = {
                  'couchDBUrl': "http://localhost:5984",
                  'nodeUrl': "http://test.example.com"

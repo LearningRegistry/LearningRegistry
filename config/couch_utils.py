@@ -13,10 +13,10 @@ def pushCouchApp(sourceDir, destURL):
     try:
         conf = cfg.Config()
         cmd.push(conf, sourceDir, destURL)
-        log.warning("Deployed CouchApp from '{0}' to '{1}'".format(sourceDir, destURL))
+        print("Deployed CouchApp from '{0}' to '{1}'".format(sourceDir, destURL))
     except:
         print repr(sys.exc_info())
-        log.warning("Unable to push CouchApp at '{0}'".format(sourceDir))
+        print("Unable to push CouchApp at '{0}'".format(sourceDir))
 
 
 def pushAllCouchApps(sourceDirPath, couchDBURL):

@@ -27,12 +27,8 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __OaiServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname, doc["service_type"]+":OAI-PMH service", doc)
-    print("Configured OAI-PMH Harvest service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
-
+    return __OaiServiceTemplate().install(server, dbname, custom_opts)
+   
 
 
 
@@ -48,9 +44,18 @@ class __OaiServiceTemplate(ServiceTemplate):
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}}
         }'''
-    
-    
-    
+        
+        # Returns keys/pair where the keys is the destination database name
+        # and value is the couchapp directory name.  This assumes a central
+        # location for all couchapps.
+        self.couchapps ={'resource_data':['apps/oai-pmh-get-records',
+                                                                  'apps/oai-pmh-identify-timestamp',
+                                                                  'apps/oai-pmh-list-identifiers',
+                                                                  'apps/oai-pmh-list-metadata-formats',
+                                                                  'apps/oai-pmh-test-data']
+                             }
+
+
     def _optsoverride(self):
         opts = {
             "active": "false",
