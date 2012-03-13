@@ -21,11 +21,14 @@ class ExtractController(BaseController):
         if len(keys) > 0:
             args['keys'] = keys
         args['reduce']=False
+        args['stale'] = appConfig['couchdb.stale.flag']
+        args['limit']=10
         if startKey is not None:
             args['startkey'] = startKey
         if endKey is not None:
             args['endkey'] = endKey
-        db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
+        db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])        
+        log.debug(db_url)
         view = h.getView(database_url=db_url,view_name=view,documentHandler=h.document,**args)
         return view
     def _streamList(self,data,dataHandler):
@@ -90,18 +93,19 @@ class ExtractController(BaseController):
         funcs = {
             "discriminator":populateDiscriminator,
             'resource':populateResource,
-            'ts'
+            'ts':populateTs
         }       
         queryOrderParts = view.split('-by-')
         aggregate = queryOrderParts[0]
-        queryParams= queryParams[1].split('-')       
+        queryParams= queryOrderParts[1].split('-')       
         for q in queryParams:
             funcs[q]
         funcs[aggregate]
-        return startKey,endKey        
+        return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None
 
     def get(self, dataservice="",view=''):
         """GET /extract/id: Show a specific item"""        
         urlBase = "_design/{0}/_view/{1}".format(dataservice,view)        
         startKey, endKey = self._orderParmaByView(request.params,view)
+        log.debug('Start Key: {0}; End Key: {1}'.format(startKey,endKey))
         return self._processRequest(startKey,endKey,urlBase)
