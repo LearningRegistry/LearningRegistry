@@ -483,8 +483,8 @@ class ModelParser(object):
                 "Invalid value for'"+fieldName+"'expecting one of:\n '"+
                 str(modelProp[self._VALUE_RANGE]) +"' instead of '"+str(value)+
                 "'\n\n:"+description)
-                    
         
+      
     def _validate(self, parseResults, jsonObject, validateExtensionField=False):
         """Validates recursively the jsonObject against the spec model"""
         modelKeySet = set(parseResults.keys())

@@ -27,11 +27,8 @@ def install(server, dbname, setupInfo):
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     
-    must = __BasicHarvestServiceTemplate()
-    config_doc = must.render(**custom_opts)
-    doc = json.loads(config_doc)
-    PublishDoc(server, dbname,doc["service_type"]+":Basic Harvest service", doc)
-    print("Configured Basic Harvest service:\n{0}\n".format(json.dumps(doc, indent=4, sort_keys=True)))
+    return __BasicHarvestServiceTemplate().install(server, dbname, custom_opts)
+
 
 
 
@@ -47,14 +44,20 @@ class __BasicHarvestServiceTemplate(ServiceTemplate):
             "id_limit": {{id_limit}}{{/id_limit}}{{#doc_limit}},
             "doc_limit": {{doc_limit}}{{/doc_limit}},
             "metadataformats": [{"metadataFormat":
-                {                    
+                {
                     "metadataPrefix": "LR_JSON_0.10.0"
                 }
-
             }]
         }'''
-    
-    
+        # Returns keys/pair where the keys is the destination database name
+        # and value is the couchapp directory name.  This assumes a central
+        # location for all couchapps.
+        self.couchapps ={'resource_data': ['apps/learningregistry-resource-location',
+                                                           'apps/learningregistry-by-date'] 
+                              }
+                              
+        def _couchapps(self):
+            return self._couchapps
     
     def _optsoverride(self):
         opts = {

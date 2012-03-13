@@ -224,7 +224,7 @@ class TestDistribute(object):
         self._setup_common_nodes_same_network_and_community_filter(include_exclude=False, count=100,  mode=2)
 
 
-    def test_gateway_to_common_node(self):
+    def test_gateway_to_common_node_different_network_community(self):
         """ This tests distribute/replication between a source gateway node on to a
             common node.  There  should be NO distribution/replication.  Distribution
             is not allowed between a gateway and common node.
@@ -233,6 +233,7 @@ class TestDistribute(object):
         sourceNode =self._NODES[0]
         destinationNode = self._NODES[1]
         self._setupNodePair(sourceNode, destinationNode, 
+                                        sourceNetworkId="Test Source Network",
                                         sourceIsGateway =True)
         
         #populate the node with test data.
@@ -240,9 +241,9 @@ class TestDistribute(object):
         sourceNode.publishResourceData(data["documents"])
         response =self._doDistributeTest(sourceNode, destinationNode)
     
-        assert ( response[self.__OK] and 
+        assert (response[self.__OK] and 
                       not response[self.__CONNECTIONS][0][self.__OK] and
-                      response[self.__CONNECTIONS][0][self.__ERROR] =='gateways can only distribute to gateways'),  \
+                      response[self.__CONNECTIONS][0][self.__ERROR] =='cannot distribute across networks (or communities) unless gateway'),  \
         "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
         
         # There should be no replication. Destination node should be 
@@ -250,6 +251,63 @@ class TestDistribute(object):
         assert len (destinationNode.getResourceDataDocs()) == 0, \
                     """There  should be NO distribution/replication.  Distribution
             is not allowed between a gateway and common node."""
+
+    def test_gateway_to_gateway_node_same_network_community(self):
+        """ This tests distribute/replication between two gateway nodes on to same
+        network and community.  There  should be NO distribution/replication.  Distribution
+            is not allowed between tow gateways on the same network.
+        """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        self._setupNodePair(sourceNode, destinationNode, 
+                                        destinationIsGateway=True,
+                                        sourceIsGateway =True)
+        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert (response[self.__OK] and 
+                      not response[self.__CONNECTIONS][0][self.__OK] and
+                      response[self.__CONNECTIONS][0][self.__ERROR] =='gateways must only distribute across different networks'),  \
+        "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
+        
+        # There should be no replication. Destination node should be 
+        # empty of resource_data docs
+        assert len (destinationNode.getResourceDataDocs()) == 0, \
+                    """There  should be NO distribution/replication.  Distribution
+            is not allowed between a gateway and common node."""
+
+
+    def test_gateway_to_common_node_same_network_community(self):
+        """ This tests distribute/replication between a source gateway node on to a
+            common node on the same community and network.
+             Distribution is allowed between a gateway and common node when there
+             are on the same community and network.
+        """
+        
+        sourceNode =self._NODES[0]
+        destinationNode = self._NODES[1]
+        
+        self._setupNodePair(sourceNode, destinationNode, sourceIsGateway =True)
+                                        
+        #populate the node with test data.
+        data = json.load(file(_TEST_DATA_PATH))
+        sourceNode.publishResourceData(data["documents"])
+        
+        response =self._doDistributeTest(sourceNode, destinationNode)
+    
+        assert (response[self.__OK] and 
+                      response[self.__CONNECTIONS][0][self.__OK]), \
+                    "Distribute failed...:\n{0} ".format(pprint.pformat(response, 4))
+                    
+        assert(sourceNode.compareDistributedResources(destinationNode)), \
+                    """Distribute for gateway to common node on the same community
+                    and network failed."""
+
 
     def test_gateway_to_gateway_closed_community(self):
         """Tests distribute between to gateway with one close community. 
@@ -269,9 +327,9 @@ class TestDistribute(object):
         
         response =self._doDistributeTest(sourceNode, destinationNode)
     
-        assert ( response[self.__OK] and 
-                      not response[self.__CONNECTIONS][0][self.__OK] and
-                      response[self.__CONNECTIONS][0][self.__ERROR] =='cannot distribute across non social communities'),  \
+        assert (response[self.__OK] and 
+                     not response[self.__CONNECTIONS][0][self.__OK] and
+                     response[self.__CONNECTIONS][0][self.__ERROR] == 'cannot distribute across non social communities'), \
         "failed to processed replication/distribute:\n{0}".format(pprint.pformat(response)) 
         
         # There should be no replication. Destination node should be 
