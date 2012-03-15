@@ -86,6 +86,52 @@ var emit = function (key, value) {
     mock_emit.emit(key, value);
 }
 
+function MockRow() {
+    this.rows = [];
+    this.cur_index = -1;
+}
+
+MockRow.prototype.clear = function() {
+    this.rows = [];
+}
+
+MockRow.prototype.setRows = function(rows) {
+    this.rows = rows;
+}
+
+MockRow.prototype.getRow = function() {
+    return this.rows.pop();
+}
+
+var mock_rows = new MockRow();
+var getRow = function() {
+    return mock_rows.getRow();
+}
+
+
+
+function MockSend() {
+    this.sent = [];
+}
+
+MockSend.prototype.clear = function() {
+    this.sent = [];
+}
+
+MockSend.prototype.send = function(obj) {
+    this.sent.push(obj);
+}
+
+MockSend.prototype.join = function() {
+    return this.sent.join("\n");
+}
+
+var mock_send = new MockSend();
+var send = function(obj) {
+    mock_send.send(obj);
+}
+
+
 var Utils = {
 
     convertDateToSeconds: function(timestamp){
@@ -98,4 +144,8 @@ if (arguments.length == 1) {
     load(arguments[0]);
 } else {
     print("No Additional files loaded.")
+}
+
+function reduce_count(keys, values, rereduce) {
+    return values.length;
 }

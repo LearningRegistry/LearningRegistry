@@ -211,6 +211,24 @@ function AlignmentTestSuite() {
         t.assertEqual(ts, row.key[0], "Timestamp doesn't match expected format.");
         t.assertEqual(resource, row.key[1], "Resource locator was expected");
     }
+
+
+    function test_list_toJSON() {
+
+        this.test_map_discriminatorByResource();
+
+        var list_fn = GetList("to-json");
+
+        mock_rows.setRows(mock_emit.emitted);
+        mock_send.clear();
+
+        list_fn(mock_data.head, mock_data.req);
+
+        log(mock_send.join(), LOG_LEVEL.INFO);
+
+
+
+    }
 }
 
 // logging enabled or disabled

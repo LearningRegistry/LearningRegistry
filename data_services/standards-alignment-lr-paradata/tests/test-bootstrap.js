@@ -30,7 +30,17 @@ function GetMap(name) {
 
 function GetReduce(name) {
     var view = couchdb_design_doc.views[name];
-    return eval(view.reduce);
+
+    if (/^(_count)$/.test(view.trim())) {
+        return reduce_count;
+    } else {
+        return eval(view.reduce);
+    }
+}
+
+function GetList(name) {
+    var list = couchdb_design_doc.lists[name];
+    return eval(list);
 }
 
 function LoadCodeMacros(f_string) {
