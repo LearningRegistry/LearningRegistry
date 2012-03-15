@@ -150,7 +150,6 @@ exports.init = function(){
 
     this.GroupIt = function(level, groups, row) {
         var row_group = _.first(row.key, level);
-        log("same? "+JSON.stringify([groups.cur_group, row_group]));
         if (_.isEqual(groups.cur_group, row_group)) {
             groups.prev_group = null;
             groups.changed = false;
