@@ -9,8 +9,8 @@ function(doc) {
                     var stds = objStr.match(ASNPatterns[re]);
                     for (s in stds) {
                         if (!seen[s]) {
-                            emit([doc.resource_locator, [verb, stds[s]]], nodeTimestamp);
-                            emit([doc.resource_locator, [stds[s], verb]], nodeTimestamp);
+                            emit([doc.resource_locator, [verb, stds[s]], nodeTimestamp], null);
+                            emit([doc.resource_locator, [stds[s], verb], nodeTimestamp], null);
                             seen[s] = 1;
                         }
                     }
