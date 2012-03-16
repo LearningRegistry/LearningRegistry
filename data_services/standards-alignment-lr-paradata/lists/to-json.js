@@ -1,15 +1,14 @@
 function(head, req) {
-  var _ = require("lib/underscore-min");
   var util = require("lib/util").init();
 
-  var info = util.GetViewInfo(req);
-  var parser = util.RowParser(info.view);
+  var info = util.GetViewInfo(req),
+      parser = util.RowParser(info.view);
+      row = null,
+      first_group = true,
+      groups = {cur_group:null, prev_group:null},
+      result_data = {},
+      count = 0;
 
-  var row;
-  var first_group = true;
-  var groups = {cur_group:null, prev_group:null};
-  var result_data = {}; 
-  var count = 0;
   send('{"documents":[');
   while(row = getRow()){
      count++;

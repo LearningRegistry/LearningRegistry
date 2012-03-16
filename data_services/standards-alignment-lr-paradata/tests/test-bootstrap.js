@@ -24,8 +24,12 @@ jsUnity.assertions.assertNotUndefined(couchdb_design_doc, "couchdb_design_doc is
 jsUnity.assertions.assertNotUndefined(couchdb_design_doc["_id"], "couchdb_design_doc is not a CouchDB Design Doc.");
 
 function GetMap(name) {
+    return eval(GetMapSource(name));
+}
+
+function GetMapSource(name) {
     var view = couchdb_design_doc.views[name];
-    return eval(view.map);
+    return view.map;
 }
 
 function GetReduce(name) {
@@ -39,9 +43,14 @@ function GetReduce(name) {
 }
 
 function GetList(name) {
-    var list = couchdb_design_doc.lists[name];
-    return eval(list);
+    return eval(GetListSource(name));
 }
+
+function GetListSource(name) {
+    var list = couchdb_design_doc.lists[name];
+    return list;
+}
+
 
 function LoadCodeMacros(f_string) {
     var code_regex = /(\/\/|#)\ ?!code (.*)/;

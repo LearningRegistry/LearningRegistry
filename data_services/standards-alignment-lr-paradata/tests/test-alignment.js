@@ -217,7 +217,9 @@ function AlignmentTestSuite() {
 
         this.test_map_discriminatorByResource();
 
-        var list_fn = GetList("to-json");
+        var src = GetListSource("to-json");
+
+        var list_fn = Couch.compileFunction(src, couchdb_design_doc);
 
         mock_rows.setRows(mock_emit.emitted);
         mock_send.clear();
