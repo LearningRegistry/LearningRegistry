@@ -54,6 +54,18 @@ function GetList(name) {
 }
 
 
+function GetFilterSource(name) {
+    var filt = couchdb_design_doc.filters[name];
+    return filt;
+}
+
+function GetFilter(name) {
+    var src = GetFilter(name);
+    var filt_fn = Couch.compileFunction(src.couchdb_design_doc);
+    return filt_fn;
+}
+
+
 function LoadCodeMacros(f_string) {
     var code_regex = /(\/\/|#)\ ?!code (.*)/;
     var match = null;
