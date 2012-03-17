@@ -116,3 +116,66 @@ var p_doc = {
         "submitter_type": "agent"
     }
 };
+
+var mock_data = {
+  "head": {
+    "update_seq": 19540
+  },
+  "req": {
+    "info": {
+      "db_name": "asn_paradata",
+      "doc_count": 19527,
+      "doc_del_count": 0,
+      "update_seq": 19540,
+      "purge_seq": 0,
+      "compact_running": false,
+      "disk_size": 135200866,
+      "instance_start_time": "1331164672362239",
+      "disk_format_version": 5,
+      "committed_update_seq": 19540
+    },
+    "id": null,
+    "uuid": "062c271889c938df8fa493d510875ae3",
+    "method": "GET",
+    "requested_path": [
+      "asn_paradata",
+      "_design",
+      "standards-alignment-dct-conformsTo",
+      "_list",
+      "debug-list-inputs",
+      "discriminator-by-resource?limit=10&reduce=true&group_level=2&foo=bar"
+    ],
+    "path": [
+      "asn_paradata",
+      "_design",
+      "standards-alignment-dct-conformsTo",
+      "_list",
+      "debug-list-inputs",
+      "discriminator-by-resource"
+    ],
+    "query": {
+      "limit": "10",
+      "reduce": "true",
+      "group_level": "2",
+      "foo": "bar"
+    },
+    "headers": {
+      "Accept": "*/*",
+      "Content-Type": "application/json; charset=utf-8",
+      "Host": "localhost:5984",
+      "User-Agent": "curl/7.19.7 (universal-apple-darwin10.0) libcurl/7.19.7 OpenSSL/0.9.8r zlib/1.2.3"
+    },
+    "body": "undefined",
+    "peer": "127.0.0.1",
+    "form": {},
+    "cookie": {},
+    "userCtx": {
+      "db": "asn_paradata",
+      "name": null,
+      "roles": [
+        "_admin"
+      ]
+    },
+    "secObj": {}
+  }
+};

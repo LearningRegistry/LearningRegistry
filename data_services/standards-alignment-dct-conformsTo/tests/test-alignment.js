@@ -82,6 +82,41 @@ function AlignmentTestSuite() {
         t.assertTrue(found["http://purl.org/ASN/resources/S1000E0F"] > 0, "http://purl.org/ASN/resources/S1000E0F not found in return value.");
     }
 
+    function test_map_discriminatorByResource() {
+
+        var map_fn = GetMap("discriminator-by-resource");
+
+        mock_emit.clear();
+        mock_emit.setDoc(dc_doc, false);
+        map_fn(dc_doc);
+
+        log(JSON.stringify(mock_emit), LOG_LEVEL.DEBUG);
+        t.assertEqual(11, mock_emit.emitted.length, "There should only be 2 elements emitted")
+
+        for (var idx in mock_emit.emitted) {
+            log(JSON.stringify(mock_emit.emitted[idx]), LOG_LEVEL.DEBUG);
+        }
+
+    }
+
+    function test_list_toJSON() {
+
+        this.test_map_discriminatorByResource();
+
+
+        // var src = GetListSource("to-json");
+        // var list_fn = Couch.compileFunction(src, couchdb_design_doc);
+        var list_fn = GetList("to-json");
+
+        mock_rows.setRows(mock_emit.emitted);
+        mock_send.clear();
+
+        list_fn(mock_data.head, mock_data.req);
+
+        log(mock_send.join(), LOG_LEVEL.INFO);
+
+    }
+
 
 }
 
