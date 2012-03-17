@@ -23,47 +23,50 @@ load("../../lib/test-common.js");
 jsUnity.assertions.assertNotUndefined(couchdb_design_doc, "couchdb_design_doc is not defined.");
 jsUnity.assertions.assertNotUndefined(couchdb_design_doc["_id"], "couchdb_design_doc is not a CouchDB Design Doc.");
 
-function GetMap(name) {
-    return eval(GetMapSource(name));
-}
+// BEGIN: MOVED TO ../../lib/test-common.js
+// function GetMap(name) {
+//     return eval(GetMapSource(name));
+// }
 
-function GetMapSource(name) {
-    var view = couchdb_design_doc.views[name];
-    return view.map;
-}
+// function GetMapSource(name) {
+//     var view = couchdb_design_doc.views[name];
+//     return view.map;
+// }
 
-function GetReduce(name) {
-    var view = couchdb_design_doc.views[name];
+// function GetReduce(name) {
+//     var view = couchdb_design_doc.views[name];
 
-    if (/^(_count)$/.test(view.trim())) {
-        return reduce_count;
-    } else {
-        return eval(view.reduce);
-    }
-}
+//     if (/^(_count)$/.test(view.trim())) {
+//         return reduce_count;
+//     } else {
+//         return eval(view.reduce);
+//     }
+// }
 
-function GetListSource(name) {
-    var list = couchdb_design_doc.lists[name];
-    return list;
-}
+// function GetListSource(name) {
+//     var list = couchdb_design_doc.lists[name];
+//     return list;
+// }
 
-function GetList(name) {
-    var src = GetListSource("to-json");
-    var list_fn = Couch.compileFunction(src, couchdb_design_doc);
-    return list_fn;
-}
+// function GetList(name) {
+//     var src = GetListSource("to-json");
+//     var list_fn = Couch.compileFunction(src, couchdb_design_doc);
+//     return list_fn;
+// }
 
 
-function GetFilterSource(name) {
-    var filt = couchdb_design_doc.filters[name];
-    return filt;
-}
+// function GetFilterSource(name) {
+//     var filt = couchdb_design_doc.filters[name];
+//     return filt;
+// }
 
-function GetFilter(name) {
-    var src = GetFilter(name);
-    var filt_fn = Couch.compileFunction(src.couchdb_design_doc);
-    return filt_fn;
-}
+// function GetFilter(name) {
+//     var src = GetFilter(name);
+//     var filt_fn = Couch.compileFunction(src.couchdb_design_doc);
+//     return filt_fn;
+// }
+
+// END: MOVED TO ../../lib/test-common.js
 
 // Deprecating - don't use
 // function LoadCodeMacros(f_string) {
