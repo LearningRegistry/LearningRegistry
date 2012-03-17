@@ -46,12 +46,12 @@ jsUnity.log = function(message) {
 
 // couchdb map & list should only call this with 1 argument
 // tests can call with 2.
-var log = function (obj, level) {
+var log = function (message, level) {
     if (!level) {
         level = default_log_level;
     }
     if (log_active && level >= log_level) {
-        jsUnity.log(obj);
+        jsUnity.log(message);
     }
 }
 
@@ -141,8 +141,21 @@ var Utils = {
 
     convertDateToSeconds: function(timestamp){
         return Math.floor(Date.parse(timestamp)/1000);
+    },
+
+    isArray: function (obj) {
+        return toString.call(obj) === "[object Array]";
+    },
+
+    sum: function (values) {
+        var rv = 0;
+        for (var i in values) {
+            rv += values[i];
+        }
+        return rv;
     }
 }
+
 var couchdb_design_doc = undefined;
 if (arguments.length == 1) {
     print("Loading external file: "+arguments[0])
@@ -338,6 +351,8 @@ var resolveModule = function(names, mod, root) {
     });
 };
 
+
+
 var Couch = {
   // moving this away from global so we can move to json2.js later
   toJSON : function (val) {
@@ -404,19 +419,6 @@ var Couch = {
 }
 
 
-function isArray(obj) {
-    return toString.call(obj) === "[object Array]";
-}
-
-
-function sum(values) {
-    var rv = 0;
-    for (var i in values) {
-        rv += values[i];
-    }
-    return rv;
-}
-
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy of
 // the License at
@@ -436,7 +438,7 @@ function init_sandbox() {
     // if possible, use evalcx (not always available)
     sandbox = evalcx('');
     sandbox.emit = emit;
-    sandbox.sum = Views.sum;
+    sandbox.sum = Utils.sum;
     sandbox.log = log;
     sandbox.toJSON = Couch.toJSON;
     sandbox.JSON = JSON;
@@ -445,7 +447,7 @@ function init_sandbox() {
     // sandbox.start = Render.start;
     sandbox.send = send;
     sandbox.getRow = getRow;
-    sandbox.isArray = isArray;
+    sandbox.isArray = Utils.isArray;
   } catch (e) {
     log(e.toSource());
   }

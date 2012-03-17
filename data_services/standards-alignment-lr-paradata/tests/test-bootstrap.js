@@ -42,13 +42,15 @@ function GetReduce(name) {
     }
 }
 
-function GetList(name) {
-    return eval(GetListSource(name));
-}
-
 function GetListSource(name) {
     var list = couchdb_design_doc.lists[name];
     return list;
+}
+
+function GetList(name) {
+    var src = GetListSource("to-json");
+    var list_fn = Couch.compileFunction(src, couchdb_design_doc);
+    return list_fn;
 }
 
 
