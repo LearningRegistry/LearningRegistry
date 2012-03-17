@@ -65,19 +65,19 @@ function GetFilter(name) {
     return filt_fn;
 }
 
+// Deprecating - don't use
+// function LoadCodeMacros(f_string) {
+//     var code_regex = /(\/\/|#)\ ?!code (.*)/;
+//     var match = null;
+//     while (matches = code_regex.exec(f_string)) {
+//         var f_path = matches[2];
+//         var f_contents = snarf("../" + f_path);
+//         f_string = f_string.replace(new RegExp(matches[0], "g"), f_contents);
+//     }
+//     return f_string;
+// }
 
-function LoadCodeMacros(f_string) {
-    var code_regex = /(\/\/|#)\ ?!code (.*)/;
-    var match = null;
-    while (matches = code_regex.exec(f_string)) {
-        var f_path = matches[2];
-        var f_contents = snarf("../" + f_path);
-        f_string = f_string.replace(new RegExp(matches[0], "g"), f_contents);
-    }
-    return f_string;
-}
-
-//  For some reason... this function has to be here for it to work.
-function LoadFn(path) {
-    return eval(LoadCodeMacros(snarf(path)));
-}
+// //  For some reason... this function has to be here for it to work.
+// function LoadFn(path) {
+//     return eval(LoadCodeMacros(snarf(path)));
+// }
