@@ -1,14 +1,9 @@
-load("../../lib/jsunity-0.6.js");
-jsUnity.log = function (obj) {
-    print(obj);
-}
-
-var log = jsUnity.log;
-
+load("test-bootstrap.js");
 load("data.js");
 
 
 var t = {}; 
+jsUnity.attachAssertions(t);
 
 function AlignmentTestSuite() {
 
@@ -20,7 +15,7 @@ function AlignmentTestSuite() {
         
     }
 
-    function test_parseDCT_ConformsTo() {
+    function test_lib_alignment_parseDCT_ConformsTo() {
         var expected = [
             "http://purl.org/ASN/resources/S11434E1",
             "http://purl.org/ASN/resources/S1143539",
@@ -54,7 +49,7 @@ function AlignmentTestSuite() {
     }
 
 
-    function test_parseLRParadata() {
+    function test_lib_alignment_parseLRParadata() {
 
         var matches = 0;
 
@@ -90,6 +85,15 @@ function AlignmentTestSuite() {
 
 }
 
-jsUnity.attachAssertions(t);
+// logging enabled or disabled
+log_active = true;
+
+// this is the current logging level 
+log_level = LOG_LEVEL.INFO;
+
+// when calling log without some level, this is the default level assigned the message, such as what might
+// appear in a map/reduce/show/list/filter function
+default_log_level = LOG_LEVEL.ERROR;
+
 var output = jsUnity.run(AlignmentTestSuite);
 // print(JSON.stringify(output));
