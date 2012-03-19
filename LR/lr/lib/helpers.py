@@ -66,7 +66,7 @@ def getServiceDocument(serviceName):
     return res
 
 
-def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):    
+def getResponse(database_url, view_name, method="GET", **kwargs):    
     json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
     get_head_args = ["key", "startkey", "startkey_docid", "endkey", 
                      "endkey_docid", "limit", "stale", "descending", "skip", 
@@ -93,8 +93,8 @@ def getView(database_url, view_name, method="GET", documentHandler=None, **kwarg
     if method is "POST" or post_data != {}:
         view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)]) 
         post_data = json.dumps(post_data)
-        log.debug("POST "+view_url)
-        log.debug("DATA " + post_data)
+        # log.debug("POST "+view_url)
+        # log.debug("DATA " + post_data)
         view_req = urllib2.Request(view_url, data=post_data, headers=json_headers)
     else:        
         view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)])
@@ -102,8 +102,10 @@ def getView(database_url, view_name, method="GET", documentHandler=None, **kwarg
         view_req = urllib2.Request(view_url, headers=json_headers)
         log.debug("GET "+view_url)  
     resp = urllib2.urlopen(view_req)
-    
+    return resp
+def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):    
     dh = StreamingCouchDBDocHandler(documentHandler)
+    resp = getResponse(database_url,view_url,method,**kwargs)
     return dh.generator(resp)
     
 #    for data in resp:

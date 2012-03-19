@@ -55,8 +55,8 @@ def make_map(config):
         mapResource('lr.oaipmh.docid', 'OAI-PMH', 'OAI-PMH')
         mapResource('lr.slice.docid', 'slice', 'slice')
         mapResource('lr.sword.docid', 'swordservice','swordservice')    
-    map.connect("/extract/{dataservice}/{view}",controller='extract', action='get')
-    map.connect("/extract//{dataservice}/{view}/format/{show}",controller='extract', action='get')
+    map.connect("/extract/{dataservice}/{view}",controller='extract', action='get', list='to-json')
+    map.connect("/extract/{dataservice}/{view}/format/{list}",controller='extract', action='get')
     map.minimization = False
     map.explicit = False
 

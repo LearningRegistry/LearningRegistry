@@ -1,4 +1,5 @@
 import logging
+import StringIO
 from  iso8601 import parse_date
 from datetime import datetime
 from pylons import request, response, session, tmpl_context as c, url
@@ -7,7 +8,7 @@ from lr.model.base_model import appConfig
 from lr.lib.base import BaseController, render
 import json
 import ijson
-from urllib2 import urlopen
+from urllib2 import urlopen,HTTPError
 import lr.lib.helpers as h
 log = logging.getLogger(__name__)
 
@@ -20,50 +21,33 @@ class ExtractController(BaseController):
         args = {'include_docs':includeDocs}
         if len(keys) > 0:
             args['keys'] = keys
-        args['reduce']=False
+        args['reduce']= False
         args['stale'] = appConfig['couchdb.stale.flag']
-        args['limit']=10
         if startKey is not None:
             args['startkey'] = startKey
         if endKey is not None:
             args['endkey'] = endKey
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])        
-        log.debug(db_url)
-        view = h.getView(database_url=db_url,view_name=view,documentHandler=h.document,**args)
+        view = h.getResponse(database_url=db_url,view_name=view,**args)
         return view
-    def _streamList(self,data,dataHandler):
-        first = True
-        for item in data:
-            if not first:
-                yield ",\n"
-            else:
-                first = False                        
-            for d in  dataHandler(item):
-                yield d
-    def _getBaseResult(self,data={},ids=[], includeDocs=True):
-        base =  json.dumps({
-                        "result_data": data,
-                        "supplemental_data" : {},
-                        "resource_data": []        
-                })
-        index = base.rfind('[') + 1
-        yield base[:index]
-        for d in self._streamList(self._getView(keys=ids,includeDocs=includeDocs),lambda d: json.dumps(d)):
-            yield d
-        yield base[index:]
     def _convertDateTime(self,dt):
         if isinstance(dt,str):
             dt = parse_date(dt)
         dt = dt - datetime(1970,1,1)
         return dt.total_seconds()
     def _processRequest(self,startKey, endKey,urlBase):
-        yield '{"documents":['        
-        def processFeed(item):            
-            for piece in self._getBaseResult(item,ids=[item['id']]):
-                yield piece            
-        for d in self._streamList(self._getView(urlBase,startKey=startKey,endKey=endKey,includeDocs=False),processFeed):
-            yield d        
-        yield ']}'        
+        def streamResult(resp):
+            CHUNK_SIZE=1024
+            data = resp.read(CHUNK_SIZE)
+            while len(data) > 0:
+                yield data
+                data = resp.read(CHUNK_SIZE)        
+        try:
+            resp = self._getView(urlBase,startKey=startKey,endKey=endKey,includeDocs=False)
+            return streamResult(resp)
+        except HTTPError as ex:
+            abort(404, "not found")
+
     def _orderParmaByView(self,params,view):
         startKey=[]
         endKey=[] 
@@ -104,9 +88,8 @@ class ExtractController(BaseController):
         funcs[aggregate]
         return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None
 
-    def get(self, dataservice="",view=''):
-        """GET /extract/id: Show a specific item"""        
-        urlBase = "_design/{0}/_view/{1}".format(dataservice,view)        
+    def get(self, dataservice="",view='',list=''):
+        """GET /extract/id: Show a specific item"""
+        urlBase = "_design/{0}/_list/{1}/{2}".format(dataservice,list,view)        
         startKey, endKey = self._orderParmaByView(request.params,view)
-        log.debug('Start Key: {0}; End Key: {1}'.format(startKey,endKey))
         return self._processRequest(startKey,endKey,urlBase)
