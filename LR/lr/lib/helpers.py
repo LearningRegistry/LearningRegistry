@@ -105,7 +105,7 @@ def getResponse(database_url, view_name, method="GET", **kwargs):
     return resp
 def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):    
     dh = StreamingCouchDBDocHandler(documentHandler)
-    resp = getResponse(database_url,view_url,method,**kwargs)
+    resp = getResponse(database_url,view_name,method,**kwargs)
     return dh.generator(resp)
     
 #    for data in resp:
