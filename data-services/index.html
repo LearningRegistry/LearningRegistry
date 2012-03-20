@@ -172,7 +172,7 @@
             <li class="slide">Views must follow a specific naming convention.</li>
             <li class="slide">View functions must emit specific keys according to the view they implement.</li>
             <li class="slide">Timestamps must be represented as seconds from epoch.</li>
-            <li class="slide">Views must always implement a reduce.</li>
+            <!-- <li class="slide">Views must always implement a reduce.</li> -->
             <li class="slide"><strong>(WIP)</strong> List conventions are expected to be defined for formatting and advanced filtering. More TBD!</li>
         </ul>
 
@@ -186,28 +186,28 @@
     </span>}</span>,
     "views": { <span class="ds-views">
         "discriminator-by-resource": { <span class="json">
-            "map": "function (doc) { emit(<span class="key">[doc.resource_locator, getDescriminator(doc)]</span>, null); }",
-            <span class="reduce">"reduce": "_count"</span>
+            "map": "function (doc) { emit(<span class="key">[doc.resource_locator, getDescriminator(doc), <span class="ts">getEpochTimestamp(doc)</span>]</span>, null); }",
+           <!--  <span class="reduce">"reduce": "_count"</span> -->
         </span>},
         "discriminator-by-resource-ts": { <span class="json">
             "map": "function (doc) { emit(<span class="key">[doc.resource_locator, <span class="ts">getEpochTimestamp(doc)</span>, getDescriminator(doc)]</span>, null); }",
-             <span class="reduce">"reduce": "_count"</span>
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
         </span>},
         "resource-by-discriminator": { <span class="json">
-            "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), doc.resource_locator]</span>, null); }",
-             <span class="reduce">"reduce": "_count"</span>
+            "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), doc.resource_locator, <span class="ts">getEpochTimestamp(doc)</span>]</span>, null); }",
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
         </span>},
         "resource-by-discriminator-ts": {<span class="json">
             "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), <span class="ts">getEpochTimestamp(doc)</span>, doc.resource_locator]</span>, null); }",
-             <span class="reduce">"reduce": "_count"</span>
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
         </span>},
         "resource-by-ts": {<span class="json">
             "map": "function (doc) { emit(<span class="key">[<span class="ts">getEpochTimestamp(doc)</span>, doc.resource_locator]</span>, null); }",
-             <span class="reduce">"reduce": "_count"</span>
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
         </span>},
         "discriminator-by-ts": {<span class="json">
             "map": "function (doc) { emit(<span class="key">[<span class="ts">getEpochTimestamp(doc)</span>, getDescriminator(doc)]</span>, null); }",
-             <span class="reduce">"reduce": "_count"</span>
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
         </span>} 
     </span>},
     <span class="lists">"lists": { ... }</span>
@@ -229,16 +229,25 @@
     {
         "result_data": {
             /* 
-                    MapReduce aggregation formatted. 
-                    Could be a paradata 'assertion'
+                    Map data formatted any way you want. Could possibly be a paradata 'assertion' for those who 
+                    want to crosswalk formats.
             */
+            "resource": "http://www.readwritethink.org/lessons/lesson_view.asp?id=131",
+            "discriminator": [
+                "matched",
+                "http://purl.org/ASN/resources/S10000FE"
+            ]
         },
         "supplemental_data": {
             /*
-                This is the value of the map/reduce?
+                WIP: Possibly something that can be dynamically extracted
+                from the list function.
             */
         },
-        "resource_data": [ /* doc ids of full docs */ ]
+        "resource_data": [ /* doc ids of full docs */ 
+            "c9966f4e59e04b168c733b19d7fcb4ad",
+            "f024d8b2272941078ffd09cc8f21cf77"
+        ]
 
     }
 
