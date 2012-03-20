@@ -10,7 +10,9 @@ function(head, req) {
         prev_group: null
       },
       result_data = {},
-      count = 0;
+      count = 0,
+      seen = {};
+
 
   send('{"documents":[');
   while (row = getRow()) {
@@ -32,8 +34,17 @@ function(head, req) {
       send('{"result_data":' + JSON.stringify(result_data) + ',');
       send('"resource_data":[');
       send(JSON.stringify(parser.either(row)));
+      var id = parser.id(row);
+      if (id) {
+        seen = {};
+        seen[id] = 1;
+      }
     } else {
-      send(',' + JSON.stringify(parser.either(row)));
+      var id = parser.id(row);
+      if (id && !seen[id]) {
+        send(',' + JSON.stringify(parser.either(row)));
+        seen[id] = 1;
+      }
     }
 
   }
