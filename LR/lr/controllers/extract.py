@@ -8,6 +8,7 @@ from lr.model.base_model import appConfig
 from lr.lib.base import BaseController, render
 import json
 import ijson
+import math
 from urllib2 import urlopen,HTTPError
 import lr.lib.helpers as h
 log = logging.getLogger(__name__)
@@ -31,11 +32,12 @@ class ExtractController(BaseController):
         view = h.getResponse(database_url=db_url,view_name=view,**args)
         return view
     def _convertDateTime(self,dt):
-        if isinstance(dt,str):
+        epoch = parse_date("1970-01-01T00:00:01Z")        
+        if isinstance(dt, str) or isinstance(dt,unicode):
             dt = parse_date(dt)
-        dt = dt - datetime(1970,1,1)
-        return dt.total_seconds()
-    def _processRequest(self,startKey, endKey,urlBase):
+        dt = dt - epoch
+        return int(math.floor(dt.total_seconds()))
+    def _processRequest(self,startKey, endKey,urlBase, includeDocs=True):
         def streamResult(resp):
             CHUNK_SIZE=1024
             data = resp.read(CHUNK_SIZE)
@@ -43,7 +45,7 @@ class ExtractController(BaseController):
                 yield data
                 data = resp.read(CHUNK_SIZE)        
         try:
-            resp = self._getView(urlBase,startKey=startKey,endKey=endKey,includeDocs=False)
+            resp = self._getView(urlBase,startKey=startKey,endKey=endKey,includeDocs=includeDocs)
             return streamResult(resp)
         except HTTPError as ex:
             abort(404, "not found")
@@ -55,11 +57,11 @@ class ExtractController(BaseController):
             if 'from' in params:
                 startKey.append(self._convertDateTime(params['from']))
             else:
-                startKey.append(self._convertDateTime(datetime.min))
+                startKey.append(self._convertDateTime(datetime.min.isoformat() + "Z"))
             if 'until' in params:
                 endKey.append(self._convertDateTime(params['until']))
             else:
-                endKey.append(self._convertDateTime(datetime.max))                
+                endKey.append(self._convertDateTime(datetime.utcnow().isoformat()+"Z"))                
         def populateDiscriminator():
             if 'discriminator' in params:
                 discriminator = params['discriminator']
@@ -75,6 +77,9 @@ class ExtractController(BaseController):
             else:
                 startKey.append('')
                 endKey.append('\ud7af')       
+        includeDocs = True
+        if "ids_only" in params:
+            includeDocs = not params
         funcs = {
             "discriminator":populateDiscriminator,
             'resource':populateResource,
@@ -84,12 +89,12 @@ class ExtractController(BaseController):
         aggregate = queryOrderParts[0]
         queryParams= queryOrderParts[1].split('-')       
         for q in queryParams:
-            funcs[q]
-        funcs[aggregate]
-        return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None
+            funcs[q]()
+        funcs[aggregate]()
+        return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None, includeDocs
 
     def get(self, dataservice="",view='',list=''):
-        """GET /extract/id: Show a specific item"""
+        """GET /extract/id: Show a specific intem"""
         urlBase = "_design/{0}/_list/{1}/{2}".format(dataservice,list,view)        
-        startKey, endKey = self._orderParmaByView(request.params,view)
-        return self._processRequest(startKey,endKey,urlBase)
+        startKey, endKey,includeDocs = self._orderParmaByView(request.params,view)
+        return self._processRequest(startKey,endKey,urlBase,includeDocs)
