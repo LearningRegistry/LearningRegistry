@@ -12,7 +12,7 @@ import math
 from urllib2 import urlopen,HTTPError
 import lr.lib.helpers as h
 log = logging.getLogger(__name__)
-
+import couchdb
 class ExtractController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -32,11 +32,14 @@ class ExtractController(BaseController):
         view = h.getResponse(database_url=db_url,view_name=view,**args)
         return view
     def _convertDateTime(self,dt):
-        epoch = parse_date("1970-01-01T00:00:01Z")        
-        if isinstance(dt, str) or isinstance(dt,unicode):
-            dt = parse_date(dt)
-        dt = dt - epoch
-        return int(math.floor(dt.total_seconds()))
+        try:
+            epoch = parse_date("1970-01-01T00:00:01Z")        
+            if isinstance(dt, str) or isinstance(dt,unicode):
+                dt = parse_date(dt)
+            dt = dt - epoch
+            return int(math.floor(dt.total_seconds()))
+        except:
+            abort(500,"Invalid Date Format")
     def _processRequest(self,startKey, endKey,urlBase, includeDocs=True):
         def streamResult(resp):
             CHUNK_SIZE=1024
@@ -94,7 +97,15 @@ class ExtractController(BaseController):
         return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None, includeDocs
 
     def get(self, dataservice="",view='',list=''):
-        """GET /extract/id: Show a specific intem"""
-        urlBase = "_design/{0}/_list/{1}/{2}".format(dataservice,list,view)        
-        startKey, endKey,includeDocs = self._orderParmaByView(request.params,view)
-        return self._processRequest(startKey,endKey,urlBase,includeDocs)
+        """GET /extract/id: Show a specific intem"""        
+        try:
+            db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])        
+            db = couchdb.Database(db_url)
+            dsDocument = db['_design/'+dataservice]
+            if "dataservices" not in dsDocument:
+                abort(406, "Invalid Data Service")
+            urlBase = "_design/{0}/_list/{1}/{2}".format(dataservice,list,view)        
+            startKey, endKey,includeDocs = self._orderParmaByView(request.params,view)
+            return self._processRequest(startKey,endKey,urlBase,includeDocs)
+        except couchdb.ResourceNotFound:
+            abort(406,"Invalid Data Service")

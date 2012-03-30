@@ -1,4 +1,5 @@
 from lr.tests import *
+from nose.tools import raises
 import logging,json
 import time
 from urllib import unquote_plus,quote_plus
@@ -11,6 +12,7 @@ import time
 from  iso8601 import parse_date
 from datetime import datetime
 from lr.util.decorators import ForceCouchDBIndexing
+from httplib import HTTPException
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 db = None
@@ -132,3 +134,16 @@ class TestExtractController(TestController):
         self._validateDiscriminator(data,discriminator)                          
         self._validateFrom(data,self.from_date)
         self._validateUntil(data,self.until_date)
+    @ForceCouchDBIndexing()
+    def test_get_with_from_junk_date(self):
+        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"from":"abc123"},status=500)
+        data = json.loads(response.body)
+        assert not data['OK']
+    @ForceCouchDBIndexing()
+    def test_get_with_until_junk_date(self):
+        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"until":"abc123"},status=500)
+        data = json.loads(response.body)
+        assert not data['OK']        
+    # @raises(HTTPException)
+    def test_invalid_Data_service(self):
+        response = self.app.get(url('/extract/learningregistry-slice/docs/format/to-json'),status=406)
