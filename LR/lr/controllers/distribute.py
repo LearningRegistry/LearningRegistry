@@ -38,7 +38,11 @@ class DistributeController(BaseController):
     
     def __before__(self):
         self.resource_data = appConfig['couchdb.db.resourcedata']
-        self.incoming = appConfig['couchdb.db.incoming']
+        try:
+            self.incoming = appConfig['couchdb.db.incoming']
+        except:
+            self.incoming = 'incoming'    
+        
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
