@@ -144,6 +144,5 @@ class TestExtractController(TestController):
         response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"until":"abc123"},status=500)
         data = json.loads(response.body)
         assert not data['OK']        
-    # @raises(HTTPException)
     def test_invalid_Data_service(self):
         response = self.app.get(url('/extract/learningregistry-slice/docs/format/to-json'),status=406)
