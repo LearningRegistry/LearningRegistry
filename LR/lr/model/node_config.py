@@ -286,6 +286,7 @@ class LRNodeModel(object):
                                     'gateway_node':self.nodeDescription.gateway_node,
                                     'social_community':self.communityDescription.social_community,
                                     'resource_data_url': appConfig['lr.distribute_resource_data_url'],
+                                    'incoming_url': appConfig['lr.distribute_incoming_url'],
                                     'filter_description':self.filterDescription.specData
                                 }
         return distributeInfo

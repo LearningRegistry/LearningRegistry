@@ -38,6 +38,7 @@ class DistributeController(BaseController):
     
     def __before__(self):
         self.resource_data = appConfig['couchdb.db.resourcedata']
+        self.incoming = appConfig['couchdb.db.incoming']
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
@@ -176,7 +177,8 @@ class DistributeController(BaseController):
             #if distinationNode['distribute service'] .service_auth["service_authz"] is not  None:
                 #log.info("Destination node '{}' require authentication".format(destinationUrl))
                 #Try to get the user name and password the url
-            destinationUrl = connectionInfo['destinationNodeInfo'].resource_data_url
+            #destinationUrl = connectionInfo['destinationNodeInfo'].resource_data_url
+            destinationUrl = connectionInfo['destinationNodeInfo'].incoming_url
 
             credential = sourceLRNode.getDistributeCredentialFor(destinationUrl)
             if credential is not None:
@@ -222,7 +224,8 @@ class DistributeController(BaseController):
             if connectionsStatusInfo.has_key(self.__ERROR) or connectionStatus.has_key(self.__ERROR) == True:
                 distributeResults.put(connectionStatus)
             else:
-                replicationArgs = (connectionStatus, defaultCouchServer, self.resource_data )
+                replicationArgs = (connectionStatus, defaultCouchServer, self.incoming )
+                #replicationArgs = (connectionStatus, defaultCouchServer, self.resource_data )
                     # Use a thread to do the actual replication.
                 replicationThread = threading.Thread(target=doDistribution, args=replicationArgs)
                 replicationThread.start()
