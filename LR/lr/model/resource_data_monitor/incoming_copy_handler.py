@@ -25,9 +25,11 @@ class IncomingCopyHandler(BaseChangeHandler):
 	def __init__(self):
 		self._serverUrl = _config.get("app:main", "couchdb.url")
 		self._targetName = _config.get("app:main", "couchdb.db.resourcedata")	
-		self._sourceName = _config.get("app:main", "couchdb.db.incoming")
-		
-	
+		try:
+			self._sourceName = _config.get("app:main", "couchdb.db.incoming")
+		except:
+			self._sourceName = 'incoming'
+
 	def _canHandle(self, change, database):
 		if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE)):
 			return True
