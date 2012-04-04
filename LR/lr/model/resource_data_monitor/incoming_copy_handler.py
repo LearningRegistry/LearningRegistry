@@ -25,6 +25,7 @@ class IncomingCopyHandler(BaseChangeHandler):
 	def __init__(self):
 		self._serverUrl = _config.get("app:main", "couchdb.url")
 		self._targetName = _config.get("app:main", "couchdb.db.resourcedata")	
+		
 		try:
 			self._sourceName = _config.get("app:main", "couchdb.db.incoming")
 		except:
@@ -45,6 +46,5 @@ class IncomingCopyHandler(BaseChangeHandler):
 		request = urllib2.Request(urlparse.urljoin(self._serverUrl, '_replicator'),
 									headers={'Content-Type':'application/json' },
 									data = json.dumps(data))
-		
+
 		results = json.load(urllib2.urlopen(request))
-            

@@ -19,6 +19,7 @@ from resource_data_handler import ResourceDataHandler
 from update_views_handler import  UpdateViewsHandler
 from distribute_threshold_handler import DistributeThresholdHandler
 from track_last_sequence import TrackLastSequence
+from incoming_copy_handler import IncomingCopyHandler
 from pylons import config
 
 appConfig = config['app_conf']
@@ -28,11 +29,18 @@ _RESOURCE_DATA_CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
     TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
-    DistributableHandler(),
-    ResourceDataHandler(),
     UpdateViewsHandler(appConfig['couchdb.threshold.viewupdate']),
     DistributeThresholdHandler(appConfig['couchdb.threshold.distributes'])
     ]
+
+_INCOMING_CHANGE_HANDLERS=[TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
+    IncomingCopyHandler()
+    ]
+
+try:
+    incomingDB = appConfig['couchdb.db.incoming']
+except:
+    incomingDB = 'incoming'
 
 def _getLastSavedSequence():
     lastSavedSequence = -1
@@ -45,15 +53,24 @@ def monitorResourceDataChanges():
     options = {'since':_getLastSavedSequence()}
     log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
 
-    changeMonitor = MonitorChanges(appConfig['couchdb.url'], 
-                                                            appConfig['couchdb.db.resourcedata'],
-                                                            _RESOURCE_DATA_CHANGE_HANDLERS,
+    changeMonitorOptions = {appConfig['couchdb.db.resourcedata']:_RESOURCE_DATA_CHANGE_HANDLERS,
+                            incomingDB:_INCOMING_CHANGE_HANDLERS}
+
+    changeMonitors = []
+    for db, handler in changeMonitorOptions.items():
+        changeMonitor = MonitorChanges(appConfig['couchdb.url'], 
+                                                            db,
+                                                            handler,
                                                             options)
-    changeMonitor.start()
-    
+        changeMonitor.start()
+        changeMonitors.append(changeMonitor)
+
     #changeMonitor.start(threading.current_thread())
     def atExitHandler():
-        changeMonitor.terminate()
+        
+        for chMon in changeMonitors:
+            chMon.terminate()
+        #changeMonitor.terminate()
         log.debug("Last change {0}\n\n".format(changeMonitor._lastChangeSequence))
 
     atexit.register(atExitHandler)
