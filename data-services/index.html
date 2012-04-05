@@ -1,4 +1,4 @@
-
+    
 <!DOCTYPE html>
 <!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
@@ -173,7 +173,7 @@
             <li class="slide">View functions must emit specific keys according to the view they implement.</li>
             <li class="slide">Timestamps must be represented as seconds from epoch.</li>
             <!-- <li class="slide">Views must always implement a reduce.</li> -->
-            <li class="slide"><strong>(WIP)</strong> List conventions are expected to be defined for formatting and advanced filtering. More TBD!</li>
+            <li class="slide">List should be named respective of their output format. Included in the prototype is a reference sample for to-json.</li>
         </ul>
 
 
@@ -210,7 +210,7 @@
              <!-- <span class="reduce">"reduce": "_count"</span> -->
         </span>} 
     </span>},
-    <span class="lists">"lists": { ... }</span>
+    <span class="lists">"lists": { "to-json": "function(head, req) { ... }" }</span>
 }</pre></code>
         
 
@@ -218,14 +218,72 @@
     </section>
 
 
-    <section class="slide" id="extract-service">
-        <h2>The Extract Service Output</h2>
-        <p><strong>(WIP)</strong> Possible output format for the <code>extract</code> service:</p>
+    <section class="slide" id="extract-service-spec">
+        <h2>The Extract Service Output Specification</h2>
+        <p>The basic JSON format for the extract service will is as specified in <a href="http://tools.ietf.org/html/draft-zyp-json-schema-03" target="_blank">JSON Schema Internet Draft</a>.</p>
+
+<div>
+<strong>Data Service Response Wrapper</strong>
+<textarea id="ds_service_json" class="code" mode="javascript" style="display: none;">
+{
+    "name": "data-service-json",
+    "properties": {
+        "documents": {
+            "type": "array",
+            "required": true,
+            "items": {
+                "$ref": "list-to-json"
+            }
+
+        }
+    }
+}</textarea>
+</div>
+<div>
+<strong>Data Service Result</strong>
+<textarea id="list_to_json" class="code" mode="javascript" style="display: none;">
+{
+    "name": "list-to-json",
+    "properties": {
+        "result_data": {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "resource": {
+                    "type": "string",
+                    "description": "resource locator URL"
+                },
+                "discriminator": {
+                    "type": ["string", "number", "integer", "boolean", "object", "array"],
+                    "description": "the common identitifier that is related to the resource locator in accordance to the algorithim implemented by the data service."
+                }
+            }
+        },
+        "supplemental_data": {
+            "type": "object",
+            "required": false,
+            "description": "free form, additional data that the list function may choose to emit to aid harvesters"
+        }.
+        "resource_data": {
+            "type": "array",
+            "required": true,
+            "items": {
+                "type": ["string", "object"];
+                "description": "elements will either be a list of doc_ID's or full resource_data documents."
+            }
+        }
+    }
+}</textarea>
+</div>
+    </section>
+
+    <section class="slide" id="extract-service-example">
+        <h2>The Extract Service Example Output</h2>
+        <p>This is an example of the data service output with doc_ID's being returned.</p>
         <div>
-<div class="code" mode="javascript" style="display: none;">
+<textarea class="code" mode="javascript" style="display: none;">
 {
     "documents": [
-
     {
         "result_data": {
             /* 
@@ -240,8 +298,7 @@
         },
         "supplemental_data": {
             /*
-                WIP: Possibly something that can be dynamically extracted
-                from the list function.
+                Optional that that can be dynamically extracted from documents from within the list function.
             */
         },
         "resource_data": [ /* doc ids of full docs */ 
@@ -252,11 +309,152 @@
     }
 
     ]
-}
-</div>
+}</textarea>
         </div>
     </section>
 
+
+    <section class="slide" id="list-function">
+        <h2>List Functions in Detail</h2>
+        <p>List functions are responsible for formatting the response for the service output.</p>
+        <p>As the previous slides defined and displayed there are two basic parts to the response, the response wrapper, and the results.<p>
+
+<strong>Data Service Response Wrapper</strong>
+<textarea id="service-wrapper" class="code" mode="javascript" style="display: none;">
+{
+    "documents": [
+        /*** a list of data service results ***/
+    ]
+}</textarea>
+
+<p>The list function will need to group each result in the <code>"documents"</code> property of the response wrapper.</p>            
+<strong>Data Service Result</strong>
+<textarea id="service-result" class="code" mode="javascript" style="display: none;">
+{
+    "result_data": { 
+        "resource": "http://example.com/my/resource", /*** the resource locator for this result ***/
+        "discriminator": {                                      /////
+            "verb": "matched",                                  //  This is could also be a simple string, number, boolean, or array.
+            "standard": "http://purl.org/ASN/resource/S000000"  //  Typically this is just the discriminator portion of your map key.
+        }                                                       /////
+     },
+    "supplemental_data": { /*** insert optional custom list output here ***/ },
+    "resource_data": [ /*** based upon request param, either full JSON doc, or just the doc_ID ***/ ]
+}</textarea>
+    </section>
+
+
+    <section class="slide" id="list-function-2">
+        <h2>Review of Prototype List Implementation</h2>
+
+        <p>List functions group results and embed results into the Extract service's format for records in the documents list. Because the amount of data requiring processing could be large, we must try to always design list functions to buffer little and mostly stream.</p>
+            <textarea class="list-function-impl code" mode="javascript" style="display: none;">
+function(head, req) {
+  var util = require("lib/util").init();  // General utilities for processing data service views
+
+  var info = util.GetViewInfo(req),       // Extracts some useful information from the request
+      parser = util.RowParser(info.view), // The row parser knows how to take the view conventions and normalize the result into a 
+                                          //    common data stru
+      row = null,
+      first_group = true,
+      groups = {
+        cur_group: null,
+        prev_group: null
+      },
+      result_data = {},
+      count = 0,
+      seen = {};
+
+
+  send('{"documents":[');               // start the extract template
+
+  // iterate over the requested view.  Views will be returned in key collated order (sorted by key).
+  while (row = getRow()) {
+    count++;
+
+    // because we want to be efficient and perform only a single query to get both doc_ID's or documents, we need to manage our
+    // own groupings.  util.GroupIt takes most of the pain out of figuring out when groups have changed.
+    groups = util.GroupIt(parser.group_length, groups, row);
+
+    // when groups.changed is true, it means we have a new unique group to switch to.
+    if (groups.changed) {
+      if (first_group) {
+        first_group = false;
+      } else {
+        ////
+        //   If you have buffered supplemental data for the previous group, you should send it at this point here
+        ////
+
+        // close the previous group
+        send("]},");
+      }
+
+      // define the result_data data structure using the parser.
+      result_data = {
+        resource: parser.resource(row),
+        discriminator: parser.discriminator(row)
+      };
+
+      // send the first piece of result data
+      send('{"result_data":' + JSON.stringify(result_data) + ',');
+
+      // send the first resource data element as well
+      send('"resource_data":[');
+      send(JSON.stringify(parser.either(row)));
+
+      ////
+      //   If you were going to try and capture some supplemental data, this is most likely the location you'd want to buffer that.
+      //   Remember to keep your buffer small!!! (Try grabbing only the first N things that match - first 5 titles.)
+      ////
+
+      // track the id's we've processed since it is possible for poorly designed views to include the same document multiple times
+      // for a single group.
+      var id = parser.id(row);
+      if (id) {
+        seen = {};
+        seen[id] = 1;
+      }
+
+    } else {
+      // Not a new group, so just process the next document - so either emit the doc_id or full doc.  parser.either handles most of that for you.
+
+      // before emitting, make sure we haven't already done this document before.
+      var id = parser.id(row);
+      if (id &amp;&amp; !seen[id]) {
+        send(',' + JSON.stringify(parser.either(row)));
+        seen[id] = 1;
+      }
+
+      ////
+      //   If you were going to try and capture some supplemental data, this is most likely the location you'd want to buffer that.
+      //   Remember to keep your buffer small!!! (Try grabbing only the first N things that match - first 5 titles.)
+      ////
+    }
+
+  }
+  // close the last group if there was one
+  if (count > 0) {
+    ////
+    //   If you have buffered supplemental data for the previous group, you should send it at this point here
+    ////
+
+    send("]}");
+  }
+  send(']}');
+}
+            </textarea>
+
+    </section>
+
+    <section class="slide" id="expected-customizations">
+        <h2>Customize or Make your Own List Function</h2>
+        <p>The prototype implementation should suffice as an adequate skeleton for making enhancing the prototype or building your own from scratch</p>
+        <ul>
+            <li class="slide">Start out by copying one of the samples.</li>
+            <li class="slide">Don't forget any required files withing the lib folder. These helper functions have been abstracted to accomodate varied discriminator formats. In most cases unless you need supplemental_data, you can use the default to-json as is without modification.</li>
+            <li class="slide">Remember to stream as much as you can, this will help keep your system resources under control.</li>
+        </ul>
+    </section>
 
 
     <section class="slide" id="extract-service-api">

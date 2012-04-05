@@ -26,6 +26,34 @@
   font-size: 12px;
 }
 
+.slide .CodeMirror {
+  font-size: 12px;
+}
+
+.deck-container #list-function-2.slide .CodeMirror {
+  height: 380px;
+}
+.deck-container #list-function-2.slide .CodeMirror-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  height: 380px;
+}
+
+#list_to_json + .CodeMirror .CodeMirror-scroll {
+  overflow: auto;
+  height: 230px;
+}
+
+.deck-container #extract-service-spec.slide .CodeMirror {
+  /*height: 380px;*/
+  font-size: 10px;
+}
+.deck-container #extract-service-spec.slide .CodeMirror-scroll {
+ /* overflow-x: auto;
+  overflow-y: auto;
+  height: 380px;*/
+}
+
 
 code .json, 
 code .ds-val,
