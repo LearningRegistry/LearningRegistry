@@ -69,17 +69,17 @@ class ExtractController(BaseController):
             if 'discriminator' in params:
                 discriminator = params['discriminator']
                 startKey.append(discriminator)
-                endKey.append(discriminator+'\ud7af')
+                endKey.append(discriminator+u'\ud7af')
             else:
                 startKey.append('')
-                endKey.append('\ud7af')            
+                endKey.append(u'\ud7af')
         def populateResource():
             if 'resource' in params:
                 startKey.append(params['resource'])
-                endKey.append(params['resource']+'\ud7af')
+                endKey.append(params['resource']+u'\ud7af')
             else:
                 startKey.append('')
-                endKey.append('\ud7af')       
+                endKey.append(u'\ud7af')       
         includeDocs = True
         if "ids_only" in params:
             includeDocs = not params
@@ -104,8 +104,10 @@ class ExtractController(BaseController):
             dsDocument = db['_design/'+dataservice]
             if "dataservices" not in dsDocument:
                 abort(406, "Invalid Data Service")
+                log.error("no dataservices element in document")
             urlBase = "_design/{0}/_list/{1}/{2}".format(dataservice,list,view)        
             startKey, endKey,includeDocs = self._orderParmaByView(request.params,view)
             return self._processRequest(startKey,endKey,urlBase,includeDocs)
-        except couchdb.ResourceNotFound:
+        except couchdb.ResourceNotFound as ex:
             abort(406,"Invalid Data Service")
+            log.error(ex)

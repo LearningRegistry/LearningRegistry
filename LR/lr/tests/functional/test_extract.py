@@ -25,6 +25,7 @@ class TestExtractController(TestController):
         return int(math.floor(dt.total_seconds()))
     def _validateJsonStructure(self,data):        
         assert "documents" in data
+        assert len(data['documents']) > 0
         for doc in data['documents']:
             assert "result_data" in doc
             assert "resource_data" in doc
@@ -90,6 +91,11 @@ class TestExtractController(TestController):
         response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'))
         data = json.loads(response.body)
         self._validateJsonStructure(data)
+    @ForceCouchDBIndexing()
+    def test_get_resource(self):
+        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-resource/format/to-json'))
+        data = json.loads(response.body)
+        self._validateJsonStructure(data)        
     @ForceCouchDBIndexing()
     def test_get_with_discriminator(self):
         discriminator = "http://purl.org/ASN/"
