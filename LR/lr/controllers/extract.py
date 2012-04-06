@@ -90,6 +90,30 @@ class ExtractController(BaseController):
 
             return newkey
 
+        def makeStartsWithEndKey(key):
+            from copy import deepcopy
+            newkey = deepcopy(key)
+            # this the base case for keys that are just strings, append the funky unicode char so that it grabs everything from
+            # "foo" to "foo\ud7af", which is technically the only way we know how to deal with starts with.
+            if isinstance(newkey, (str, unicode, basestring)):
+                newkey=newkey+u'\ud7af'
+            # if this is a complex key, then get the last element and recurse
+            elif isinstance(newkey, list):
+                newkey[-1] = makeStartsWithEndKey(newkey[-1])
+            # if the last element in an object, it becomes a bit tricky, because you must modify the last key, which implies
+            # order of keys was maintained when the value was originally parsed.
+            # *** IMPORTANT: The key parameter MUST have been originally json parsed with the object_pairs_hook=collections.OrderedDict otherwise
+            # ***            key order won't be guaranteed to be the same as what CouchDB will use!!!! 
+            elif isinstance(last, dict):
+                lastkey = last.keys()[-1]
+                #take the value from the last key and recurse.
+                last[lastkey] = makeEndKey(last[lastkey])
+            # if we skipped everything else - we don't have a strategy to deal with it as a Starts With key, so just return 
+            else:
+                newkey = key
+
+            return newkey
+
         def populateTs(startKey, endKey, pos, isLast):
             if 'from' in params:
                 startKey.append(self._convertDateTime(params['from']))
@@ -120,7 +144,8 @@ class ExtractController(BaseController):
                     log.error(sys.exc_info()[0])
                     discriminator = params['discriminator-starts-with']
                 startKey.append(discriminator)
-                endKey.append(discriminator+u'\ud7af')
+                endKey.append(discriminator)
+                endKey = makeStartsWithEndKey(endKey)
             return startKey, endKey
             # else:
             #     startKey.append('')
