@@ -8,6 +8,7 @@ from lr.model.base_model import appConfig
 from lr.lib.base import BaseController, render
 import json
 import ijson
+import collections, sys
 import math
 from urllib2 import urlopen,HTTPError
 import lr.lib.helpers as h
@@ -54,9 +55,42 @@ class ExtractController(BaseController):
             abort(404, "not found")
 
     def _orderParmaByView(self,params,view):
-        startKey=[]
-        endKey=[] 
-        def populateTs():
+        def makeEndKey(key):
+            from copy import deepcopy
+            newkey = deepcopy(key)
+            #if complex key
+            if isinstance(newkey, list):
+                # get last element in key
+                last = newkey[-1]
+                # if the last element is a list, just append an empty object to the last element's list
+                if isinstance(last, list):
+                    last.append({})
+                # if the last element in an object, it becomes a bit tricky
+                # *** note that the key parameter MUST have been originally json parsed with the object_pairs_hook=collections.OrderedDict otherwise
+                #     key order won't be guaranteed to be the same as what CouchDB will use!!!!
+                elif isinstance(last, dict):
+                    lastkey = last.keys()[-1]
+                    # since there's no easy way to increment a float accurately, instead append a new key that 'should' sort after the previous key.
+                    if (isinstance(last[lastkey], float)):
+                        last[lastkey+u'\ud7af'] = None
+                    # if it's something else... this thing should recurse and keep going.
+                    else:
+                        last[lastkey] = makeEndKey(last[lastkey])
+                # if we got here, it's nothing really special, so we'll just append a {} to newkey
+                else:
+                    newkey.append({})
+            # this if to handle the odd case where we have string as either the key or the value of an object in a complex key.
+            elif isinstance(newkey, (str, unicode, basestring)):
+                newkey=newkey+u'\ud7af'
+            # integer... so just increment 1.
+            elif isinstance(newkey, int):
+                newkey += 1
+            
+            # if we skipped everything else - we don't have a strategy to deal with it... so don't
+
+            return newkey
+
+        def populateTs(startKey, endKey, isLast):
             if 'from' in params:
                 startKey.append(self._convertDateTime(params['from']))
             else:
@@ -64,22 +98,46 @@ class ExtractController(BaseController):
             if 'until' in params:
                 endKey.append(self._convertDateTime(params['until']))
             else:
-                endKey.append(self._convertDateTime(datetime.utcnow().isoformat()+"Z"))                
-        def populateDiscriminator():
+                endKey.append(self._convertDateTime(datetime.utcnow().isoformat()+"Z"))     
+            return startKey, endKey           
+        def populateDiscriminator(startKey, endKey, isLast):
             if 'discriminator' in params:
-                discriminator = params['discriminator']
+                # preserve key order!!!
+                try:
+                    discriminator = json.loads(params['discriminator'], object_pairs_hook=collections.OrderedDict)
+                except:
+                    log.error(sys.exc_info()[0])
+                    discriminator = params['discriminator']
+                startKey.append(discriminator)
+                endKey.append(discriminator)
+                endKey = makeEndKey(endKey)
+            elif 'discriminator-starts-with' in params:
+                # preserve key order!!!
+                try:
+                    discriminator = json.loads(params['discriminator-starts-with'], object_pairs_hook=collections.OrderedDict)
+                except:
+                    log.error(sys.exc_info()[0])
+                    discriminator = params['discriminator-starts-with']
                 startKey.append(discriminator)
                 endKey.append(discriminator+u'\ud7af')
-            else:
-                startKey.append('')
-                endKey.append(u'\ud7af')
-        def populateResource():
+            return startKey, endKey
+            # else:
+            #     startKey.append('')
+            #     endKey.append(u'\ud7af')
+        def populateResource(startKey, endKey, isLast):
             if 'resource' in params:
                 startKey.append(params['resource'])
-                endKey.append(params['resource']+u'\ud7af')
-            else:
-                startKey.append('')
-                endKey.append(u'\ud7af')       
+                endKey.append(params['resource'])
+                endKey = makeEndKey(endKey);
+            elif 'resource-starts-with' in params:
+                startKey.append(params['resource-starts-with'])
+                endKey.append(params['resource-starts-with']+u'\ud7af')
+            return startKey, endKey
+            # else:
+            #     startKey.append('')
+            #     endKey.append(u'\ud7af') 
+        startKey=[]
+        endKey=[]      
         includeDocs = True
         if "ids_only" in params:
             includeDocs = not params
@@ -91,9 +149,9 @@ class ExtractController(BaseController):
         queryOrderParts = view.split('-by-')
         aggregate = queryOrderParts[0]
         queryParams= queryOrderParts[1].split('-')       
-        for q in queryParams:
-            funcs[q]()
-        funcs[aggregate]()
+        for pos, q in enumerate(queryParams,start=1):
+            startkey, endKey = funcs[q](startKey, endKey, len(queryParams)==pos)
+        startkey, endKey = funcs[aggregate](startKey, endKey, True)
         return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None, includeDocs
 
     def get(self, dataservice="",view='',list=''):
