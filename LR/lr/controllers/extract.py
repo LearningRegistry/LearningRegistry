@@ -90,17 +90,18 @@ class ExtractController(BaseController):
 
             return newkey
 
-        def populateTs(startKey, endKey, isLast):
+        def populateTs(startKey, endKey, pos, isLast):
             if 'from' in params:
                 startKey.append(self._convertDateTime(params['from']))
-            else:
+            elif pos == 1:
                 startKey.append(self._convertDateTime(datetime.min.isoformat() + "Z"))
+
             if 'until' in params:
                 endKey.append(self._convertDateTime(params['until']))
-            else:
+            elif pos == 1:
                 endKey.append(self._convertDateTime(datetime.utcnow().isoformat()+"Z"))     
             return startKey, endKey           
-        def populateDiscriminator(startKey, endKey, isLast):
+        def populateDiscriminator(startKey, endKey, pos, isLast):
             if 'discriminator' in params:
                 # preserve key order!!!
                 try:
@@ -124,7 +125,7 @@ class ExtractController(BaseController):
             # else:
             #     startKey.append('')
             #     endKey.append(u'\ud7af')
-        def populateResource(startKey, endKey, isLast):
+        def populateResource(startKey, endKey, pos, isLast):
             if 'resource' in params:
                 startKey.append(params['resource'])
                 endKey.append(params['resource'])
@@ -150,8 +151,8 @@ class ExtractController(BaseController):
         aggregate = queryOrderParts[0]
         queryParams= queryOrderParts[1].split('-')       
         for pos, q in enumerate(queryParams,start=1):
-            startkey, endKey = funcs[q](startKey, endKey, len(queryParams)==pos)
-        startkey, endKey = funcs[aggregate](startKey, endKey, True)
+            startkey, endKey = funcs[q](startKey, endKey, pos, len(queryParams)==pos)
+        startkey, endKey = funcs[aggregate](startKey, endKey, len(queryParams)+1, True)
         return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None, includeDocs
 
     def get(self, dataservice="",view='',list=''):
