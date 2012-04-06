@@ -54,10 +54,11 @@ exports.init = function(){
                 timestamp: function(r) {
                     return getKeyField(r, 2);
                 },
+                showTimestamp: false,
                 doc: getDoc,
                 id: getId,
                 either: getEither,
-                group_length: 1 
+                group_length: 2 
             };
 
         } else if (viewname === "discriminator-by-resource-ts") {
@@ -71,10 +72,11 @@ exports.init = function(){
                 timestamp: function(r) {
                     return getKeyField(r, 1);
                 },
+                showTimestamp: true,
                 doc: getDoc,
                 id: getId,
                 either: getEither,
-                group_length: 1 
+                group_length: 3 
             };
         } else if (viewname === "discriminator-by-ts") {
             return {
@@ -87,10 +89,11 @@ exports.init = function(){
                 timestamp: function(r) {
                     return getKeyField(r, 0);
                 },
+                showTimestamp: true,
                 doc: getDoc,
                 id: getId,
                 either: getEither,
-                group_length: 1 
+                group_length: 2 
             };
         } else if (viewname === "resource-by-discriminator") {
             return {
@@ -103,10 +106,11 @@ exports.init = function(){
                 timestamp: function(r) {
                     return getKeyField(r, 2);
                 },
+                showTimestamp: false,
                 doc: getDoc,
                 id: getId,
                 either: getEither,
-                group_length: 1 
+                group_length: 2 
             };
         } else if (viewname === "resource-by-discriminator-ts") {
             return {
@@ -119,10 +123,11 @@ exports.init = function(){
                 timestamp: function(r) {
                     return getKeyField(r, 1);
                 },
+                showTimestamp: true,
                 doc: getDoc,
                 id: getId,
                 either: getEither,
-                group_length: 1 
+                group_length: 3 
             };
         } else if (viewname === "resource-by-ts") {
                     return {
@@ -135,10 +140,11 @@ exports.init = function(){
                 timestamp: function(r) {
                     return getKeyField(r, 0);
                 },
+                showTimestamp: true,
                 doc: getDoc,
                 id: getId,
                 either: getEither,
-                group_length: 1 
+                group_length: 2 
             };
         } else {
             return null;
@@ -160,6 +166,38 @@ exports.init = function(){
         }
         return groups;
     }
+
+    this.searchObjectForPattern = function(obj, regex) {
+        var rs = {};
+        var tmp = {};
+        if (Object.prototype.toString.apply(obj) === "[object String]") {
+            tmp = parser(obj.trim(), verb);
+        } else if (Object.prototype.toString.apply(obj) === "[object Array]") {
+            for (var j=0; j<obj.length; j++) {
+                merge(searchObjectForPattern(obj[j], regex), tmp); 
+            }
+        } else if (Object.prototype.toString.apply(obj) === "[object Object]") {
+            for (var key in obj) {
+                merge(searchObjectForPattern(obj[key], regex), tmp);
+            }
+        } 
+        if (tmp != undefined && tmp != null) {
+            for (var key in tmp) {
+                if (rs[key]) {
+                    rs[key] += tmp[key];
+                } else {
+                    rs[key] = tmp[key];
+                }
+            }
+        }
+
+        return rs;
+    };
+
+    this.secondsToISODate = function(ts) {
+        var ctime = new Date(ts*1000);
+        return ctime.toISOString().replace(/\.000Z$/, "Z");
+    };
 
     return this;
 };

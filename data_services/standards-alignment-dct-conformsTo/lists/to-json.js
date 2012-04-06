@@ -31,6 +31,10 @@ function(head, req) {
         discriminator: parser.discriminator(row)
       };
 
+      if (parser.showTimestamp){
+        result_data.timestamp = util.secondsToISODate(parser.timestamp(row));
+      }
+
       send('{"result_data":' + JSON.stringify(result_data) + ',');
       send('"resource_data":[');
       send(JSON.stringify(parser.either(row)));
