@@ -55,6 +55,76 @@
 }
 
 
+#extract-service-api .chart {
+    /*border: 1px solid #6699CC;*/
+    border: 1px solid;
+    border-collapse: collapse;
+    /*font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;*/
+    font-size: 10px;
+    margin: 20px;
+    text-align: left;
+    width: 100%;
+}
+#extract-service-api .chart th {
+    /*border-bottom: 1px dashed #6699CC;*/
+    border-bottom: 1px dashed;
+    /*color: #003399;*/
+    font-size: 12px;
+    font-weight: bold;
+    padding: 10px 10px;
+}
+#extract-service-api .chart td {
+    /*color: #666699;*/
+    font-size: 12px;
+    padding: 4px 10px;
+}
+#extract-service-api .chart tbody tr:hover td {
+    background: none repeat scroll 0 0 #CACACA;
+    color: #FF0000;
+}
+
+#extract-service-api .chart tbody tr td:first-child {
+    white-space: nowrap;
+}
+
+#extract-service-api h4 {
+  font-size: 14px;
+}
+
+#extract-service-api code, #extract-query-examples code {
+  font-size: 12px;
+}
+
+#extract-query-examples .runme {
+  white-space: nowrap;
+}
+
+#extract-query-examples .runme * {
+  text-align: left;
+  vertical-align: text-top;
+}
+
+#extract-query-examples textarea {
+  width: 750px;
+}
+
+#extract-query-examples .loading {
+  height: 200px;
+}
+
+.hidden {
+  display: none;
+}
+
+#extract-query-examples .loading img{
+  padding-top: 20px;
+}
+
+#extract-query-examples .result {
+  height: 200px;
+  overflow: auto;
+}
+
 code .json, 
 code .ds-val,
 code .ds-views {
