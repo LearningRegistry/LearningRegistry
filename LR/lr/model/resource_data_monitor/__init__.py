@@ -33,7 +33,8 @@ _RESOURCE_DATA_CHANGE_HANDLERS=[
     DistributeThresholdHandler(appConfig['couchdb.threshold.distributes'])
     ]
 
-_INCOMING_CHANGE_HANDLERS=[TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
+_INCOMING_CHANGE_HANDLERS=[
+    TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
     IncomingCopyHandler()
     ]
 
