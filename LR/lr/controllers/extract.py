@@ -34,7 +34,7 @@ class ExtractController(BaseController):
         return view
     def _convertDateTime(self,dt):
         try:
-            epoch = parse_date("1970-01-01T00:00:01Z")        
+            epoch = parse_date("1970-01-01T00:00:00Z")        
             if isinstance(dt, str) or isinstance(dt,unicode):
                 dt = parse_date(dt)
             dt = dt - epoch
@@ -114,6 +114,16 @@ class ExtractController(BaseController):
 
             return newkey
 
+        def hasParamFor(funcName):
+            if funcName == 'ts' and ('from' in params or 'until' in params):
+                return True
+            elif funcName == 'discriminator' and ('discriminator' in params or 'discriminator-starts-with' in params):
+                return True
+            elif funcName == 'resource' and ('resource' in params or 'resource-starts-with' in params):
+                return True
+            else:
+                return False
+
         def populateTs(startKey, endKey, pos, isLast):
             if 'from' in params:
                 startKey.append(self._convertDateTime(params['from']))
@@ -123,8 +133,10 @@ class ExtractController(BaseController):
             if 'until' in params:
                 endKey.append(self._convertDateTime(params['until']))
             elif pos == 1:
-                endKey.append(self._convertDateTime(datetime.utcnow().isoformat()+"Z"))     
-            return startKey, endKey           
+                endKey.append(self._convertDateTime(datetime.utcnow().isoformat()+"Z"))    
+
+            return startKey, endKey   
+
         def populateDiscriminator(startKey, endKey, pos, isLast):
             if 'discriminator' in params:
                 # preserve key order!!!
@@ -135,7 +147,7 @@ class ExtractController(BaseController):
                     discriminator = params['discriminator']
                 startKey.append(discriminator)
                 endKey.append(discriminator)
-                endKey = makeEndKey(endKey)
+
             elif 'discriminator-starts-with' in params:
                 # preserve key order!!!
                 try:
@@ -154,7 +166,6 @@ class ExtractController(BaseController):
             if 'resource' in params:
                 startKey.append(params['resource'])
                 endKey.append(params['resource'])
-                endKey = makeEndKey(endKey);
             elif 'resource-starts-with' in params:
                 startKey.append(params['resource-starts-with'])
                 endKey.append(params['resource-starts-with']+u'\ud7af')
@@ -174,10 +185,21 @@ class ExtractController(BaseController):
         }       
         queryOrderParts = view.split('-by-')
         aggregate = queryOrderParts[0]
-        queryParams= queryOrderParts[1].split('-')       
+        queryParams= queryOrderParts[1].split('-')
+
+        # if we don't have explicit params for this, then omit.
+        if hasParamFor(aggregate):
+            queryParams.append(aggregate)
+            log.error("added aggregate")
+
         for pos, q in enumerate(queryParams,start=1):
             startkey, endKey = funcs[q](startKey, endKey, pos, len(queryParams)==pos)
-        startkey, endKey = funcs[aggregate](startKey, endKey, len(queryParams)+1, True)
+        
+        if len(endKey) > 0 and 'resource-starts-with' not in params and 'discriminator-starts-with' not in params:
+            log.error("making endkey")
+            endKey = makeEndKey(endKey)
+
+        # startkey, endKey = funcs[aggregate](startKey, endKey, len(queryParams)+1, True)
         return startKey if len(startKey) > 0 else None, endKey if len(endKey) > 0 else None, includeDocs
 
     def get(self, dataservice="",view='',list=''):
