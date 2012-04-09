@@ -55,7 +55,7 @@
 }
 
 
-#extract-service-api .chart {
+/*#extract-service-api*/ table.chart {
     /*border: 1px solid #6699CC;*/
     border: 1px solid;
     border-collapse: collapse;
@@ -65,7 +65,7 @@
     text-align: left;
     width: 100%;
 }
-#extract-service-api .chart th {
+/*#extract-service-api*/ table.chart th {
     /*border-bottom: 1px dashed #6699CC;*/
     border-bottom: 1px dashed;
     /*color: #003399;*/
@@ -73,18 +73,22 @@
     font-weight: bold;
     padding: 10px 10px;
 }
-#extract-service-api .chart td {
+/*#extract-service-api*/ table.chart td {
     /*color: #666699;*/
     font-size: 12px;
     padding: 4px 10px;
 }
-#extract-service-api .chart tbody tr:hover td {
+/*#extract-service-api*/ table.chart tbody tr:hover td {
     background: none repeat scroll 0 0 #CACACA;
     color: #FF0000;
 }
 
-#extract-service-api .chart tbody tr td:first-child {
+/*#extract-service-api*/ table.chart tbody tr td:first-child {
     white-space: nowrap;
+}
+
+#extract-service-param-matrix table.chart tbody tr td:first-child + td {
+  white-space: nowrap;
 }
 
 #extract-service-api h4 {

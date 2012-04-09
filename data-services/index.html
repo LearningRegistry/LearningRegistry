@@ -499,6 +499,28 @@ function(head, req) {
         </table>
     </section>
 
+    <section class="slide" id="extract-service-param-matrix">
+        <h2>Extract Service Parameter Matrix</h2>
+        <p>Data services aims to allow you to narrow in on your data. So not all parameters work as expected with all data service views.  Here is a breakdown of what parameters work together with specific view. Remember not to be concerned about the characteristics of the data returned, because the map functions have already taken care of that for you.  If the data-service map functions only emit keys for documents that contain the word "exciting", that means anything this service returns will be at the very least, "exciting".  The parameters just control how much to return.</p>
+        <table class="chart">
+            <thead>
+                <tr><th>View</th><th>Parameter Set</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>discriminator-by-resource</td><td>resource</td><td>Get a list of discriminators for a specific resource locator.</td></tr>
+                <tr><td>discriminator-by-resource</td><td>resource-starts-with</td><td>Get a list of discriminators that where the resource locator starts with a specified prefix.</td></tr>
+                <tr><td>discriminator-by-resource-ts</td><td>resource, from, until</td><td>Get a list of discriminators for a specific resource locator between for a specified period of time.</td></tr>
+                <tr><td>discriminator-by-resource-ts</td><td>resource-starts-with</td><td>Get a list of discriminators that where the resource locator starts with a specified prefix, include the timestamp in the result</td></tr>
+                <tr><td>discriminator-by-ts</td><td>from, until</td><td>Get a list of discriminators for a specified time period.</td></tr>
+                <tr><td>resource-by-discriminator</td><td>discriminator</td><td>Get a list of resource locators for a specified discriminator.</td></tr>
+                <tr><td>resource-by-discriminator</td><td>discriminator-starts-with</td><td>Get a list of resource locators that start with the specified discriminator as a prefix.</td></tr>
+                <tr><td>resource-by-discriminator-ts</td><td>discriminator, from, until</td><td>Get a list of resource locators that for a specified discriminator for a specified period of time.</td></tr>
+                <tr><td>resource-by-discriminator-ts</td><td>discriminator-starts-with</td><td>Get a list of resource locators that start with the specified discriminator as a prefix. Timestamps are included in the output.</td></tr>
+                <tr><td>resource-by-ts</td><td>from, until</td><td>Get a list of resource locators for a specified period of time.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
     <section class="slide" id="extract-query-examples">
         <h2>HTTP Request Examples</h2>
         
@@ -516,28 +538,6 @@ function(head, req) {
         <div class="result"></div>
     </section>
 
-
-    <section class="slide" id="extract-service-param-matrix">
-        <h2>Extract Service Parameter Matrix</h2>
-        <p>Data services aims to allow you to narrow in on your data. So not all parameters work as expected with all data service views.  Here is a breakdown of what parameters work together with specific view. Remember not to be concerned about the characteristics of the data returned, because the map functions have already taken care of that for you.  If the data-service map functions only emit keys for documents that contain the word "exciting", that means anything this service returns will be at the very least, "exciting".  The parameters just control how much to return.</p>
-        <table>
-            <thead>
-                <tr><th>View</th><th>Parameter Set</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>discriminator-by-resource</td><td>resource</td></tr>
-                <tr><td>discriminator-by-resource</td><td>resource-starts-with</td></tr>
-                <tr><td>discriminator-by-resource-ts</td><td>resource, from, until</td></tr>
-                <tr><td>discriminator-by-resource-ts</td><td>resource-starts-with</td></tr>
-                <tr><td>discriminator-by-ts</td><td>from, until</td></tr>
-                <tr><td>resource-by-discriminator</td><td>discriminator</td></tr>
-                <tr><td>resource-by-discriminator</td><td>discriminator-starts-with</td></tr>
-                <tr><td>resource-by-discriminator-ts</td><td>discriminator, from, until</td></tr>
-                <tr><td>resource-by-discriminator-ts</td><td>discriminator-starts-with</td></tr>
-                <tr><td>resource-by-ts</td><td>from, until</td></tr>
-            </tbody>
-        </table>
-    </section>
  <!--    <section class="slide" id="themes">
         <h2></h2>
         <p>Customizes the colors, typography, and layout of slide&nbsp;content.</p>

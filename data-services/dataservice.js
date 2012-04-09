@@ -10,6 +10,7 @@ $(function() {
         $('#transition-theme-link').attr('href', $(this).val());
     });
 
+
     var server = "http://learnreg1.sri.com";
     function runQuery( url ) {
 
@@ -33,5 +34,13 @@ $(function() {
         $('#extract-query-examples .loading').show(500);
         $('#extract-query-examples .result').hide(500);
         runQuery($('#extract-query-examples textarea').val());
-    })
+    });
+
+    $(document).bind('deck.change', function(event, from, to) {
+        if (from === 26 || to === 26) {
+             $('#extract-query-examples .result').hide(500).html("");
+        }
+
+    });
+
 });
