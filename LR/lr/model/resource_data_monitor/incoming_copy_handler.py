@@ -7,6 +7,7 @@ import urlparse
 import ConfigParser
 import os
 from pylons import config
+from lr.lib import helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
 
 log = logging.getLogger(__name__)
@@ -26,10 +27,8 @@ class IncomingCopyHandler(BaseChangeHandler):
 		self._serverUrl = _config.get("app:main", "couchdb.url")
 		self._targetName = _config.get("app:main", "couchdb.db.resourcedata")	
 		
-		try:
-			self._sourceName = _config.get("app:main", "couchdb.db.incoming")
-		except:
-			self._sourceName = 'incoming'
+		s = couchdb.Server(self._serverUrl)
+		self._db = s[self._targetName]
 
 	def _canHandle(self, change, database):
 		if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE)):
@@ -38,13 +37,8 @@ class IncomingCopyHandler(BaseChangeHandler):
 
 
 	def _handle(self, change, database):
-		sourcedb = urlparse.urljoin(self._serverUrl, self._sourceName)
-		targetdb = urlparse.urljoin(self._serverUrl, self._targetName)	
 
-		data = {"source" : sourcedb, "target" : targetdb} 
-
-		request = urllib2.Request(urlparse.urljoin(self._serverUrl, '_replicator'),
-									headers={'Content-Type':'application/json' },
-									data = json.dumps(data))
-
-		results = json.load(urllib2.urlopen(request))
+		newDoc = change[_DOC]
+		newDoc['node_timestamp'] = h.nowToISO8601Zformat()
+		del newDoc['_rev']
+		self._db.save(newDoc)

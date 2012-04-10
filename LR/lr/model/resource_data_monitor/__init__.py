@@ -57,6 +57,19 @@ def monitorResourceDataChanges():
     changeMonitorOptions = {appConfig['couchdb.db.resourcedata']:_RESOURCE_DATA_CHANGE_HANDLERS,
                             incomingDB:_INCOMING_CHANGE_HANDLERS}
 
+    rdChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
+                                                            appConfig['couchdb.db.resourcedata'],
+                                                            _RESOURCE_DATA_CHANGE_HANDLERS,
+                                                            options)
+    rdChangeMonitor.start()
+
+    inChangeMonitor = MonitorChanges(appConfig['couchdb.url'],
+                                                            incomingDB,
+                                                            _INCOMING_CHANGE_HANDLERS,
+                                                            options)
+    inChangeMonitor.start()
+
+    '''
     changeMonitors = []
     for db, handler in changeMonitorOptions.items():
         changeMonitor = MonitorChanges(appConfig['couchdb.url'], 
@@ -65,13 +78,18 @@ def monitorResourceDataChanges():
                                                             options)
         changeMonitor.start()
         changeMonitors.append(changeMonitor)
-
+    '''
     #changeMonitor.start(threading.current_thread())
     def atExitHandler():
-        
+        '''
         for chMon in changeMonitors:
             chMon.terminate()
+        '''
+        rdChangeMonitor.terminate()
+        inChangeMonitor.terminate()    
         #changeMonitor.terminate()
-        log.debug("Last change {0}\n\n".format(changeMonitor._lastChangeSequence))
+        log.debug("Last change in {0}: {1}\n\n".format('RDCHANGEMONITOR',rdChangeMonitor._lastChangeSequence))
+        log.debug("Last change in {0}: {1}\n\n".format('INCHANGEMONITOR',inChangeMonitor._lastChangeSequence))
+
 
     atexit.register(atExitHandler)
