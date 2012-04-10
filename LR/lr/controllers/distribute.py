@@ -38,10 +38,7 @@ class DistributeController(BaseController):
     
     def __before__(self):
         self.resource_data = appConfig['couchdb.db.resourcedata']
-        try:
-            self.incoming = appConfig['couchdb.db.incoming']
-        except:
-            self.incoming = 'incoming'    
+            
         
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -228,8 +225,7 @@ class DistributeController(BaseController):
             if connectionsStatusInfo.has_key(self.__ERROR) or connectionStatus.has_key(self.__ERROR) == True:
                 distributeResults.put(connectionStatus)
             else:
-                replicationArgs = (connectionStatus, defaultCouchServer, self.incoming )
-                #replicationArgs = (connectionStatus, defaultCouchServer, self.resource_data )
+                replicationArgs = (connectionStatus, defaultCouchServer, self.resource_data )
                     # Use a thread to do the actual replication.
                 replicationThread = threading.Thread(target=doDistribution, args=replicationArgs)
                 replicationThread.start()
