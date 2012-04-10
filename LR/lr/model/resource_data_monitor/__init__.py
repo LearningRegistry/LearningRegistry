@@ -25,16 +25,16 @@ from pylons import config
 appConfig = config['app_conf']
 log = logging.getLogger(__name__)
 
-_RESOURCE_DATA_CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
+_CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
-    TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
+    TrackLastSequence(_CHANGE_ID),
     UpdateViewsHandler(appConfig['couchdb.threshold.viewupdate']),
     DistributeThresholdHandler(appConfig['couchdb.threshold.distributes'])
     ]
 
 _INCOMING_CHANGE_HANDLERS=[
-    TrackLastSequence(_RESOURCE_DATA_CHANGE_ID),
+    TrackLastSequence(_CHANGE_ID),
     IncomingCopyHandler()
     ]
 
@@ -45,51 +45,34 @@ except:
 
 def _getLastSavedSequence():
     lastSavedSequence = -1
-    if _RESOURCE_DATA_CHANGE_ID in ResourceDataModel._defaultDB:
-        lastSavedSequence=ResourceDataModel._defaultDB[_RESOURCE_DATA_CHANGE_ID][TrackLastSequence._LAST_CHANGE_SEQ]
+    if _CHANGE_ID in ResourceDataModel._defaultDB:
+        lastSavedSequence=ResourceDataModel._defaultDB[_CHANGE_ID][TrackLastSequence._LAST_CHANGE_SEQ]
     return lastSavedSequence
 
     
 def monitorResourceDataChanges(): 
     options = {'since':_getLastSavedSequence()}
     log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
+    
+    resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
+                                                        appConfig['couchdb.db.resourcedata'],
+                                                        _RESOURCE_DATA_CHANGE_HANDLERS,
+                                                        options)
+    resourceDataChangeMonitor.start()
+        
+    incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
+                                                        incomingDB,
+                                                        _INCOMING_CHANGE_HANDLERS,
+                                                        options)
+    incomingChangeMonitor.start()
+    
 
-    changeMonitorOptions = {appConfig['couchdb.db.resourcedata']:_RESOURCE_DATA_CHANGE_HANDLERS,
-                            incomingDB:_INCOMING_CHANGE_HANDLERS}
-
-    rdChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
-                                                            appConfig['couchdb.db.resourcedata'],
-                                                            _RESOURCE_DATA_CHANGE_HANDLERS,
-                                                            options)
-    rdChangeMonitor.start()
-
-    inChangeMonitor = MonitorChanges(appConfig['couchdb.url'],
-                                                            incomingDB,
-                                                            _INCOMING_CHANGE_HANDLERS,
-                                                            options)
-    inChangeMonitor.start()
-
-    '''
-    changeMonitors = []
-    for db, handler in changeMonitorOptions.items():
-        changeMonitor = MonitorChanges(appConfig['couchdb.url'], 
-                                                            db,
-                                                            handler,
-                                                            options)
-        changeMonitor.start()
-        changeMonitors.append(changeMonitor)
-    '''
     #changeMonitor.start(threading.current_thread())
     def atExitHandler():
-        '''
-        for chMon in changeMonitors:
-            chMon.terminate()
-        '''
-        rdChangeMonitor.terminate()
-        inChangeMonitor.terminate()    
-        #changeMonitor.terminate()
-        log.debug("Last change in {0}: {1}\n\n".format('RDCHANGEMONITOR',rdChangeMonitor._lastChangeSequence))
-        log.debug("Last change in {0}: {1}\n\n".format('INCHANGEMONITOR',inChangeMonitor._lastChangeSequence))
-
+        
+        resourceDataChangeMonitor.terminate()
+        incomingChangeMonitor.terminate()
+        log.debug("Last change in Resource Data: {0}\n\n".format(resourceDataChangeMonitor._lastChangeSequence))        
+        log.debug("Last change in Incoming: {0}\n\n".format(incomingChangeMonitor._lastChangeSequence))
 
     atexit.register(atExitHandler)
