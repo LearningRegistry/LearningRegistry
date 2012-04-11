@@ -9,7 +9,7 @@ try{
 exports.alignment = (function() {
     try {
         if (!log && console.log){
-            var log = console.log;
+            var log = function() { console.log(arguments) };
         } else {
             var log = function() { throw arguments; }
         }
@@ -31,7 +31,9 @@ exports.alignment = (function() {
                     var nsdl = new XML(resource_data);
                     var dct = new Namespace("http://purl.org/dc/terms/");
 
-                    conformsToElems = nsdl..dct::conformsTo
+                    // barfs on anything that doesn't support E4X. use eval so we throw an error
+                    // instead of a parse error. :(
+                    eval("conformsToElems = nsdl..dct::conformsTo");
 
                     for (idx in conformsToElems) {
                         if (!stds[conformsToElems[idx].toString().trim()]) {
@@ -44,7 +46,15 @@ exports.alignment = (function() {
                     }
 
             } catch (error) {
-                log(error);
+                if (Object.prototype.toString.apply(error)==="[object Error]") {
+                    if (error.arguments.length > 0 && error.arguments[0] === "XML") {
+                        log("E4X is not supported in this environment, try Rhino, Spidermonkey, or Firefox!")
+                    } else {
+                        log(error.message);
+                    }
+                } else {
+                    log(error);
+                }
             }
             return stds;
         },
