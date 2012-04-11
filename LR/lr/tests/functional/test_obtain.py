@@ -255,6 +255,27 @@ class TestObtainController(TestController):
         params['request_id'] = self.resourceLocators[0]
         response = self.app.get(url(controller='obtain', **params))
         self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+    @ForceCouchDBIndexing()
+    def test_request_ID_resource_and_token_get(self):
+        params = self._getInitialPostData()
+        params['request_id'] = self.resourceLocators[0]
+        firstResponse = json.loads(self.app.get(url(controller='obtain', **params)).body)
+        params['resumption_token'] = firstResponse['resumption_token']
+        response = json.loads(self.app.get(url(controller='obtain',**params), status=500).body)
+        assert response["OK"] == False
+    @ForceCouchDBIndexing()
+    def test_request_ID_resource_and_token_get_complete(self):
+        params = self._getInitialPostData()
+        testKey = self.resourceLocators[0]
+        params['request_id'] = testKey        
+        while True:
+            path = url(controller='obtain', **params)
+            response = self.app.get(path)
+            data = json.loads(response.body)        
+            self._validateResponse(response,json.dumps(params),[testKey])
+            if "resumption_token" not in data or data['resumption_token'] is None:
+                break
+            params = {'resumption_token':data['resumption_token']} 
     @ForceCouchDBIndexing()        
     def test_get_fail_both_false(self):
         params = self._getInitialPostData()
