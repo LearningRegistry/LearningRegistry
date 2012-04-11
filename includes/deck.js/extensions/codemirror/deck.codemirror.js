@@ -185,7 +185,7 @@
                 });
               }
 
-              // write a script into the <iframe> and create the sandbox
+                           // write a script into the <iframe> and create the sandbox
               frames[frames.length - 1].document.write(sandBoxMarkup);
 
               var combinedSource = "";
@@ -197,7 +197,14 @@
                 }
               });
               
-              combinedSource += editor.getValue();
+              if (exposeCM = $(codeblock).attr("codemirror")) {
+                exposeCM = $.trim(exposeCM)
+                if (exposeCM) {
+                  iframe[0].contentWindow[exposeCM] = editor;
+                }
+              } else {
+                combinedSource += editor.getValue();
+              }
               
               // Append all cleanup scripts
               $.each(cleanupScripts, function() {
