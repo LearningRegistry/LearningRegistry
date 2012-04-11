@@ -1,9 +1,9 @@
 try{
-    if (!exports) {
-        exports = {};
+    if (!window["exports"]) {
+        window["exports"] = {};
     }
 } catch (e) {
-    exports = {};
+    window["exports"] = {};
 }
 
 exports.alignment = (function() {
