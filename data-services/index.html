@@ -14,6 +14,9 @@
     <meta name="author" content="Jim Klo">
     <meta name="viewport" content="width=1024, user-scalable=no">
     
+
+    <link rel="stylesheet" href="../includes/css/blitzer/jquery-ui-1.8.18.custom.css">
+
     <!-- Core and extension CSS files -->
     <link rel="stylesheet" href="../includes/deck.js/core/deck.core.css">
     <link rel="stylesheet" href="../includes/deck.js/extensions/goto/deck.goto.css">
@@ -216,6 +219,178 @@
 
         <div class="foot"></div>
     </section>
+
+    <section class="slide" id="map-functions-described">
+        <h2>How Map Functions Work</h2>
+        <div>
+        <p>In LR, each record is JavaScript object, much like the one displayed below. The map function will process each individual object once for each view.</p>
+        <h3>A Resource Data Document</h3>
+        <textarea id="lr_paradata_doc_json" class="code" mode="javascript" style="display: none;">
+{
+    "_id": "c9966f4e59e04b168c733b19d7fcb4ad",
+    "_rev": "1-a6aae49518aa1ec59f223d4631e9eef4",
+    "keys": ["nanometer", "atom", "standards alignment", "Cells", "Environmental Issues", "ions", "magnetic field", "English-Language Arts", "California Academic Content Standards", "Equations and Inequalities", "Music", "Vocabulary &amp; Spelling", "Physics", "Factoring", "delta", "predicatable text", "Botany and Plant Science", "California's Common Core Content Standards", "Algebra &amp; Functions", "Earth &amp; Space Science", "Grade 12", "Grade 11", "Grade Pre-K", "Chemistry", "Grade 10", "Biochemistry", "aurora borealis", "Mathematics", "natural resource", "watershed", "particle", "conservation", "electron", "charged particles", "Grade K", "water", "northern lights", "Life Sciences", "Structure and Function in Living Things", "Reading Comprehension", "nano", "Science", "water cycle", "Grade 9", "Visual Arts", "Literary Analysis", "Grade 8", "Grade 5", "Grade 6", "Grade 3", "Grade 1", "Grade 2", "high frequency"],
+    "TOS": {
+        "submission_attribution": "Copyright 2011 California Department of Education: CC-BY-3.0",
+        "submission_TOS": "http://creativecommons.org/licenses/by/3.0/"
+    },
+    "payload_placement": "inline",
+    "node_timestamp": "2012-02-28T17:01:59.202435Z",
+    "create_timestamp": "2012-02-28T17:01:59.202435Z",
+    "update_timestamp": "2012-02-28T17:01:59.202435Z",
+    "active": true,
+    "publishing_node": "3b7ea975ac0f4c2c89a62268be6cbb03",
+    "resource_locator": "http://www.readwritethink.org/lessons/lesson_view.asp?id=131",
+    "identity": {
+        "signer": "Brokers of Expertise",
+        "submitter": "Brokers of Expertise",
+        "submitter_type": "agent"
+    },
+    "doc_type": "resource_data",
+    "resource_data": {
+        "activity": {
+            "content": "A resource found at http://www.readwritethink.org/lessons/lesson_view.asp?id=131 was matched to the academic content standard with ID http://purl.org/ASN/resources/S10000FE by a member of the Brokers of Expertise Standards Matching Group on November 7, 2011",
+            "related": [{
+                "content": "Recognize that sentences in print are made up of separate words.",
+                "id": "http://purl.org/ASN/resources/S10000FE",
+                "objectType": "academic standard"
+            }],
+            "verb": {
+                "action": "matched",
+                "date": "2011-11-07",
+                "context": {
+                    "objectType": "LMS",
+                    "id": "http://www.myboe.org/go/resource/7238",
+                    "description": "Brokers of Expertise resource management page"
+                }
+            },
+            "actor": {
+                "url": "http://myboe.org/go/groups/standards_matchers",
+                "displayName": "Brokers of Expertise Standards Matching Group",
+                "objectType": "group"
+            },
+            "object": {
+                "id": "http://www.readwritethink.org/lessons/lesson_view.asp?id=131"
+            }
+        }
+    },
+    "resource_data_type": "paradata",
+    "payload_schema": ["LR Paradata 1.0"],
+    "doc_version": "0.23.0",
+    "doc_ID": "c9966f4e59e04b168c733b19d7fcb4ad"
+}</textarea>
+        </div>
+    </section>
+
+    <section class="slide" id="map-functions-described">
+        <h2>How Map Functions Work: Try It</h2>
+        <div class="body">
+            <p>A map function takes takes one argument, the Resource Data Document. The function should perform the following tasks against the document:</p>
+            <ul>
+                <li>Evaluate the document to determine if the document should be included in the index. Does it meet some set of criteria specific to your use case?</li>
+                <li>If the document should be included, define the structure of the keys and values in the index. Remember to follow the key conventions defined earlier.</li>
+            </ul>
+            <p>Below is a sample implementation of a data services map function. Try editing and click run to learn what get's created in the index.</p>
+            <a class="show-code" href="javascript: void(0);">show sample resource data</a>
+        </div>
+<script type="codemirror" data-selector="#lr_paradata_doc_json">
+var docs = exports.alignment_data;
+
+var log = function() { console.log(arguments) };
+var ASNPatterns = exports.alignment.ASNPatterns;
+var Alignment = exports.alignment.Alignment;
+var convertDateToSeconds = exports.alignment.convertDateToSeconds;
+
+exports.mock_couchdb.mock_emit.clear();
+$('#map-functions-described div.deck-codemirror-result').html("");
+var emit = exports.mock_couchdb.emit;
+</script>
+<script type="codemirror/cleanup" data-selector="#lr_paradata_doc_json">
+    var editor_contents = cm.getValue();
+
+    var local = {};
+    var sbox_map = "local.map = (function(){ return " + 
+        editor_contents + ";})()";
+    try {
+        eval(sbox_map);
+   
+        for (var i in docs) {
+            local.map(docs[i]);
+        }
+     } catch (e) {
+        console.log("PARSER ERROR:");
+        if (e) {
+           console.log(e); 
+        } else {
+            console.log("Syntax Error.")
+        }
+    }
+
+    var mock_emit = exports.mock_couchdb.mock_emit;
+    console.log("ROWS EMITTED:");
+    console.log(JSON.stringify(mock_emit.emitted, null, "&nbsp;").replace(/\n/g, "<br/>"));
+    
+</script>
+<textarea id="lr_paradata_doc_json" class="code" mode="javascript" style="display: none;" runnable="true" globals="exports,$,editor" codemirror="cm">
+function(doc) {
+
+    /***
+     * When using python CouchApp to build, !code is a macro to insert the contents of the
+     * specified file when compiling into a design document.
+     */
+    // !code lib/alignment.js
+
+    try {
+        if (doc.doc_type == "resource_data" && doc.resource_data && doc.resource_locator && doc.node_timestamp) {
+            var nodeTimestamp = convertDateToSeconds(doc);
+
+            /****
+             * For Parsing LR Paradata 1.0 with alignment information.        
+             ****/
+            var seen = {};
+            var parserLR = function (objStr, verb) {
+                for (re in ASNPatterns){
+                    var stds = objStr.match(ASNPatterns[re]);
+                    for (s in stds) {
+                        if (!seen[s]) {
+                            emit([doc.resource_locator, nodeTimestamp, [verb, stds[s]]], null);
+                            seen[s] = 1;
+                        }
+                    }
+                }
+            };
+
+            Alignment.parseLRParadata(doc.resource_data, parserLR);
+
+            /****
+             * For Parsing Dublin Core Terms <conformsTo> elements.        
+             ****/ 
+            var parserDct = function (conformsToText) {
+                var seen = {};
+                for (re in ASNPatterns){
+                    var stds = conformsToText.match(ASNPatterns[re]);
+                    for (s in stds) {
+                        if (!seen[s]) {
+                            emit([doc.resource_locator, nodeTimestamp, stds[s]], null);
+                            seen[s] = 1;
+                        }
+                    }
+                }
+            };
+            Alignment.parseDCT_ConformsTo(doc.resource_data, parserDct);
+        }   
+    
+    } catch (error) {
+            log("error: "+error);
+    }
+}</textarea>
+<div syle="display: none;" class="dialog body">
+</div>
+    </section>
+
+
+
+
 
 
     <section class="slide" id="extract-service-spec">
@@ -471,6 +646,14 @@ function(head, req) {
         </ul>
     </section>
 
+    <section class="slide" id="extract-service">
+        <h2>The Extract Service</h2>
+        <p>Provides a common HTTP interface to access data services with simplified parameters.</p>
+        <ul>
+        <li class="slide">What it does is create a bridge between the raw CouchDB view and list functions and query parameters, so you don't have to fully understand much of the complexity of CouchDB's query solution. The Extract service transforms your parameters into the equivalent query for CouchDB</li>
+        <li class="slide">If running your own node, and you understand CouchDB's API, nothing prevents you from using the views directly for doing queries not supported by the extract service.</li>
+        </ul>
+    </section>
 
     <section class="slide" id="extract-service-api">
         <h2>The Extract Service HTTP Request Format</h2>
@@ -522,110 +705,39 @@ function(head, req) {
     </section>
 
     <section class="slide" id="extract-query-examples">
-        <h2>HTTP Request Examples</h2>
-        
-        <p><code>GET /extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator=["matched"]</code></p>
-        <p><code>GET /extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator-starts-with=["matched","http://purl.org/ASN/resources/S"]</code></p>
-        <p><code>GET /extract/standards-alignment-dc-conformsTo/discriminator-by-resource?resource-starts-with=http://pbs.org</code></p>
-        <p><code>GET /extract/standards-alignment-lr-paradata/resource-by-discriminator-ts?ids_only=true&amp;discriminator=["matched","http://purl.org/ASN/resources/S1000132"]&amp;from=2012-02-28T16:59:31Z&amp;until=2012-02-28T16:59:31Z</code></p>
-        
+        <h2>Extract Service API - Try It</h2>
+        <p>Here are some example requests that you can try against a real data service install. Click on the line to populate the example into input box or edit by hand. Click Run to execute the request. This can take a bit of time, and cause your browser to complain. It's okay to click "Wait" or "Continue" if prompted by your browser until it completes.</p>
+        <ul>
+            <li><code>GET <span class="example">/extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator=["matched"]</span></code></li>
+            <li><code>GET <span class="example">/extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator-starts-with=["matched","http://purl.org/ASN/resources/S"]</span></code></li>
+            <li><code>GET <span class="example">/extract/standards-alignment-dc-conformsTo/discriminator-by-resource?resource-starts-with=http://www.shodor.org/interactivate/activities/Advanced</code></span></li>
+            <li><code>GET <span class="example">/extract/standards-alignment-lr-paradata/resource-by-discriminator-ts?ids_only=true&amp;discriminator=["matched","http://purl.org/ASN/resources/S1000132"]&amp;from=2012-02-28T16:59:31Z&amp;until=2012-02-28T16:59:31Z</span></code></li>
+        </ul>
+       
         <div class="runme">
         GET 
         <textarea>/extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator=["matched"]</textarea>
-        <button class="tryit">Try It</button>
+        <button class="tryit">Run</button>
         </div>
         <div class="loading hidden"><img src="./animated_progress.gif"></div>
         <div class="result"></div>
     </section>
 
- <!--    <section class="slide" id="themes">
-        <h2></h2>
-        <p>Customizes the colors, typography, and layout of slide&nbsp;content.</p>
-        <pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;/path/to/css/style-theme.css&quot;&gt;</code></pre>
-        <h2>Transition Themes</h2>
-        <p>Defines transitions between slides using CSS3 transitions.  Less capable browsers fall back to cutaways. But <strong>you</strong> aren&rsquo;t using <em>those</em> browsers to give your presentations, are&nbsp;you&hellip;</p>
-        <pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;/path/to/css/transition-theme.css&quot;&gt;</code></pre>
-    </section> -->
-
-<!--     <section class="slide" id="extensions">
-        <h2>Extensions</h2>
-        <p>Core gives you basic slide functionality with left and right arrow navigation, but you may want more. Here are the ones included in this&nbsp;deck:</p>
-
+    <section class="slide" id="next-steps">
+        <h2>Next Steps</h2>
         <ul>
-            <li class="slide" id="extensions-goto">
-                <strong>deck.goto</strong>: Adds a shortcut key to jump to any slide number.  Hit g, type in the slide number, and hit&nbsp;enter.
-            </li>
-
-            <li class="slide" id="extensions-hash">
-                <strong>deck.hash</strong>: Enables internal linking within slides, deep linking to individual slides, and updates the address bar &amp; a permalink anchor with each slide&nbsp;change.
-            </li>
-
-            <li class="slide" id="extensions-menu">
-                <strong>deck.menu</strong>: Adds a menu view, letting you see all slides in a grid. Hit m to toggle to menu view, continue navigating your deck, and hit m to return to normal view. Touch devices can double-tap the deck to switch between&nbsp;views.
-            </li>
-
-            <li class="slide" id="extensions-navigation">
-                <strong>deck.navigation</strong>: Adds clickable left and right buttons for the less keyboard&nbsp;inclined.
-            </li>
-
-            <li class="slide" id="extensions-status">
-                <strong>deck.status</strong>: Adds a page number indicator. (current/total)
-            </li>
+            <li>Check out the code on Github: 
+                <ul><li><a href="https://github.com/jimklo/LearningRegistry/tree/data-services-proto/data_services">https://github.com/jimklo/LearningRegistry/tree/data-services-proto/data_services</a></li></ul>
+                </li>
+            <li>Ask Questions on the LR Dev Google Group: 
+                <ul>
+                    <li><a href="mailto:learningreg-dev@googlegroups.com">learningreg-dev@googlegroups.com</a></li>
+                    <li><a href="http://groups.google.com/group/learningreg-dev">http://groups.google.com/group/learningreg-dev</a></li>
+                </ul></li>
         </ul>
-
-        <p class="slide" id="extension-folders">Each extension folder in the download package contains the necessary JavaScript, CSS, and HTML&nbsp;files. For a complete list of extension modules included in deck.js, check out the&nbsp;<a href="http://imakewebthings.github.com/deck.js/docs">documentation</a>.</p>
-    </section> -->
-
-<!--     <section class="slide" id="nested">
-        <h2>Nested Slides</h2>
-        <p>That last slide had a few steps.  To create substeps in slides, just nest them:</p>
-        <pre><code>&lt;section class=&quot;slide&quot;&gt;
-  &lt;h2&gt;Extensions&lt;/h2&gt;
-  &lt;p&gt;Core gives you basic slide functionality...&lt;/p&gt;        
-  &lt;ul&gt;
-     &lt;li class=&quot;slide&quot;&gt;
-        &lt;h3&gt;deck.goto&lt;/h3&gt;
-        &lt;p&gt;Adds a shortcut key to jump to any slide number...&lt;/p&gt;
-     &lt;/li&gt;
-     &lt;li class=&quot;slide&quot;&gt;...&lt;/li&gt;   
-     &lt;li class=&quot;slide&quot;&gt;...&lt;/li&gt;
-     &lt;li class=&quot;slide&quot;&gt;...&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/section&gt;</code></pre>
-    </section> -->
-
-<!--     <section class="slide" id="elements-images">
-        <h2>Other Elements: Images</h2>
-        <img src="http://placekitten.com/600/375" alt="Kitties">
-        <pre><code>&lt;img src=&quot;http://placekitten.com/600/375&quot; alt=&quot;Kitties&quot;&gt;</code></pre>
+        
     </section>
 
-    <section class="slide" id="elements-blockquotes">
-        <h2>Other Elements: Blockquotes</h2>
-        <blockquote cite="http://example.org">
-            <p>Food is an important part of a balanced diet.</p>
-            <p><cite>Fran Lebowitz</cite></p>
-        </blockquote>
-        <pre><code>&lt;blockquote cite=&quot;http://example.org&quot;&gt;
-  &lt;p&gt;Food is an important part of a balanced diet.&lt;/p&gt;
-  &lt;p&gt;&lt;cite&gt;Fran Lebowitz&lt;/cite&gt;&lt;/p&gt;
-&lt;/blockquote&gt;</code></pre>
-    </section> -->
-
-
-<!--     <section class="slide" id="elements-videos">
-        <h2>Other Elements: Video Embeds</h2>
-        <p>Embed videos using embed codes from your favorite online video service or with an HTML5 video&nbsp;element.</p>
-        
-        <iframe src="http://player.vimeo.com/video/1063136?title=0&amp;byline=0&amp;portrait=0" width="400" height="225" frameborder="0"></iframe>
-        
-        <pre><code>&lt;iframe src=&quot;http://player.vimeo.com/video/1063136?title=0&amp;amp;byline=0&amp;amp;portrait=0&quot; width=&quot;400&quot; height=&quot;225&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</code></pre>
-    </section> -->
-
-<!--     <section class="slide" id="digging-deeper">
-        <h2>Digging Deeper</h2>
-        <p>If you want to learn about making your own themes, extending deck.js, and more, check out the&nbsp;<a href="../docs/">documentation</a>.</p>
-    </section> -->
 
     <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
     <a href="#" class="deck-next-link" title="Next">&#8594;</a>
@@ -656,6 +768,10 @@ function(head, req) {
 <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
 <script>window.jQuery || document.write('<script src="../includes/deck.js/jquery-1.7.min.js"><\/script>')</script>
 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script>window.jQuery.ui || document.write('<script src="../includes/deck.js/core/jquery-ui-1.8.18.custom.min.js"><\/script>')</script>
+
+
 <!-- Deck Core and extensions -->
 <script src="../includes/deck.js/core/deck.core.js"></script>
 <script src="../includes/deck.js/extensions/hash/deck.hash.js"></script>
@@ -682,6 +798,7 @@ function(head, req) {
 
 <!-- Specific to this page -->
 <script src="dataservice.js"></script>
-
+<script src="alignment.js"></script>
+<script src="mock_couchdb.js"></script>
 </body>
 </html>

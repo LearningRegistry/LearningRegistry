@@ -54,6 +54,21 @@
   height: 380px;*/
 }
 
+.deck-container #map-functions-described.slide .CodeMirror {
+  height: 250px;
+}
+
+.deck-container #map-functions-described.slide .CodeMirror-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.deck-container #map-functions-described.slide div.deck-codemirror-result {
+  font-family: monospace;
+  font-size: 10px;
+  max-height: 70px;
+  overflow-y: auto;
+}
 
 /*#extract-service-api*/ table.chart {
     /*border: 1px solid #6699CC;*/
@@ -91,6 +106,10 @@
   white-space: nowrap;
 }
 
+span.example:hover {
+  cursor: pointer;
+}
+
 #extract-service-api h4 {
   font-size: 14px;
 }
@@ -113,7 +132,8 @@
 }
 
 #extract-query-examples .loading {
-  height: 200px;
+  height: 1450px;
+  margin-top: 5px;
 }
 
 .hidden {
@@ -125,8 +145,9 @@
 }
 
 #extract-query-examples .result {
-  height: 200px;
+  height: 145px;
   overflow: auto;
+  margin-top: 5px;
 }
 
 code .json, 
@@ -200,6 +221,10 @@ img.old-ds {
   transform: translate3d(400%, 0, 0);
 }
 
+
+#map-functions-described div.body {
+  font-size: 12px !important;
+}
 
 
 @media print {
