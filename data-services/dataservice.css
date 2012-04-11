@@ -54,16 +54,20 @@
   height: 380px;*/
 }
 
-.deck-container #map-functions-described.slide .CodeMirror {
+.deck-container #map-functions-tryit.slide .CodeMirror {
   height: 250px;
 }
 
-.deck-container #map-functions-described.slide .CodeMirror-scroll {
+.deck-container #map-functions-described.slide .CodeMirror {
+  height: 350px;
+}
+
+.deck-container #map-functions-tryit.slide .CodeMirror-scroll {
   overflow-x: auto;
   overflow-y: auto;
 }
 
-.deck-container #map-functions-described.slide div.deck-codemirror-result {
+.deck-container #map-functions-tryit.slide div.deck-codemirror-result {
   font-family: monospace;
   font-size: 10px;
   max-height: 70px;
@@ -222,7 +226,7 @@ img.old-ds {
 }
 
 
-#map-functions-described div.body {
+#map-functions-tryit div.body {
   font-size: 12px !important;
 }
 

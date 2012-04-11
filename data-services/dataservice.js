@@ -54,7 +54,7 @@ $(function() {
 
     });
 
-    $('#map-functions-described a.show-code').click(function() {
+    $('#map-functions-tryit a.show-code').click(function() {
 
         var $dialog = $('<div></div>')
         .html(JSON.stringify(exports.alignment_data, null, '&nbsp;').replace(/\n/g, "<br/>"))
