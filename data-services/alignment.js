@@ -47,10 +47,10 @@ exports.alignment = (function() {
 
             } catch (error) {
                 if (Object.prototype.toString.apply(error)==="[object Error]") {
-                    if (error.arguments.length > 0 && error.arguments[0] === "XML") {
+                    if (error.arguments && error.arguments.length > 0 && error.arguments[0] === "XML") {
                         log("E4X is not supported in this environment, try Rhino, Spidermonkey, or Firefox!")
                     } else {
-                        log(error.message);
+                        log("WARNING: "+error.message);
                     }
                 } else {
                     log(error);
@@ -111,7 +111,11 @@ exports.alignment = (function() {
 
                 result = searchObjectForPattern(resource_data,ASNPatterns);
             } catch (error) {
-                log(error);
+                if (Object.prototype.toString.apply(error) === "[object Error]") {
+                    log("WARNING: "+error.message);
+                } else {
+                    log(error);
+                }
             } finally {
                 return result;
             }
