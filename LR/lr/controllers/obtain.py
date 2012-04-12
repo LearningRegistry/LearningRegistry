@@ -38,7 +38,7 @@ class ObtainController(BaseController):
             args['limit'] = self.limit
         args['include_docs'] = include_docs
         if resumption_token is not None:
-            if len(args['keys']) == 0:
+            if 'keys' not in args or len(args['keys']) == 0:
                 args['keys'] = [resumption_token['startkey']]
             args['startkey'] = resumption_token['startkey']
             args['startkey_docid'] = resumption_token['startkey_docid']
