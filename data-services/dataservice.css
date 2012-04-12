@@ -230,6 +230,30 @@ img.old-ds {
   font-size: 12px !important;
 }
 
+div.not_mozilla {
+  border: 1px solid #999;
+  padding: 10px;
+  margin-top: 435px;
+  visibility: hidden;
+}
+
+div.not_mozilla img {
+  height: 65px;
+  width: 65px;
+  float: left;
+  margin: 0px;
+}
+
+div.not_mozilla div.right {
+  block: inline;
+  width: 765px;
+  float: right;
+}
+
+div.not_mozilla div.clear {
+  clear: both;
+  height: 0px;
+}
 
 @media print {
   header, footer {

@@ -68,4 +68,9 @@ $(function() {
     });
 
 
+    if ($.browser.mozilla === undefined) {
+        $('div.not_mozilla').css("visibility", "visible");
+        console.log("showing")
+    }
+
 });
