@@ -74,26 +74,27 @@ class ObtainController(BaseController):
         if data is not None:
             firstID = True
             for doc in data:
-                lastStartKey = doc.key
-                lastId = doc.id
-                count += 1
-                if full_docs: 
-                    if doc.key != currentID:                        
-                        currentID = doc.key                        
-                        if not firstID:
-                            yield ']' + byIDResponseChunks[1] + ',\n'                            
-                        byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
-                        yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
-                        firstID = False
-                    else:                        
-                        yield ',\n' + json.dumps(doc.doc)    
-                else:
-                    if doc.key != currentID:
-                        currentID = doc.key
-                        if not firstID:
-                            yield ',\n'
-                        firstID = False
-                        yield json.dumps({'doc_ID': doc.key})
+                if hasattr(doc,'id'):                
+                    lastStartKey = doc.key
+                    lastId = doc.id
+                    count += 1
+                    if full_docs: 
+                        if doc.key != currentID:                        
+                            currentID = doc.key                        
+                            if not firstID:
+                                yield ']' + byIDResponseChunks[1] + ',\n'                            
+                            byIDResponseChunks = json.dumps({'doc_ID':doc.key,'document':[]}).split(']')
+                            yield byIDResponseChunks[0] + json.dumps(doc.doc)                                                                                    
+                            firstID = False
+                        else:                        
+                            yield ',\n' + json.dumps(doc.doc)    
+                    else:
+                        if doc.key != currentID:
+                            currentID = doc.key
+                            if not firstID:
+                                yield ',\n'
+                            firstID = False
+                            yield json.dumps({'doc_ID': doc.key})
         if full_docs and byIDResponseChunks is not None:             
             yield ']' + byIDResponseChunks[1]                        
         if  not self.enable_flow_control:			
