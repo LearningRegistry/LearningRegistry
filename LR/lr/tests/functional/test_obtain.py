@@ -276,6 +276,17 @@ class TestObtainController(TestController):
             if "resumption_token" not in data or data['resumption_token'] is None:
                 break
             params = {'resumption_token':data['resumption_token']} 
+    @ForceCouchDBIndexing()
+    def test_request_ID_resource_and_token_get_complete_no_key(self):
+        params = self._getInitialPostData()   
+        while True:
+            path = url(controller='obtain', **params)
+            response = self.app.get(path)
+            data = json.loads(response.body)        
+            self._validateResponse(response,json.dumps(params),self.resourceLocators)
+            if "resumption_token" not in data or data['resumption_token'] is None:
+                break
+            params = {'resumption_token':data['resumption_token']}             
     @ForceCouchDBIndexing()        
     def test_get_fail_both_false(self):
         params = self._getInitialPostData()

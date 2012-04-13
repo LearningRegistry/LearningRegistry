@@ -38,12 +38,12 @@ class ObtainController(BaseController):
             args['limit'] = self.limit
         args['include_docs'] = include_docs
         if resumption_token is not None:
-            if 'keys' not in args or len(args['keys']) == 0:
-                args['keys'] = [resumption_token['startkey']]
+            if 'key' not in args or len(args['keys']) == 0:
+                args['key'] = resumption_token['startkey']
             args['startkey'] = resumption_token['startkey']
             args['startkey_docid'] = resumption_token['startkey_docid']
             args['skip'] = 1
-        view = h.getView(database_url=db_url,view_name=view_name,documentHandler=lambda d: h.document(d),**args)
+        view = h.getView(database_url=db_url,view_name=view_name,method="GET",documentHandler=lambda d: h.document(d),**args)
         return view
     def _getServiceDocment(self,full_docs):
         self.enable_flow_control = False
@@ -197,9 +197,7 @@ class ObtainController(BaseController):
         if params.has_key('ids_only'):
             data['ids_only'] = params['ids_only'] in trues
         if params.has_key('resumption_token'):
-            log.error(params['resumption_token'])
             data['resumption_token'] = rt.parse_token('obtain',params['resumption_token'])
-            log.debug(data['resumption_token'])
         if params.has_key('callback'):
             data['callback'] = params['callback']
         if params.has_key('request_ID'):
