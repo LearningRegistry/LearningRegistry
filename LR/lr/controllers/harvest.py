@@ -118,9 +118,15 @@ class HarvestController(BaseController):
             }
             return json.dumps(data)
         def listmetadataformats():
+            def formatFromDesignDoc(doc):
+                if type(doc['metadataFormat']) == str:
+                    prefix = doc['metadataFormat']
+                else:
+                    prefix = doc['metadataFormat']['metadataPrefix']
+                return {'metadataformat':{"metadataPrefix":prefix}}
             self._getServiceDocment(False)
             data = self.get_base_response(verb,body)
-            data['listmetadataformats']=map(lambda format: {'metadataformat':{"metadataPrefix":format['metadataFormat']}},self.metadataFormats)
+            data['listmetadataformats']=map(formatFromDesignDoc,self.metadataFormats)
             return json.dumps(data)
         def listsets():
             data = self.get_base_response(verb,body)
