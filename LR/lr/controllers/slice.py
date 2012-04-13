@@ -1,7 +1,7 @@
 import logging, urllib2, json, couchdb
 from lr.model.base_model import appConfig
 import lr.lib.helpers as h
-
+import couchdb
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
@@ -313,8 +313,8 @@ class SliceController(BaseController):
                 rt = ''' "resumption_token":"{0}", '''.format(resumption_token.get_offset_token(self.service_id, offset=offset+doc_count, keys=keys, maxResults=maxResults))
 
         
-
-        yield '\n],'+rt+'"resultCount":'+str(maxResults) +'}'
+        db  = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
+        yield '\n],'+rt+'"resultCount":'+str(maxResults) +',"viewUpToDate":'+h.isViewUpdated(db,'_design/learningregistry-slice')+'}'
         
 # if __name__ == '__main__':
 # param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
