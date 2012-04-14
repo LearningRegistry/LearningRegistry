@@ -260,7 +260,7 @@ class TestObtainController(TestController):
         params = self._getInitialPostData()
         params['by_doc_ID'] = False
         params['by_resource_ID'] = False
-        params['request_IDs'] = self.resourceLocators[0:1]
+        params['request_ID'] = self.resourceLocators[0:1]
         try:
             response = self.app.get(url(controller='obtain',**params),headers=headers)
         except AppError as ex:
@@ -289,10 +289,17 @@ class TestObtainController(TestController):
         params = self._getInitialPostData()
         params['by_doc_ID'] = True
         params['by_resource_ID'] = True
-        params['request_IDs'] = self.resourceLocators[0:1]
+        params['request_ID'] = self.resourceLocators[0:1]
         try:
             response = self.app.get(url(controller='obtain',**params),headers=headers)
         except AppError as ex:
             self._validateError(ex.message[ex.message.rfind('{'):])                    
+    @ForceCouchDBIndexing()
+    def test_bad_doc_id(self):
+        params = self._getInitialPostData()
+        params['by_doc_ID'] = True
+        params['by_resource_ID'] = False
+        params['request_ID'] = 'xxxx'
+        response = self.app.get(url(controller='obtain',**params),headers=headers)
     def test_empty(self):
             pass
