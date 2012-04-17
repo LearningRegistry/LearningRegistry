@@ -90,7 +90,7 @@ class ModelParser(object):
     _OBJECT = '_Me_object'
     _IS_REQUIRED_IF = 'isRequiredIf'
     _DESCRIPTION = 'description'
-    
+    _ARRAY_ELEMENT_TYPE = 1
     _SPEC_DATA_TYPES =  ['string', 'boolean', 'number', 'integer',  'array', 'object']
     
     # Define pyparsing variables.
@@ -455,7 +455,7 @@ class ModelParser(object):
             description = modelProp[self._DESCRIPTION]+"\n\n"
         def createTest():
             if modelProp[self._VALUE_TYPE] == 'array':
-                return isOfSpecType(value, modelProp[self._VALUE_TYPE],modelProp[1])    
+                return isOfSpecType(value, modelProp[self._VALUE_TYPE],modelProp[self._ARRAY_ELEMENT_TYPE])    
             else:    
                 return isOfSpecType(value, modelProp[self._VALUE_TYPE])                    
         # Check for correct type.
