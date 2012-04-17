@@ -44,25 +44,29 @@ class SpecValidationException(Exception):
     pass
 
 
-def isOfSpecType(object, type):
+def isOfSpecType(obj, type,elementType=None):
     if type == 'string':
-        return (isinstance(object, str) or
-                     isinstance(object, unicode))
+        return (isinstance(obj, str) or
+                     isinstance(obj, unicode))
     elif type == 'integer':
-        return (isinstance(object, int) or 
-                     isinstance(object, long))
+        return (isinstance(obj, int) or 
+                     isinstance(obj, long))
     elif type == 'number':
-        return (isinstance(object, float) or
-                isinstance(object, int) or
-                isinstance(object, long))
+        return (isinstance(obj, float) or
+                isinstance(obj, int) or
+                isinstance(obj, long))
     elif type == 'boolean':
-        return isinstance(object, bool)
-    
+        return isinstance(obj, bool)        
     elif type =='array':
-        return (isinstance(object, list) or isinstance(object, tuple))
-    
+        if (isinstance(obj, list) or isinstance(obj, tuple)):
+            correct = True
+            if elementType is not None:
+                for element in obj:
+                    correct = correct and isOfSpecType(element,elementType)
+            return correct
+        return False
     elif type == 'object':
-        return isinstance(object, dict)
+        return isinstance(obj, dict)
     
     return False
     
@@ -296,24 +300,23 @@ class ModelParser(object):
     def _extractObjectType(self, parseResults):
         """Futher parses and cleans values of type object"""
 
-        object = None
+        obj = None
         for key in parseResults.keys():
             if self._VALUE_TYPE_INLINE in parseResults[key].keys():
-                object = parseResults[key][self._VALUE_TYPE_INLINE]
+                objobject = parseResults[key][self._VALUE_TYPE_INLINE]
                 parseResults[key][self._VALUE_TYPE] = 'object'
                 # Remove the old inline key.
                 parseResults[key].pop(self._VALUE_TYPE_INLINE)
                 
             # If the object is of type ParseResults process it futher to 
             # extract any comments or array info
-            if isinstance(object, ParseResults) == True:
-                self._extractObjectType(object)
-                self._extractArrayType(object)
+            if isinstance(obj, ParseResults) == True:
+                self._extractObjectType(obj)
+                self._extractArrayType(obj)
               
     
     def _extractArrayType(self, parseResults):
         """Futher parse and clean values of type array"""
-
         array = None
         for key in parseResults.keys():
             if isinstance(parseResults[key], ParseResults) == False:
@@ -324,7 +327,6 @@ class ModelParser(object):
                 parseResults[key][self._VALUE_TYPE] = 'array'
                 # Remove the old value type array key.
                 parseResults[key].pop(self._VALUE_TYPE_ARRAY)
-                
             # If the object is parse result process it futher to 
             # extract comments or array info
             if (isinstance(array, ParseResults) == True 
@@ -447,14 +449,17 @@ class ModelParser(object):
     def _validateField(self, fieldName, value,  modelProp):
         """Validates that the field named key conforms to the spec model for the key"""
     
-        # Get description for the the file if there is any.
+        # Get description for the the file if there is any.        
         description = ''
         if self._DESCRIPTION in modelProp.keys():
             description = modelProp[self._DESCRIPTION]+"\n\n"
-        
+        def createTest():
+            if modelProp[self._VALUE_TYPE] == 'array':
+                return isOfSpecType(value, modelProp[self._VALUE_TYPE],modelProp[1])    
+            else:    
+                return isOfSpecType(value, modelProp[self._VALUE_TYPE])                    
         # Check for correct type.
-        if (self._VALUE_TYPE in modelProp.keys() and 
-           isOfSpecType(value, modelProp[self._VALUE_TYPE]) == False):
+        if (self._VALUE_TYPE in modelProp.keys() and  createTest() == False):
             raise SpecValidationException(
                 "Value for '"+fieldName+"' is of wrong type, spec defines '"
                 +fieldName+"' of type "+
