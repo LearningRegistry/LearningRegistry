@@ -128,6 +128,8 @@ class TestHarvestController(TestController):
         assert (not data['OK'])
     def validate_listrecords_response(self, response):
         data = json.loads(response.body)
+        if not data['OK']:
+            print data
         assert data.has_key('OK') and data['OK']
         assert data.has_key('listrecords')
         assert len(data['listrecords']) > 0
@@ -141,15 +143,18 @@ class TestHarvestController(TestController):
           assert nodeTimestamp[:nodeTimestamp.rfind('.')] <= self.until_date[:self.until_date.rfind('.')]
     @ForceCouchDBIndexing()          
     def test_listrecords_get(self):
+        self.until_date = datetime.utcnow().isoformat()+"Z"
         response = self.app.get(url('harvest', id='listrecords'),params={'from':self.from_date,'until':self.until_date})
         self.validate_listrecords_response(response)
     @ForceCouchDBIndexing()
     def test_listrecords_post(self):
+        self.until_date = datetime.utcnow().isoformat()+"Z"
         data = json.dumps({'from':self.from_date,'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
         self.validate_listrecords_response(response)
     @ForceCouchDBIndexing()
     def test_listrecords_post_bad_from(self):
+        self.until_date = datetime.utcnow().isoformat()+"Z"
         data = json.dumps({'from':"aaa",'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listrecords'), params=data ,headers=headers)
         self._validate_error_message(response)
@@ -172,15 +177,18 @@ class TestHarvestController(TestController):
           assert record.has_key('identifier')
     @ForceCouchDBIndexing()
     def test_listidentifiers_get(self):
+        self.until_date = datetime.utcnow().isoformat()+"Z"
         response = self.app.get(url('harvest', id='listidentifiers'),params={'from':self.from_date,'until':self.until_date})
         self.validate_listidentifiers_response(response)
     @ForceCouchDBIndexing()
     def test_listidentifiers_post(self):
+        self.until_date = datetime.utcnow().isoformat()+"Z"
         data = json.dumps({'from':self.from_date,'until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self.validate_listidentifiers_response(response)
     @ForceCouchDBIndexing()
     def test_listidentifiers_post_bad_from(self):
+        self.until_date = datetime.utcnow().isoformat()+"Z"
         data = json.dumps({'from':'self.from_date','until':self.until_date})
         response = self.app.post(url(controller='harvest',action='listidentifiers'), params=data ,headers={'content-type': 'application/json'})
         self._validate_error_message(response)
