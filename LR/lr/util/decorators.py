@@ -14,9 +14,43 @@ import ijson
 from ijson.parse import items
 import os
 import urllib
-
+import couchdb
 log = logging.getLogger(__name__)
 
+class SetFlowControl(object):
+    def __init__(self,enabled,serviceDoc):
+        server = couchdb.Server(config['couchdb.url'])
+        self.nodeDb = server[config['couchdb.db.node']]
+        self.enabled = enabled
+        self.serviceDoc = serviceDoc
+    def __call__(self,f):
+        def set_flow_control(*args):
+            serviceDoc = self.nodeDb[self.serviceDoc]
+            flowControlCurrent = serviceDoc['service_data']['flow_control']
+            serviceDoc['service_data']['flow_control'] = self.enabled
+            idLimit = None
+            if self.enabled and serviceDoc['service_data'].has_key('id_limit'):
+                idLimit = serviceDoc['service_data']['id_limit']
+            docLimit = None
+            if self.enabled and serviceDoc['service_data'].has_key('doc_limit'):
+                docLimit = serviceDoc['service_data']['doc_limit']        
+            serviceDoc['service_data']['doc_limit'] = 100
+            serviceDoc['service_data']['id_limit'] = 100
+            self.nodeDb[self.serviceDoc] = serviceDoc
+            log.debug(serviceDoc)            
+            f(*args)
+            serviceDoc['service_data']['flow_control'] = flowControlCurrent
+            if idLimit is None:
+                del serviceDoc['service_data']['id_limit']
+            else:
+                serviceDoc['service_data']['id_limit'] = idLimit
+            if docLimit is None:
+                del serviceDoc['service_data']['doc_limit']
+            else:
+                serviceDoc['service_data']['doc_limit'] = docLimit            
+            self.nodeDb[self.serviceDoc] = serviceDoc  
+            log.debug(serviceDoc)          
+        return set_flow_control
 def ForceCouchDBIndexing():
     json_headers = {"Content-Type": "application/json"}
     couch = {
