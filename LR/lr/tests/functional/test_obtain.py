@@ -97,8 +97,8 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
-    @ForceCouchDBIndexing()
     @SetFlowControl(True,config["lr.obtain.docid"])
+    @ForceCouchDBIndexing()                
     def test_flow_control_enabled(self):
         params = self._getInitialPostData()        
         params['ids_only'] = True
@@ -108,9 +108,9 @@ class TestObtainController(TestController):
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         result = json.loads(response.body)
         assert result.has_key('resumption_token')
-        assert len(result['documents']) == 100
-    @ForceCouchDBIndexing()    
+        assert len(result['documents']) == 100    
     @SetFlowControl(False,config["lr.obtain.docid"])    
+    @ForceCouchDBIndexing()    
     def test_flow_control_disabled(self):
         params = self._getInitialPostData()        
         params['ids_only'] = True
@@ -234,6 +234,7 @@ class TestObtainController(TestController):
         params['request_id'] = self.resourceLocators[0]
         response = self.app.get(url(controller='obtain', **params))
         self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+    @SetFlowControl(True, config["lr.obtain.docid"])
     @ForceCouchDBIndexing()
     def test_request_ID_resource_and_token_get(self):
         params = self._getInitialPostData()
@@ -241,9 +242,9 @@ class TestObtainController(TestController):
         firstResponse = json.loads(self.app.get(url(controller='obtain', **params)).body)
         params['resumption_token'] = firstResponse['resumption_token']
         response = json.loads(self.app.get(url(controller='obtain',**params), status=500).body)
-        assert response["OK"] == False
-    @ForceCouchDBIndexing()
-    @SetFlowControl(True,config["lr.obtain.docid"])
+        assert response["OK"] == False    
+    @SetFlowControl(True, config["lr.obtain.docid"])
+    @ForceCouchDBIndexing()     
     def test_request_ID_resource_and_token_get_complete(self):
         params = self._getInitialPostData()
         testKey = self.resourceLocators[0]
@@ -256,6 +257,7 @@ class TestObtainController(TestController):
             if "resumption_token" not in data or data['resumption_token'] is None:
                 break
             params = {'resumption_token':data['resumption_token']} 
+    @SetFlowControl(True, config["lr.obtain.docid"])
     @ForceCouchDBIndexing()
     def test_request_ID_resource_and_token_get_complete_no_key(self):
         params = self._getInitialPostData()   
@@ -276,7 +278,8 @@ class TestObtainController(TestController):
         try:
             response = self.app.get(url(controller='obtain',**params),headers=headers)
         except AppError as ex:
-            self._validateError(ex.message[ex.message.rfind('{'):])        
+            self._validateError(ex.message[ex.message.rfind('{'):])     
+    @SetFlowControl(True, config["lr.obtain.docid"])   
     @ForceCouchDBIndexing()        
     def test_obtain_empty_resource_locator(self):
         import uuid
