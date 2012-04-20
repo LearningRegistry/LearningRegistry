@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import couchdb,
+import couchdb
 from oaipmh.client import Client
 from oaipmh.common import Identify, Metadata, Header
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader , MetadataReader

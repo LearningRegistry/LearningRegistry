@@ -24,7 +24,7 @@ def deploy(branch, runTests=False):
                    'git checkout origin/%s' % branch]
     updateLRInstall = [activateLrVirtualEnv,
                        changeToLRProjectDir,
-                       'yes |pip uninstall LR',
+                       'yes | pip uninstall LR',
                        'yes | pip install .',
                        'yes | pip install uwsgi',
                        deactivate]
@@ -40,7 +40,7 @@ def deploy(branch, runTests=False):
                    'nosetests lr/tests/functional/test_slice.py']                     
     run(';'.join(gitCheckout))
     run(';'.join(updateLRInstall))
-    run('killall -9 uwsgi;')
+    #run('killall -9 uwsgi;')
     if runTests:
         run(';'.join(testCommand))
-    run(';'.join(startLRServer))
+    run('service learningregistry restart')
