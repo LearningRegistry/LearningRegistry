@@ -588,11 +588,14 @@ class TestSlicesController(TestController):
             # get view info to determine if updater is running
             req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_info', **couch), headers=json_headers)
             view_info = json.loads(urllib2.urlopen(req).read())
-            if 'updater_running' in view_info and view_info['updater_running'] == False:
+            if 'view_index' in view_info and view_info['view_index']['updater_running'] == False:
                 break;
             elif retry < 10:
                 retry += 1
-                time.sleep(3)
+                wait_time = 5*retry
+                log.info("Waiting {0} seconds for view updater to stop.".format(wait_time))
+                time.sleep(wait_time)
+
             else:
                 assert view_info['updater_running'] == False, "View updater is still running, need to extend wait time probably so it stops before test can continue."
 
