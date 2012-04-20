@@ -16,7 +16,7 @@ import os
 import urllib
 import couchdb
 log = logging.getLogger(__name__)
-
+import copy
 class SetFlowControl(object):
     def __init__(self,enabled,serviceDoc):
         server = couchdb.Server(config['couchdb.url'])
@@ -25,30 +25,17 @@ class SetFlowControl(object):
         self.serviceDoc = serviceDoc
     def __call__(self,f):
         def set_flow_control(obj, *args, **kw):
-            log.debug("SetFlowControl")
             serviceDoc = self.nodeDb[self.serviceDoc]
-            flowControlCurrent = serviceDoc['service_data']['flow_control']
+            service_data = copy.deepcopy(serviceDoc['service_data'])     
             serviceDoc['service_data']['flow_control'] = self.enabled
-            idLimit = None
-            if self.enabled and serviceDoc['service_data'].has_key('id_limit'):
-                idLimit = serviceDoc['service_data']['id_limit']
-            docLimit = None
-            if self.enabled and serviceDoc['service_data'].has_key('doc_limit'):
-                docLimit = serviceDoc['service_data']['doc_limit']        
             serviceDoc['service_data']['doc_limit'] = 100
             serviceDoc['service_data']['id_limit'] = 100
             self.nodeDb[self.serviceDoc] = serviceDoc
-            f(obj, *args, **kw)
-            serviceDoc['service_data']['flow_control'] = flowControlCurrent
-            if idLimit is None:
-                del serviceDoc['service_data']['id_limit']
-            else:
-                serviceDoc['service_data']['id_limit'] = idLimit
-            if docLimit is None:
-                del serviceDoc['service_data']['doc_limit']
-            else:
-                serviceDoc['service_data']['doc_limit'] = docLimit            
-            self.nodeDb[self.serviceDoc] = serviceDoc  
+            try:
+                f(obj, *args, **kw)
+            finally:
+                serviceDoc['service_data'] = service_data         
+                self.nodeDb[self.serviceDoc] = serviceDoc  
         return set_flow_control
 def ForceCouchDBIndexing():
     json_headers = {"Content-Type": "application/json"}
