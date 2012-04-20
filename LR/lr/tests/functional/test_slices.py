@@ -574,7 +574,7 @@ class TestSlicesController(TestController):
         with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
             data = json.load(f)    
 
-        retry = 0:
+        retry = 0
         while True:
             # get view info to determine if updater is running
             req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_info', **couch), headers=json_headers)
@@ -600,7 +600,7 @@ class TestSlicesController(TestController):
             "limit":1
         }
 
-        retry = 0;
+        retry = 0
         while True:
             # force index
             req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_view/docs', opts=urllib.urlencode(index_opts), **couch), headers=json_headers)
