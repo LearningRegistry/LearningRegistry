@@ -571,6 +571,15 @@ class TestSlicesController(TestController):
                 assert self._checkTimestamp(doc['resource_data_description'], self.test_start_date_string+self.test_time_string)
                 assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_by_date_and_identity")
     def test_is_view_updated(self):        
+        
+        couch = {
+            "url": config["couchdb.url"],
+            "resource_data": config["couchdb.db.resourcedata"]
+        }        
+        index_opts={
+            "limit":1
+        }
+
         with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
             data = json.load(f)    
 
@@ -592,13 +601,7 @@ class TestSlicesController(TestController):
         result =  json.loads(self._slice(params).body)
         assert not result['viewUpToDate']
 
-        couch = {
-            "url": config["couchdb.url"],
-            "resource_data": config["couchdb.db.resourcedata"]
-        }        
-        index_opts={
-            "limit":1
-        }
+   
 
         retry = 0
         while True:
