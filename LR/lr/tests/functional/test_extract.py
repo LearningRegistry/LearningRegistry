@@ -13,9 +13,23 @@ from  iso8601 import parse_date
 from datetime import datetime
 from lr.util.decorators import ForceCouchDBIndexing
 from httplib import HTTPException
+from couchapp import config as cfg, commands as cmd
+from pylons import config
+import sys
+
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 db = None
+
+def _pushCouchApp(sourceDir, destURL):
+    try:
+        conf = cfg.Config()
+        cmd.push(conf, sourceDir, destURL)
+        print("Deployed CouchApp from '{0}' to '{1}'".format(sourceDir, destURL))
+    except:
+        print repr(sys.exc_info())
+        print("Unable to push CouchApp at '{0}'".format(sourceDir))
+
 class TestExtractController(TestController):
     def _convertDateTime(self,dt):
         epoch = parse_date("1970-01-01T00:00:01Z")
@@ -44,6 +58,7 @@ class TestExtractController(TestController):
             for envelope in  doc['resource_data']:
                 timestamp = self._convertDateTime(envelope['node_timestamp'])
                 assert timestamp >= f
+    
     @classmethod
     def setupClass(self):
         self.setup = True
@@ -72,7 +87,14 @@ class TestExtractController(TestController):
         while not done:      
             view = self.db.view('_all_docs',keys=distributableIds)                
             done = len(distributableIds) == len(view.rows)
-            time.sleep(0.5)                
+            time.sleep(0.5)
+
+        #install data_service view  
+        couchdb_url = config['couchdb.url']
+        resource_data_db = config['couchdb.db.resourcedata']
+
+        _pushCouchApp("../data_services/standards-alignment-dct-conformsTo", "{0}/{1}".format(couchdb_url,resource_data_db))
+
     def test_empty(self):
         pass
     @classmethod
@@ -88,45 +110,47 @@ class TestExtractController(TestController):
                 pass
     @ForceCouchDBIndexing()
     def test_get(self):
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'))
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json'))
         data = json.loads(response.body)
         self._validateJsonStructure(data)
     @ForceCouchDBIndexing()
     def test_get_resource(self):
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-resource/format/to-json'))
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-resource/format/to-json'))
         data = json.loads(response.body)
         self._validateJsonStructure(data)        
     @ForceCouchDBIndexing()
     def test_get_with_discriminator(self):
         discriminator = "http://purl.org/ASN/"
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json',discriminator=discriminator))
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json',discriminator=discriminator))
         data = json.loads(response.body)
         self._validateJsonStructure(data)
         self._validateDiscriminator(data,discriminator)        
     @ForceCouchDBIndexing()
     def test_get_with_from(self):
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"from":self.from_date})
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json'),params={"from":self.from_date})
         data = json.loads(response.body)
         self._validateJsonStructure(data)
         self._validateFrom(data,self.from_date)
     @ForceCouchDBIndexing()
     def test_get_with_until(self):
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json',until=self.until_date))
+        until_date = datetime.utcnow().isoformat()+"Z"
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json',until=until_date))
         data = json.loads(response.body)
         self._validateJsonStructure(data)                
-        self._validateUntil(data,self.until_date)
+        self._validateUntil(data,until_date)
     @ForceCouchDBIndexing()
     def test_get_with_discriminator_until(self):
         discriminator = "http://purl.org/ASN/"
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json',discriminator=discriminator,until=self.until_date))
+        until_date = datetime.utcnow().isoformat()+"Z"
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json',discriminator=discriminator,until=until_date))
         data = json.loads(response.body)
         self._validateJsonStructure(data)
         self._validateDiscriminator(data,discriminator)          
-        self._validateUntil(data,self.until_date)
+        self._validateUntil(data,until_date)
     @ForceCouchDBIndexing()
     def test_get_with_discriminator_from(self):
         discriminator = "http://purl.org/ASN/"
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"discriminator":discriminator,"from":self.from_date})
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json'),params={"discriminator":discriminator,"from":self.from_date})
         data = json.loads(response.body)
         self._validateJsonStructure(data)
         self._validateDiscriminator(data,discriminator)                  
@@ -134,20 +158,21 @@ class TestExtractController(TestController):
     @ForceCouchDBIndexing()
     def test_get_with_discriminator_from_until(self):
         discriminator = "http://purl.org/ASN/"
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"discriminator":discriminator,"from":self.from_date, "until":self.until_date})
+        until_date = datetime.utcnow().isoformat()+"Z"
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json'),params={"discriminator":discriminator,"from":self.from_date, "until":until_date})
         data = json.loads(response.body)
         self._validateJsonStructure(data)
         self._validateDiscriminator(data,discriminator)                          
         self._validateFrom(data,self.from_date)
-        self._validateUntil(data,self.until_date)
+        self._validateUntil(data,until_date)
     @ForceCouchDBIndexing()
     def test_get_with_from_junk_date(self):
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"from":"abc123"},status=500)
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json'),params={"from":"abc123"},status=500)
         data = json.loads(response.body)
         assert not data['OK']
     @ForceCouchDBIndexing()
     def test_get_with_until_junk_date(self):
-        response = self.app.get(url('/extract/standards-alignment-dc-conformsTo/discriminator-by-ts/format/to-json'),params={"until":"abc123"},status=500)
+        response = self.app.get(url('/extract/standards-alignment-dct-conformsTo/discriminator-by-ts/format/to-json'),params={"until":"abc123"},status=500)
         data = json.loads(response.body)
         assert not data['OK']        
     def test_invalid_Data_service(self):
