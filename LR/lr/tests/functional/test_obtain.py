@@ -7,7 +7,7 @@ import lr.lib.helpers as h
 from webtest import AppError
 import time
 from pylons import config
-from lr.util.decorators import ForceCouchDBIndexing
+from lr.util.decorators import ForceCouchDBIndexing,SetFlowControl
 log = logging.getLogger(__name__)
 headers={'Content-Type': 'application/json'}
 class TestObtainController(TestController):
@@ -97,17 +97,9 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         self._validateResponse(response,params,map(lambda doc: doc['key'],self.db.view('_design/learningregistry-resource-location/_view/docs').rows))
-    @ForceCouchDBIndexing()
+    @SetFlowControl(True,config["lr.obtain.docid"])
+    @ForceCouchDBIndexing()                
     def test_flow_control_enabled(self):
-        nodeDb = self.server[config["couchdb.db.node"]]
-        serviceDoc = nodeDb[config["lr.obtain.docid"]]
-        flowControlCurrent = serviceDoc['service_data']['flow_control']
-        serviceDoc['service_data']['flow_control'] = True
-        idLimit = None
-        if serviceDoc['service_data'].has_key('id_limit'):
-            idLimit = serviceDoc['service_data']['id_limit']
-        serviceDoc['service_data']['id_limit'] = 100
-        nodeDb[config["lr.obtain.docid"]] = serviceDoc
         params = self._getInitialPostData()        
         params['ids_only'] = True
         params['by_doc_ID'] = True
@@ -115,22 +107,11 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         result = json.loads(response.body)
-        serviceDoc['service_data']['flow_control'] = flowControlCurrent
-        if idLimit is None:
-            del serviceDoc['service_data']['id_limit']
-        else:
-            serviceDoc['service_data']['id_limit'] = idLimit
-        nodeDb[config["lr.obtain.docid"]] = serviceDoc
         assert result.has_key('resumption_token')
-        assert len(result['documents']) == 100
-    @ForceCouchDBIndexing()        
+        assert len(result['documents']) == 100    
+    @SetFlowControl(False,config["lr.obtain.docid"])    
+    @ForceCouchDBIndexing()    
     def test_flow_control_disabled(self):
-        nodeDb = self.server[config["couchdb.db.node"]]
-        serviceDoc = nodeDb[config["lr.obtain.docid"]]
-        flowControlCurrent = serviceDoc['service_data']['flow_control']
-        serviceDoc['service_data']['flow_control'] = False
-        serviceDoc['service_data']['id_limit'] = 100
-        nodeDb[config["lr.obtain.docid"]] = serviceDoc
         params = self._getInitialPostData()        
         params['ids_only'] = True
         params['by_doc_ID'] = True
@@ -138,8 +119,6 @@ class TestObtainController(TestController):
         params = json.dumps(params)
         response = self.app.post(url(controller='obtain'), params=params ,headers=headers)
         result = json.loads(response.body)
-        serviceDoc['service_data']['flow_control'] = flowControlCurrent
-        nodeDb[config["lr.obtain.docid"]] = serviceDoc
         assert not result.has_key('resumption_token')
     @ForceCouchDBIndexing()        
     def test_create_by_doc_id(self):
@@ -255,6 +234,41 @@ class TestObtainController(TestController):
         params['request_id'] = self.resourceLocators[0]
         response = self.app.get(url(controller='obtain', **params))
         self._validateResponse(response,json.dumps(params),[self.resourceLocators[0]])
+    @SetFlowControl(True, config["lr.obtain.docid"])
+    @ForceCouchDBIndexing()
+    def test_request_ID_resource_and_token_get(self):
+        params = self._getInitialPostData()
+        params['request_id'] = self.resourceLocators[0]
+        firstResponse = json.loads(self.app.get(url(controller='obtain', **params)).body)
+        params['resumption_token'] = firstResponse['resumption_token']
+        response = json.loads(self.app.get(url(controller='obtain',**params), status=500).body)
+        assert response["OK"] == False    
+    @SetFlowControl(True, config["lr.obtain.docid"])
+    @ForceCouchDBIndexing()     
+    def test_request_ID_resource_and_token_get_complete(self):
+        params = self._getInitialPostData()
+        testKey = self.resourceLocators[0]
+        params['request_id'] = testKey        
+        while True:
+            path = url(controller='obtain', **params)
+            response = self.app.get(path)
+            data = json.loads(response.body)        
+            self._validateResponse(response,json.dumps(params),[testKey])
+            if "resumption_token" not in data or data['resumption_token'] is None:
+                break
+            params = {'resumption_token':data['resumption_token']} 
+    @SetFlowControl(True, config["lr.obtain.docid"])
+    @ForceCouchDBIndexing()
+    def test_request_ID_resource_and_token_get_complete_no_key(self):
+        params = self._getInitialPostData()   
+        while True:
+            path = url(controller='obtain', **params)
+            response = self.app.get(path)
+            data = json.loads(response.body)        
+            self._validateResponse(response,json.dumps(params),self.resourceLocators)
+            if "resumption_token" not in data or data['resumption_token'] is None:
+                break
+            params = {'resumption_token':data['resumption_token']}             
     @ForceCouchDBIndexing()        
     def test_get_fail_both_false(self):
         params = self._getInitialPostData()
@@ -264,7 +278,7 @@ class TestObtainController(TestController):
         try:
             response = self.app.get(url(controller='obtain',**params),headers=headers)
         except AppError as ex:
-            self._validateError(ex.message[ex.message.rfind('{'):])        
+            self._validateError(ex.message[ex.message.rfind('{'):])      
     @ForceCouchDBIndexing()        
     def test_obtain_empty_resource_locator(self):
         import uuid
@@ -278,11 +292,12 @@ class TestObtainController(TestController):
             doc['resource_locator'] = ""
             doc['doc_ID'] = uuid.uuid1().hex   
             self.db.save(doc)
-        response = self.app.get(url(controller='obtain',**params),headers=headers)
-        self.resourceLocators.append("")
-        results = self.db.view('_design/learningregistry-resource-location/_view/docs',keys=[""])
-        self._validateResponse(response,json.dumps(params),self.resourceLocators)
-        for i in results:
+        results = self.db.view('_design/learningregistry-resource-location/_view/docs')                    
+        response = self.app.get(url(controller='obtain',**params),headers=headers)             
+        resourceLocators = [row.key for row in results]
+        self._validateResponse(response,json.dumps(params),resourceLocators)
+        items_to_delete = (r for r in results if r.key == "")
+        for i in items_to_delete:
             del self.db[i.id]
     @ForceCouchDBIndexing()
     def test_get_fail_both_true(self):
