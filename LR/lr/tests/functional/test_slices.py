@@ -585,8 +585,33 @@ class TestSlicesController(TestController):
         index_opts={
             "limit":1
         }
-        req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_view/docs', opts=urllib.urlencode(index_opts), **couch), headers=json_headers)
-        resp = urllib2.urlopen(req).read()
+
+        retry = 0;
+        while True:
+            # force index
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_view/docs', opts=urllib.urlencode(index_opts), **couch), headers=json_headers)
+            resp = urllib2.urlopen(req).read()
+
+            # get last db sequence
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='', **couch), headers=json_headers)
+            db_info = json.loads(urllib2.urlopen(req).read())
+            log.debug("db_info: "+json.dumps(db_info))
+            # get last view sequenc
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_info', **couch), headers=json_headers)
+            view_info = json.loads(urllib2.urlopen(req).read())
+            log.debug("view_info: "+json.dumps(view_info))
+
+            # if the index is up-to-date, then these should be equal
+            if db_info['committed_update_seq'] == view_info['view_index']['update_seq']:
+                break;
+            # we'll allow a few retries to give couchdb more time (the silly change monitor might be causing some grief)
+            elif retry < 10:
+                retry += 1
+                time.sleep(3)
+            # by now, if it hasn't caught up... assert an error.
+            else:
+                assert db_info['committed_update_seq'] == view_info['view_index']['update_seq'], "CouchDB view index isn't updating!!!"
+
         result =  json.loads(self._slice(params).body)
         assert result['viewUpToDate']
 
