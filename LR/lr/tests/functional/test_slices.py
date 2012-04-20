@@ -573,6 +573,20 @@ class TestSlicesController(TestController):
     def test_is_view_updated(self):        
         with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
             data = json.load(f)    
+
+        retry = 0:
+        while True:
+            # get view info to determine if updater is running
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_info', **couch), headers=json_headers)
+            view_info = json.loads(urllib2.urlopen(req).read())
+            if 'updater_running' in view_info and view_info['updater_running'] == False:
+                break;
+            else if retry < 10:
+                retry += 1
+                time.sleep(3)
+            else:
+                assert view_info['updater_running'] == False, "View updater is still running, need to extend wait time probably so it stops before test can continue."
+
         result = self.app.post('/publish', params=json.dumps(data), headers=json_headers)                
         params = {ANY_TAGS:['lr-test-data']}
         result =  json.loads(self._slice(params).body)
