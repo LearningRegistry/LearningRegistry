@@ -592,7 +592,10 @@ class TestSlicesController(TestController):
                 break;
             elif retry < 10:
                 retry += 1
-                time.sleep(3)
+                wait_time = 5*retry
+                log.info("Waiting {0} seconds for view updater to stop.".format(wait_time))
+                time.sleep(wait_time)
+
             else:
                 assert view_info['updater_running'] == False, "View updater is still running, need to extend wait time probably so it stops before test can continue."
 
