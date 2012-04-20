@@ -278,8 +278,7 @@ class TestObtainController(TestController):
         try:
             response = self.app.get(url(controller='obtain',**params),headers=headers)
         except AppError as ex:
-            self._validateError(ex.message[ex.message.rfind('{'):])     
-    @SetFlowControl(True, config["lr.obtain.docid"])   
+            self._validateError(ex.message[ex.message.rfind('{'):])      
     @ForceCouchDBIndexing()        
     def test_obtain_empty_resource_locator(self):
         import uuid
@@ -293,11 +292,12 @@ class TestObtainController(TestController):
             doc['resource_locator'] = ""
             doc['doc_ID'] = uuid.uuid1().hex   
             self.db.save(doc)
-        response = self.app.get(url(controller='obtain',**params),headers=headers)
-        self.resourceLocators.append("")
-        results = self.db.view('_design/learningregistry-resource-location/_view/docs',keys=[""])
-        self._validateResponse(response,json.dumps(params),self.resourceLocators)
-        for i in results:
+        results = self.db.view('_design/learningregistry-resource-location/_view/docs')                    
+        response = self.app.get(url(controller='obtain',**params),headers=headers)             
+        resourceLocators = [row.key for row in results]
+        self._validateResponse(response,json.dumps(params),resourceLocators)
+        items_to_delete = (r for r in results if r.key == "")
+        for i in items_to_delete:
             del self.db[i.id]
     @ForceCouchDBIndexing()
     def test_get_fail_both_true(self):
