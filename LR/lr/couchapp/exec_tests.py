@@ -22,8 +22,10 @@ from subprocess import Popen, PIPE, STDOUT
 
 from couchapp.localdoc import document
 from couchapp import util
+from nose import tools
 
-
+# need this decorator to tell nose that this thing isn't a test
+@tools.nottest
 def test(conf, path, *args, **opts):
     export = opts.get('export', False)
     js = opts.get('spidermonkey', 'js');
