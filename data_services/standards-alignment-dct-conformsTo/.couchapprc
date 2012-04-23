@@ -1,0 +1,6 @@
+{
+    "extensions": [
+        "lr.couchapp.exec_tests"
+    ]
+
+}
