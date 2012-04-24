@@ -130,7 +130,11 @@ class MonitorChanges(BaseChangeMonitor):
 
     def run(self):
         #initialize the database in run side
-        self._database = couchdb.Server(self._serverUrl)[self._databaseName]
+        try:
+            self._database = couchdb.Server(self._serverUrl)[self._databaseName]
+        except:
+            server = couchdb.Server(self._serverUrl)
+            self._database = server.create(self._databaseName)    
         # As long as we are running keep monitoring the change feed for changes.
         log.debug("\n\nStart monitoring database : {0} changes PID: {1} since:{2}\n\n".format(
                     str(self._database), self.monitorId, self._lastChangeSequence))

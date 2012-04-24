@@ -65,6 +65,7 @@ couchdb.db.node = node
 couchdb.db.resourcedata = resource_data
 couchdb.db.network = network
 couchdb.db.community = community
+couchdb.db.incoming = incoming
 couchdb.db.resourcesview = _design/learningregistry-resources/_view/docs
 couchdb.db.resourcecount = _design/learningregistry-resources/_view/count
 couchdb.threshold.distributes = 1000
@@ -84,7 +85,7 @@ lr.services.docid = administrative:Network Node Services service
 lr.policy.docid = administrative:Resource Distribution Network Policy service
 lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
-
+lr.distribute_incoming_url = http://localhost/incoming
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 

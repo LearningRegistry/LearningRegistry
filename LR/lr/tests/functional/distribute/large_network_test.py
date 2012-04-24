@@ -50,6 +50,7 @@ def generateNodeConfig(numberOfNodes):
         config.set("couch_info", "community", nodeName+"_community")
         config.set("couch_info", "node",  nodeName+"_node")
         config.set("couch_info", "network",  nodeName+"_network")
+        config.set("couch_info", "incoming", nodeName+"_incoming")
         
         nodeConfigs[nodeName] = config
     return nodeConfigs
