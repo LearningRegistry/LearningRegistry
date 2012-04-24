@@ -38,10 +38,12 @@ class ObtainController(BaseController):
             args['limit'] = self.limit
         args['include_docs'] = include_docs
         if resumption_token is not None:
+            if 'key' not in args or len(args['keys']) == 0:
+                args['key'] = resumption_token['startkey']
             args['startkey'] = resumption_token['startkey']
             args['startkey_docid'] = resumption_token['startkey_docid']
             args['skip'] = 1
-        view = h.getView(database_url=db_url,view_name=view_name,documentHandler=lambda d: h.document(d),**args)
+        view = h.getView(database_url=db_url,view_name=view_name,method="GET",documentHandler=lambda d: h.document(d),**args)
         return view
     def _getServiceDocment(self,full_docs):
         self.enable_flow_control = False
@@ -102,7 +104,7 @@ class ObtainController(BaseController):
         elif count < self.limit:
             yield '], "resumption_token":%s}' % 'null'
         else:
-            token = rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId)
+            token = h.fixUtf8(rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId))
             yield '], "resumption_token":"%s"}' % token
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""        
@@ -180,6 +182,8 @@ class ObtainController(BaseController):
         return self._performObtain(data)
         # url('obtain', id=ID)
     def _parseParams(self,params):
+        if "resumption_token" in params and len(params) > 1:
+            abort(500,"resumption_token must be the only parameter")
         data = {
             'by_doc_ID':False,
             'by_resource_ID':True,
@@ -195,7 +199,6 @@ class ObtainController(BaseController):
             data['ids_only'] = params['ids_only'] in trues
         if params.has_key('resumption_token'):
             data['resumption_token'] = rt.parse_token('obtain',params['resumption_token'])
-            log.debug(data['resumption_token'])
         if params.has_key('callback'):
             data['callback'] = params['callback']
         if params.has_key('request_ID'):
@@ -206,7 +209,6 @@ class ObtainController(BaseController):
             data['request_IDs'].extend(params['request_IDs'])
         if data['by_resource_ID']:
             data['request_IDs'] = [unquote_plus(id) for id in data['request_IDs']]        
-        log.debug(data)
         return data        
     def edit(self, id, format='html'):
         """GET /obtain/id/edit: Form to edit an existing item"""

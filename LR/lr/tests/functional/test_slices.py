@@ -571,13 +571,7 @@ class TestSlicesController(TestController):
                 assert self._checkTimestamp(doc['resource_data_description'], self.test_start_date_string+self.test_time_string)
                 assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_by_date_and_identity")
     def test_is_view_updated(self):        
-        with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
-            data = json.load(f)    
-        result = self.app.post('/publish', params=json.dumps(data), headers=json_headers)                
-        params = {ANY_TAGS:['lr-test-data']}
-        result =  json.loads(self._slice(params).body)
-        assert not result['viewUpToDate']
-
+        
         couch = {
             "url": config["couchdb.url"],
             "resource_data": config["couchdb.db.resourcedata"]
@@ -585,8 +579,59 @@ class TestSlicesController(TestController):
         index_opts={
             "limit":1
         }
-        req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_view/docs', opts=urllib.urlencode(index_opts), **couch), headers=json_headers)
-        resp = urllib2.urlopen(req).read()
+
+        with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
+            data = json.load(f)    
+
+        retry = 0
+        while True:
+            # get view info to determine if updater is running
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_info', **couch), headers=json_headers)
+            view_info = json.loads(urllib2.urlopen(req).read())
+            if 'view_index' in view_info and view_info['view_index']['updater_running'] == False:
+                break;
+            elif retry < 10:
+                retry += 1
+                wait_time = 5*retry
+                log.info("Waiting {0} seconds for view updater to stop.".format(wait_time))
+                time.sleep(wait_time)
+
+            else:
+                assert view_info['updater_running'] == False, "View updater is still running, need to extend wait time probably so it stops before test can continue."
+
+        result = self.app.post('/publish', params=json.dumps(data), headers=json_headers)                
+        params = {ANY_TAGS:['lr-test-data']}
+        result =  json.loads(self._slice(params).body)
+        assert not result['viewUpToDate']
+
+   
+
+        retry = 0
+        while True:
+            # force index
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_view/docs', opts=urllib.urlencode(index_opts), **couch), headers=json_headers)
+            resp = urllib2.urlopen(req).read()
+
+            # get last db sequence
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='', **couch), headers=json_headers)
+            db_info = json.loads(urllib2.urlopen(req).read())
+            log.debug("db_info: "+json.dumps(db_info))
+            # get last view sequenc
+            req = urllib2.Request("{url}/{resource_data}/{view}".format(view='_design/learningregistry-slice/_info', **couch), headers=json_headers)
+            view_info = json.loads(urllib2.urlopen(req).read())
+            log.debug("view_info: "+json.dumps(view_info))
+
+            # if the index is up-to-date, then these should be equal
+            if db_info['committed_update_seq'] == view_info['view_index']['update_seq']:
+                break;
+            # we'll allow a few retries to give couchdb more time (the silly change monitor might be causing some grief)
+            elif retry < 10:
+                retry += 1
+                time.sleep(3)
+            # by now, if it hasn't caught up... assert an error.
+            else:
+                assert db_info['committed_update_seq'] == view_info['view_index']['update_seq'], "CouchDB view index isn't updating!!!"
+
         result =  json.loads(self._slice(params).body)
         assert result['viewUpToDate']
 

@@ -14,9 +14,29 @@ import ijson
 from ijson.parse import items
 import os
 import urllib
-
+import couchdb
 log = logging.getLogger(__name__)
-
+import copy
+class SetFlowControl(object):
+    def __init__(self,enabled,serviceDoc):
+        server = couchdb.Server(config['couchdb.url'])
+        self.nodeDb = server[config['couchdb.db.node']]
+        self.enabled = enabled
+        self.serviceDoc = serviceDoc
+    def __call__(self,f):
+        def set_flow_control(obj, *args, **kw):
+            serviceDoc = self.nodeDb[self.serviceDoc]
+            service_data = copy.deepcopy(serviceDoc['service_data'])     
+            serviceDoc['service_data']['flow_control'] = self.enabled
+            serviceDoc['service_data']['doc_limit'] = 100
+            serviceDoc['service_data']['id_limit'] = 100
+            self.nodeDb[self.serviceDoc] = serviceDoc
+            try:
+                f(obj, *args, **kw)
+            finally:
+                serviceDoc['service_data'] = service_data         
+                self.nodeDb[self.serviceDoc] = serviceDoc  
+        return set_flow_control
 def ForceCouchDBIndexing():
     json_headers = {"Content-Type": "application/json"}
     couch = {
@@ -40,7 +60,7 @@ def ForceCouchDBIndexing():
                     index_opts = { "limit": 1, "descending": 'true'}
                     if "reduce" in row.doc["views"][view]:
                         index_opts["reduce"] = 'false'
-                    # log.error("Indexing: {0}".format( view_name))
+                    # log.debug("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
                     res = urllib2.urlopen(req)

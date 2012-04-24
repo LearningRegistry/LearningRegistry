@@ -42,6 +42,7 @@ def make_map(config):
     
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
+    map.resource("register","register")
     mapResource('lr.status.docid', 'status','status')
     mapResource('lr.distribute.docid','distribute','distribute')
     if not LRNode.nodeDescription.gateway_node:
@@ -55,6 +56,8 @@ def make_map(config):
         mapResource('lr.oaipmh.docid', 'OAI-PMH', 'OAI-PMH')
         mapResource('lr.slice.docid', 'slice', 'slice')
         mapResource('lr.sword.docid', 'swordservice','swordservice')    
+    map.connect("/extract/{dataservice}/{view}",controller='extract', action='get', list='to-json')
+    map.connect("/extract/{dataservice}/{view}/format/{list}",controller='extract', action='get')
     map.minimization = False
     map.explicit = False
 

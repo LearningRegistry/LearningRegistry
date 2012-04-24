@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import urllib2,os,json,codecs
 import ConfigParser
 from random import choice
@@ -22,8 +22,8 @@ if args.key is not None and args.key_location is not None:
     signer = Sign_0_21(privateKeyID=args.key ,publicKeyLocations=[args.key_location], passphrase=args.passphrase, gpgbin=args.gpgbin)
 _config = ConfigParser.ConfigParser()
 _config.read(args.config)
-root_path = _config.get("upload", "root_path")
-publish_url = _config.get("upload", "publish_url")
+#root_path = _config.get("upload", "root_path")
+#publish_url = _config.get("upload", "publish_url")
 lr_test_data = args.lr_test_data.lower() in ["true", "t", "yes" "1"]
 
 if args.publish_url != None:
