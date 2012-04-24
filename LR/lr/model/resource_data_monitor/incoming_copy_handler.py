@@ -9,7 +9,7 @@ import os
 from pylons import config
 from lr.lib import helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
-
+from lr.model import ResourceDataModel
 log = logging.getLogger(__name__)
 
 scriptPath = os.path.dirname(os.path.abspath(__file__))
@@ -38,7 +38,14 @@ class IncomingCopyHandler(BaseChangeHandler):
 
 	def _handle(self, change, database):
 
-		newDoc = change[_DOC]
-		newDoc['node_timestamp'] = h.nowToISO8601Zformat()
-		del newDoc['_rev']
-		self._db.save(newDoc)
+		try:
+			newDoc = change[_DOC]
+			newDoc['node_timestamp'] = h.nowToISO8601Zformat()
+			rd = ResourceDataModel(newDoc)
+			rd.save()
+			del database[newDoc['node_ID']]
+		except SpecValidationException:
+			log.error(str(newDoc) + " Fails Validation" )
+		except Exception as ex:
+			log.error(ex)
+			pass#ignore conflicts when copying
