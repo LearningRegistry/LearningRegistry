@@ -42,6 +42,10 @@ _NODE = _config.get("app:main", "couchdb.db.node")
 _COMMUNITY = _config.get("app:main", "couchdb.db.community")
 _NETWORK = _config.get("app:main", "couchdb.db.network")
 
+try:
+    _INCOMING = _config.get("app:main", "couchdb.db.incoming")
+except:
+    _INCOMING = 'incoming'
 # Dictionary of types services and the corresponding services that are added 
 # by default to the node.  The format is 
 # "<serviceType>":["<list of services of Name>"]
@@ -145,7 +149,7 @@ def setConfigFile(nodeSetup):
     # set the url to for destribute/replication (that is the url that a source couchdb node
     # will use for replication.
     _config.set("app:main", "lr.distribute_resource_data_url",  nodeSetup['distributeResourceDataUrl'])
-
+    _config.set("app:main", "lr.distribute_incoming_url", nodeSetup['distributeIncomingUrl'])
     if server.version() < "1.1.0":
         _config.set("app:main", "couchdb.stale.flag", "OK")
         
@@ -154,14 +158,16 @@ def setConfigFile(nodeSetup):
     destConfigfile.close()
       
       #Re-read the database info to make we have the correct urls
-    global _RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK
+    global _RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK, _INCOMING
     _config.read(_PYLONS_CONFIG_DEST)
     _RESOURCE_DATA = _config.get("app:main", "couchdb.db.resourcedata")
     _NODE = _config.get("app:main", "couchdb.db.node")
     _COMMUNITY = _config.get("app:main", "couchdb.db.community")
     _NETWORK = _config.get("app:main", "couchdb.db.network")
-    
-
+    try:
+        _INCOMING = _config.get("app:main", "couchdb.db.incoming")
+    except:
+        _INCOMING = 'incoming'
 
 if __name__ == "__main__":
 
@@ -192,6 +198,7 @@ if __name__ == "__main__":
 
     #Create the databases.
     CreateDB(server, dblist=[_RESOURCE_DATA])
+    CreateDB(server, dblist=[_INCOMING])
     
     #Delete the existing databases
     CreateDB(server, dblist=[ _NODE, _NETWORK, _COMMUNITY], deleteDB=True)
