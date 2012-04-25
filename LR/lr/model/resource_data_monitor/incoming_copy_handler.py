@@ -12,10 +12,11 @@ from lr.lib.couch_change_monitor import BaseChangeHandler
 from lr.model import ResourceDataModel
 log = logging.getLogger(__name__)
 
-scriptPath = os.path.dirname(os.path.abspath(__file__))
-_PYLONS_CONFIG =  os.path.join(scriptPath, '..', '..', '..', 'development.ini.orig')
-_config = ConfigParser.ConfigParser()
-_config.read(_PYLONS_CONFIG)
+# this doesn't need to be done... should be handled by pylons.config
+# scriptPath = os.path.dirname(os.path.abspath(__file__))
+# _PYLONS_CONFIG =  os.path.join(scriptPath, '..', '..', '..', 'development.ini')
+# _config = ConfigParser.ConfigParser()
+# _config.read(_PYLONS_CONFIG)
 
 _RESOURCE_DISTRIBUTABLE_TYPE = "resource_data_distributable"
 _DOC_TYPE = "doc_type"
@@ -24,8 +25,8 @@ _DOC = "doc"
 
 class IncomingCopyHandler(BaseChangeHandler):
 	def __init__(self):
-		self._serverUrl = _config.get("app:main", "couchdb.url")
-		self._targetName = _config.get("app:main", "couchdb.db.resourcedata")	
+		self._serverUrl = config["couchdb.url"]
+		self._targetName = config["couchdb.db.resourcedata"]
 		
 		s = couchdb.Server(self._serverUrl)
 		self._db = s[self._targetName]
