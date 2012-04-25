@@ -23,9 +23,15 @@ class BaseViewsUpdateHandler(BaseChangeThresholdHandler):
     """
     def _updateView(self, viewUrl):
         log.debug('start view update %s' % viewUrl)
-        log.debug(urllib2.urlopen(viewUrl).read())
+        try:
+            log.debug(urllib2.urlopen(viewUrl).read())
+        except Exception as e:
+            log.error("Error Updating: %s\n%s" % (viewUrl, e))
     def _compactView(self,compactUrl):
-        log.debug(urllib2.urlopen(compactUrl).read())
+        try:
+            log.debug(urllib2.urlopen(compactUrl).read())
+        except Exception as e:
+            log.error("Error Compacting: %s\n%s" % (compactUrl, e))
     def _handle (self, change, database):
         log.debug("class: {0} Updating views ...".format(self.__class__.__name__))
         try:
