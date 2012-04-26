@@ -1,6 +1,6 @@
 function(doc, req){
         // Don't send the design document.
-        if ( !doc || (doc.doc_type != "resource_data_distributable")){
+        if ( !doc || (doc.doc_type != "resource_data")){
             //print("Ignore document that is not resource_data_distributable: "+ doc);
             return false;
         }
