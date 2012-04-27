@@ -20,6 +20,7 @@ from update_views_handler import  UpdateViewsHandler
 from distribute_threshold_handler import DistributeThresholdHandler
 from track_last_sequence import TrackLastSequence
 from incoming_copy_handler import IncomingCopyHandler
+from compaction_handler import CompactionHandler
 from pylons import config
 
 appConfig = config['app_conf']
@@ -30,7 +31,8 @@ _CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
 _RESOURCE_DATA_CHANGE_HANDLERS=[
     TrackLastSequence(_CHANGE_ID),
     UpdateViewsHandler(appConfig['couchdb.threshold.viewupdate']),
-    DistributeThresholdHandler(appConfig['couchdb.threshold.distributes'])
+    DistributeThresholdHandler(appConfig['couchdb.threshold.distributes']),
+    CompactionHandler(appConfig['couchdb.threshold.compaction'])
     ]
 
 _INCOMING_CHANGE_HANDLERS=[
