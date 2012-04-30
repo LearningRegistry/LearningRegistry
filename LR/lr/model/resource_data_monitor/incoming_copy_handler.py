@@ -45,9 +45,12 @@ class IncomingCopyHandler(BaseChangeHandler):
 			log.debug('got here')
 			newDoc = change[_DOC]
 			newDoc['node_timestamp'] = h.nowToISO8601Zformat()
+			if newDoc[_DOC_TYPE] == _RESOURCE_DISTRIBUTABLE_TYPE:
+				doc['_id'] = doc['doc_ID']
+				doc[_DOC_TYPE] = _RESOURCE_TYPE
 			rd = ResourceDataModel(newDoc)
 			rd.save()
-			del database[newDoc['node_ID']]
+			del database[newDoc['_id']]
 		except SpecValidationException:
 			log.error(str(newDoc) + " Fails Validation" )
 		except ResourceConflict:
