@@ -42,12 +42,11 @@ class IncomingCopyHandler(BaseChangeHandler):
 	def _handle(self, change, database):
 
 		try:
-			log.debug('got here')
 			newDoc = change[_DOC]
 			newDoc['node_timestamp'] = h.nowToISO8601Zformat()
-			if newDoc[_DOC_TYPE] == _RESOURCE_DISTRIBUTABLE_TYPE:
-				doc['_id'] = doc['doc_ID']
-				doc[_DOC_TYPE] = _RESOURCE_TYPE
+			if newDoc[_DOC_TYPEnewDoc_RESOURCE_DISTRIBUTABLE_TYPE:
+				newDoc['_id'] = doc['doc_ID']
+				newDoc[_DOC_TYPE] = _RESOURCE_TYPE
 			rd = ResourceDataModel(newDoc)
 			rd.save()
 			del database[newDoc['_id']]
