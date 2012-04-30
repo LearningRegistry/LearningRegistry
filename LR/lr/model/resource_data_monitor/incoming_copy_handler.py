@@ -44,8 +44,8 @@ class IncomingCopyHandler(BaseChangeHandler):
 		try:
 			newDoc = change[_DOC]
 			newDoc['node_timestamp'] = h.nowToISO8601Zformat()
-			if newDoc[_DOC_TYPEnewDoc_RESOURCE_DISTRIBUTABLE_TYPE:
-				newDoc['_id'] = doc['doc_ID']
+			if newDoc[_DOC_TYPE] == _RESOURCE_DISTRIBUTABLE_TYPE:
+				newDoc['_id'] = newDoc['doc_ID']
 				newDoc[_DOC_TYPE] = _RESOURCE_TYPE
 			rd = ResourceDataModel(newDoc)
 			rd.save()
