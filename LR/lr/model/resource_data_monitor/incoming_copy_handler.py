@@ -40,19 +40,22 @@ class IncomingCopyHandler(BaseChangeHandler):
 
 
 	def _handle(self, change, database):
-
+		should_delete = True
 		try:
+			log.debug('got here')
 			newDoc = change[_DOC]
 			newDoc['node_timestamp'] = h.nowToISO8601Zformat()
-			if newDoc[_DOC_TYPE] == _RESOURCE_DISTRIBUTABLE_TYPE:
-				newDoc['_id'] = newDoc['doc_ID']
-				newDoc[_DOC_TYPE] = _RESOURCE_TYPE
 			rd = ResourceDataModel(newDoc)
-			rd.save()
-			del database[newDoc['_id']]
+			rd.save()				
 		except SpecValidationException:
 			log.error(str(newDoc) + " Fails Validation" )
 		except ResourceConflict:
 			pass #ignore conflicts
 		except Exception as ex:
+			should_delete = False # don't delete something unexpected happend
 			log.error(ex)
+		if should_delete:
+			try:
+				del database[change[_DOC]['node_ID']]
+			except Exception as ex:
+				log.error(ex)
