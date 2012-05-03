@@ -1,0 +1,812 @@
+    
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>LR Data Services</title>
+    
+    <meta name="description" content="Learning Registry Data Services">
+    <meta name="author" content="Jim Klo">
+    <meta name="viewport" content="width=1024, user-scalable=no">
+    
+
+    <link rel="stylesheet" href="../includes/css/blitzer/jquery-ui-1.8.18.custom.css">
+
+    <!-- Core and extension CSS files -->
+    <link rel="stylesheet" href="../includes/deck.js/core/deck.core.css">
+    <link rel="stylesheet" href="../includes/deck.js/extensions/goto/deck.goto.css">
+    <link rel="stylesheet" href="../includes/deck.js/extensions/menu/deck.menu.css">
+    <link rel="stylesheet" href="../includes/deck.js/extensions/navigation/deck.navigation.css">
+    <link rel="stylesheet" href="../includes/deck.js/extensions/status/deck.status.css">
+    <link rel="stylesheet" href="../includes/deck.js/extensions/hash/deck.hash.css">
+    <link rel="stylesheet" href="../includes/deck.js/extensions/codemirror/deck.codemirror.css">
+
+    <!-- Theme CSS files (menu swaps these out) -->
+    <link rel="stylesheet" id="style-theme-link" href="../includes/deck.js/themes/style/swiss.css">
+    <link rel="stylesheet" id="transition-theme-link" href="../includes/deck.js/themes/transition/horizontal-slide.css">
+    
+
+    <!-- Codemirror CSS -->
+    <link rel="stylesheet" href="../includes/deck.js/extensions/codemirror/themes/default.css">
+
+    <!-- Custom CSS just for this page -->
+    <link rel="stylesheet" href="../includes/css/common.css">
+    <link rel="stylesheet" href="dataservice.css">
+    
+    
+
+    
+    <script src="../includes/deck.js/modernizr.custom.js"></script>
+</head>
+
+
+<body class="introduction">
+
+
+<header>
+    <nav>
+        <h1><a href="../">LR Data Services</a></h1>
+        
+        <div class="theme-menu">
+            <label for="style-themes">Style Theme:</label>
+            <select id="style-themes">
+                <option value="../includes/deck.js/themes/style/web-2.0.css">Web 2.0</option>
+                <option selected value="../includes/deck.js/themes/style/swiss.css">Swiss</option>
+                <option value="../includes/deck.js/themes/style/neon.css">Neon</option>
+                <option value="">None</option>
+            </select>
+
+            <label for="transition-themes">Transition Theme:</label>
+            <select id="transition-themes">
+                <option selected value="../includes/deck.js/themes/transition/horizontal-slide.css">Horizontal Slide</option>
+                <option value="../includes/deck.js/themes/transition/vertical-slide.css">Vertical Slide</option>
+                <option value="../includes/deck.js/themes/transition/fade.css">Fade</option>
+                <option value="">None</option>
+            </select>
+        </div>
+        
+        <!-- <ul>
+            <li>Getting Started</li>
+            <li><a href="../docs">Docs</a></li>
+            <li><a href="http://github.com/imakewebthings/deck.js">GitHub</a></li>
+        </ul> -->
+    </nav>
+</header>
+
+<article class="deck-container">
+    <section class="slide" id="title-slide">
+        <h1>Getting Started<br/>with<br/>LR Data Services</h1>
+        <div class="not_mozilla">
+            <img src="about-logo.png" alt="Firefox Recommended">
+            <div class="right">We notice you're not using Firefox. Some of the "Try It" features are only supported Firefox as they require a feature, E4X, that is present only in Mozilla's Javascript engine, which CouchDB uses. Please use Firefox if you wish to use "Try It" to it's fullest.</div>
+            <div class="clear" />
+        </div>
+    </section>
+
+    <section class="slide" id="what-was-data-services">
+        <h2>What Was Data Services?</h2>
+        <div class="subject-noflow">
+            <img class="old-ds" src="./old-data-services.png">
+        </div>
+        <ul class="topic">
+            <li>Make it easier to get relevant data.</li>
+            <li>Get clean data.</li>
+            <ul>
+                <li>In depth scrutiny of the LR data.</li>
+                <li>I.E. Schemas &amp; Signatures validated, envelopes filtered.</li>
+            </ul>
+            <li>Mostly external, complementary to a LR Node.</li>
+        </ul>
+        <div class="footer"></div>
+    </section>
+
+
+    <section class="slide" id="what-are-data-services">
+        <h2>What Is LR Data Services Now?</h2>
+        <ol>
+            <li class="slide">
+                <h3>A Way to Get the Data You Want</h3>
+                <p>Only interested in one specific kind of data? Data Services aims to provide a way to extract the data that's relevant to you through simple customization.</p>
+            </li>
+            <li class="slide">
+                <h3>It's A Design Pattern, With Some "Batteries Included".</h3>
+                <ul>
+                    <li>Follow simple conventions to identify <strong>discriminators</strong> within the LR documents</li>
+                    <li>Reuse or modify community-sourced libraries to aid in extracting data for your use case</li>
+                    <li>Install your data service code into a LR Node's CouchDB</li>
+                    <li>Access your custom solution via the <code>extract</code> HTTP service API installed on the node.</li>
+           <!--        , you can create a harvest-like service from LR that can leverage a standardized extraction API.</p> -->
+                </ul>
+            </li>
+            <li class="slide">
+                <h3>A Path Towards Making LR use Fewer Resources</h3>
+                <p>We know LR can potentially hold mountains of data, and has a few data extraction services that utilize loads of storage space. This is a way to extract data in a very focused manner, which will result in substantial storage savings.</p>
+            </li>
+        </ol>
+    </section>
+
+    <section class="slide" id="what-is-a-discriminator">
+        <h2>What Is a Discriminator?</h2>
+        <p>Discriminators in Data Services are the characteristics of the data that you've identified that you want to capture.
+        <ul>
+            <li>This allows you to exclude data you do not know how to process or recognize as quality information.</li>
+            <li>For example, if you were only interested in ASN urls contained within the &lt;conformsTo&gt; element of XML metadata that uses a Dublin Core Terms schema, the identified ASN url becomes your discriminator.</li></ul></p>
+    </section>
+
+    <section class="slide" id="what-can-ds-do">
+        <h2>What Can Data Services Do?</h2>
+        <p>Following the conventions outlined, you will be able to extract data using:</p>
+        <ul>
+            <li>Resource Locator by Discriminator</li>
+            <li>Resource Locator by start of Discriminator</li>
+            <li>Resource Locator by Timestamp</li>
+            <li>Discriminator by Resource Locator</li>
+            <li>Discriminator by start of Resource Locator</li>
+            <li>Discriminator by Timestamp</li>
+            <li>Discriminated Resource Locator by Timestamp</li>
+            <li>All Discriminated Resources</li>
+        </ul>
+    </section>
+
+
+    <section class="slide" id="asn-prototype">
+        <h2>The Alignment to Standards Prototype Example</h2>
+        <p>The prototype implementation can provide a Data Service that will allow use of the extract service to request resource data and aggregations where ASN's are Discriminators, `resource_locator`'s are Resource resource_locator, and `node_timestamp`'s are Timestamps, which will enable us to get:</p>
+        <ul>
+            <li>`resource_locator` by ASN</li>
+            <li>`resource_locator` by start of ASN</li>
+            <li>`resource_locator` by `node_timestamp`</li>
+            <li>ASN by `resource_locator`</li>
+            <li>ASN by start of `resource_locator`</li>
+            <li>ASN by `node_timestamp`</li>
+            <li>ASN `resource_locator`s by `node_timestamp`</li>
+            <li>All ASN `resource_locator`s</li>
+        </ul>
+    </section>
+
+
+    <section class="slide" id="conventions">
+        <h2>Conventions</h2>
+
+        <p>To follow the K.I.S.S principle, we're adopting a set of conventions to make adding new data services simple. These conventions are part of a CouchDB design documnent.</p>
+
+        <ul class="topic wide">
+            <li class="slide" >A field named <code>dataservice</code> so the extract service can locate the implementation. The field will contain a map that indicates the name and description of the data service. More details for this TBD!</li>
+            <li class="slide">Views must follow a specific naming convention.</li>
+            <li class="slide">View functions must emit specific keys according to the view they implement.</li>
+            <li class="slide">Timestamps must be represented as seconds from epoch.</li>
+            <!-- <li class="slide">Views must always implement a reduce.</li> -->
+            <li class="slide">List should be named respective of their output format. Included in the prototype is a reference sample for to-json.</li>
+        </ul>
+
+
+        
+<code class="subject"><pre>{
+    "_id": "_design/standards-alignment",
+    <span class="ds">"dataservice": { <span class="ds-val">
+        "name": "Standards Alignment Data Service",
+        "description": "This is where I would document how this data service works."
+    </span>}</span>,
+    "views": { <span class="ds-views">
+        "discriminator-by-resource": { <span class="json">
+            "map": "function (doc) { emit(<span class="key">[doc.resource_locator, getDescriminator(doc), <span class="ts">getEpochTimestamp(doc)</span>]</span>, null); }",
+           <!--  <span class="reduce">"reduce": "_count"</span> -->
+        </span>},
+        "discriminator-by-resource-ts": { <span class="json">
+            "map": "function (doc) { emit(<span class="key">[doc.resource_locator, <span class="ts">getEpochTimestamp(doc)</span>, getDescriminator(doc)]</span>, null); }",
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
+        </span>},
+        "resource-by-discriminator": { <span class="json">
+            "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), doc.resource_locator, <span class="ts">getEpochTimestamp(doc)</span>]</span>, null); }",
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
+        </span>},
+        "resource-by-discriminator-ts": {<span class="json">
+            "map": "function (doc) { emit(<span class="key">[getDescriminator(doc), <span class="ts">getEpochTimestamp(doc)</span>, doc.resource_locator]</span>, null); }",
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
+        </span>},
+        "resource-by-ts": {<span class="json">
+            "map": "function (doc) { emit(<span class="key">[<span class="ts">getEpochTimestamp(doc)</span>, doc.resource_locator]</span>, null); }",
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
+        </span>},
+        "discriminator-by-ts": {<span class="json">
+            "map": "function (doc) { emit(<span class="key">[<span class="ts">getEpochTimestamp(doc)</span>, getDescriminator(doc)]</span>, null); }",
+             <!-- <span class="reduce">"reduce": "_count"</span> -->
+        </span>} 
+    </span>},
+    <span class="lists">"lists": { "to-json": "function(head, req) { ... }" }</span>
+}</pre></code>
+        
+
+        <div class="foot"></div>
+    </section>
+
+    <section class="slide" id="map-functions-described">
+        <h2>How Map Functions Work</h2>
+        <div>
+        <p>In LR, each record is JavaScript object, much like the one displayed below. The map function will process each individual object once for each view.</p>
+        <h3>A Resource Data Document</h3>
+        <textarea id="lr_paradata_doc_json" class="code" mode="javascript" style="display: none;">
+{
+    "_id": "c9966f4e59e04b168c733b19d7fcb4ad",
+    "_rev": "1-a6aae49518aa1ec59f223d4631e9eef4",
+    "keys": ["nanometer", "atom", "standards alignment", "Cells", "Environmental Issues", "ions", "magnetic field", "English-Language Arts", "California Academic Content Standards", "Equations and Inequalities", "Music", "Vocabulary &amp; Spelling", "Physics", "Factoring", "delta", "predicatable text", "Botany and Plant Science", "California's Common Core Content Standards", "Algebra &amp; Functions", "Earth &amp; Space Science", "Grade 12", "Grade 11", "Grade Pre-K", "Chemistry", "Grade 10", "Biochemistry", "aurora borealis", "Mathematics", "natural resource", "watershed", "particle", "conservation", "electron", "charged particles", "Grade K", "water", "northern lights", "Life Sciences", "Structure and Function in Living Things", "Reading Comprehension", "nano", "Science", "water cycle", "Grade 9", "Visual Arts", "Literary Analysis", "Grade 8", "Grade 5", "Grade 6", "Grade 3", "Grade 1", "Grade 2", "high frequency"],
+    "TOS": {
+        "submission_attribution": "Copyright 2011 California Department of Education: CC-BY-3.0",
+        "submission_TOS": "http://creativecommons.org/licenses/by/3.0/"
+    },
+    "payload_placement": "inline",
+    "node_timestamp": "2012-02-28T17:01:59.202435Z",
+    "create_timestamp": "2012-02-28T17:01:59.202435Z",
+    "update_timestamp": "2012-02-28T17:01:59.202435Z",
+    "active": true,
+    "publishing_node": "3b7ea975ac0f4c2c89a62268be6cbb03",
+    "resource_locator": "http://www.readwritethink.org/lessons/lesson_view.asp?id=131",
+    "identity": {
+        "signer": "Brokers of Expertise",
+        "submitter": "Brokers of Expertise",
+        "submitter_type": "agent"
+    },
+    "doc_type": "resource_data",
+    "resource_data": {
+        "activity": {
+            "content": "A resource found at http://www.readwritethink.org/lessons/lesson_view.asp?id=131 was matched to the academic content standard with ID http://purl.org/ASN/resources/S10000FE by a member of the Brokers of Expertise Standards Matching Group on November 7, 2011",
+            "related": [{
+                "content": "Recognize that sentences in print are made up of separate words.",
+                "id": "http://purl.org/ASN/resources/S10000FE",
+                "objectType": "academic standard"
+            }],
+            "verb": {
+                "action": "matched",
+                "date": "2011-11-07",
+                "context": {
+                    "objectType": "LMS",
+                    "id": "http://www.myboe.org/go/resource/7238",
+                    "description": "Brokers of Expertise resource management page"
+                }
+            },
+            "actor": {
+                "url": "http://myboe.org/go/groups/standards_matchers",
+                "displayName": "Brokers of Expertise Standards Matching Group",
+                "objectType": "group"
+            },
+            "object": {
+                "id": "http://www.readwritethink.org/lessons/lesson_view.asp?id=131"
+            }
+        }
+    },
+    "resource_data_type": "paradata",
+    "payload_schema": ["LR Paradata 1.0"],
+    "doc_version": "0.23.0",
+    "doc_ID": "c9966f4e59e04b168c733b19d7fcb4ad"
+}</textarea>
+        </div>
+    </section>
+
+    <section class="slide" id="map-functions-tryit">
+        <h2>How Map Functions Work: Try It</h2>
+        <div class="body">
+            <p>A map function takes takes one argument, the Resource Data Document. The function should perform the following tasks against the document:</p>
+            <ul>
+                <li>Evaluate the document to determine if the document should be included in the index. Does it meet some set of criteria specific to your use case?</li>
+                <li>If the document should be included, define the structure of the keys and values in the index. Remember to follow the key conventions defined earlier.</li>
+            </ul>
+            <p>Below is a sample implementation of a data services map function. Try editing and click run to learn what get's created in the index.</p>
+            <a class="show-code" href="javascript: void(0);">show sample resource data</a>
+        </div>
+<script type="codemirror" data-selector="#lr_paradata_doc_json">
+var docs = exports.alignment_data;
+
+var log = function() { console.log(arguments) };
+var ASNPatterns = exports.alignment.ASNPatterns;
+var Alignment = exports.alignment.Alignment;
+var convertDateToSeconds = exports.alignment.convertDateToSeconds;
+
+exports.mock_couchdb.mock_emit.clear();
+$('#map-functions-described div.deck-codemirror-result').html("");
+var emit = exports.mock_couchdb.emit;
+</script>
+<script type="codemirror/cleanup" data-selector="#lr_paradata_doc_json">
+    var editor_contents = cm.getValue();
+
+    var local = {};
+    var sbox_map = "local.map = (function(){ return " + 
+        editor_contents + ";})()";
+    try {
+        eval(sbox_map);
+   
+        for (var i in docs) {
+            local.map(docs[i]);
+        }
+     } catch (e) {
+        console.log("PARSER ERROR:");
+        if (e) {
+           console.log(e); 
+        } else {
+            console.log("Syntax Error.")
+        }
+    }
+
+    var mock_emit = exports.mock_couchdb.mock_emit;
+    console.log("ROWS EMITTED:");
+    console.log(JSON.stringify(mock_emit.emitted, null, "&nbsp;").replace(/\n/g, "<br/>"));
+    
+</script>
+<textarea id="lr_paradata_doc_json" class="code" mode="javascript" style="display: none;" runnable="true" globals="exports,$,editor" codemirror="cm">
+function(doc) {
+
+    /***
+     * When using python CouchApp to build, !code is a macro to insert the contents of the
+     * specified file when compiling into a design document.
+     */
+    // !code lib/alignment.js
+
+    try {
+        if (doc.doc_type == "resource_data" && doc.resource_data && doc.resource_locator && doc.node_timestamp) {
+            var nodeTimestamp = convertDateToSeconds(doc);
+
+            /****
+             * For Parsing LR Paradata 1.0 with alignment information.        
+             ****/
+            var seen = {};
+            var parserLR = function (objStr, verb) {
+                for (re in ASNPatterns){
+                    var stds = objStr.match(ASNPatterns[re]);
+                    for (s in stds) {
+                        if (!seen[s]) {
+                            emit([doc.resource_locator, nodeTimestamp, [verb, stds[s]]], null);
+                            seen[s] = 1;
+                        }
+                    }
+                }
+            };
+
+            Alignment.parseLRParadata(doc.resource_data, parserLR);
+
+            /****
+             * For Parsing Dublin Core Terms <conformsTo> elements.        
+             ****/ 
+            var parserDct = function (conformsToText) {
+                var seen = {};
+                for (re in ASNPatterns){
+                    var stds = conformsToText.match(ASNPatterns[re]);
+                    for (s in stds) {
+                        if (!seen[s]) {
+                            emit([doc.resource_locator, nodeTimestamp, stds[s]], null);
+                            seen[s] = 1;
+                        }
+                    }
+                }
+            };
+            Alignment.parseDCT_ConformsTo(doc.resource_data, parserDct);
+        }   
+    
+    } catch (error) {
+            log("error: "+error);
+    }
+}</textarea>
+<div syle="display: none;" class="dialog body">
+</div>
+    </section>
+
+
+
+
+
+
+    <section class="slide" id="extract-service-spec">
+        <h2>The Extract Service Output Specification</h2>
+        <p>The basic JSON format for the extract service will is as specified in <a href="http://tools.ietf.org/html/draft-zyp-json-schema-03" target="_blank">JSON Schema Internet Draft</a>.</p>
+
+<div>
+<strong>Data Service Response Wrapper</strong>
+<textarea id="ds_service_json" class="code" mode="javascript" style="display: none;">
+{
+    "name": "data-service-json",
+    "properties": {
+        "documents": {
+            "type": "array",
+            "required": true,
+            "items": {
+                "$ref": "list-to-json"
+            }
+
+        }
+    }
+}</textarea>
+</div>
+<div>
+<strong>Data Service Result</strong>
+<textarea id="list_to_json" class="code" mode="javascript" style="display: none;">
+{
+    "name": "list-to-json",
+    "properties": {
+        "result_data": {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "resource": {
+                    "type": ["string", "null"],
+                    "required": true,
+                    "description": "The resource locator URL. This value may be null for DS results that do not yield a resource (i.e. ts-by-discriminator)"
+                },
+                "discriminator": {
+                    "type": ["string", "number", "integer", "boolean", "object", "array", "null"],
+                    "required": true,
+                    "description": "The common identitifier that is related to the resource locator in accordance to the algorithim implemented by the data service. This value may be null for DS views that do not yield a discriminator (i.e. ts-by-resource)."
+                },
+                "timestamp": {
+                    "type": "string",
+                    "required": false
+                    "description": "The ISO 8601 formatted date of the result. This should only be included in views that contain timestamps as part of the key."
+                }
+            }
+            }
+        },
+        "supplemental_data": {
+            "type": "object",
+            "required": false,
+            "description": "free form, additional data that the list function may choose to emit to aid harvesters"
+        }.
+        "resource_data": {
+            "type": "array",
+            "required": true,
+            "items": {
+                "type": ["string", "object"];
+                "description": "elements will either be a list of doc_ID's or full resource_data documents."
+            }
+        }
+    }
+}</textarea>
+</div>
+    </section>
+
+    <section class="slide" id="extract-service-example">
+        <h2>The Extract Service Example Output</h2>
+        <p>This is an example of the data service output with doc_ID's being returned.</p>
+        <div>
+<textarea class="code" mode="javascript" style="display: none;">
+{
+    "documents": [
+    {
+        "result_data": {
+            /* 
+                    Map data formatted any way you want. Could possibly be a paradata 'assertion' for those who 
+                    want to crosswalk formats.
+            */
+            "resource": "http://www.readwritethink.org/lessons/lesson_view.asp?id=131",
+            "discriminator": [
+                "matched",
+                "http://purl.org/ASN/resources/S10000FE"
+            ]
+        },
+        "supplemental_data": {
+            /*
+                Optional that that can be dynamically extracted from documents from within the list function.
+            */
+        },
+        "resource_data": [ /* doc ids of full docs */ 
+            "c9966f4e59e04b168c733b19d7fcb4ad",
+            "f024d8b2272941078ffd09cc8f21cf77"
+        ]
+
+    }
+
+    ]
+}</textarea>
+        </div>
+    </section>
+
+
+    <section class="slide" id="list-function">
+        <h2>List Functions in Detail</h2>
+        <p>List functions are responsible for formatting the response for the service output.</p>
+        <p>As the previous slides defined and displayed there are two basic parts to the response, the response wrapper, and the results.<p>
+
+<strong>Data Service Response Wrapper</strong>
+<textarea id="service-wrapper" class="code" mode="javascript" style="display: none;">
+{
+    "documents": [
+        /*** a list of data service results ***/
+    ]
+}</textarea>
+
+<p>The list function will need to group each result in the <code>"documents"</code> property of the response wrapper.</p>            
+<strong>Data Service Result</strong>
+<textarea id="service-result" class="code" mode="javascript" style="display: none;">
+{
+    "result_data": { 
+        "resource": "http://example.com/my/resource",           //  the resource locator for this result
+        "discriminator": {                                      /////
+            "verb": "matched",                                  //  This is could also be a simple string, number, boolean, or array.
+            "standard": "http://purl.org/ASN/resource/S000000"  //  Typically this is just the discriminator portion of your map key.
+        },                                                      /////
+        "timestamp": "2010-04-01T00:00:01Z"                     //  optional timestamp value, should only exist for views where ts is part of the key
+     },
+    "supplemental_data": { /*** insert optional custom list output here ***/ },
+    "resource_data": [ /*** based upon request param, either full JSON doc, or just the doc_ID ***/ ]
+}</textarea>
+    </section>
+
+
+    <section class="slide" id="list-function-2">
+        <h2>Review of Prototype List Implementation</h2>
+
+        <p>List functions group results and embed results into the Extract service's format for records in the documents list. Because the amount of data requiring processing could be large, we must try to always design list functions to buffer little and mostly stream.</p>
+            <textarea class="list-function-impl code" mode="javascript" style="display: none;">
+function(head, req) {
+  var util = require("lib/util").init();  // General utilities for processing data service views
+
+  var info = util.GetViewInfo(req),       // Extracts some useful information from the request
+      parser = util.RowParser(info.view), // The row parser knows how to take the view conventions and normalize the result into a 
+                                          //    common data stru
+      row = null,
+      first_group = true,
+      groups = {
+        cur_group: null,
+        prev_group: null
+      },
+      result_data = {},
+      count = 0,
+      seen = {};
+
+
+  send('{"documents":[');               // start the extract template
+
+  // iterate over the requested view.  Views will be returned in key collated order (sorted by key).
+  while (row = getRow()) {
+    count++;
+
+    // because we want to be efficient and perform only a single query to get both doc_ID's or documents, we need to manage our
+    // own groupings.  util.GroupIt takes most of the pain out of figuring out when groups have changed.
+    groups = util.GroupIt(parser.group_length, groups, row);
+
+    // when groups.changed is true, it means we have a new unique group to switch to.
+    if (groups.changed) {
+      if (first_group) {
+        first_group = false;
+      } else {
+        ////
+        //   If you have buffered supplemental data for the previous group, you should send it at this point here
+        ////
+
+        // close the previous group
+        send("]},");
+      }
+
+      // define the result_data data structure using the parser.
+      result_data = {
+        resource: parser.resource(row),
+        discriminator: parser.discriminator(row)
+      };
+
+      // check to see if this is a view that we should display the timestamp. Note the utility function to convert from the
+      // stored integer format (number of seconds from epoch) into ISO Date.
+      if (parser.showTimestamp){
+        result_data.timestamp = util.secondsToISODate(parser.timestamp(row));
+      }
+
+      // send the first piece of result data
+      send('{"result_data":' + JSON.stringify(result_data) + ',');
+
+      // send the first resource data element as well
+      send('"resource_data":[');
+      send(JSON.stringify(parser.either(row)));
+
+      ////
+      //   If you were going to try and capture some supplemental data, this is most likely the location you'd want to buffer that.
+      //   Remember to keep your buffer small!!! (Try grabbing only the first N things that match - first 5 titles.)
+      ////
+
+      // track the id's we've processed since it is possible for poorly designed views to include the same document multiple times
+      // for a single group.
+      var id = parser.id(row);
+      if (id) {
+        seen = {};
+        seen[id] = 1;
+      }
+
+    } else {
+      // Not a new group, so just process the next document - so either emit the doc_id or full doc.  parser.either handles most of that for you.
+
+      // before emitting, make sure we haven't already done this document before.
+      var id = parser.id(row);
+      if (id &amp;&amp; !seen[id]) {
+        send(',' + JSON.stringify(parser.either(row)));
+        seen[id] = 1;
+      }
+
+      ////
+      //   If you were going to try and capture some supplemental data, this is most likely the location you'd want to buffer that.
+      //   Remember to keep your buffer small!!! (Try grabbing only the first N things that match - first 5 titles.)
+      ////
+    }
+
+  }
+  // close the last group if there was one
+  if (count > 0) {
+    ////
+    //   If you have buffered supplemental data for the previous group, you should send it at this point here
+    ////
+
+    send("]}");
+  }
+  send(']}');
+}
+            </textarea>
+
+    </section>
+
+    <section class="slide" id="expected-customizations">
+        <h2>Customize or Make your Own List Function</h2>
+        <p>The prototype implementation should suffice as an adequate skeleton for making enhancing the prototype or building your own from scratch</p>
+        <ul>
+            <li class="slide">Start out by copying one of the samples.</li>
+            <li class="slide">Don't forget any required files withing the lib folder. These helper functions have been abstracted to accomodate varied discriminator formats. In most cases unless you need supplemental_data, you can use the default to-json as is without modification.</li>
+            <li class="slide">Remember to stream as much as you can, this will help keep your system resources under control.</li>
+        </ul>
+    </section>
+
+    <section class="slide" id="extract-service">
+        <h2>The Extract Service</h2>
+        <p>Provides a common HTTP interface to access data services with simplified parameters.</p>
+        <ul>
+        <li class="slide">What it does is create a bridge between the raw CouchDB view and list functions and query parameters, so you don't have to fully understand much of the complexity of CouchDB's query solution. The Extract service transforms your parameters into the equivalent query for CouchDB</li>
+        <li class="slide">If running your own node, and you understand CouchDB's API, nothing prevents you from using the views directly for doing queries not supported by the extract service.</li>
+        </ul>
+    </section>
+
+    <section class="slide" id="extract-service-api">
+        <h2>The Extract Service HTTP Request Format</h2>
+
+        <h4>The Basics</h4>
+        <p><code>GET /extract/&lt;data service name&gt;/&lt;view name&gt;[?&lt;DS Query Params&gt;]</code></p>
+        
+
+        <h4>Custom List functions (AKA Roll Your Own Output Format)</h4>
+        <P><code>GET /extract/&lt;data service name&gt;/&lt;view name&gt;/format/&lt;your function name&gt;[?&lt;DS Query Params&gt;]</code></P>
+
+        <h4>The DS Query Params</h4>
+        <table class="chart">
+            <thead>
+                <tr><th>Parameter</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>from</td><td>ISO 8601 formatted timestamp for start range.</td></tr>
+                <tr><td>until</td><td>ISO 8601 formatted timestamp for end range.</td></tr>
+                <tr><td>resource</td><td>The resource locator you wish to harvest data.</td></tr>
+                <tr><td>discriminator</td><td>The discriminator you wish to harvest data.</td></tr>
+                <tr><td>resource-starts-with</td><td>A partial resource locator you wish to harvest data that uses the specified value as a prefix. (i.e. <code>resource-starts-with=http://shodor.org</code> will return all resources from http://shodor.org.</td></tr>
+                <tr><td>discriminator-starts-with</td><td>The partial discriminator you wish to harvest data to be used for find the range that uses the specified value as a prefix.</td></tr>
+                <tr><td>ids_only</td><td>Presence of the value will cause the resource_data values to be a list of doc_ID's instead of full resource_data documents (default behavior)</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="slide" id="extract-service-param-matrix">
+        <h2>Extract Service Parameter Matrix</h2>
+        <p>Data services aims to allow you to narrow in on your data. So not all parameters work as expected with all data service views.  Here is a breakdown of what parameters work together with specific view. Remember not to be concerned about the characteristics of the data returned, because the map functions have already taken care of that for you.  If the data-service map functions only emit keys for documents that contain the word "exciting", that means anything this service returns will be at the very least, "exciting".  The parameters just control how much to return.</p>
+        <table class="chart">
+            <thead>
+                <tr><th>View</th><th>Parameter Set</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>discriminator-by-resource</td><td>resource</td><td>Get a list of discriminators for a specific resource locator.</td></tr>
+                <tr><td>discriminator-by-resource</td><td>resource-starts-with</td><td>Get a list of discriminators that where the resource locator starts with a specified prefix.</td></tr>
+                <tr><td>discriminator-by-resource-ts</td><td>resource, from, until</td><td>Get a list of discriminators for a specific resource locator between for a specified period of time.</td></tr>
+                <tr><td>discriminator-by-resource-ts</td><td>resource-starts-with</td><td>Get a list of discriminators that where the resource locator starts with a specified prefix, include the timestamp in the result</td></tr>
+                <tr><td>discriminator-by-ts</td><td>from, until</td><td>Get a list of discriminators for a specified time period.</td></tr>
+                <tr><td>resource-by-discriminator</td><td>discriminator</td><td>Get a list of resource locators for a specified discriminator.</td></tr>
+                <tr><td>resource-by-discriminator</td><td>discriminator-starts-with</td><td>Get a list of resource locators that start with the specified discriminator as a prefix.</td></tr>
+                <tr><td>resource-by-discriminator-ts</td><td>discriminator, from, until</td><td>Get a list of resource locators that for a specified discriminator for a specified period of time.</td></tr>
+                <tr><td>resource-by-discriminator-ts</td><td>discriminator-starts-with</td><td>Get a list of resource locators that start with the specified discriminator as a prefix. Timestamps are included in the output.</td></tr>
+                <tr><td>resource-by-ts</td><td>from, until</td><td>Get a list of resource locators for a specified period of time.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="slide" id="extract-query-examples">
+        <h2>Extract Service API - Try It</h2>
+        <p>Here are some example requests that you can try against a real data service install. Click on the line to populate the example into input box or edit by hand. Click Run to execute the request. This can take a bit of time, and cause your browser to complain. It's okay to click "Wait" or "Continue" if prompted by your browser until it completes.</p>
+        <ul>
+            <li><code>GET <span class="example">/extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator=["matched"]</span></code></li>
+            <li><code>GET <span class="example">/extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator-starts-with=["matched","http://purl.org/ASN/resources/S"]</span></code></li>
+            <li><code>GET <span class="example">/extract/standards-alignment-dc-conformsTo/discriminator-by-resource?resource-starts-with=http://www.shodor.org/interactivate/activities/Advanced</code></span></li>
+            <li><code>GET <span class="example">/extract/standards-alignment-lr-paradata/resource-by-discriminator-ts?ids_only=true&amp;discriminator=["matched","http://purl.org/ASN/resources/S1000132"]&amp;from=2012-02-28T16:59:31Z&amp;until=2012-02-28T16:59:31Z</span></code></li>
+        </ul>
+       
+        <div class="runme">
+        GET 
+        <textarea>/extract/standards-alignment-lr-paradata/resource-by-discriminator?ids_only&amp;discriminator=["matched"]</textarea>
+        <button class="tryit">Run</button>
+        </div>
+        <div class="loading hidden"><img src="./animated_progress.gif"></div>
+        <div class="result"></div>
+    </section>
+
+    <section class="slide" id="next-steps">
+        <h2>Next Steps</h2>
+        <ul>
+            <li>Check out the code on Github: 
+                <ul><li><a href="https://github.com/jimklo/LearningRegistry/tree/data-services-proto/data_services">https://github.com/jimklo/LearningRegistry/tree/data-services-proto/data_services</a></li></ul>
+                </li>
+            <li>Ask Questions on the LR Dev Google Group: 
+                <ul>
+                    <li><a href="mailto:learningreg-dev@googlegroups.com">learningreg-dev@googlegroups.com</a></li>
+                    <li><a href="http://groups.google.com/group/learningreg-dev">http://groups.google.com/group/learningreg-dev</a></li>
+                </ul></li>
+        </ul>
+        
+    </section>
+
+
+    <a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+    <a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+    <p class="deck-status">
+        <span class="deck-status-current"></span>
+        /
+        <span class="deck-status-total"></span>
+    </p>
+
+    <form action="." method="get" class="goto-form">
+        <label for="goto-slide">Go to slide:</label>
+        <input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+        <datalist id="goto-datalist"></datalist>
+        <input type="submit" value="Go">
+    </form>
+    
+    <a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+</article>
+
+<footer>
+    <p>This presentation was made with <a href="http://imakewebthings.github.com/deck.js">deck.js</a>, a project of <a href="http://imakewebthings.com">I Make Web Things</a></p>
+</footer>
+
+
+
+<!-- Grab CDN jQuery, with a protocol relative URL; fall back to local if offline -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../includes/deck.js/jquery-1.7.min.js"><\/script>')</script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script>window.jQuery.ui || document.write('<script src="../includes/deck.js/core/jquery-ui-1.8.18.custom.min.js"><\/script>')</script>
+
+
+<!-- Deck Core and extensions -->
+<script src="../includes/deck.js/core/deck.core.js"></script>
+<script src="../includes/deck.js/extensions/hash/deck.hash.js"></script>
+<script src="../includes/deck.js/extensions/menu/deck.menu.js"></script>
+<script src="../includes/deck.js/extensions/goto/deck.goto.js"></script>
+<script src="../includes/deck.js/extensions/status/deck.status.js"></script>
+<script src="../includes/deck.js/extensions/navigation/deck.navigation.js"></script>
+
+
+<!-- Base codemiror code -->
+<script src="../includes/deck.js/extensions/codemirror/codemirror.js"></script>
+
+<!-- Syntax highlighting Modes -->
+<!-- javascript -->
+<script src="../includes/deck.js/extensions/codemirror/mode/javascript/javascript.js"></script>
+
+<!-- html mode (note html mode requires xml, css and javascript) -->
+<!-- <script src="../includes/deck.js/extensions/codemirror/mode/xml/xml.js"></script>
+<script src="../includes/deck.js/extensions/codemirror/mode/css/css.js"></script>
+<script src="../includes/deck.js/extensions/codemirror/mode/htmlmixed/htmlmixed.js"></script> -->
+
+<!-- Plugin code -->
+<script src="../includes/deck.js/extensions/codemirror/deck.codemirror.js"></script>
+
+<!-- Specific to this page -->
+<script type="text/javascript">
+    var exports = {};
+</script>
+<script src="dataservice.js"></script>
+<script src="alignment.js"></script>
+<script src="mock_couchdb.js"></script>
+</body>
+</html>
