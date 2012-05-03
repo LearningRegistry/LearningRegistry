@@ -44,8 +44,8 @@ class ResourceDataModel(BaseModel):
             doc_id = uuid4().hex
             self.__setattr__(self._DOC_ID, doc_id)
 
-    def save(self, doc_id=None, db=None):
-        return BaseModel.save(self, self.doc_ID, db)
+    def save(self, doc_id=None, db=None, log_exceptions=True):
+        return BaseModel.save(self, self.doc_ID, db, log_exceptions)
 
 
 

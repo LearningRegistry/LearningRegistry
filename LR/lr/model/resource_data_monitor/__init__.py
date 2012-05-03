@@ -65,7 +65,7 @@ def monitorResourceDataChanges():
     incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
                                                         incomingDB,
                                                         _INCOMING_CHANGE_HANDLERS,
-                                                        options)
+                                                        {'since':-1})
     incomingChangeMonitor.start()
     
 

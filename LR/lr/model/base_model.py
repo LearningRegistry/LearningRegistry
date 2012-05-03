@@ -169,7 +169,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             self._validate()
             self._postValidation()
             
-        def save(self,  doc_id= None, database = None):
+        def save(self,  doc_id= None, database = None, log_exceptions=True):
             
             # Make sure the spec data conforms to the spec before saving
             # it to the database
@@ -201,12 +201,13 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             except Exception as e:
                 result['OK'] = False
                 result['ERROR'] = "CouchDB save error:  "+str(e)
-                log.exception("\n"+pprint.pformat(result, indent=4)+"\n"+
+                if log_exceptions:
+                    log.exception("\n"+pprint.pformat(result, indent=4)+"\n"+
                           pprint.pformat(document, indent=4)+"\n\n")
                         
             return result
             
-        def update(self, database=None):
+        def update(self, database=None, log_exceptions=True):
             db = database
             # If no database is provided use the default one.
             if db == None:
@@ -219,7 +220,8 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
             try:
                 db.update([document])
             except Exception as ex:
-                log.exception(ex)
+                if log_exceptions:
+                    log.exception(ex)
                 return
             self.__dict__[self._ID]   = document[self._ID] 
             self.__dict__[self._REV] = document[self._REV]
