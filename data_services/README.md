@@ -59,7 +59,7 @@ You will need to define MapReduce views in CouchDB the emit keys in the followin
         "resource-by-ts"               : [ Timestamp, Resource Locator ]
         "discriminator-by-ts"          : [ Timestamp, Discriminator ]
 
-Each view **must** implement a `reduce` function.
+Each view should **not** implement a reduce function.
 
 Using example data:
 
@@ -74,54 +74,134 @@ Definition of CouchDB keys in this manner will allow one to query CouchDB in the
 
 * To get "All ASNs by Resource Locator":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>",{}]&reduce=true&group_level=2'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>",{}]'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/discriminator-by-resource?resource=<resource_locator>'
+
+
 
 * To get "All ASNs by Resource Locator from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource-ts?startkey=["<resource_locator>",<timestamp1>]&endkey=["<resource_locator>",<timestamp2>,{}]&reduce=true&group_level=2'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/discriminator-by-resource-ts?startkey=["<resource_locator>",<timestamp1>]&endkey=["<resource_locator>",<timestamp2>,{}]'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/discriminator-by-resource-ts?resource=<resource_locator>&from=<ISO8601timestamp1>&until=<ISO8601timestamp2>'
+
+
+
 
 * To get "All ASNs by Resource Locator prefix":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+  - CouchDB API: 
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/discriminator-by-resource?startkey=["<resource_locator>"]&endkey=["<resource_locator>\uD7AF"]&reduce=true&group_level=2'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/discriminator-by-resource?resource-starts-with=<resource_locator>'
+
+
+
 
 * To get "All Resource Locators by ASN":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>",{}]&reduce=true&group_level=2'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>",{}]'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/resource-by-discriminator?discriminator=<asn>'
+
+
+
 
 * To get "All Resource Locators by ASN from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator-ts?startkey=["<asn>",<timestamp1>]&endkey=["<asn>",<timestamp2>,null]&reduce=true&group_level=3'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/resource-by-discriminator-ts?startkey=["<asn>",<timestamp1>]&endkey=["<asn>",<timestamp2>,null]'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/resource-by-discriminator-ts?discriminator=<asn>&from=<ISO8601timestamp1>&until=<ISO8601timestamp2>'
+
+
+
 
 * To get "All Resource Locators by ASN prefix":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>\uD7AF"]&reduce=true&group_level=2'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/resource-by-discriminator?startkey=["<asn>"]&endkey=["<asn>\uD7AF"]'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/resource-by-discriminator?discriminator-starts-with=<asn>'
+
+
+
 
 * To get "All ASN Resource Locators":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-resource?group_level=1'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/discriminator-by-resource'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/discriminator-by-resource'
+
+
+
 
 * To get "All ASN Resource Locators from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/resource-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]'
+
+  - Extract API:
+
+>      curl -g -X GET 'http://<node address>/extract/standards-alignment/resource-by-ts?from=<ISO8601timestamp1>&until=<ISO8601timestamp2>'
+
+
+
 
 * To get "All ASNs":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/resource-by-discriminator?reduce=true&group_level=1'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/resource-by-discriminator'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/resource-by-discriminator'
+
+
+
 
 * To get "All ASNs from Timestamp1 to until Timestamp2":
 
->       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_view/discriminator-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]&reduce=false'
+  - CouchDB API:
+
+>       curl -g -X GET 'http://<couchdb>/resource_data/_design/standards-alignment/_list/to-json/discriminator-by-ts?startkey=[<timestamp1>]&endkey=[<timestamp2>,{}]'
+
+  - Extract API:
+
+>       curl -g -X GET 'http://<node address>/extract/standards-alignment/discriminator-by-ts?from=<ISO8601timestamp1>&until=<ISO8601timestamp2>'
+
+
 
 
 ## TODO / Notes
-
-* How to deal with _list_ functions
-
-> The current thinking is that we will use list functions initially to only handle result format.  Using a naming convention like:
-
->        list_func_name := <viewname>-<format>
-
-> An example of this would be: `discriminator-by-resource-paradata`. Advanced implementations in the future could take account of query parameters to perform more advanced filtering.
 
 * Indentification of data service design documents.
 
