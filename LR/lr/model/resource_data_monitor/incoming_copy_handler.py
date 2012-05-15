@@ -1,4 +1,5 @@
 import logging
+from threading import Thread
 import pprint
 import urllib2
 import couchdb
@@ -24,39 +25,49 @@ _RESOURCE_TYPE = "resource_data"
 _DOC_TYPE = "doc_type"
 _DOC = "doc"
 _ID = "id"
-
+_DOCUMENT_UPDATE_THRESHOLD = 100
 
 class IncomingCopyHandler(BaseChangeHandler):
-	def __init__(self):
-		self._serverUrl = config["couchdb.url"]
-		self._targetName = config["couchdb.db.resourcedata"]
-		
-		s = couchdb.Server(self._serverUrl)
-		self._db = s[self._targetName]
+    def __init__(self):
+        self._serverUrl = config["couchdb.url"]
+        self._targetName = config["couchdb.db.resourcedata"]
+        self.documents = []     
+        s = couchdb.Server(self._serverUrl)
+        self._db = s[self._targetName]
 
-	def _canHandle(self, change, database):
-		if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
-			return True
-		return False
+    def _canHandle(self, change, database):
+        if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
+            return True
+        return False
 
 
-	def _handle(self, change, database):
-		should_delete = True
-		try:
-			log.debug('got here')
-			newDoc = change[_DOC]
-			newDoc['node_timestamp'] = h.nowToISO8601Zformat()
-			rd = ResourceDataModel(newDoc)
-			rd.save(log_exceptions=False)				
-		except SpecValidationException:
-			log.error(str(newDoc) + " Fails Validation" )
-		except ResourceConflict:
-			pass #ignore conflicts
-		except Exception as ex:
-			should_delete = False # don't delete something unexpected happend
-			log.error(ex)
-		if should_delete:
-			try:
-				del database[change[_ID]]
-			except Exception as ex:
-				log.error(ex)
+    def _handle(self, change, database):
+        def handleDocument(newDoc):
+            should_delete = True
+            try:
+                newDoc['node_timestamp'] = h.nowToISO8601Zformat()
+                rd = ResourceDataModel(newDoc)
+                rd.save(log_exceptions=False)               
+            except SpecValidationException:
+                log.error(str(newDoc) + " Fails Validation" )
+            except ResourceConflict:
+                pass #ignore conflicts
+            except Exception as ex:
+                should_delete = False # don't delete something unexpected happend
+                log.error(ex)
+            if should_delete:
+                try:
+                    del database[newDoc['_id']]
+                except Exception as ex:
+                    log.error(ex)            
+        self.documents.append(change[_DOC])     
+        if len(self.documents) >= _DOCUMENT_UPDATE_THRESHOLD or len(self.documents) >= database.info()['doc_count']:            
+            for doc in self.documents:
+                t = Thread(target=handleDocument, args=(doc,))
+                t.start()           
+            self.documents = []
+        
+
+
+
+
