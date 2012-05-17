@@ -48,10 +48,10 @@ class IncomingCopyHandler(BaseChangeHandler):
                 newDoc['node_timestamp'] = h.nowToISO8601Zformat()
                 rd = ResourceDataModel(newDoc)
                 rd.save(log_exceptions=False)               
-            except SpecValidationException:
-                log.error(str(newDoc) + " Fails Validation" )
+            except SpecValidationException as e:
+                log.error(newDoc['_id'] + str(e) )
             except ResourceConflict:
-                pass #ignore conflicts
+                log.error('conflict')
             except Exception as ex:
                 should_delete = False # don't delete something unexpected happend
                 log.error(ex)
