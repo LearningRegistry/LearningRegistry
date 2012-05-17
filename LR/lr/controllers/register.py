@@ -1,11 +1,11 @@
 import logging
-
+import urlparse
 from pylons import request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
 from lr.lib.base import BaseController, render
 from lr.model.node_status import NodeStatusModel
-from lr.model import NodeConnectivityModel
+from lr.model import NodeConnectivityModel,LRNode as sourceLRNode
 log = logging.getLogger(__name__)
 import uuid
 import urllib2
@@ -13,7 +13,7 @@ import httplib
 class RegisterController(BaseController):
     def __before__(self):
         response.headers['Content-Type'] = 'text/html;charset=utf-8'
-    def _publishConnection(self,destUrl):
+    def _publishConnection(self,destUrl,username,password):
         connectionInfo = {
            "doc_type": "connection_description",
            "gateway_connection": False,
@@ -28,6 +28,9 @@ class RegisterController(BaseController):
             urllib2.urlopen(destUrl)
             conn = NodeConnectivityModel(connectionInfo)
             result = conn.save()
+            destinationURL = urlparse.urljoin(destUrl.strip(),"destination")
+            if bool(username) and bool(password):
+                sourceLRNode.addDistributeCredentialFor(destinationURL,username,password)
             if result["OK"]:
                 return "Your end point was successfully registered"
             else:
@@ -50,5 +53,13 @@ class RegisterController(BaseController):
         }
         return switch[request.method]()
     def create(self):
-
-        return self._publishConnection(request.POST['destUrl'])
+        username = None
+        password = None
+        destination = None
+        if 'username' in request.POST:
+            username = request.POST['username']
+        if 'password' in request.POST:
+            password = request.POST['password']
+        if 'destUrl' in request.POST:
+            destination = request.POST['destUrl']
+        return self._publishConnection(destination,username,password)
