@@ -31,7 +31,7 @@ class ErrorController(BaseController):
                  message=content)
         if request.environ.has_key('pylons.controller.exception'):
             import json
-            return json.dumps({'OK':False, 'message':request.environ['pylons.controller.exception'].message})
+            return json.dumps({'OK':False, 'message':str(request.environ['pylons.controller.exception'].message)})
         else:
             response.headers['Content-Type'] = 'text/html; charset=utf-8'
             return page
