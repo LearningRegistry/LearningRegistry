@@ -273,6 +273,14 @@ class LRNodeModel(object):
                     s.save(doc_id=s.service_id)
                 else:
                     s.update()
+    def addDistributeCredentialFor(self,targetUrl,username,password):
+        if _ACCESS_CREDENTIALS_ID in NodeModel._defaultDB:
+            access_credentials = NodeModel._defaultDB[_ACCESS_CREDENTIALS_ID]
+        else:
+            access_credentials = {"_id": _ACCESS_CREDENTIALS_ID,"passwords":{}}
+        access_credentials['passwords'][targetUrl] = {"username":username,"password":password}
+        NodeModel._defaultDB.update([access_credentials])
+
 
     def getDistributeCredentialFor(self, targetUrl):
         #Get all the passwords for distribute
