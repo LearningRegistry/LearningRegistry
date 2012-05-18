@@ -18,7 +18,7 @@ class TestRegisterController(TestController):
         s= couchdb.Server(config['couchdb.url'])
         db = s[config['couchdb.db.node']]
         creds = db['access_credentials']
-        destinationURL = urlparse.urljoin(destUrl.strip(),"destination")
+        destinationURL = urlparse.urljoin(destUrl.strip(),"incoming")
         creds=creds['passwords'][destinationURL]
         assert creds['username'] == 'testUser'
         assert creds['password'] == 'password'
