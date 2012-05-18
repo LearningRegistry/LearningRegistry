@@ -183,7 +183,7 @@ class DistributeController(BaseController):
 
             credential = sourceLRNode.getDistributeCredentialFor(destinationUrl)
             if credential is not None:
-                parsedUrl = urlparse.urlparse()
+                parsedUrl = urlparse.urlparse(destinationUrl)
                 destinationUrl = destinationUrl.replace(parsedUrl.netloc, "{0}:{1}@{2}".format(
                                                 credential['username'], credential['password'], parsedUrl.netloc))
             
