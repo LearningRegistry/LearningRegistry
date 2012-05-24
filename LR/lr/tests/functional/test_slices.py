@@ -9,6 +9,7 @@ from pylons.configuration import config
 from urllib2 import urlopen, quote
 from lr.lib import helpers as helpers
 import logging
+from lr.util.decorators import ForceCouchDBIndexing,SetFlowControl
 log = logging.getLogger(__name__)
 json_headers={'content-type': 'application/json'}
 
@@ -397,35 +398,36 @@ class TestSlicesController(TestController):
             assert self._checkIdentity(docs[1]['resource_data_description'], self.identities[1]+"test_by_identity")
             assert self._checkIdentity(docs[2]['resource_data_description'], self.identities[1]+"test_by_identity")
             
-#    #test that there are 100 docs in the first result and 50 in the result after 1 resumption
-#    #grab the service document for slice: http://127.0.0.1:5984/node/access%3Aslice
-#    @DataCleaner("test_resumption", "Resumption")
-#    def test_resumption(self):
-#
-#        slice_doc = helpers.getServiceDocument("access:slice")
-#        page_size = slice_doc["service_data"]["doc_limit"]
-#        
-#        ##add test to assert that flow control is enabled, check that flow_control in service_data is true
-#        
-#        parameters = {}
-#        parameters[IDENTITY] = self.identities[1]+"test_resumption"
-#        parameters[IDS_ONLY] = False
-#        response = self._slice(parameters)
-#        data = json.loads(response.body) 
-#        docs = data["documents"]
-#        if len(docs)!=100 :
-#            print "resumption assert will fail. doc count is: " + str(len(docs))
-#        assert len(docs)==100
-#        for doc in docs:
-#            assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_resumption")
-#        resumption_token = data["resumption_token"]
-#        parameters[RESUMPTION] = resumption_token
-#        response = self._slice(parameters)
-#        data = json.loads(response.body) 
-#        docs = data["documents"]
-#        assert len(docs)==50
-#        for doc in docs:
-#            assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_resumption")
+    #test that there are 100 docs in the first result and 50 in the result after 1 resumption
+    #grab the service document for slice: http://127.0.0.1:5984/node/access%3Aslice
+    @SetFlowControl(True,config["lr.slice.docid"])    
+    @DataCleaner("test_resumption", "Resumption")
+    def test_resumption(self):
+
+       slice_doc = helpers.getServiceDocument("access:slice")
+       page_size = slice_doc["service_data"]["doc_limit"]
+       
+       ##add test to assert that flow control is enabled, check that flow_control in service_data is true
+       
+       parameters = {}
+       parameters[IDENTITY] = self.identities[1]+"test_resumption"
+       parameters[IDS_ONLY] = False
+       response = self._slice(parameters)
+       data = json.loads(response.body) 
+       docs = data["documents"]
+       if len(docs)!=100 :
+           print "resumption assert will fail. doc count is: " + str(len(docs))
+       assert len(docs)==100
+       for doc in docs:
+           assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_resumption")
+       resumption_token = data["resumption_token"]
+       parameters[RESUMPTION] = resumption_token
+       response = self._slice(parameters)
+       data = json.loads(response.body) 
+       docs = data["documents"]
+       assert len(docs)==50
+       for doc in docs:
+           assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_resumption")
 
        
     #test that there are 3 documents with key = testKeys[0]
