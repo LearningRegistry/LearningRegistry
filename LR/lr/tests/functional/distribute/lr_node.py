@@ -448,13 +448,12 @@ class Node(object):
         if self._isRunning == True:
            return
             
-        # remove any existing log file to start from scratch to avoid ever 
-        # growing log file.
+        # # remove any existing log file to start from scratch to avoid ever 
+        # # growing log file.
         self.removeTestLog()
         
         #Create the log file directory if it does not exists.
         if not path.exists(_TEST_DISTRIBUTE_DIR_LOG):
-            print("create dir")
             os.mkdir(_TEST_DISTRIBUTE_DIR_LOG)
             
         self._nodeProcess.start()
@@ -462,8 +461,8 @@ class Node(object):
         self._waitOnNodeStart()       
         self._isRunning = True
         
-        #Wait the change monitor to catch up
-        self.waitOnChangeMonitor()
+        # #Wait the change monitor to catch up
+        # self.waitOnChangeMonitor()
         print("node '{0}' started ....\n".format(self._nodeName) )
         
     
