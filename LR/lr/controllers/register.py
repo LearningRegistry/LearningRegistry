@@ -31,7 +31,7 @@ class RegisterController(BaseController):
             urllib2.urlopen(destUrl)
             conn = NodeConnectivityModel(connectionInfo)
             result = conn.save()
-            destinationURL = urlparse.urljoin(destUrl.strip(),"destination")
+            destinationURL = urlparse.urljoin(destUrl.strip(),"incoming")
             if bool(username) and bool(password):
                 sourceLRNode.addDistributeCredentialFor(destinationURL,username,password)
             if result["OK"]:
