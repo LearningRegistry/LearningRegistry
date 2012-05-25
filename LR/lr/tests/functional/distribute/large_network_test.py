@@ -214,7 +214,7 @@ def assertNodeDistributeResults(sourceNode):
         _CONNECTIONS[sourceNode][destinationNode](sourceNode, destinationNode)
 
     
-def  startNodes():
+def startNodes():
     for node in _NODES:
         node.start()
 
@@ -227,10 +227,10 @@ def doNodesDistribute():
         assertNodeDistributeResults(_NODES[n])
         sleep(5)
 
-def testLargeNetwork():
-    createNetwork()
-    startNodes()
-    doNodesDistribute()
+# def testLargeNetwork():
+#     createNetwork()
+#     startNodes()
+#     doNodesDistribute()
     
 
 def teardown():

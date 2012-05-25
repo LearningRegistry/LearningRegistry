@@ -370,6 +370,16 @@ class Node(object):
             options["filter_description"] = json.dumps(filter_description)
         return db.changes(**options)["results"]
 
+    def getIncomingDataDocs(self):
+        db = self._server[self._nodeConfig.get("couch_info", "incoming")]        
+        #For source node get all the resource_data documents using the filter
+        # that was using to distribute the document to destination node.
+        options = { "filter": "filtered-replication/change_feed_filter",
+                            "include_docs":include_docs,
+                            "doc_type":doc_type}
+        if filter_description is not None:
+            options["filter_description"] = json.dumps(filter_description)
+        return db.changes(**options)["results"]        
 
     def compareDistributedResources(self, destination, filter_description=None):
         """This method considers this node as source node.
@@ -379,7 +389,7 @@ class Node(object):
         nodes that are being compared"""
 
         sourceResults = self.getResourceDataDocs(filter_description)
-        destinationResults = destination.getResourceDataDocs() 
+        destinationResults = destination.getIncomingDataDocs() 
         
         #check the number of source document is the same at destination.
         #otherwise the nodes resource distribution failed somehow.
