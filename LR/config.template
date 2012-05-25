@@ -50,6 +50,7 @@ spec.models.resource_data = %(here)s/data/models/resource_data_description
 models_spec_dir = %(here)s/data/models
 tos.url = http://www.learningregistry.org/tos/
 couchdb.url = http://127.0.0.1:5984
+couchdb.url.dbadmin = http://admin:password@127.0.0.1:5984
 spec.models.network_policy_description = %(here)s/data/models/network_distribution_policy_description
 use = egg:LR
 spec.models.status_description = %(here)s/data/models/status_description

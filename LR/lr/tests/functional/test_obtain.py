@@ -1,4 +1,5 @@
 from lr.tests import *
+import couchdb
 import json
 import urllib
 import logging
@@ -24,9 +25,9 @@ class TestObtainController(TestController):
         else:
             controller =  TestObtainController(methodName="test_empty")
             app = controller.app  
-        h = harvest()
-        self.db = h.db              
-        self.server = h.server
+                    
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.db =  self.server[config['couchdb.db.resourcedata']] 
         result = app.post('/publish', params=json.dumps(data), headers=headers)                
         result = json.loads(result.body)
         self.ids = []

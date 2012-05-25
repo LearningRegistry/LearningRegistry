@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 import copy
 class SetFlowControl(object):
     def __init__(self,enabled,serviceDoc):
-        server = couchdb.Server(config['couchdb.url'])
+        server = couchdb.Server(config['couchdb.url.dbadmin'])
         self.nodeDb = server[config['couchdb.db.node']]
         self.enabled = enabled
         self.serviceDoc = serviceDoc

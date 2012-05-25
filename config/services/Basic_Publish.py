@@ -20,7 +20,7 @@ def install(server, dbname, setupInfo):
     custom_opts["doc_limit"] = int(active)
 
     active = getInput("Enter message size limit in octet. \n"+
-                    "This should the maximum data size the the node will accept", None, isInt)
+                    "This should the maximum data size the the node will accept", 4194304, isInt)
 
     custom_opts["msg_size_limit"] = int(active)
 

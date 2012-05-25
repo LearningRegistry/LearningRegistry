@@ -9,9 +9,12 @@ from couch_utils import pushCouchApp
 import uuid
 import json
 from os import path
-from urlparse import urljoin
+from urlparse import urljoin, urlsplit, urlunsplit
 
-_COUCHAPP_PATH = path.abspath(path.join(path.dirname(path.abspath(__file__)), '../..', 'couchdb'))
+_COUCHAPP_PATH = path.abspath(path.join(path.dirname(path.abspath(__file__)), '..', '..', 'couchdb'))
+
+def getCouchAppPath():
+    return _COUCHAPP_PATH
 
 class ServiceTemplate():
     __metaclass__ = abc.ABCMeta
@@ -92,7 +95,16 @@ class ServiceTemplate():
         for db in self.couchapps.keys():
             for app in  self.couchapps[db]:
                 appPath = path.abspath(path.join(path.join(couchappsDir, db), app))
-                dbUrl =  urljoin(server.resource.url, db)
+                
+                if server.resource.credentials:
+                    username, password = server.resource.credentials
+                    parts = list(urlsplit(server.resource.url))
+                    parts[1] = "%s:%s@%s" % (username, password, parts[1])
+                    server_url = urlunsplit(parts)
+                else:
+                    server_url = server.resource.url
+
+                dbUrl =  urljoin(server_url, db)
                 
                 pushCouchApp(appPath, dbUrl)
                 #print("\nPushed couch app {0} to {1}".format(appPath, dbUrl))

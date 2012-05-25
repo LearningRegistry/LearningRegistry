@@ -17,6 +17,8 @@ from uuid import uuid4
 import shutil
 import logging
 from setup_utils import *
+import json
+
 import re
 log = logging.getLogger(__name__)
 scriptPath = os.path.dirname(os.path.abspath(__file__))
@@ -107,6 +109,42 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
                     print ("\n\n--Cannot find custom plugin for: '{0}:{1}'".format(serviceType, serviceName))
                     publishService(nodeUrl, server, dbname, serviceType, serviceName)
 
+def makeDBPublicReadOnly(server, dbname):
+    import couch_utils, os
+    from services.service_template import getCouchAppPath
+
+    dba_url = nodeSetup['couchDBUrlDBA']
+    db = server[dbname]
+
+    # Add doc change handler
+    couch_utils.pushCouchApp(os.path.join(getCouchAppPath(),"resource_data","apps","restrict-writers"), "%s/%s" % (dba_url, dbname))
+
+    # Add security object
+    _, _, exist_sec_obj = db.resource.get_json('_security')
+
+    sec_obj = {
+        "admins": {
+            "names": [],
+            "roles": []
+        },
+        "readers": {
+            "names": [],
+            "roles": []
+        }
+    }
+    
+    sec_obj.update(exist_sec_obj)
+
+    parts = urlparse.urlsplit(dba_url)
+    if (hasattr(parts,'username') and parts.username is not None 
+        and parts.username not in sec_obj["admins"]["roles"]):
+        sec_obj["admins"]["names"].append(parts.username)
+
+    db = server[dbname]
+    _, _, result = db.resource.put_json('_security', sec_obj)
+    print json.dumps(result)
+
+
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
     for dest_node_url in connectionList:
         connection = dict(t.connection_description)
@@ -146,6 +184,8 @@ def setConfigFile(nodeSetup):
 
     #Update pylons config file to use the couchdb url
     _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
+    _config.set("app:main", "couchdb.url.dbadmin", nodeSetup['couchDBUrlDBA'])
+
     # set the url to for destribute/replication (that is the url that a source couchdb node
     # will use for replication.
     _config.set("app:main", "lr.distribute_resource_data_url",  nodeSetup['distributeResourceDataUrl'])
@@ -192,7 +232,8 @@ if __name__ == "__main__":
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
 
-    server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
+
+    server =  couchdb.Server(url= nodeSetup['couchDBUrlDBA'])
     setConfigFile(nodeSetup)
     
 
@@ -222,4 +263,8 @@ if __name__ == "__main__":
     #Add the node connections
     publishNodeConnections(nodeSetup["nodeUrl"], server, _NODE,  
                                             nodeSetup["node_name"],  nodeSetup['connections'])
+
+    #make resource data publicly read only
+    makeDBPublicReadOnly(server, _RESOURCE_DATA)
+
 

@@ -90,7 +90,7 @@ class TestExtractController(TestController):
             time.sleep(0.5)
 
         #install data_service view  
-        couchdb_url = config['couchdb.url']
+        couchdb_url = config['couchdb.url.dbadmin']
         resource_data_db = config['couchdb.db.resourcedata']
 
         _pushCouchApp("../data_services/standards-alignment-dct-conformsTo", "{0}/{1}".format(couchdb_url,resource_data_db))

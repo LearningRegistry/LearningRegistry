@@ -61,6 +61,7 @@ beaker.session.use_cookies = false
 
 
 couchdb.url = http://localhost:5984/
+couchdb.url.dbadmin = http://localhost:5984/
 couchdb.db.node = node
 couchdb.db.resourcedata = resource_data
 couchdb.db.network = network

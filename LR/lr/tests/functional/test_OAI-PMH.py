@@ -55,8 +55,8 @@ class TestOaiPmhControllerSpecialData(TestController):
     @classmethod
     def setUpClass(self):
         self.o = oaipmh()
-        self.server = self.o.server
-        self.db = self.o.db
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.db =  self.server[config['couchdb.db.resourcedata']] 
 
     @classmethod
     def tearDownClass(self):

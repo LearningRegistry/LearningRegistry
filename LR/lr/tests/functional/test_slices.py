@@ -212,8 +212,9 @@ class TestSlicesSmallController(TestController):
     #end_date = datetime.strptime("2011-01-01","%Y-%m-%d")
     
     couch_url = config['couchdb.url']
+    couch_dba_url = config['couchdb.url.dbadmin']
     database='resource_data'
-    server = couchdb.Server(couch_url)
+    server = couchdb.Server(couch_dba_url)
     db = server[database]
     
     setupCount=0
@@ -244,8 +245,9 @@ class TestSlicesController(TestController):
     #end_date = datetime.strptime("2011-01-01","%Y-%m-%d")
     
     couch_url = config['couchdb.url']
+    couch_dba_url = config['couchdb.url.dbadmin']
     database='resource_data'
-    server = couchdb.Server(couch_url)
+    server = couchdb.Server(couch_dba_url)
     db = server[database]
     
     setupCount=0

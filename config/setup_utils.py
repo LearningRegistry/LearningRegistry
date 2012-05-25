@@ -14,6 +14,7 @@ import urlparse
 
 #Default url to the couchdb server.
 _DEFAULT_COUCHDB_URL =  "http://127.0.0.1:5984"
+_DEFAULT_AUTH_COUCHDB_URL =  "http://admin:password@127.0.0.1:5984"
 
 def publishService(nodeUrl, server, dbname, serviceType, serviceName):
     service = {}
@@ -72,6 +73,18 @@ def testCouchServer(serverURL):
         couchServer =  couchdb.Server(url=serverURL)
         # Try to get the server configuration to ensure the the server is up and
         # and running. There may be a better way of doing that.
+        couchServer.version()
+    except Exception as e:
+        print(e)
+        print("Cannot connect to couchDB server '{0}'\n".format(serverURL))
+        return False
+    return True
+
+def testAuthCouchServer(serverURL):
+    try:
+        couchServer =  couchdb.Server(url=serverURL)
+        # Try to get the server configuration to ensure the the server is up and
+        # and running. There may be a better way of doing that.
         couchServer.config()
     except Exception as e:
         print(e)
@@ -120,17 +133,33 @@ def isInt(userInput):
     except ValueError:
         return False
 
+def getDefaultEndpoint():
+    import socket
+    hostname = socket.gethostname()
+    if hostname != None:
+        parts = list(urlparse.urlsplit(_DEFAULT_ENDPOINT))
+        parts[1] = hostname
+        return urlparse.urlunsplit(parts)
+    else:
+        return _DEFAULT_ENDPOINT
+
+
 def getSetupInfo():
     """Get the user node info"""
     nodeSetup = {}
     
-    nodeUrl = getInput("Enter the node service endpoint URL", _DEFAULT_ENDPOINT, isURL)
+
+
+    nodeUrl = getInput("Enter the node service endpoint URL", getDefaultEndpoint(), isURL)
     nodeSetup['nodeUrl'] = nodeUrl
     
-    couchDBUrl  = getInput("Enter your couchDB server URL",
+    couchDBUrl  = getInput("Enter your unauthenticated couchDB server URL",
                                             _DEFAULT_COUCHDB_URL, testCouchServer)
-
     nodeSetup['couchDBUrl'] = couchDBUrl
+
+    couchDBUrlDBA  = getInput("Enter your AUTHENTICATED CouchDB server DBA URL",
+                                            _DEFAULT_AUTH_COUCHDB_URL, testAuthCouchServer)
+    nodeSetup['couchDBUrlDBA'] = couchDBUrlDBA
 
     nodeName = getInput("Enter your node name", "Node@{0}".format(nodeUrl))
     nodeSetup['node_name'] = nodeName
