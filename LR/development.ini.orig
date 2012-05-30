@@ -73,6 +73,7 @@ couchdb.threshold.distributes = 1000
 couchdb.threshold.viewupdate = 100
 couchdb.threshold.compaction = 10000
 couchdb.stale.flag = update_after
+lr.oauth.signup = https://localhost:8443/apps/oauth-key-management
 lr.distribute.url = http://localhost/distribute
 lr.obtain.docid = access:Basic Obtain service
 lr.harvest.docid = access:Basic Harvest service

@@ -48,7 +48,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
         _ID = '_id'
         _REV = '_rev'
         _SPEC_DATA = '_specData'
-        
+
         _defaultDB = createDB(defaultDBName, server)
         _modelParsers = getModelPasers(modelSpec)
     
