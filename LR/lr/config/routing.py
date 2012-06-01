@@ -43,7 +43,6 @@ def make_map(config):
     map.resource('filter', 'filters', controller='contrib/filters', 
         path_prefix='/contrib', name_prefix='contrib_')
     map.resource("register","register")
-    map.resource("oauth","oauth")
     mapResource('lr.status.docid', 'status','status')
     mapResource('lr.distribute.docid','distribute','distribute')
     if not LRNode.nodeDescription.gateway_node:
@@ -70,4 +69,6 @@ def make_map(config):
     # CUSTOM ROUTES HERE
     map.connect('/{controller}/{action}')
     map.connect('/{controller}/{action}/{id}')
+
+    map.resource('oauth','oauth')
     return map
