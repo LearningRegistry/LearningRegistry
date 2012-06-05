@@ -3,20 +3,23 @@ Created on Oct 11, 2011
 
 @author: jklo
 '''
+from contextlib import closing
+from functools import wraps
+from ijson.parse import items
+from pylons import config
 from uuid import uuid1
+import copy
+import couchdb
+import ijson
 import json
 import logging
-from contextlib import closing
-from pylons import config
-import time
-import urllib2
-import ijson
-from ijson.parse import items
 import os
-import urllib
-import couchdb
+import time
+import urllib, urlparse, oauth2
+import urllib2
+
 log = logging.getLogger(__name__)
-import copy
+
 class SetFlowControl(object):
     def __init__(self,enabled,serviceDoc):
         server = couchdb.Server(config['couchdb.url.dbadmin'])
@@ -190,3 +193,107 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
                 
         return test_decorated
     return test_decorator
+
+
+def getExtraEnvironment(base_url=None):
+    env = {}
+    if base_url:
+        scheme, netloc, path, query, fragment = urlparse.urlsplit(base_url)
+        if query or fragment:
+            raise ValueError(
+                "base_url (%r) cannot have a query or fragment"
+                % base_url)
+        if scheme:
+            env['wsgi.url_scheme'] = scheme
+        if netloc:
+            if ':' not in netloc:
+                if scheme == 'http':
+                    netloc += ':80'
+                elif scheme == 'https':
+                    netloc += ':443'
+                else:
+                    raise ValueError(
+                        "Unknown scheme: %r" % scheme)
+            host, port = netloc.split(':', 1)
+            env['SERVER_PORT'] = port
+            env['SERVER_NAME'] = host
+            env['HTTP_HOST'] = netloc
+        if path:
+            env['SCRIPT_NAME'] = urllib.unquote(path)
+    return env
+
+class OAuthRequest(object):
+    def __init__(self,  path, http_method="GET", url_base="http://www.example.com",  oauth_user_attrib="oauth_user", oauth_info_attrib="oauth" ):
+        self.oauth_user_attrib = oauth_user_attrib
+        self.oauth_info_attrib = oauth_info_attrib
+        self.http_method = http_method
+        self.url_base = url_base
+        self.path = path
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.users =  self.server[config['couchdb.db.users']] 
+
+    def __call__(self, fn):
+
+        def create_user(oauth_user):
+            try:
+                del self.users[oauth_user["_id"]]
+            except:
+                pass
+            finally:
+                self.users.save(oauth_user)
+
+        def remove_user(oauth_user):
+            try:
+                del self.users[oauth_user["_id"]]
+            except:
+                pass
+
+        @wraps(fn)
+        def test_decorator(cls, *args, **kwargs):
+            if (hasattr(cls, self.oauth_user_attrib)):
+                self.oauth_user = getattr(cls, self.oauth_user_attrib)
+            else:
+                err = AttributeError()
+                err.message = "Missing attribute '%s' which should be data for CouchDB OAuth User" % self.oauth_user_attrib
+                raise  err
+
+            consumer = oauth2.Consumer(key=self.oauth_user["name"], secret=self.oauth_user["oauth"]["consumer_keys"][self.oauth_user["name"]])
+            token = oauth2.Token(key="node_sign_token", secret=self.oauth_user["oauth"]["tokens"]["node_sign_token"])
+
+            params = {
+                "oauth_signature_method": "HMAC-SHA1",
+            }
+
+
+            req = oauth2.Request.from_consumer_and_token(consumer, token, http_method=self.http_method, http_url="{0}{1}".format(self.url_base, self.path), parameters=params)
+
+            # Sign the request.
+            signature_method = oauth2.SignatureMethod_HMAC_SHA1()
+            req.sign_request(signature_method, consumer, token)
+            
+            header = req.to_header()
+            header["Authorization"] = str(header["Authorization"])
+
+            extraEnv = getExtraEnvironment(self.url_base)
+
+            class OauthInfo(object):
+                def __init__(self, consumer, token, request, header, extraEnv, path):
+                    self.consumer = consumer
+                    self.token = token
+                    self.request = request
+                    self.header = header
+                    self.env = extraEnv
+                    self.path = path
+
+
+            setattr(cls, self.oauth_info_attrib, OauthInfo(consumer, token, req, header, extraEnv, self.path))
+    
+            try:
+                create_user(self.oauth_user)
+                result = fn(cls, *args, **kwargs)
+                return result
+            finally:
+                delattr(cls, self.oauth_info_attrib)
+                remove_user(self.oauth_user)
+
+        return test_decorator

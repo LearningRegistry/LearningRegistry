@@ -6,17 +6,13 @@ from pylons.decorators import rest
 
 from lr.lib.base import BaseController, render
 import lr.lib.oauth as oauth
+from lr.lib.signing import lrsignature_mapper
 
+# import rpdb2; rpdb2.start_embedded_debugger("password")
 
 log = logging.getLogger(__name__)
 
 appConfig = config['app_conf']
-
-def lrsignature_mapper(row_result, row):
-    if "lrsignature" in row["doc"]:
-        row_result["lrsignature"] = row["doc"]["lrsignature"]
-    else:
-        row_result["lrsignature"] = { }
 
 
 class OauthController(BaseController):
@@ -38,46 +34,22 @@ class OauthController(BaseController):
         
         # return "Moved permanently: %s" % appConfig['lr.oauth.signup']
 
-    
-    def verify(self):
-        
+    @oauth.authorize("oauth-verify", roles=None, require=None, mapper=lrsignature_mapper)
+    def verify(self, *args, **kwargs):
         # from pprint import pformat
-        values = ""
-        for key in dir(request):
-            if hasattr(request, key):
-                try:
-                    values += "%s : %s\n" % (key, getattr(request,key))
-                except:
-                    values += "%s : %s\n" % (key, "ERROR")
-                    pass
-        log.error(values)
-
-        # util = oauth.CouchDBOAuthUtil()
-        # success = {}
-        # try:
-        #     success["parameters"], user = util.check_request(request)
-        #     if success["parameters"] is None:
-        #         success["status"] = ["No Signature"]
-        #     else:
-        #         success["status"] = ["Okay"]
-        # except oauth.BadOAuthSignature as e:
-        #     success["status"] = ["Bad Signature", e.message]
-        # except:
-        #     log.exception("Caught Exception in verify")
-        from beaker.session import Session as BeakerSession
-        real_session = session._current_obj()
-        params = real_session.__dict__['_params']
-        real_session.__dict__['_sess'] = BeakerSession({}, **params)
-
-        session["foo"] = {}
-        @oauth.authorize(session["foo"], roles=None, require=None, mapper=lrsignature_mapper)
-        def doVerify():
-            success = session["foo"]
-            log.error(repr(success))
-            return repr(success)
-
-        return doVerify()
+        # values = ""
+        # for key in dir(request):
+        #     if hasattr(request, key):
+        #         try:
+        #             values += "%s : %s\n" % (key, getattr(request,key))
+        #         except:
+        #             values += "%s : %s\n" % (key, "ERROR")
+        #             pass
+        # log.error(values)
         
+        success = session["oauth-verify"]
+        return json.dumps(success, cls=oauth.OAuthJSONEncoder)
+
 
     def login(self):
         data = None

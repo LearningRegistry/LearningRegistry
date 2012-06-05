@@ -22,7 +22,8 @@ from pylons import request, response, session, tmpl_context as c, url, config
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 from  lr.model import ResourceDataModel, LRNode
-from  lr.lib import ModelParser, SpecValidationException, helpers as  h
+from  lr.lib import ModelParser, SpecValidationException, helpers as  h, signing, oauth
+
 log = logging.getLogger(__name__)
 
 
@@ -36,7 +37,8 @@ class PublishController(BaseController):
     __DOCUMENT_RESULTS =  'document_results'
     __DOCUMENTS = 'documents'
     
-    def create(self):
+    @oauth.authorize("oauth-sign", roles=None, require=None, mapper=signing.lrsignature_mapper)
+    def create(self, *args, **kwargs):
 
         results = {self.__OK:True}
         error_message = None
@@ -56,7 +58,7 @@ class PublishController(BaseController):
                 log.debug(error_message)
                 results[self.__ERROR] = error_message
             else:
-                results[self.__DOCUMENT_RESULTS ] = map(self._publish, data[self.__DOCUMENTS])
+                results[self.__DOCUMENT_RESULTS ] = map(lambda doc: signing.sign_doc(doc, cb=self._publish), data[self.__DOCUMENTS])
         except Exception as ex:
             log.exception(ex)
             results[self.__ERROR] = str(ex)

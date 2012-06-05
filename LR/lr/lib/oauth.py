@@ -1,6 +1,7 @@
 import logging, couchdb, oauth2, json, sys
 from pylons import config, request as r, response as res, session
 from pylons.controllers.util import abort
+from functools import wraps
 
 log = logging.getLogger(__name__)
 
@@ -23,6 +24,12 @@ class Error(RuntimeError):
 class BadOAuthSignature(Error):
     pass
 
+
+class OAuthJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, (oauth2.Consumer, oauth2.Token)):
+            return { "key": o.key, "secret": o.secret }
+        return json.JSONEncoder.default(self, obj)
 
 
 class CouchDBOAuthUtil():
@@ -95,6 +102,7 @@ class CouchDBOAuthUtil():
 
 _authobj = CouchDBOAuthUtil()
 
+DEFAULT_SESSION_KEY = "oauth"
 
 class authorize(object):
     Okay = "Okay"
@@ -103,13 +111,14 @@ class authorize(object):
     Error = "Error"
     Unknown = "Unknown"
 
-    def __init__(self, authobj, roles=None, require=None, mapper=None):
+    def __init__(self, session_key=DEFAULT_SESSION_KEY, roles=None, require=None, mapper=None):
         self.require = require
         self.roles = roles
         self.mapper = mapper
-        self.authobj=authobj
+        self.session_key=session_key
     def __call__(self, fn):
         
+        @wraps(fn)
         def wrap(*args, **kwargs):
             success = { "status": authorize.Unknown, "user": None, "parameters": None }
             try:
@@ -126,18 +135,29 @@ class authorize(object):
                 success["detail"] = repr(sys.exc_info())
                 log.exception("Caught Exception in authorize")
 
-            self.authobj = success
+            sess = session._current_obj()
+            sess[self.session_key] = success
 
-            log.error("in wrap:"+repr(self.authobj))
+            log.error("in wrap:"+repr(sess[self.session_key]))
             cont = True
+
             if self.roles:
-                cont = UserHasRoles(self.roles, self.authobj)
+                cont = UserHasRoles(self.session_key, self.roles)
             
             if self.require:
                 cont = self.require(cont)
 
             if cont:
-                fn(*args, **kwargs)
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n"
+                print args
+                print kwargs
+                print "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                return fn(*args, **kwargs)
             else:
                 log.error("Unauthorized")
                 abort(401, "Unauthorized")
@@ -146,10 +166,11 @@ class authorize(object):
 
 
 
-def UserHasRoles(roles=[], auth_obj=None):
+def UserHasRoles(session_key, roles=[] ):
     hasRoles = False
     try:
-        hasRoles = all([role in auth_obj["user"]["roles"] for role in roles])
+        s = session._current_obj()
+        hasRoles = all([role in s[session_key]["user"]["roles"] for role in roles])
     except:
         pass
     return hasRoles

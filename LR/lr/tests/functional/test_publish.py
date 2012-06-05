@@ -1,7 +1,10 @@
 from lr.tests import *
 from lr.model import ResourceDataModel
+from lr.util import decorators
 from time import sleep
-import json
+from pylons import config
+import couchdb, json
+
 
 headers={'Content-Type': 'application/json'}
 
@@ -12,8 +15,127 @@ class TestPublisherController(TestController):
     def __init__(self, *args, **kwargs):
         TestController.__init__(self,*args,**kwargs)
         self.controllerName = "publish"
+        
+        self.oauth_info = {
+                "name": "tester@example.com",
+                "full_name": "Joe Tester"
+        }
+
+        self.oauth_user = {
+           "_id": "org.couchdb.user:{0}".format(self.oauth_info["name"]),
+           "type": "user",
+           "name": self.oauth_info["name"],
+           "roles": [
+               "browserid"
+           ],
+           "browserid": True,
+           "oauth": {
+               "consumer_keys": {
+                   self.oauth_info["name"] : "ABC_consumer_key_123"
+               },
+               "tokens": {
+                   "node_sign_token": "QWERTY_token_ASDFGH",
+               }
+           },
+           "lrsignature": {
+               "full_name": self.oauth_info["full_name"]
+           }
+        }
+
+
     def test_index(self):
         pass
+
+    @decorators.OAuthRequest(path="/publish", http_method="POST")
+    def test_oauth_sign_publish(self):
+        data = {
+            "documents": 
+                    [
+                       {"doc_type": "resource_data",
+                        "resource_locator": "http://example.com",
+                         "resource_data": "\n<nsdl_dc:nsdl_dc xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n xmlns:dct=\"http://purl.org/dc/terms/\"\n xmlns:ieee=\"http://www.ieee.org/xsd/LOMv1p0\"\n xmlns:nsdl_dc=\"http://ns.nsdl.org/nsdl_dc_v1.02/\"\n schemaVersion=\"1.02.020\"\n xsi:schemaLocation=\"http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd\">\n <dc:identifier xsi:type=\"dct:URI\">http://www.myboe.org/go/resource/23466</dc:identifier>\n <dc:title>Posters to Go</dc:title>\n <dc:description>PDF version of a set of fifteen posters from the National Portrait Gallery and the Smithsonian American Art Museum. Includes an application for receiving the actual posters for the classroom. Arranged into themes: Westward Expansion Civil War Harlem Renaissance World War II and the Sixties.</dc:description>\n <dc:creator/>\n <dc:language>en-US</dc:language>\n <dct:accessRights xsi:type=\"nsdl_dc:NSDLAccess\">Free access</dct:accessRights>\n <dc:format>text/html</dc:format>\n <dc:date>2010-07-26</dc:date>\n <dct:modified>2010-07-26</dct:modified>\n</nsdl_dc:nsdl_dc>",
+                         "update_timestamp": "2011-11-07T14:51:07.137671Z",
+                         "TOS": {"submission_attribution": "Smithsonian Education",
+                         "submission_TOS": "http://si.edu/Termsofuse"},
+                         "resource_data_type": "metadata",
+                         "payload_schema_locator": "http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd",
+                         "payload_placement": "inline",
+                         "payload_schema": ["NSDL DC 1.02.020"],
+                         "doc_version": "0.23.0",
+                         "active": True,
+                         "identity": {"signer": "Smithsonian Education <learning@si.edu>",
+                         "submitter": "Brokers of Expertise on behalf of Smithsonian Education",
+                         "submitter_type": "agent",
+                         "curator": "Smithsonian Education",
+                         "owner": "Smithsonian American Art Museum"}
+                         },
+                         
+                        {"doc_type": "resource_data",
+                        "resource_locator": "http://example.com/1",
+                         "resource_data": "\n<nsdl_dc:nsdl_dc xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n xmlns:dct=\"http://purl.org/dc/terms/\"\n xmlns:ieee=\"http://www.ieee.org/xsd/LOMv1p0\"\n xmlns:nsdl_dc=\"http://ns.nsdl.org/nsdl_dc_v1.02/\"\n schemaVersion=\"1.02.020\"\n xsi:schemaLocation=\"http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd\">\n <dc:identifier xsi:type=\"dct:URI\">http://www.myboe.org/go/resource/23466</dc:identifier>\n <dc:title>Posters to Go</dc:title>\n <dc:description>PDF version of a set of fifteen posters from the National Portrait Gallery and the Smithsonian American Art Museum. Includes an application for receiving the actual posters for the classroom. Arranged into themes: Westward Expansion Civil War Harlem Renaissance World War II and the Sixties.</dc:description>\n <dc:creator/>\n <dc:language>en-US</dc:language>\n <dct:accessRights xsi:type=\"nsdl_dc:NSDLAccess\">Free access</dct:accessRights>\n <dc:format>text/html</dc:format>\n <dc:date>2010-07-26</dc:date>\n <dct:modified>2010-07-26</dct:modified>\n</nsdl_dc:nsdl_dc>",
+                         "TOS": {"submission_attribution": "Smithsonian Education",
+                         "submission_TOS": "http://si.edu/Termsofuse"},
+                         "resource_data_type": "metadata",
+                         "payload_schema_locator": "http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd",
+                         "payload_placement": "inline",
+                         "payload_schema": ["NSDL DC 1.02.020"],
+                         "create_timestamp": "2011-11-07T14:51:07.137671Z",
+                         "doc_version": "0.21.0",
+                         "active": True,
+                         "identity": {"signer": "Smithsonian Education <learning@si.edu>",
+                         "submitter": "Brokers of Expertise on behalf of Smithsonian Education",
+                         "submitter_type": "agent",
+                         "curator": "Smithsonian Education",
+                         "owner": "Smithsonian American Art Museum"}
+                        }
+                        # ,
+                        
+                        # {
+                        # "doc_type": "resource_data",
+                        # "resource_locator": "http://example.com/2",
+                        #  "resource_data": "\n<nsdl_dc:nsdl_dc xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n xmlns:dct=\"http://purl.org/dc/terms/\"\n xmlns:ieee=\"http://www.ieee.org/xsd/LOMv1p0\"\n xmlns:nsdl_dc=\"http://ns.nsdl.org/nsdl_dc_v1.02/\"\n schemaVersion=\"1.02.020\"\n xsi:schemaLocation=\"http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd\">\n <dc:identifier xsi:type=\"dct:URI\">http://www.myboe.org/go/resource/23466</dc:identifier>\n <dc:title>Posters to Go</dc:title>\n <dc:description>PDF version of a set of fifteen posters from the National Portrait Gallery and the Smithsonian American Art Museum. Includes an application for receiving the actual posters for the classroom. Arranged into themes: Westward Expansion Civil War Harlem Renaissance World War II and the Sixties.</dc:description>\n <dc:creator/>\n <dc:language>en-US</dc:language>\n <dct:accessRights xsi:type=\"nsdl_dc:NSDLAccess\">Free access</dct:accessRights>\n <dc:format>text/html</dc:format>\n <dc:date>2010-07-26</dc:date>\n <dct:modified>2010-07-26</dct:modified>\n</nsdl_dc:nsdl_dc>",
+                        #  "TOS": {"submission_attribution": "Smithsonian Education",
+                        #  "submission_TOS": "http://si.edu/Termsofuse"},
+                        #  "resource_data_type": "metadata",
+                        #  "payload_schema_locator": "http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd",
+                        #  "payload_placement": "inline",
+                        #  "payload_schema": ["NSDL DC 1.02.020"],
+                        #  "create_timestamp": "2011-11-07T14:51:07.137671Z",
+                        #  "doc_version": "0.11.0",
+                        #  "active": True,
+                        #  "submitter": "Brokers of Expertise on behalf of Smithsonian Education",
+                        #  "submitter_type": "agent",
+                        #  }
+                     ]
+                }
+
+        h={}
+        h.update(headers)
+        h.update(self.oauth.header)
+
+        result = json.loads(self.app.post(self.oauth.path, params=json.dumps(data), headers=h, extra_environ=self.oauth.env).body)
+        assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+        
+ 
+        for index, docResults in enumerate(result['document_results']):
+            assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+            assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])
+
+            doc = ResourceDataModel._defaultDB[docResults['doc_ID']]
+            assert doc["identity"]["submitter"] == "{full_name} <{name}>".format(**self.oauth_info), "identity.submitter is not correct for #{0}, got: {1}".format(index, doc["identity"]["submitter"])
+            assert doc["identity"]["submitter_type"] == "user", "identity.submitter_type is not correct for #{0}, got: {1}".format(index, doc["identity"]["submitter_type"])
+            assert doc["identity"]["signer"] == config["app_conf"]["lr.publish.signing.signer"], "identity.signer is not correct for #{0}, got: {1}".format(index, doc["identity"]["signer"])
+
+
+        ##delete the published  testdocuments.
+        #Wait for documents to be processed
+        sleep(5)
+        for  doc in result['document_results']:
+            try:
+                del ResourceDataModel._defaultDB[doc['doc_ID']]
+            except:
+                pass
+
 
     def test_invalid_doc_version(self):
         data = { 
