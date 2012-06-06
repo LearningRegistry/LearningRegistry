@@ -95,16 +95,17 @@ def test_view_update_handler():
 	designDocs = get_design_docs(resource_data_database)
 	changes = resource_data_database.changes(**_DEFAULT_CHANGE_OPTIONS)
 	did_views_update = False
-	data = load_data()
-	resource_data_database.update(data['documents'])
+	def send_data():
+		data = load_data()	
+		resource_data_database.update(data['documents'])
+	send_data()
 	for change in changes:
 		handler.handle(change,resource_data_database)
 		for designDoc in designDocs:
 			viewInfo = "{0}/{1}/_info".format(resource_data_database.resource.url, designDoc.id)
 			viewInfo = json.load(urllib2.urlopen(viewInfo))
 			did_views_update = did_views_update or viewInfo['view_index']['updater_running']
-			log.debug(did_views_update)
-		assert did_views_update
+	assert did_views_update
 
 
 
