@@ -42,7 +42,7 @@ class CouchDBOAuthUtil():
     def find_possible(self, consumer, token, mapper=None):
 
         def wrap_row(row):
-            log.error("wrap_row: "+json.dumps(row))
+            # log.error("wrap_row: "+json.dumps(row))
             row_result = {}
             if "doc" in row:
                 row_result["name"] = row["doc"]["name"]
@@ -138,7 +138,7 @@ class authorize(object):
             sess = session._current_obj()
             sess[self.session_key] = success
 
-            log.error("in wrap:"+repr(sess[self.session_key]))
+            # log.error("in wrap:"+repr(sess[self.session_key]))
             cont = True
 
             if self.roles:
@@ -148,15 +148,6 @@ class authorize(object):
                 cont = self.require(cont)
 
             if cont:
-                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n"
-                print args
-                print kwargs
-                print "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                 return fn(*args, **kwargs)
             else:
                 log.error("Unauthorized")

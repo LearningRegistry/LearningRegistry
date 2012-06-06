@@ -1,9 +1,14 @@
-import gnupg, json
+import gnupg, json, re
 from pylons import session, config
 from lr.lib import oauth
 from LRSignature.sign import Sign
 
 _appConfig = config["app_conf"]
+
+def _cmp_version(version1, version2):
+    def normalize(v):
+        return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
+    return cmp(normalize(version1), normalize(version2))
 
 def lrsignature_mapper(row_result, row):
     if "lrsignature" in row["doc"]:
@@ -24,7 +29,8 @@ _signOpts = {
     "passphrase": _appConfig["lr.publish.signing.passphrase"],
     "gnupgHome": _gpgOpts["gnupghome"],
     "gpgbin": _gpgOpts["gpgbinary"],
-    "publicKeyLocations": json.loads(_appConfig["lr.publish.signing.publickeylocations"])
+    "publicKeyLocations": json.loads(_appConfig["lr.publish.signing.publickeylocations"]),
+    "sign_everything": False
 }
 
 gpg = gnupg.GPG(**_gpgOpts)
@@ -49,18 +55,32 @@ def sign_doc(doc, cb=None):
         except:
             pass
             
-        if "identity" not in doc:
-            doc["identity"] = {}
+        if _cmp_version(doc["doc_version"], "0.21.0") >= 0:
+            if "identity" not in doc:
+                doc["identity"] = {}
 
-        doc["identity"]["submitter"] = submitter
-        doc["identity"]["submitter_type"] = "user"
-        doc["identity"]["signer"] = signer
-
-        if cb == None:
-            return _signer.sign(doc)
+            doc["identity"]["submitter"] = submitter
+            doc["identity"]["submitter_type"] = "user"
+            doc["identity"]["signer"] = signer
         else:
-            return cb(_signer.sign(doc))
+            doc["submitter"] = submitter
+            doc["submitter_type"] = "user"
 
+
+        if _cmp_version(doc["doc_version"], "0.20.0") >= 0:
+            if cb == None:
+                return _signer.sign(doc)
+            else:
+                return cb(_signer.sign(doc))
+        else:
+            if cb == None:
+                return doc
+            else:
+                return cb(doc)
+    elif cb == None:
+        return doc
+    else:
+        return cb(doc)
 
 
 
