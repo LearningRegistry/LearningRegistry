@@ -10,7 +10,7 @@ import rpdb2
 
 
 
-class TestOauthController(TestController):
+class TestAuthController(TestController):
     def __init__(self, *args, **kwargs):
         TestController.__init__(self, *args, **kwargs)
 
@@ -45,7 +45,7 @@ class TestOauthController(TestController):
         response = self.app.get(url(controller='oauth', action='index'))
         # Test response...
 
-    @decorators.OAuthRequest(path="/oauth/verify")
+    @decorators.OAuthRequest(path="/auth/verify")
     def test_verify(self):
     
         response = self.app.get(self.oauth.path, headers=self.oauth.header, extra_environ=self.oauth.env)

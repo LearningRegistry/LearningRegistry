@@ -22,10 +22,21 @@ from pylons import request, response, session, tmpl_context as c, url, config
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 from  lr.model import ResourceDataModel, LRNode
-from  lr.lib import ModelParser, SpecValidationException, helpers as  h, signing, oauth
+from  lr.lib import ModelParser, SpecValidationException, helpers as  h, signing, oauth, bauth
 
 log = logging.getLogger(__name__)
 
+def _continue_if_missing_oauth():
+    try:
+        nosig = (session["oauth-sign"]["status"] == oauth.authorize.NoSignature)
+        if nosig:
+            session["oauth-sign"] = None
+        return nosig
+    except:
+        return True
+
+def _no_abort(prev):
+    return True
 
 class PublishController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -37,7 +48,8 @@ class PublishController(BaseController):
     __DOCUMENT_RESULTS =  'document_results'
     __DOCUMENTS = 'documents'
     
-    @oauth.authorize("oauth-sign", roles=None, require=None, mapper=signing.lrsignature_mapper)
+    @oauth.authorize("oauth-sign", roles=None, require=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
+    @bauth.authorize("oauth-sign", roles=None, pre_cond=continue_if_missing_oauth, realm="Learning Registry")
     def create(self, *args, **kwargs):
 
         results = {self.__OK:True}
