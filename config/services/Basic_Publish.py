@@ -24,6 +24,18 @@ def install(server, dbname, setupInfo):
 
     custom_opts["msg_size_limit"] = int(active)
 
+    custom_opts["authz"] = []
+    active = getInput("Secure publish with Basic Authentication?", "T", isBoolean)
+    if active:
+        custom_opts["authz"].append("basicauth")
+
+    active = getInput("Secure publish with OAuth and enable Node Signing?", "T", isBoolean)
+    if active:
+        custom_opts["authz"].append("oauth")
+
+    if len(custom_opts["authz"]) == 0:
+        del custom_opts["authz"]
+
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex
     

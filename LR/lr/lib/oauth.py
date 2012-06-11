@@ -1,4 +1,5 @@
 import logging, couchdb, oauth2, json, sys
+from decorator import decorator
 from pylons import config, request as r, response as res, session
 from pylons.controllers.util import abort
 from functools import wraps
@@ -121,70 +122,79 @@ _authobj = CouchDBOAuthUtil()
 
 DEFAULT_SESSION_KEY = "oauth"
 
-class authorize(object):
+class status(object):
     Okay = "Okay"
     NoSignature = "No Signature"
     BadSignature = "Bad Signature"
     Error = "Error"
     Unknown = "Unknown"
 
-    def __init__(self, session_key=DEFAULT_SESSION_KEY, roles=None, mapper=None, realm=None, pre_cond=None, post_cond=None):
+def authorize(session_key=DEFAULT_SESSION_KEY, service_doc=None, roles=None, mapper=None, realm=None, pre_cond=None, post_cond=None):
+    
+    _roles = roles
+    _mapper = mapper
+    _session_key=session_key
+    _realm = realm or ""
+    _pre_cond = pre_cond
+    _post_cond = post_cond
+    _service_doc = service_doc
 
-        self.roles = roles
-        self.mapper = mapper
-        self.session_key=session_key
-        self.realm = realm or ""
-        self.pre_cond = pre_cond
-        self.post_cond = post_cond
+    def wrapper(fn, self, *args, **kwargs):
+        if _service_doc:
+            sdoc = _service_doc()
+            try:
+                if "oauth" not in sdoc["service_auth"]["service_authz"]:
+                    return fn(self, *args, **kwargs)
+            except:
+                raise ValueError("Missing service_document for checking if OAUTH access is enabled.")
 
-    def __call__(self, fn):
-        
-        @wraps(fn)
-        def wrap(*args, **kwargs):
-            if self.pre_cond:
-                precond = cont = self.pre_cond()
-            else:
-                precond = cont = True
+        if _pre_cond:
+            precond = cont = _pre_cond()
+        else:
+            precond = cont = True
 
-            if precond:
-                success = { "status": authorize.Unknown, "user": None, "parameters": None }
-                try:
-                    success["parameters"], success["user"] = _authobj.check_request(r._current_obj(), self.mapper)
-                    if success["parameters"] is None:
-                        success["status"] = authorize.NoSignature
-                    else:
-                        success["status"] = authorize.Okay
-                except BadOAuthSignature as e:
-                    success["status"] = authorize.BadSignature
-                    success["detail"] = e.message
-                    cont = False
-                except:
-                    success["status"] = authorize.Error
-                    success["detail"] = repr(sys.exc_info())
-                    log.exception("Caught Exception in authorize")
-                    cont = False
+        if precond:
+            success = { "status": status.Unknown, "user": None, "parameters": None }
+            try:
+                success["parameters"], success["user"] = _authobj.check_request(r._current_obj(), _mapper)
+                if success["parameters"] is None:
+                    success["status"] = status.NoSignature
+                else:
+                    success["status"] = status.Okay
+            except BadOAuthSignature as e:
+                success["status"] = status.BadSignature
+                success["detail"] = e.message
+                cont = False
+            except:
+                success["status"] = status.Error
+                success["detail"] = repr(sys.exc_info())
+                log.exception("Caught Exception in authorize")
+                cont = False
 
-                sess = session._current_obj()
-                sess[self.session_key] = success
+            sess = session._current_obj()
+            sess[_session_key] = success
 
-                # log.error("in wrap:"+repr(sess[self.session_key]))
-                
-                if cont and self.roles:
-                    cont = UserHasRoles(self.session_key, self.roles)
+            # log.error("in wrap:"+repr(sess[_session_key]))
             
-                if self.post_cond:
-                    cont = self.post_cond(cont)
+            if cont and _roles:
+                cont = UserHasRoles(_session_key, _roles)
+        
+            if _post_cond:
+                cont = _post_cond(cont)
 
 
-            if cont:
-                return fn(*args, **kwargs)
-            else:
-                h = {"WWW-Authenticate": "OAuth realm=\"{0}\"".format(self.realm)}
-                log.error("Authorization Required")
-                res.headers.update(h)
-                abort(401, "Authorization Required", headers=h)
+        if cont:
+            try:
+                return fn(self, *args, **kwargs)
+            finally:
+                pass
+        else:
+            h = {"WWW-Authenticate": "OAuth realm=\"{0}\"".format(_realm)}
+            log.error("Authorization Required")
+            res.headers.update(h)
+            abort(401, "OAuth Authorization Required", headers=h)
 
-        return wrap
+    return decorator(wrapper)
 
 
 

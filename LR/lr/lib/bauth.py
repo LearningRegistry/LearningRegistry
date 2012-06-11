@@ -1,3 +1,4 @@
+from decorator import decorator
 from pylons import config, request, session, response
 from pylons.controllers.util import abort
 from functools import wraps
@@ -52,53 +53,61 @@ class CouchDBBasicAuthUtil(object):
 
 _authUtil = CouchDBBasicAuthUtil()
 
-class authorize(object):
+class status(object):
     Okay = "Okay"
     NotAuthorized = "NotAuthorized"
 
-    def __init__(self, session_key="validate-basic", roles=None, realm=None, pre_cond=None, post_cond=None):
-        self.session_key = session_key
-        self.roles = roles
-        self.post_cond = post_cond
-        self.pre_cond = pre_cond
-        self.realm = realm or ""
+def authorize(session_key="validate-basic", service_doc=None, roles=None, realm=None, pre_cond=None, post_cond=None):
+    _session_key = session_key
+    _roles = roles
+    _post_cond = post_cond
+    _pre_cond = pre_cond
+    _realm = realm or ""
+    _service_doc = service_doc
 
-    def __call__(self, fn):
-        @wraps(fn)
-        def wrap(*args, **kwargs):
-            if self.pre_cond:
-                precond = self.pre_cond()
-            else:
-                precond = True
+    def wrapper(fn, self, *args, **kwargs):
 
-            # if precondition is true, continue with auth. otherwise skip
-            if precond:    
-                sess = session._current_obj()
+        if _service_doc:
+            sdoc = _service_doc()
+            try:
+                if "basicauth" not in sdoc["service_auth"]["service_authz"]:
+                    return fn(self, *args, **kwargs)
+            except:
+                raise ValueError("Missing service_document for checking if OAUTH access is enabled.")
 
-                success = {}
-                success["user"], success["status"] = _authUtil.validate_session(self.roles)
-                sess[self.session_key] = success
+        if _pre_cond:
+            precond = _pre_cond()
+        else:
+            precond = True
 
-                # log.error("in wrap:"+repr(sess[self.session_key]))
-                cont = success["status"] and success["user"]
-                if cont:
-                    success["status"] = authorize.Okay
-                else:
-                    success["status"] = authorize.NotAuthorized
+        # if precondition is true, continue with auth. otherwise skip
+        if precond:    
+            sess = session._current_obj()
 
-                if self.post_cond:
-                    cont = self.post_cond(cont)
-            else:
-                cont = True
+            success = {}
+            success["user"], success["status"] = _authUtil.validate_session(_roles)
+            sess[_session_key] = success
 
+            # log.error("in wrap:"+repr(sess[_session_key]))
+            cont = success["status"] and success["user"]
             if cont:
-                return fn(*args, **kwargs)
+                success["status"] = status.Okay
             else:
-                h = {"WWW-Authenticate": "Basic realm=\"{0}\"".format(self.realm)}
-                log.error("Authorization Required")
-                response.headers.update(h)
-                abort(401, "Authorization Required", headers=h)
+                success["status"] = status.NotAuthorized
 
-        return wrap
+            if _post_cond:
+                cont = _post_cond(cont)
+        else:
+            cont = True
+
+        if cont:
+            return fn(self, *args, **kwargs)
+        else:
+            h = {"WWW-Authenticate": "Basic realm=\"{0}\"".format(_realm)}
+            log.error("Authorization Required")
+            response.headers.update(h)
+            abort(401, "Basic Authorization Required", headers=h)
+
+    return decorator(wrapper)
 
 

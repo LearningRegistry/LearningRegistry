@@ -38,6 +38,15 @@ def _continue_if_missing_oauth():
 def _no_abort(prev):
     return True
 
+__service_doc = None
+def _service_doc(recache=False):
+    def get_service_doc():
+        global __service_doc
+        if not __service_doc or recache:
+            __service_doc = h.getServiceDocument(config["lr.publish.docid"])
+        return __service_doc
+    return get_service_doc
+
 class PublishController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -48,15 +57,16 @@ class PublishController(BaseController):
     __DOCUMENT_RESULTS =  'document_results'
     __DOCUMENTS = 'documents'
     
-    @oauth.authorize("oauth-sign", roles=None, require=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
-    @bauth.authorize("oauth-sign", roles=None, pre_cond=continue_if_missing_oauth, realm="Learning Registry")
+
+    @oauth.authorize("oauth-sign", _service_doc(True), roles=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
+    @bauth.authorize("oauth-sign", _service_doc(), roles=None, pre_cond=_continue_if_missing_oauth, realm="Learning Registry")
     def create(self, *args, **kwargs):
 
         results = {self.__OK:True}
         error_message = None
         try:
             data = json.loads(request.body)
-            doc_limit =  h.getServiceDocument(config['lr.publish.docid'])['service_data']['doc_limit']
+            doc_limit =  _service_doc()()['service_data']['doc_limit']
             
             if not self.__DOCUMENTS in data.keys():
                 # Comply with LR-RQST-009 'Missing documents in POST'
@@ -70,7 +80,7 @@ class PublishController(BaseController):
                 log.debug(error_message)
                 results[self.__ERROR] = error_message
             else:
-                results[self.__DOCUMENT_RESULTS ] = map(lambda doc: signing.sign_doc(doc, cb=self._publish), data[self.__DOCUMENTS])
+                results[self.__DOCUMENT_RESULTS ] = map(lambda doc: signing.sign_doc(doc, cb=self._publish, session_key="oauth-sign"), data[self.__DOCUMENTS])
         except Exception as ex:
             log.exception(ex)
             results[self.__ERROR] = str(ex)

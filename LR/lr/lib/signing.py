@@ -41,13 +41,13 @@ _signer = Sign.Sign_0_21(**_signOpts)
 def get_node_public_key():
     return gpg.export_keys(privateKeyID)
 
-def sign_doc(doc, cb=None):
-    if session["oauth-sign"]["status"] == oauth.authorize.Okay:
+def sign_doc(doc, cb=None, session_key="oauth-sign"):
+    if session_key in session and session[session_key]["status"] == oauth.status.Okay:
 
         if isinstance(doc,unicode):
             doc = json.loads(doc)
 
-        params = session["oauth-sign"]["user"]
+        params = session[session_key]["user"]
 
         submitter = params["name"]
         try:
