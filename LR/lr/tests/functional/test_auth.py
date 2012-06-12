@@ -4,7 +4,6 @@ from lr.lib import oauth
 
 from pylons import config, request
 import couchdb, oauth2,urlparse, json
-import rpdb2
 
 # rpdb2.start_embedded_debugger("password")
 
