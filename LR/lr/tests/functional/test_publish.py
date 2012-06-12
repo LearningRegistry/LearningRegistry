@@ -5,7 +5,6 @@ from time import sleep
 from pylons import config
 import couchdb, json, re
 
-
 headers={'Content-Type': 'application/json'}
 
 def _cmp_version(version1, version2):
@@ -47,10 +46,17 @@ class TestPublisherController(TestController):
            }
         }
 
+        self.bauth_user = {
+                "name": "mrbasicauth",
+                "password": "ABC_123"
+        }
+
+
 
     def test_index(self):
         pass
 
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
     @decorators.OAuthRequest(path="/publish", http_method="POST")
     def test_oauth_sign_publish(self):
         data = {
@@ -155,7 +161,7 @@ class TestPublisherController(TestController):
             except:
                 pass
 
-
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_invalid_doc_version(self):
         data = { 
                 "documents": 
@@ -208,6 +214,7 @@ class TestPublisherController(TestController):
         for doc in result['document_results']:
                 assert(doc['OK'] == False), "Should catch missing/invalid doc version"
 
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_invalid_array_value(self):
         data = { 
                 "documents": 
@@ -233,6 +240,7 @@ class TestPublisherController(TestController):
         assert(result['OK'] == True), self._PUBLISH_UNSUCCESSFUL_MSG
         assert(result['document_results'][0]['OK'] == False), "Should catch document with invalid array values"
 
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_empty_document_array(self):
         data = { "documents": [] }
         result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
@@ -241,6 +249,7 @@ class TestPublisherController(TestController):
 
     # Handles case where documents field is missing
     # Example here is trying to publish a document without the wrapper
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_missing_document_body(self):
         data = { 
                     "active" : True,
@@ -260,7 +269,9 @@ class TestPublisherController(TestController):
         assert(result['OK'] == False), "Accepted invalid json object on publish"
         assert(result['error'] == "Missing field 'documents' in post body"), "Incorrect error message returned"
 
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_multiple_version(self):
+        
         data = {
             "documents": 
                     [
@@ -328,7 +339,7 @@ class TestPublisherController(TestController):
                          }
                      ]
                 }
-
+        
         result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
         assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
         

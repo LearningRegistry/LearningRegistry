@@ -1,15 +1,16 @@
-from lr.tests import *
 from datetime import datetime, timedelta
-import urllib2
-import couchdb
-import time
-import urllib    
-import json
+from functools import wraps
+from lr.lib import helpers as helpers
+from lr.tests import *
+from lr.util.decorators import ForceCouchDBIndexing,SetFlowControl,ModifiedServiceDoc, update_authz
 from pylons.configuration import config
 from urllib2 import urlopen, quote
-from lr.lib import helpers as helpers
+import couchdb
+import json
 import logging
-from lr.util.decorators import ForceCouchDBIndexing,SetFlowControl
+import time
+import urllib    
+import urllib2
 log = logging.getLogger(__name__)
 json_headers={'content-type': 'application/json'}
 
@@ -31,6 +32,7 @@ def DataCleaner(testName, type="Basic"):
     #write a document for each combination of test key and test identity (currently 3X3), multiplied
     #by the data multiplier. Returns the response from posting this array of docs to the publish 
     #service. Also attempts to force a reindex (by calling the slice view directly) before returning.
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def writeTestData(obj):
         test_data = { "documents" : [] }
         
@@ -70,6 +72,7 @@ def DataCleaner(testName, type="Basic"):
     
     
     #for each identity in test indentities, writes a doc with all 3 test keys
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def writeMultiKeyTestData(obj):
         test_data = { "documents" : [] }
         for testIdentity in obj.identities :
@@ -84,6 +87,7 @@ def DataCleaner(testName, type="Basic"):
         return response
     
     #writes 150 docs for the purpose of resumption testing
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def writeResumptionTestData(obj):
         num_docs = 150
         #i=0
@@ -172,6 +176,7 @@ def DataCleaner(testName, type="Basic"):
         
     #a decorator to wrap each test case in that writes test data before the test is run and removes is after
     def test_decorator(fn):
+        @wraps(fn)
         def test_decorated(self, *args, **kw):
             try:
                 #print "Wrapper Before...."
@@ -181,7 +186,7 @@ def DataCleaner(testName, type="Basic"):
                     self.test_data_response = writeMultiKeyTestData(self)
                 elif(type=="Resumption"):
                     self.test_data_response = writeResumptionTestData(self)
-                fn(self, *args, **kw)
+                return fn(self, *args, **kw)
             except :
                 raise
             finally:
@@ -406,7 +411,7 @@ class TestSlicesController(TestController):
     @DataCleaner("test_resumption", "Resumption")
     def test_resumption(self):
 
-       slice_doc = helpers.getServiceDocument("access:slice")
+       slice_doc = helpers.getServiceDocument(config["lr.slice.docid"])
        page_size = slice_doc["service_data"]["doc_limit"]
        
        ##add test to assert that flow control is enabled, check that flow_control in service_data is true
@@ -574,6 +579,8 @@ class TestSlicesController(TestController):
             for doc in docs:
                 assert self._checkTimestamp(doc['resource_data_description'], self.test_start_date_string+self.test_time_string)
                 assert self._checkIdentity(doc['resource_data_description'], self.identities[1]+"test_by_date_and_identity")
+    
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def test_is_view_updated(self):        
         
         couch = {

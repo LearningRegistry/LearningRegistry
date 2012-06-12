@@ -1,21 +1,21 @@
-from lr.tests import *
-from nose.tools import raises
-import logging,json
-import time
-from urllib import unquote_plus,quote_plus
-from pylons import config
-from datetime import datetime
-from lr.lib.harvest import harvest
-import threading
-import math
-import time
 from  iso8601 import parse_date
-from datetime import datetime
-from lr.util.decorators import ForceCouchDBIndexing
-from httplib import HTTPException
 from couchapp import config as cfg, commands as cmd
+from datetime import datetime
+from datetime import datetime
+from httplib import HTTPException
+from lr.lib.harvest import harvest
+from lr.tests import *
+from lr.util.decorators import ForceCouchDBIndexing, ModifiedServiceDoc, update_authz
+from nose.tools import raises
 from pylons import config
+from pylons import config
+from urllib import unquote_plus,quote_plus
+import logging,json
+import math
 import sys
+import threading
+import time
+import time
 
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
@@ -60,6 +60,7 @@ class TestExtractController(TestController):
                 assert timestamp >= f
     
     @classmethod
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def setupClass(self):
         self.setup = True
         with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:
