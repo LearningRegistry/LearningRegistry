@@ -79,11 +79,20 @@ function setSigningInfo() {
     }
 }
 
+function setPasswordInfo(email, doc) {
+    if (doc.password_sha) {
+        $("#password_set").prop("checked", true);
+    } else {
+        $("#password_set").prop("checked", false);
+    }
+}
+
 function getUserInfo(email) {
     users.get(email, function(err, doc) {
         if (!err) {
             getOAuth(email, doc);
             getSigningInfo(email, doc);
+            setPasswordInfo(email, doc);
         }
         else {
             setMessage(err);
@@ -111,6 +120,42 @@ function sessionTimeout () {
     });
 }
 
+function checkPasswordMatch() {
+    var passwd1 = $("#password").val();
+    var passwd2 = $("#verify_password").val();
+    if (passwd1 === "" || passwd2 === "" || passwd1 !== passwd2)
+        return false;
+    return true;
+}
+
+function savePassword() {
+    var passwd1 = $("#password").val();
+    var passwd2 = $("#verify_password").val();
+    if ( checkPasswordMatch() ) {
+        session.info(function(err, session_info) {
+            if (session_info.userCtx.name) {
+                users.get(session_info.userCtx.name, function(err, doc){
+                    doc.password = passwd1;
+
+                    users.update(session_info.userCtx.name, null, doc, function(err) {
+                        if (err) {
+                            console.log(err);
+                            setMessage("Unable to save publish password.");
+                        } else {
+                            setMessage("Password saved.");
+                            $("#password").val("");
+                            $("#verify_password").val("");
+                            $("#password_set").prop("checked", true);
+                        }
+                    });
+                }); 
+            };
+        });
+    } else {
+        setMessage("Passwords do no match.");
+    }
+}
+
 
 exports.registerCallbacks = function() {
     $.couch.browserid.login(function(evt, err, info) { 
@@ -132,6 +177,7 @@ exports.registerCallbacks = function() {
 
     $("#info_update").bind('click', setSigningInfo);
     $("#regenerate").bind('click', revokeAndGenerate);
+    $("#save_password").bind('click', savePassword);
 }
 
 

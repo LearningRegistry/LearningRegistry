@@ -5,6 +5,11 @@ div.oauth {
     clear: both;
 }
 
+div.oauth input[type=checkbox], div.oauth label[for=password_set] {
+    display: inline;
+    width: 25px;
+}
+
 div.oauth label, div.oauth input {
     display: block;
     width: 100%;

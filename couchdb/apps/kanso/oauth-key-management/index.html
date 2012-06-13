@@ -24,10 +24,23 @@
     </div>
     <div class="msg"></div>
     <div class="oauth">
-      
+      <fieldset>
+        <legend>Publish Password</legend>
+        <p>Using your email address as username and this password, you may publish to the Basic Publish or SWORD interfaces your own digitally signed resource data envelopes.</p>
+
+        <label for="password_set">Is Password Set?</label>
+        <input type="checkbox" id="password_set" disabled="disabled">
+
+        <label for="password">Password</label>
+        <input type="password" id="password">
+
+        <label for="verify_password">Verify Password</label>
+        <input type="password" id="verify_password">
+        <button id="save_password">Save</button>
+      </fieldset>
       <fieldset>
         <legend>Signing Information</legend>
-        <p>The following will be appended to the resource data document's identity.signer field along with your email address so that your submissions may be identified.</p>
+        <p>The following will be appended to the resource data document's identity signer field along with your email address so that your submissions may be identified.</p>
         <label for="full_name">Full Name</label>
         <input type="text" id="full_name">
 
