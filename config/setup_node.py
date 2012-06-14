@@ -173,7 +173,12 @@ def setNetworkId():
     t.node_description['network_id'] = network
     t.network_policy_description['network_id'] = network
     t.network_policy_description['policy_id'] =network+" policy"
-        
+ 
+def writeConfig():
+    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
+    _config.write(destConfigfile)
+    destConfigfile.close()
+
 def setConfigFile(nodeSetup):
     
     #create a copy of the existing config file as to not overide it.
@@ -193,9 +198,7 @@ def setConfigFile(nodeSetup):
     if server.version() < "1.1.0":
         _config.set("app:main", "couchdb.stale.flag", "OK")
         
-    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
-    _config.write(destConfigfile)
-    destConfigfile.close()
+    writeConfig()
       
       #Re-read the database info to make we have the correct urls
     global _RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK, _INCOMING
@@ -250,6 +253,10 @@ if __name__ == "__main__":
         services = _GATEWAY_NODE_SERVICES
     publishNodeServices(nodeSetup["nodeUrl"], server, _NODE, services)
     
+    if setNodeSigning(server, _config, nodeSetup):
+        writeConfig()
+
+
     #Add the network and community description
     PublishDoc(server, _COMMUNITY, "community_description", t.community_description)
     PublishDoc(server, _NETWORK,  "network_description", t.network_description)

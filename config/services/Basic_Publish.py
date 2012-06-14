@@ -32,6 +32,7 @@ def install(server, dbname, setupInfo):
     active = getInput("Secure publish with OAuth and enable Node Signing?", "T", isBoolean)
     if active:
         custom_opts["authz"].append("oauth")
+        setupInfo["oauth"] = True
 
     if len(custom_opts["authz"]) == 0:
         del custom_opts["authz"]
