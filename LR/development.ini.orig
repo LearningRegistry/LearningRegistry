@@ -63,6 +63,7 @@ beaker.session.secret = somesecret
 couchdb.db.node.description = description
 couchdb.url = http://localhost:5984/
 couchdb.url.dbadmin = http://localhost:5984/
+couchdb.db.apps = apps
 couchdb.db.node = node
 couchdb.db.resourcedata = resource_data
 couchdb.db.network = network
