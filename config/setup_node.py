@@ -17,6 +17,7 @@ from uuid import uuid4
 import shutil
 import logging
 from setup_utils import *
+import nginx_util
 import json
 
 import re
@@ -212,6 +213,24 @@ def setConfigFile(nodeSetup):
     except:
         _INCOMING = 'incoming'
 
+def writeNGINXConfig(setupInfo, filename):
+    print("##############################################")
+    print("### NGINX Site Configuration #################")
+    
+    nginx_cfg = nginx_util.getNGINXSiteConfig(setupInfo, _config)
+    print nginx_cfg
+    print("##############################################")
+
+    with open(filename, "w") as f:
+        f.truncate(0)
+        f.flush()
+        f.write(nginx_cfg)
+        f.close()
+        print ("### Site configuration written to: %s" % filename)
+        print ("### For most installations you should copy this to /etc/nginx/sites-available then")
+        print ("###   ln -s /etc/nginx/sites-available /etc/nginx/sites-enabled")
+        print ("### and then subsequently restart or reload nginx")
+
 if __name__ == "__main__":
 
     from optparse import OptionParser
@@ -274,4 +293,6 @@ if __name__ == "__main__":
     #make resource data publicly read only
     makeDBPublicReadOnly(server, _RESOURCE_DATA)
 
+    #provide a basic NGINX site configuraition
+    writeNGINXConfig(nodeSetup, "learning_registry.conf")
 

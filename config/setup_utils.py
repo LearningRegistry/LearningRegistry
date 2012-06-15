@@ -214,12 +214,14 @@ def getGPG(gpgbin, gnupghome):
 def checkKey(gpg):
     def checkKeyID(userInput):
         try:
+            if len(userInput.strip()) == 0:
+                return False
             privateKey = gpg.export_keys(userInput, True)
             publicKey = gpg.export_keys(userInput, True)
             foundKey = len(privateKey) > 0 and len(publicKey) > 0
             if not foundKey:
                 print("Invalid Private Key ID. Ensure key public and private key exists in keyring. Please try again.\n")
-            return 
+            return foundKey
         except:
             pass
         return False
@@ -287,21 +289,22 @@ def setNodeSigning(server, config, setupInfo):
         server.resource("_config","httpd").put('WWW-Authenticate', '"OAuth"')
         server.resource("_config","browserid").put('enabled', '"true"')
 
+        apps = config.get("app:main", "couchdb.db.apps", "apps")
         try:
-            server.create("apps")
+            server.create(apps)
         except:
             pass
 
-        oauthCouchApp = os.path.join(getCouchAppPath(),"apps","kanso","oauth-key-management.json")
+        oauthCouchApp = os.path.join(getCouchAppPath(),apps,"kanso","oauth-key-management.json")
         with open(oauthCouchApp) as f:
             ddoc = json.load(f)
             try:
-                del server["apps"]["_design/%s"%ddoc['kanso']['config']['name']]
+                del server[apps]["_design/%s"%ddoc['kanso']['config']['name']]
             except:
                 pass
             ddoc["_id"] = "_design/%s"%ddoc['kanso']['config']['name']
-            server["apps"].save(ddoc)
-
+            server[apps].save(ddoc)
+            setupInfo["oauth.app.name"] = ddoc['kanso']['config']['name']
             setupInfo["lr.oauth.signup"] = "{0}/apps/{1}".format(setupInfo["nodeUrl"],ddoc['kanso']['config']['name']) 
             config.set("app:main","lr.oauth.signup",setupInfo["lr.oauth.signup"])
         return True
