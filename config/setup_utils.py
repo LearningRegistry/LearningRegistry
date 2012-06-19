@@ -16,6 +16,35 @@ import urlparse
 _DEFAULT_COUCHDB_URL =  "http://127.0.0.1:5984"
 _DEFAULT_AUTH_COUCHDB_URL =  "http://admin:password@127.0.0.1:5984"
 
+class ResponseFile(object):
+    def __init__(self, filename=None):
+        self._response_file = None
+        ResponseFile.set(self, filename)
+    
+    def set(self, path):
+        self._path = path
+        try:
+            self._response_file = open(path, "w")
+            self._response_file.truncate()
+            self._response_file.flush()
+        except:
+            pass
+
+
+    def write(self, response):
+        if self._response_file:
+            self._response_file.write("{0}{1}".format(response, os.linesep))
+            self._response_file.flush()
+
+    def close(self):
+        if self._response_file:
+            self._response_file.close()
+            self._response_file = None
+            self._path = None
+
+response_file = ResponseFile()
+
+
 def publishService(nodeUrl, server, dbname, serviceType, serviceName):
     service = {}
     service.update(t.service_description)
@@ -113,6 +142,8 @@ def getInput(question, defaultInput=None,  validateFunc=None, hide_input=False):
         if validateFunc is not None and validateFunc(userInput) == False:
             continue
 
+        response_file.write(userInput)
+
         return userInput
     
 _DEFAULT_ENDPOINT = "http://www.example.com"
@@ -153,7 +184,7 @@ def getDefaultEndpoint():
         return _DEFAULT_ENDPOINT
 
 
-def getSetupInfo():
+def getSetupInfo(response_file=None):
     """Get the user node info"""
     nodeSetup = {}
     

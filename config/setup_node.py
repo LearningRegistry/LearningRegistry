@@ -242,13 +242,18 @@ if __name__ == "__main__":
     parser.add_option("-d", "--devel", dest="devel", action="store_true", default=False,
                       help="Development mode allows the setting of network and community.",
                     )
+    parser.add_option("-r", "--response", dest="response_file", default=None,
+                      help="Specify a filename for writing a response_file to input.")
     (options, args) = parser.parse_args()
     print("\n\n=========================\nNode Configuration\n")
     if options.devel:
         setCommunityId()
         setNetworkId()
     
-    
+    if options.response_file:
+        print("Saving a response file to: {0}".format(options.response_file))
+        response_file.set(options.response_file)
+
     nodeSetup = getSetupInfo()
     print("\n\n=========================\nNode Configuration\n")
     for k in nodeSetup.keys():
@@ -295,4 +300,6 @@ if __name__ == "__main__":
 
     #provide a basic NGINX site configuraition
     writeNGINXConfig(nodeSetup, "learningregistry.conf")
+
+    response_file.close()
 
