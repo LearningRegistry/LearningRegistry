@@ -17,12 +17,12 @@ class PubkeyController(BaseController):
     def index(self, format='text'):
         """GET /pubkey: All items in the collection"""
         # url('pubkey')
-        response.headers["Content-Type": "text/plain"]
+        response.headers["Content-Type"] =  "text/plain; charset=us-ascii"
         return signing.get_node_public_key()
 
     def create(self):
         """POST /pubkey: Create a new item"""
-        response.headers["Content-Type": "text/plain"]
+        response.headers["Content-Type"] =  "text/plain; charset=us-ascii"
         return signing.get_node_public_key()
 
     # def new(self, format='html'):
