@@ -294,5 +294,5 @@ if __name__ == "__main__":
     makeDBPublicReadOnly(server, _RESOURCE_DATA)
 
     #provide a basic NGINX site configuraition
-    writeNGINXConfig(nodeSetup, "learning_registry.conf")
+    writeNGINXConfig(nodeSetup, "learningregistry.conf")
 
