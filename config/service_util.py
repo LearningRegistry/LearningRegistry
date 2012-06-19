@@ -101,7 +101,7 @@ lr_start () {
 lr_stop () {
     if [ -e $LR_PID ]
     then
-        su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --stop --pidfile $LR_PID;rm -f $LR_PID{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
+        su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --stop $LR_PID;rm -f $LR_PID{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
         echo "LR Node is stopping. Log: $LR_LOG   PID: $LR_PID"
     fi
 
@@ -110,7 +110,7 @@ lr_stop () {
 lr_restart () {
     if [ -e $LR_PID ]
     then
-        su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --stop --pidfile $LR_PID;rm -f $LR_PID"
+        su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --stop $LR_PID;rm -f $LR_PID"
         su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --ini-paste $LR_HOME/development.ini start {{#LR_VIRTUALENV}}-H $LR_VIRTUALENV{{/LR_VIRTUALENV}} --pidfile $LR_PID --daemonize $LR_LOG{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
         echo "LR Node is restarting. Log: $LR_LOG   PID: $LR_PID"
     fi
