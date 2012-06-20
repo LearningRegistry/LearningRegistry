@@ -284,6 +284,7 @@ def getDefaultSigner(gpg, keyID):
 def setNodeSigning(server, config, setupInfo):
     if "oauth" in setupInfo and setupInfo["oauth"]:
         from services.service_template import getCouchAppPath
+        import oauth2 as oauth, time
 
         gpgbin = getInput("Path to GnuPG executable", "gpg")
         setupInfo["lr.publish.signing.gpgbin"] = gpgbin
@@ -338,6 +339,52 @@ def setNodeSigning(server, config, setupInfo):
             setupInfo["oauth.app.name"] = ddoc['kanso']['config']['name']
             setupInfo["lr.oauth.signup"] = "{0}/apps/{1}".format(setupInfo["nodeUrl"],ddoc['kanso']['config']['name']) 
             config.set("app:main","lr.oauth.signup",setupInfo["lr.oauth.signup"])
+
+        ## TODO: Need to make an initial OAuth call to get the oauth view installed.
+        users = config.get("app:main", "couchdb.db.users", "_users")
+        couch_url = config.get("app:main", "couchdb.url", "http://localhost:5984")
+
+        dummy_user = {
+            "_id": "org.couchdb.user:tempuser",
+            "name": "tempuser",
+            "type": "user",
+            "roles": [],
+            "oauth": {
+                "consumer_keys":
+                {
+                    "localhost": "walt_2.0"
+                },
+                "tokens":
+                {
+                    "temptoken": "learningregistry"
+                }
+            }
+        }
+        server[users].save(dummy_user)
+
+        # Create your consumer with the proper key/secret.
+        consumer = oauth.Consumer(key="localhost", 
+            secret=dummy_user["oauth"]["consumer_keys"]["localhost"])
+
+        token = oauth.Token(key="temptoken",
+            secret=dummy_user["oauth"]["tokens"]["temptoken"])
+
+
+
+        # Create our client.
+        client = oauth.Client(consumer, token=token)
+        client.disable_ssl_certificate_validation=True
+
+        params = {
+            'oauth_version': "1.0",
+            'oauth_nonce': oauth.generate_nonce(),
+            'oauth_timestamp': int(time.time())
+        }
+        
+        resp, content = client.request("{0}/_session".format(couch_url), "GET", headers={"Content-Type": "application/json"})
+
+        del server[users][dummy_user["_id"]]
+
         return True
     return False
 
