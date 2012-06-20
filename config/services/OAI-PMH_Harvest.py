@@ -14,7 +14,7 @@ def install(server, dbname, setupInfo):
     active = getInput("Enable OAI-PMH Harvest?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable OAI-PMH Flow Control?", "F", isBoolean)
+    active = getInput("Enable OAI-PMH Flow Control?", "T", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:

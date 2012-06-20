@@ -1,0 +1,11 @@
+{
+    "name": "restrict-writers",
+    "version": "0.0.1",
+    "description": "Restrict writers to lrnode role",
+    "modules":["lib"],
+    "load":"lib/app",
+    "dependencies": {
+        "modules":null,
+        "properties": null
+    }
+}

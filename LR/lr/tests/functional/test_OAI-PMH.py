@@ -23,7 +23,7 @@ import unittest
 import urllib2
 import uuid
 from lr.util.testdata import getDC_v1_1, getTestDataForMetadataFormats, getTestDataForEmbeddedXMLDOCTYPEHeaders
-from lr.util.decorators import PublishTestDocs, ForceCouchDBIndexing
+from lr.util.decorators import PublishTestDocs, ForceCouchDBIndexing, ModifiedServiceDoc, update_authz
 from lr.util.validator import XercesValidator, validate_xml_content_type, validate_json_content_type, parse_response, validate_lr_oai_etree, validate_lr_oai_response
 
 json_headers={'content-type': 'application/json'}
@@ -45,7 +45,6 @@ log = logging.getLogger(__name__)
 
 
 
-test_data_delete = True
 nsdl_data = { "documents" : [], "ids": [] }
 dc_data = { "documents" : [], "ids": [] }
 sorted_dc_data = { "documents" : [], "ids": [] }
@@ -55,8 +54,8 @@ class TestOaiPmhControllerSpecialData(TestController):
     @classmethod
     def setUpClass(self):
         self.o = oaipmh()
-        self.server = self.o.server
-        self.db = self.o.db
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.db =  self.server[config['couchdb.db.resourcedata']] 
 
     @classmethod
     def tearDownClass(self):
@@ -181,21 +180,22 @@ class TestOaiPmhController(TestController):
         TestController.__init__(self,*args,**kwargs)
         self.controllerName = "OAI-PMH"
     @classmethod
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def setUpClass(self):
-
+        self.test_data_delete = True
         schema_file = file("lr/public/schemas/OAI/2.0/OAI-PMH-LR.xsd", "r")
         schema_doc = etree.parse(schema_file)
         self.oailrschema = etree.XMLSchema(schema_doc)
         
         self.validator = XercesValidator()
         
-        global test_data_delete, nsdl_data, dc_data, sorted_dc_data, sorted_nsdl_data
+        global nsdl_data, dc_data, sorted_dc_data, sorted_nsdl_data
         self.o = oaipmh()
         self.server = self.o.server
         self.db = self.o.db
         
         view_data = self.db.view('oai-pmh-test-data/docs')
-        
+    
         dropData = False
         if "oaipmh.drop_data_on_launch" in config:
             dropData =  config["oaipmh.drop_data_on_launch"] in ["true", "True"]
@@ -267,9 +267,9 @@ class TestOaiPmhController(TestController):
         
     @classmethod       
     def tearDownClass(self):
-        global test_data_delete
+       
         log.info ("Tearing Down Test")
-        if test_data_delete == True:
+        if TestOaiPmhController.test_data_delete == True:
             for doc in nsdl_data["documents"]:
                 try:
                     del self.db[doc["_id"]]
@@ -350,7 +350,6 @@ class TestOaiPmhController(TestController):
 
             log.info("test_get_oai_lr_schema: pass")
         except Exception as e:
-            test_data_delete = False
             raise e
         
     @ForceCouchDBIndexing()    
@@ -456,8 +455,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listMetadataFormats_get: fail")
             log.exception("test_listMetadataFormats_with_doc_id_identifier_get: fail")
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_with_doc_id_identifier_get: pass")
     
@@ -497,8 +494,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listMetadataFormats_get: fail")
             log.exception("test_listMetadataFormats_with_resource_id_identifier_get: fail")
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_with_resource_id_identifier_get: pass")        
 
@@ -510,8 +505,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listMetadataFormats_get: fail")
             log.exception("test_listMetadataFormats_get: fail")
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_get: pass")
     
@@ -523,8 +516,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listMetadataFormats_post: fail")
             log.exception("test_listMetadataFormats_post: fail")
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listMetadataFormats_post: pass")
     
@@ -594,8 +585,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_match_requested_dissemination_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_getRecord_match_requested_dissemination_get: pass")
 
@@ -618,8 +607,7 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_by_doc_ID_JSON_metadataPrefix_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
-            global test_data_delete
-            test_data_delete = False
+
             raise e
         log.info("test_getRecord_by_doc_ID_JSON_metadataPrefix_get: pass")
     
@@ -633,8 +621,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_get: pass")
     
@@ -648,44 +634,38 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_getRecord_by_doc_ID_post: fail - identifier: {0}".format(randomDoc["doc_ID"]))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_getRecord_by_doc_ID_post: pass")
     
     @ForceCouchDBIndexing()
     def test_getRecord_by_resource_ID_get(self):
-        global nsdl_data, sorted_dc_data, test_data_delete
+        global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.get("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
             validate_lr_oai_response(response)
         except AssertionError:
             log.exception("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
-            test_data_delete = False
             raise
         except Exception as e:
 #            log.error("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             log.exception("test_getRecord_by_resource_ID_get: fail - identifier: {0}".format(randomDoc["resource_locator"]))
-            test_data_delete = False
             raise e
         log.info("test_getRecord_by_resource_ID_get: pass")
     
     @ForceCouchDBIndexing()    
     def test_getRecord_by_resource_ID_post(self):
-        global nsdl_data, sorted_dc_data, test_data_delete
+        global nsdl_data, sorted_dc_data
         randomDoc = choice(sorted_dc_data["documents"])
         response = self.app.post("/OAI-PMH", params={'verb': 'GetRecord', 'metadataPrefix':'oai_dc', 'identifier': randomDoc["resource_locator"], 'by_resource_ID': True})
         try:
             validate_lr_oai_response(response)
         except AssertionError:
             log.exception("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
-            test_data_delete = False
             raise
         except Exception as e:
 #            log.error("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
             log.exception("test_getRecord_by_resource_ID_post: fail - identifier: {0}".format(randomDoc["resource_locator"]))
-            test_data_delete = False
             raise e
         log.info("test_getRecord_by_resource_ID_post: pass")
 
@@ -703,8 +683,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listRecords_post: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listRecords_post: pass")
     
@@ -736,8 +714,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listRecords_match_requested_disseminaton_get: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listRecords_match_requested_disseminaton_get: pass")
 
@@ -776,8 +752,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listRecords_noRecordsMatch_get: fail - from: {0}".format(from_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listRecords_noRecordsMatch_get: pass")
     
@@ -814,8 +788,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_getRecord_by_doc_ID_get: fail - identifier: {0}".format(randomDoc["doc_ID"]))
             log.exception("test_listRecords_JSON_metadataPrefix_get: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listRecords_JSON_metadataPrefix_get: pass")
     
@@ -859,8 +831,6 @@ class TestOaiPmhController(TestController):
             except Exception as e:
     #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
                 log.exception("test_listRecords_flow_control_get: fail - from: {0} until: {1}".format(from_, until_))
-                global test_data_delete
-                test_data_delete = False
                 raise e
             log.info("test_listRecords_flow_control_get: pass")
         finally:
@@ -882,8 +852,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listRecords_get: pass")
 
@@ -902,8 +870,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listIdentifiers_post: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listIdentifiers_post: pass")
     
@@ -921,8 +887,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listIdentifiers_get: pass")
     
@@ -966,8 +930,6 @@ class TestOaiPmhController(TestController):
             except Exception as e:
     #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
                 log.exception("test_listIdentifiers_flow_control_get: fail - from: {0} until: {1}".format(from_, until_))
-                global test_data_delete
-                test_data_delete = False
                 raise e
             log.info("test_listIdentifiers_flow_control_get: pass")
         finally:
@@ -1008,8 +970,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listIdentifiers_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listIdentifiers_timestamp_headers_match_response_get: fail - from: {0} until: {1}".format(from_, until_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listIdentifiers_timestamp_headers_match_response_get: pass")
         
@@ -1048,8 +1008,6 @@ class TestOaiPmhController(TestController):
         except Exception as e:
 #            log.error("test_listRecords_get: fail - from: {0} until: {1}".format(from_, until_))
             log.exception("test_listIdentifiers_noRecordsMatch_get: fail - from: {0}".format(from_))
-            global test_data_delete
-            test_data_delete = False
             raise e
         log.info("test_listIdentifiers_noRecordsMatch_get: pass")
 

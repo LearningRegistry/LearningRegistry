@@ -1,0 +1,15 @@
+{
+    "name": "oauth-key-management",
+    "version": "0.0.1",
+    "description": "OAuth Key Management",
+    "attachments": ["index.html","css","images"],
+    "modules":["lib"],
+    "load": "lib/app",
+    "dependencies": {
+        "attachments": null,
+        "modules": null,
+        "users": null,
+        "underscore": null,
+        "properties": null
+    }
+}

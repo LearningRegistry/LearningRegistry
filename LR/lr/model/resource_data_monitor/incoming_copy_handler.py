@@ -28,7 +28,7 @@ _ID = "id"
 
 class IncomingCopyHandler(BaseChangeHandler):
 	def __init__(self):
-		self._serverUrl = config["couchdb.url"]
+		self._serverUrl = config["couchdb.url.dbadmin"]
 		self._targetName = config["couchdb.db.resourcedata"]
 		
 		s = couchdb.Server(self._serverUrl)

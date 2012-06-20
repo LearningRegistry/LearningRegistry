@@ -4,7 +4,7 @@ Created on Aug 16, 2011
 @author: jklo
 '''
 import couchdb 
-import sys
+import sys, os, gnupg, json, getpass
 import traceback
 from uuid import uuid4
 import lrnodetemplate as t
@@ -14,6 +14,36 @@ import urlparse
 
 #Default url to the couchdb server.
 _DEFAULT_COUCHDB_URL =  "http://127.0.0.1:5984"
+_DEFAULT_AUTH_COUCHDB_URL =  "http://admin:password@127.0.0.1:5984"
+
+class ResponseFile(object):
+    def __init__(self, filename=None):
+        self._response_file = None
+        ResponseFile.set(self, filename)
+    
+    def set(self, path):
+        self._path = path
+        try:
+            self._response_file = open(path, "w")
+            self._response_file.truncate()
+            self._response_file.flush()
+        except:
+            pass
+
+
+    def write(self, response):
+        if self._response_file:
+            self._response_file.write("{0}{1}".format(response, os.linesep))
+            self._response_file.flush()
+
+    def close(self):
+        if self._response_file:
+            self._response_file.close()
+            self._response_file = None
+            self._path = None
+
+response_file = ResponseFile()
+
 
 def publishService(nodeUrl, server, dbname, serviceType, serviceName):
     service = {}
@@ -72,6 +102,18 @@ def testCouchServer(serverURL):
         couchServer =  couchdb.Server(url=serverURL)
         # Try to get the server configuration to ensure the the server is up and
         # and running. There may be a better way of doing that.
+        couchServer.version()
+    except Exception as e:
+        print(e)
+        print("Cannot connect to couchDB server '{0}'\n".format(serverURL))
+        return False
+    return True
+
+def testAuthCouchServer(serverURL):
+    try:
+        couchServer =  couchdb.Server(url=serverURL)
+        # Try to get the server configuration to ensure the the server is up and
+        # and running. There may be a better way of doing that.
         couchServer.config()
     except Exception as e:
         print(e)
@@ -79,13 +121,17 @@ def testCouchServer(serverURL):
         return False
     return True
 
-def getInput(question, defaultInput=None,  validateFunc=None):
+def getInput(question, defaultInput=None,  validateFunc=None, hide_input=False):
     ques = question+':  '
     if defaultInput is not None:
             ques = question+' [{0}]:  '.format(defaultInput)
 
     while True:
-        userInput = raw_input(ques)
+        if not hide_input:
+            userInput = raw_input(ques)
+        else:
+            userInput = getpass.getpass(ques)
+
         inputLen =  len(userInput.strip())
         if inputLen == 0:
             if defaultInput is not None:
@@ -96,9 +142,16 @@ def getInput(question, defaultInput=None,  validateFunc=None):
         if validateFunc is not None and validateFunc(userInput) == False:
             continue
 
+        response_file.write(userInput)
+
         return userInput
     
 _DEFAULT_ENDPOINT = "http://www.example.com"
+
+
+
+def isValidKey(userInput):
+    pass
 
 def isURL(userInput):
     if userInput.lower() == _DEFAULT_ENDPOINT:
@@ -120,17 +173,33 @@ def isInt(userInput):
     except ValueError:
         return False
 
-def getSetupInfo():
+def getDefaultEndpoint():
+    import socket
+    hostname = socket.gethostname()
+    if hostname != None:
+        parts = list(urlparse.urlsplit(_DEFAULT_ENDPOINT))
+        parts[1] = hostname
+        return urlparse.urlunsplit(parts)
+    else:
+        return _DEFAULT_ENDPOINT
+
+
+def getSetupInfo(response_file=None):
     """Get the user node info"""
     nodeSetup = {}
     
-    nodeUrl = getInput("Enter the node service endpoint URL", _DEFAULT_ENDPOINT, isURL)
+
+
+    nodeUrl = getInput("Enter the node service endpoint URL", getDefaultEndpoint(), isURL)
     nodeSetup['nodeUrl'] = nodeUrl
     
-    couchDBUrl  = getInput("Enter your couchDB server URL",
+    couchDBUrl  = getInput("Enter your unauthenticated couchDB server URL",
                                             _DEFAULT_COUCHDB_URL, testCouchServer)
-
     nodeSetup['couchDBUrl'] = couchDBUrl
+
+    couchDBUrlDBA  = getInput("Enter your AUTHENTICATED CouchDB server DBA URL",
+                                            _DEFAULT_AUTH_COUCHDB_URL, testAuthCouchServer)
+    nodeSetup['couchDBUrlDBA'] = couchDBUrlDBA
 
     nodeName = getInput("Enter your node name", "Node@{0}".format(nodeUrl))
     nodeSetup['node_name'] = nodeName
@@ -166,3 +235,157 @@ def getSetupInfo():
     isDistributeDest = getInput("Does the node want to be the destination for replication (T/F)", 'T')
     nodeSetup['open_connect_dest'] =(isDistributeDest =='T')
     return nodeSetup
+
+def getDefaultGnuPGHome():
+    return os.path.join(os.path.expanduser('~'), ".gnupg")
+
+def getGPG(gpgbin, gnupghome):
+    return gnupg.GPG(gpgbin, gnupghome)
+
+def checkKey(gpg):
+    def checkKeyID(userInput):
+        try:
+            if len(userInput.strip()) == 0:
+                return False
+            privateKey = gpg.export_keys(userInput, True)
+            publicKey = gpg.export_keys(userInput, True)
+            foundKey = len(privateKey) > 0 and len(publicKey) > 0
+            if not foundKey:
+                print("Invalid Private Key ID. Ensure key public and private key exists in keyring. Please try again.\n")
+            return foundKey
+        except:
+            pass
+        return False
+    return checkKeyID
+
+def checkPassphrase(gpg, keyID):
+    def check(userInput):
+        try:
+            sign = gpg.sign("hello learning registry", keyid=keyID, passphrase=userInput)
+            if len(sign.data) > 0 and len(sign.fingerprint) > 0:
+                return True
+            else:
+                print("Bad passphrase! Please try again.\n")
+        except:
+            pass
+        return False
+    return check
+
+def getDefaultSigner(gpg, keyID):
+    try:
+        for key in gpg.list_keys(True):
+            if key['keyid'] == keyID.strip():
+                return key['uids'][0]
+    except:
+        pass
+    return None
+            
+
+def setNodeSigning(server, config, setupInfo):
+    if "oauth" in setupInfo and setupInfo["oauth"]:
+        from services.service_template import getCouchAppPath
+        import oauth2 as oauth, time
+
+        gpgbin = getInput("Path to GnuPG executable", "gpg")
+        setupInfo["lr.publish.signing.gpgbin"] = gpgbin
+        config.set("app:main","lr.publish.signing.gpgbin",gpgbin)
+
+        gnupghome = getInput("Path to GnuPG Home", getDefaultGnuPGHome())
+        setupInfo["lr.publish.signing.gnupghome"] = gnupghome
+        config.set("app:main","lr.publish.signing.gnupghome",gnupghome)
+
+        gpg = getGPG(gpgbin, gnupghome)
+
+        privateKeyId = getInput("Private Key Id for Signing", "", checkKey(gpg)).strip()
+        setupInfo["lr.publish.signing.privatekeyid"] = privateKeyId
+        config.set("app:main","lr.publish.signing.privatekeyid",privateKeyId)
+
+
+        publickeylocations = [ "%s/pubkey" %  setupInfo['nodeUrl']]
+        setupInfo["lr.publish.signing.publickeylocations"] = json.dumps(publickeylocations)
+        config.set("app:main","lr.publish.signing.publickeylocations",json.dumps(publickeylocations))
+
+
+        signer = getInput("Signer for Resource Data Identity", getDefaultSigner(gpg, privateKeyId))
+        setupInfo["lr.publish.signing.signer"] = signer
+        config.set("app:main","lr.publish.signing.signer",signer)
+
+
+        passphrase = getInput("Passphrase for Signing with Private Key [typing is concealed]", "", checkPassphrase(gpg, privateKeyId), hide_input=True)
+        setupInfo["lr.publish.signing.passphrase"] = passphrase
+        config.set("app:main","lr.publish.signing.passphrase",passphrase)
+
+        
+
+        server.resource("_config","couch_httpd_oauth").put('use_users_db', '"true"')
+        server.resource("_config","httpd").put('WWW-Authenticate', '"OAuth"')
+        server.resource("_config","browserid").put('enabled', '"true"')
+
+        apps = config.get("app:main", "couchdb.db.apps", "apps")
+        try:
+            server.create(apps)
+        except:
+            pass
+
+        oauthCouchApp = os.path.join(getCouchAppPath(),apps,"kanso","oauth-key-management.json")
+        with open(oauthCouchApp) as f:
+            ddoc = json.load(f)
+            try:
+                del server[apps]["_design/%s"%ddoc['kanso']['config']['name']]
+            except:
+                pass
+            ddoc["_id"] = "_design/%s"%ddoc['kanso']['config']['name']
+            server[apps].save(ddoc)
+            setupInfo["oauth.app.name"] = ddoc['kanso']['config']['name']
+            setupInfo["lr.oauth.signup"] = "{0}/apps/{1}".format(setupInfo["nodeUrl"],ddoc['kanso']['config']['name']) 
+            config.set("app:main","lr.oauth.signup",setupInfo["lr.oauth.signup"])
+
+        ## TODO: Need to make an initial OAuth call to get the oauth view installed.
+        users = config.get("app:main", "couchdb.db.users", "_users")
+        couch_url = config.get("app:main", "couchdb.url", "http://localhost:5984")
+
+        dummy_user = {
+            "_id": "org.couchdb.user:tempuser",
+            "name": "tempuser",
+            "type": "user",
+            "roles": [],
+            "oauth": {
+                "consumer_keys":
+                {
+                    "localhost": "walt_2.0"
+                },
+                "tokens":
+                {
+                    "temptoken": "learningregistry"
+                }
+            }
+        }
+        server[users].save(dummy_user)
+
+        # Create your consumer with the proper key/secret.
+        consumer = oauth.Consumer(key="localhost", 
+            secret=dummy_user["oauth"]["consumer_keys"]["localhost"])
+
+        token = oauth.Token(key="temptoken",
+            secret=dummy_user["oauth"]["tokens"]["temptoken"])
+
+
+
+        # Create our client.
+        client = oauth.Client(consumer, token=token)
+        client.disable_ssl_certificate_validation=True
+
+        params = {
+            'oauth_version': "1.0",
+            'oauth_nonce': oauth.generate_nonce(),
+            'oauth_timestamp': int(time.time())
+        }
+        
+        resp, content = client.request("{0}/_session".format(couch_url), "GET", headers={"Content-Type": "application/json"})
+
+        del server[users][dummy_user["_id"]]
+
+        return True
+    return False
+
+        

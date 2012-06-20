@@ -14,7 +14,7 @@ def install(server, dbname, setupInfo):
     active = getInput("Enable Slice?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable Flow Control for Slice?", "F", isBoolean)
+    active = getInput("Enable Flow Control for Slice?", "T", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:

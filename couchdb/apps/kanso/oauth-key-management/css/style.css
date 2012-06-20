@@ -1,0 +1,49 @@
+
+div.oauth {
+    display: none;
+    width: 100%;
+    clear: both;
+}
+
+div.oauth input[type=checkbox], div.oauth label[for=password_set] {
+    display: inline;
+    width: 25px;
+}
+
+div.oauth label, div.oauth input {
+    display: block;
+    width: 100%;
+}
+
+div.head , div.credentials {
+    width: 100%;
+    clear: both;
+}
+
+#browserid {
+    width: auto;
+}
+
+div.login { 
+
+}
+
+.head h2 {
+    float: left;
+    width: 60%;
+}
+
+
+.picture {
+    float: left;
+}
+
+img {
+    border: none;
+}
+
+.logo {
+    float: right;
+}
+
+.clear: both;

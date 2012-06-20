@@ -39,7 +39,10 @@ class ObtainController(BaseController):
         args['include_docs'] = include_docs
         if resumption_token is not None:
             if 'key' not in args or len(args['keys']) == 0:
-                args['key'] = resumption_token['startkey']
+                if "key" in resumption_token:
+                    args['key'] = resumption_token['key']
+                if "keys" in resumption_token:
+                    args['keys'] = resumption_token['keys']
             args['startkey'] = resumption_token['startkey']
             args['startkey_docid'] = resumption_token['startkey_docid']
             args['skip'] = 1
@@ -65,7 +68,7 @@ class ObtainController(BaseController):
                     self.limit = serviceData['id_limit']
                 elif self.enable_flow_control:
                     self.limit = 100                            
-    def format_data(self, full_docs, data, currentResumptionToken):
+    def format_data(self, full_docs, data, currentResumptionToken, keys=[]):
         yield '{"documents":['
         num_sent = 0
         currentID = None
@@ -104,7 +107,18 @@ class ObtainController(BaseController):
         elif count < self.limit:
             yield '], "resumption_token":%s}' % 'null'
         else:
-            token = h.fixUtf8(rt.get_token(self.service_id,startkey=lastStartKey,endkey=None,startkey_docid=lastId))
+            token_params = {
+                "startkey" : lastStartKey,
+                "endkey" : None,
+                "startkey_docid" : lastId
+            }
+
+            if len(keys) > 0:
+                token_params["keys"] = keys
+            elif currentResumptionToken and "keys" in currentResumptionToken and len(currentResumptionToken["keys"]) > 0:
+                token_params["keys"] = currentResumptionToken["keys"]
+            token = h.fixUtf8(rt.get_token(self.service_id,**token_params))
+
             yield '], "resumption_token":"%s"}' % token
     def index(self, format='html'):
         """GET /obtain: All items in the collection"""        
@@ -142,7 +156,7 @@ class ObtainController(BaseController):
                 view = self.get_view('_all_docs',keys, include_docs=full_docs,resumption_token=resumption_token)            
         elif by_resource_ID:
             view = self.get_view('_design/learningregistry-resource-location/_view/docs',keys, include_docs=full_docs,resumption_token=resumption_token)        
-        for i in  self.format_data(full_docs,view, resumption_token):        
+        for i in  self.format_data(full_docs,view, resumption_token, keys=keys):        
             yield i
         if(data.has_key(callbackKey)):
             yield ')'

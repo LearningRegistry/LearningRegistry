@@ -1,13 +1,13 @@
-from lr.tests import *
-import logging,json
-import time
-from urllib import unquote_plus,quote_plus
-from pylons import config
 from datetime import datetime
 from lr.lib.harvest import harvest
+from lr.tests import *
+from lr.util.decorators import ForceCouchDBIndexing, ModifiedServiceDoc, update_authz
+from pylons import config
+from urllib import unquote_plus,quote_plus
+import logging,json
 import threading
 import time
-from lr.util.decorators import ForceCouchDBIndexing
+import time
 log = logging.getLogger(__name__)
 headers={'content-type': 'application/json'}
 db = None
@@ -16,6 +16,7 @@ class TestHarvestController(TestController):
         TestController.__init__(self,*args,**kwargs)
         self.controllerName = "obtain"
     @classmethod
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def setupClass(self):
         self.setup = True
         with open("lr/tests/data/nsdl_dc/data-000000000.json",'r') as f:

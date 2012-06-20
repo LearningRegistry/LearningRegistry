@@ -7,6 +7,7 @@ import urlparse
 import json
 import logging
 import types
+import base64
 from iso8601 import iso8601
 
 log = logging.getLogger(__name__)
@@ -21,6 +22,15 @@ from iso8601.iso8601 import ISO8601_REGEX
 import re
 from stream import StreamingCouchDBDocHandler
 
+def getBasicAuthHeaderFromURL(basic_auth_url):
+    try:
+        urlparts = urlparse.urlparse(basic_auth_url)
+        if "username" in urlparts and "password" in urlparts and urlparts.username != None and urlparts.password != None:
+            base64_enc = base64.encodestring("%s:%s" % (urlparts.username, urlparts.password)).replace("\n", "")
+            return { "Authorization": "Basic %s" % base64_enc }
+    except:
+        return { }
+        
 def dictToObject(dictionary):
     class DictToObject(dict):
         def __init__(self, data):

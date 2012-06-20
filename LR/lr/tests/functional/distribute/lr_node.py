@@ -151,6 +151,7 @@ class Node(object):
 
         #Set the couchdb database info
         pylonsConfig.set("app:main", "couchdb.url", self._nodeConfig.get("couch_info", "server"))
+        pylonsConfig.set("app:main", "couchdb.url.dbadmin", self._nodeConfig.get("couch_info", "serveradmin"))
         for database in self._CONFIG_DATABASE_NAMES:
             pylonsConfig.set("app:main", "couchdb.db.{0}".format(database),
                                        self._nodeConfig.get("couch_info" , database))

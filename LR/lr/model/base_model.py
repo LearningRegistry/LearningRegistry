@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 appConfig = config['app_conf']
 
 #Default couchdb server that use by all the models when none is provided.
-defaultCouchServer =  couchdb.Server(appConfig['couchdb.url'])    
+defaultCouchServer =  couchdb.Server(appConfig['couchdb.url.dbadmin'])    
 
 def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
         
@@ -48,7 +48,7 @@ def createBaseModel( modelSpec, defaultDBName, server=defaultCouchServer):
         _ID = '_id'
         _REV = '_rev'
         _SPEC_DATA = '_specData'
-        
+
         _defaultDB = createDB(defaultDBName, server)
         _modelParsers = getModelPasers(modelSpec)
     

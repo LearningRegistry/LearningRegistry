@@ -17,6 +17,9 @@ from uuid import uuid4
 import shutil
 import logging
 from setup_utils import *
+import nginx_util
+import json
+
 import re
 log = logging.getLogger(__name__)
 scriptPath = os.path.dirname(os.path.abspath(__file__))
@@ -107,6 +110,42 @@ def publishNodeServices(nodeUrl, server, dbname, services=_DEFAULT_SERVICES):
                     print ("\n\n--Cannot find custom plugin for: '{0}:{1}'".format(serviceType, serviceName))
                     publishService(nodeUrl, server, dbname, serviceType, serviceName)
 
+def makeDBPublicReadOnly(server, dbname):
+    import couch_utils, os
+    from services.service_template import getCouchAppPath
+
+    dba_url = nodeSetup['couchDBUrlDBA']
+    db = server[dbname]
+
+    # Add doc change handler
+    couch_utils.pushCouchApp(os.path.join(getCouchAppPath(),"resource_data","apps","restrict-writers"), "%s/%s" % (dba_url, dbname))
+
+    # Add security object
+    _, _, exist_sec_obj = db.resource.get_json('_security')
+
+    sec_obj = {
+        "admins": {
+            "names": [],
+            "roles": []
+        },
+        "readers": {
+            "names": [],
+            "roles": []
+        }
+    }
+    
+    sec_obj.update(exist_sec_obj)
+
+    parts = urlparse.urlsplit(dba_url)
+    if (hasattr(parts,'username') and parts.username is not None 
+        and parts.username not in sec_obj["admins"]["roles"]):
+        sec_obj["admins"]["names"].append(parts.username)
+
+    db = server[dbname]
+    _, _, result = db.resource.put_json('_security', sec_obj)
+    print json.dumps(result)
+
+
 def publishNodeConnections(nodeUrl, server, dbname,  nodeName, connectionList):
     for dest_node_url in connectionList:
         connection = dict(t.connection_description)
@@ -135,7 +174,12 @@ def setNetworkId():
     t.node_description['network_id'] = network
     t.network_policy_description['network_id'] = network
     t.network_policy_description['policy_id'] =network+" policy"
-        
+ 
+def writeConfig():
+    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
+    _config.write(destConfigfile)
+    destConfigfile.close()
+
 def setConfigFile(nodeSetup):
     
     #create a copy of the existing config file as to not overide it.
@@ -146,6 +190,8 @@ def setConfigFile(nodeSetup):
 
     #Update pylons config file to use the couchdb url
     _config.set("app:main", "couchdb.url", nodeSetup['couchDBUrl'])
+    _config.set("app:main", "couchdb.url.dbadmin", nodeSetup['couchDBUrlDBA'])
+
     # set the url to for destribute/replication (that is the url that a source couchdb node
     # will use for replication.
     _config.set("app:main", "lr.distribute_resource_data_url",  nodeSetup['distributeResourceDataUrl'])
@@ -153,9 +199,7 @@ def setConfigFile(nodeSetup):
     if server.version() < "1.1.0":
         _config.set("app:main", "couchdb.stale.flag", "OK")
         
-    destConfigfile = open(_PYLONS_CONFIG_DEST, 'w')
-    _config.write(destConfigfile)
-    destConfigfile.close()
+    writeConfig()
       
       #Re-read the database info to make we have the correct urls
     global _RESOURCE_DATA, _NODE, _COMMUNITY, _NETWORK, _INCOMING
@@ -169,6 +213,24 @@ def setConfigFile(nodeSetup):
     except:
         _INCOMING = 'incoming'
 
+def writeNGINXConfig(setupInfo, filename):
+    print("##############################################")
+    print("### NGINX Site Configuration #################")
+    
+    nginx_cfg = nginx_util.getNGINXSiteConfig(setupInfo, _config)
+    print nginx_cfg
+    print("##############################################")
+
+    with open(filename, "w") as f:
+        f.truncate(0)
+        f.flush()
+        f.write(nginx_cfg)
+        f.close()
+        print ("### Site configuration written to: %s" % filename)
+        print ("### For most installations you should copy this to /etc/nginx/sites-available then")
+        print ("###   ln -s /etc/nginx/sites-available /etc/nginx/sites-enabled")
+        print ("### and then subsequently restart or reload nginx")
+
 if __name__ == "__main__":
 
     from optparse import OptionParser
@@ -180,19 +242,25 @@ if __name__ == "__main__":
     parser.add_option("-d", "--devel", dest="devel", action="store_true", default=False,
                       help="Development mode allows the setting of network and community.",
                     )
+    parser.add_option("-r", "--response", dest="response_file", default=None,
+                      help="Specify a filename for writing a response_file to input.")
     (options, args) = parser.parse_args()
     print("\n\n=========================\nNode Configuration\n")
     if options.devel:
         setCommunityId()
         setNetworkId()
     
-    
+    if options.response_file:
+        print("Saving a response file to: {0}".format(options.response_file))
+        response_file.set(options.response_file)
+
     nodeSetup = getSetupInfo()
     print("\n\n=========================\nNode Configuration\n")
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
 
-    server =  couchdb.Server(url= nodeSetup['couchDBUrl'])
+
+    server =  couchdb.Server(url= nodeSetup['couchDBUrlDBA'])
     setConfigFile(nodeSetup)
     
 
@@ -209,6 +277,10 @@ if __name__ == "__main__":
         services = _GATEWAY_NODE_SERVICES
     publishNodeServices(nodeSetup["nodeUrl"], server, _NODE, services)
     
+    if setNodeSigning(server, _config, nodeSetup):
+        writeConfig()
+
+
     #Add the network and community description
     PublishDoc(server, _COMMUNITY, "community_description", t.community_description)
     PublishDoc(server, _NETWORK,  "network_description", t.network_description)
@@ -222,4 +294,12 @@ if __name__ == "__main__":
     #Add the node connections
     publishNodeConnections(nodeSetup["nodeUrl"], server, _NODE,  
                                             nodeSetup["node_name"],  nodeSetup['connections'])
+
+    #make resource data publicly read only
+    makeDBPublicReadOnly(server, _RESOURCE_DATA)
+
+    #provide a basic NGINX site configuraition
+    writeNGINXConfig(nodeSetup, "learningregistry.conf")
+
+    response_file.close()
 

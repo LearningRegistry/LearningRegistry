@@ -14,7 +14,7 @@ def install(server, dbname, setupInfo):
     active = getInput("Enable Basic Obtain?", "T", isBoolean)
     custom_opts["active"] = active.lower() in YES
     
-    active = getInput("Enable Basic Obtain Flow Control?", "F", isBoolean)
+    active = getInput("Enable Basic Obtain Flow Control?", "T", isBoolean)
     custom_opts["flow_control"] = active.lower() in YES
     
     if custom_opts["flow_control"]:

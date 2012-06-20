@@ -22,9 +22,30 @@ from pylons import request, response, session, tmpl_context as c, url, config
 from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 from  lr.model import ResourceDataModel, LRNode
-from  lr.lib import ModelParser, SpecValidationException, helpers as  h
+from  lr.lib import ModelParser, SpecValidationException, helpers as  h, signing, oauth, bauth
+
 log = logging.getLogger(__name__)
 
+def _continue_if_missing_oauth():
+    try:
+        nosig = (session["oauth-sign"]["status"] == oauth.authorize.NoSignature)
+        if nosig:
+            session["oauth-sign"] = None
+        return nosig
+    except:
+        return True
+
+def _no_abort(prev):
+    return True
+
+__service_doc = None
+def _service_doc(recache=False):
+    def get_service_doc():
+        global __service_doc
+        if not __service_doc or recache:
+            __service_doc = h.getServiceDocument(config["lr.publish.docid"])
+        return __service_doc
+    return get_service_doc
 
 class PublishController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -36,13 +57,16 @@ class PublishController(BaseController):
     __DOCUMENT_RESULTS =  'document_results'
     __DOCUMENTS = 'documents'
     
-    def create(self):
+
+    @oauth.authorize("oauth-sign", _service_doc(True), roles=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
+    @bauth.authorize("oauth-sign", _service_doc(), roles=None, pre_cond=_continue_if_missing_oauth, realm="Learning Registry")
+    def create(self, *args, **kwargs):
 
         results = {self.__OK:True}
         error_message = None
         try:
             data = json.loads(request.body)
-            doc_limit =  h.getServiceDocument(config['lr.publish.docid'])['service_data']['doc_limit']
+            doc_limit =  _service_doc()()['service_data']['doc_limit']
             
             if not self.__DOCUMENTS in data.keys():
                 # Comply with LR-RQST-009 'Missing documents in POST'
@@ -56,7 +80,7 @@ class PublishController(BaseController):
                 log.debug(error_message)
                 results[self.__ERROR] = error_message
             else:
-                results[self.__DOCUMENT_RESULTS ] = map(self._publish, data[self.__DOCUMENTS])
+                results[self.__DOCUMENT_RESULTS ] = map(lambda doc: signing.sign_doc(doc, cb=self._publish, session_key="oauth-sign"), data[self.__DOCUMENTS])
         except Exception as ex:
             log.exception(ex)
             results[self.__ERROR] = str(ex)
