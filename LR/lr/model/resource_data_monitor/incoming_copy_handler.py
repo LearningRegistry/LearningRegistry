@@ -39,7 +39,6 @@ class IncomingCopyHandler(BaseChangeHandler):
 			return True
 		return False
 
-
     def _handle(self, change, database):
         def handleDocument(newDoc):
             should_delete = True
