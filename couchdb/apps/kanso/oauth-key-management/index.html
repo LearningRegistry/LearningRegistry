@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/_browserid/include.js" type="text/javascript"></script>
+
+    <!-- Optional styles -->
+    <link rel="stylesheet" type="text/css" href="/_browserid/style.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+
+  <body>
+    <div class="head">
+      <h2>OAuth Management for Sign on Publish</h2>
+      <img class="logo" src="images/learning-registry-logo.png">
+    </div>
+
+    <div class="credentials">
+      <div id="browserid">
+        <div class="picture"></div>
+        <div class="login">
+          <img src="/_browserid/sign_in_green.png">
+        </div>
+      </div>
+    </div>
+    <div class="msg"></div>
+    <div class="oauth">
+      <fieldset>
+        <legend>Publish Password</legend>
+        <p>Using your email address as username and this password, you may publish to the Basic Publish or SWORD interfaces your own digitally signed resource data envelopes.</p>
+
+        <label for="password_set">Is Password Set?</label>
+        <input type="checkbox" id="password_set" disabled="disabled">
+
+        <label for="password">Password</label>
+        <input type="password" id="password">
+
+        <label for="verify_password">Verify Password</label>
+        <input type="password" id="verify_password">
+        <button id="save_password">Save</button>
+      </fieldset>
+      <fieldset>
+        <legend>Signing Information</legend>
+        <p>The following will be appended to the resource data document's identity signer field along with your email address so that your submissions may be identified.</p>
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name">
+
+        <button id="info_update">Save</button>
+      </fieldset>
+      <fieldset>
+        <legend>2-Legged OAuth Config</legend>
+        <p>Use the following when connecting your application to LR to sign on your behalf.  If the OAuth signature is present when you publish, the documents you publish will be signed by the node.</p>
+        <label for="consumer_key">oauth_consumer_key</label>
+        <input type="text" disabled="disabled" id="consumer_key" value="node_sign_key">
+
+        <label for="consumer_secret">oauth_consumer_secret</label>
+        <input type="text" disabled="disabled" id="consumer_secret">
+
+
+        <label for="token">oauth_token</label>
+        <input type="text" disabled="disabled" id="token" value="node_sign_token">
+
+        <label for="token_secret">oauth_token_secret</label>
+        <input type="text" disabled="disabled" id="token_secret">
+
+        <button id="regenerate">Revoke and Regenerate</button>
+      </fieldset>
+      
+    </div>
+  </body>
+
+  <!-- Recommended convenience API -->
+  <script src="/_utils/script/jquery.js" type="text/javascript"></script>
+  <script src="/_utils/script/oauth.js" type="text/javascript"></script>
+  <script src="/_utils/script/sha1.js" type="text/javascript"></script>
+  <script src="/_browserid/main.js" type="text/javascript"></script>
+  <script src="modules.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var manage_tokens = require("lib/manage-tokens");
+
+    manage_tokens.registerCallbacks();
+  </script>
+</html>

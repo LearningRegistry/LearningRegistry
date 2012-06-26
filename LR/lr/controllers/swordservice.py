@@ -1,15 +1,17 @@
-import logging
-import urlparse
-from pylons import request, response, session, tmpl_context as c, url
+from lr.controllers.publish import PublishController, _continue_if_missing_oauth, _no_abort
+from lr.lib import signing, oauth, bauth, helpers as h
+from lr.lib.base import BaseController, render
+from lr.lib.harvest import harvest
+from lr.model import LRNode as sourceLRNode
+from pylons import request, response, session, tmpl_context as c, url, config
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import rest
-from lr.lib.base import BaseController, render
-import lr.model as m
-from lr.controllers.publish import PublishController
-from lr.lib.harvest import harvest
-import json
-from lr.model import LRNode as sourceLRNode
 from pylons.decorators.rest import restrict
+import json
+import logging
+import lr.model as m
+import urlparse
+
 log = logging.getLogger(__name__)
 
 class SwordError(Exception):
@@ -17,12 +19,26 @@ class SwordError(Exception):
       self.value = value
     def __str__(self):
       return repr(self.value)
+
+__service_doc = None
+def _service_doc(recache=False):
+    def get_service_doc():
+        global __service_doc
+        
+        if not __service_doc or recache:
+            __service_doc = h.getServiceDocument(m.base_model.appConfig["lr.sword.docid"])
+        return __service_doc
+    return get_service_doc
+
 class SwordserviceController(PublishController):
     def __init__(self):
         self.h = harvest()
+
     def __before__(self):
         response.headers['Content-Type'] = 'application/atom+xml;charset=utf-8'
         self.parse_params()
+        
+
     def index(self): 
         c.collection_url = urlparse.urljoin(self.baseUrl,'swordpub')
         if sourceLRNode.nodeDescription.node_name is not None:
@@ -53,7 +69,10 @@ class SwordserviceController(PublishController):
             c.no_op = request.headers['X-No-Op']
         c.tos_url = m.base_model.appConfig['tos.url']
         c.generator_url = self.baseUrl
+
     @restrict("POST")
+    @oauth.authorize("oauth-sign", _service_doc(True), roles=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
+    @bauth.authorize("oauth-sign", _service_doc(), roles=None, pre_cond=_continue_if_missing_oauth, realm="Learning Registry")
     def create(self):		
         log.debug(request.body)
         if c.no_op:

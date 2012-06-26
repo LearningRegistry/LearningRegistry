@@ -56,13 +56,13 @@ def monitorResourceDataChanges():
     options = {'since':_getLastSavedSequence()}
     log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
     
-    resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
+    resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
                                                         appConfig['couchdb.db.resourcedata'],
                                                         _RESOURCE_DATA_CHANGE_HANDLERS,
                                                         options)
     resourceDataChangeMonitor.start()
         
-    incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url'], 
+    incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
                                                         incomingDB,
                                                         _INCOMING_CHANGE_HANDLERS,
                                                         {'since':-1})

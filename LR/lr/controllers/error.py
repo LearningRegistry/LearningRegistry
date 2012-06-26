@@ -31,10 +31,16 @@ class ErrorController(BaseController):
                  message=content)
         if request.environ.has_key('pylons.controller.exception'):
             import json
+            try:
+                response.headers.update(request.environ['pylons.controller.exception'].headers)
+            except:
+                pass
+
             return json.dumps({'OK':False, 'message':str(request.environ['pylons.controller.exception'].message)})
         else:
             response.headers['Content-Type'] = 'text/html; charset=utf-8'
             return page
+
     def img(self, id):
         """Serve Pylons' stock images"""
         return self._serve_file('/'.join(['media/img', id]))

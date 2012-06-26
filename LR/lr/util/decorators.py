@@ -3,40 +3,85 @@ Created on Oct 11, 2011
 
 @author: jklo
 '''
+from contextlib import closing
+from functools import wraps
+from ijson.parse import items
+from pylons import config
 from uuid import uuid1
+import base64
+import copy
+import couchdb
+import ijson
 import json
 import logging
-from contextlib import closing
-from pylons import config
-import time
-import urllib2
-import ijson
-from ijson.parse import items
 import os
-import urllib
-import couchdb
+import time
+import urllib, urlparse, oauth2
+import urllib2
+
 log = logging.getLogger(__name__)
-import copy
+
 class SetFlowControl(object):
-    def __init__(self,enabled,serviceDoc):
-        server = couchdb.Server(config['couchdb.url'])
+    def __init__(self,enabled,serviceDoc,doc_limit=100,id_limit=100):
+        server = couchdb.Server(config['couchdb.url.dbadmin'])
         self.nodeDb = server[config['couchdb.db.node']]
         self.enabled = enabled
         self.serviceDoc = serviceDoc
+        self.doc_limit=doc_limit
+        self.id_limit=id_limit
+
     def __call__(self,f):
+        @wraps(f)
         def set_flow_control(obj, *args, **kw):
             serviceDoc = self.nodeDb[self.serviceDoc]
             service_data = copy.deepcopy(serviceDoc['service_data'])     
             serviceDoc['service_data']['flow_control'] = self.enabled
-            serviceDoc['service_data']['doc_limit'] = 100
-            serviceDoc['service_data']['id_limit'] = 100
+            serviceDoc['service_data']['doc_limit'] = self.doc_limit
+            serviceDoc['service_data']['id_limit'] = self.id_limit  
             self.nodeDb[self.serviceDoc] = serviceDoc
             try:
-                f(obj, *args, **kw)
+                return f(obj, *args, **kw)
             finally:
                 serviceDoc['service_data'] = service_data         
                 self.nodeDb[self.serviceDoc] = serviceDoc  
         return set_flow_control
+
+class ModifiedServiceDoc(object):
+    def __init__(self, service_doc_id, update=None):
+        server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.nodeDb = server[config['couchdb.db.node']]
+        self.service_doc_id = service_doc_id
+        self.update_fn = update
+        
+    def __call__(self,f):
+        @wraps(f)
+        def wrapped(*args, **kw):
+            orig_serviceDoc = self.nodeDb[self.service_doc_id]
+            copy_serviceDoc = copy.deepcopy(orig_serviceDoc)
+            if self.update_fn:
+                copy_serviceDoc =self.update_fn(copy_serviceDoc)
+                self.nodeDb[self.service_doc_id] = copy_serviceDoc
+            try:
+                return f(*args, **kw)
+            finally:
+                orig_serviceDoc["_rev"] = self.nodeDb[self.service_doc_id]["_rev"]       
+                self.nodeDb[self.service_doc_id] = orig_serviceDoc  
+        return wrapped
+
+def update_authz(basicauth=False, oauth=False):
+        def update(orig):
+                orig["service_auth"] = orig["service_auth"] or { }
+                orig["service_auth"]["service_authz"] = []
+                if basicauth == True:
+                        orig["service_auth"]["service_authz"].append("basicauth")
+                if oauth == True:
+                        orig["service_auth"]["service_authz"].append("oauth")
+
+                if len(orig["service_auth"]["service_authz"]) == 0:
+                        orig["service_auth"]["service_authz"].append("none")
+                return orig
+        return update
+
 def ForceCouchDBIndexing():
     json_headers = {"Content-Type": "application/json"}
     couch = {
@@ -74,7 +119,7 @@ def ForceCouchDBIndexing():
             try:
                 #print "Wrapper Before...."
                 indexTestData(self)
-                fn(self, *args, **kw)
+                return fn(self, *args, **kw)
             except :
                 raise
             finally:
@@ -96,6 +141,7 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
         "resource_data": config["couchdb.db.resourcedata"]
     }
     
+    @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
     def writeTestData(obj):
         if not hasattr(obj, "test_data_ids"):
             obj.test_data_ids = {}
@@ -180,7 +226,7 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
                 writeTestData(self)
                 indexTestData(self)
                 cacheTestData(self)
-                fn(self, *args, **kw)
+                return fn(self, *args, **kw)
             except :
                 raise
             finally:
@@ -190,3 +236,177 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
                 
         return test_decorated
     return test_decorator
+
+
+def getExtraEnvironment(base_url=None):
+    env = {}
+    if base_url:
+        scheme, netloc, path, query, fragment = urlparse.urlsplit(base_url)
+        if query or fragment:
+            raise ValueError(
+                "base_url (%r) cannot have a query or fragment"
+                % base_url)
+        if scheme:
+            env['wsgi.url_scheme'] = scheme
+        if netloc:
+            if ':' not in netloc:
+                if scheme == 'http':
+                    netloc += ':80'
+                elif scheme == 'https':
+                    netloc += ':443'
+                else:
+                    raise ValueError(
+                        "Unknown scheme: %r" % scheme)
+            host, port = netloc.split(':', 1)
+            env['SERVER_PORT'] = port
+            env['SERVER_NAME'] = host
+            env['HTTP_HOST'] = netloc
+        if path:
+            env['SCRIPT_NAME'] = urllib.unquote(path)
+    return env
+
+class OAuthRequest(object):
+    def __init__(self,  path, http_method="GET", url_base="http://www.example.com",  oauth_user_attrib="oauth_user", oauth_info_attrib="oauth" ):
+        self.oauth_user_attrib = oauth_user_attrib
+        self.oauth_info_attrib = oauth_info_attrib
+        self.http_method = http_method
+        self.url_base = url_base
+        self.path = path
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.users =  self.server[config['couchdb.db.users']] 
+
+    def __call__(self, fn):
+
+        def create_user(oauth_user):
+            try:
+                del self.users[oauth_user["_id"]]
+            except:
+                pass
+            finally:
+                self.users.save(oauth_user)
+
+        def remove_user(oauth_user):
+            try:
+                del self.users[oauth_user["_id"]]
+            except:
+                pass
+
+        @wraps(fn)
+        def test_decorator(cls, *args, **kwargs):
+            if (hasattr(cls, self.oauth_user_attrib)):
+                self.oauth_user = getattr(cls, self.oauth_user_attrib)
+            else:
+                err = AttributeError()
+                err.message = "Missing attribute '%s' which should be data for CouchDB OAuth User" % self.oauth_user_attrib
+                raise  err
+
+            consumer = oauth2.Consumer(key=self.oauth_user["name"], secret=self.oauth_user["oauth"]["consumer_keys"][self.oauth_user["name"]])
+            token = oauth2.Token(key="node_sign_token", secret=self.oauth_user["oauth"]["tokens"]["node_sign_token"])
+
+            params = {
+                "oauth_signature_method": "HMAC-SHA1",
+            }
+
+
+            req = oauth2.Request.from_consumer_and_token(consumer, token, http_method=self.http_method, http_url="{0}{1}".format(self.url_base, self.path), parameters=params)
+
+            # Sign the request.
+            signature_method = oauth2.SignatureMethod_HMAC_SHA1()
+            req.sign_request(signature_method, consumer, token)
+            
+            header = req.to_header()
+            header["Authorization"] = str(header["Authorization"])
+
+            extraEnv = getExtraEnvironment(self.url_base)
+
+            class OauthInfo(object):
+                def __init__(self, consumer, token, request, header, extraEnv, path):
+                    self.consumer = consumer
+                    self.token = token
+                    self.request = request
+                    self.header = header
+                    self.env = extraEnv
+                    self.path = path
+
+
+            setattr(cls, self.oauth_info_attrib, OauthInfo(consumer, token, req, header, extraEnv, self.path))
+    
+            try:
+                create_user(self.oauth_user)
+                result = fn(cls, *args, **kwargs)
+                return result
+            finally:
+                delattr(cls, self.oauth_info_attrib)
+                remove_user(self.oauth_user)
+
+        return test_decorator
+
+class BasicAuthRequest(object):
+    def __init__(self, bauth_user_attrib="bauth_user", bauth_info_attrib="bauth" ):
+        self.bauth_user_attrib = bauth_user_attrib
+        self.bauth_info_attrib = bauth_info_attrib
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.users =  self.server[config['couchdb.db.users']] 
+
+    def __call__(self, fn):
+
+        def build_basic_auth_header(name, password):
+            base64string = base64.encodestring('%s:%s' % (name, password))[:-1]
+            return {"Authorization": "Basic %s" % base64string}
+
+
+        def create_user(name, password, roles=[]):
+            user_doc = {
+              "_id"          : "org.couchdb.user:{0}".format(name),
+              "type"         : "user",
+              "name"         : "{0}".format(name),
+              "roles"        : roles,
+              "password"     : password
+            }
+            try:
+                del self.users[user_doc["_id"]]
+            except:
+                pass
+            finally:
+                _, user_doc["_rev"] = self.users.save(user_doc)
+                return user_doc
+
+
+        def delete_user(user_doc):
+            try:
+                del self.users[user_doc["_id"]]
+            except:
+                pass
+
+
+
+        class BAuthInfo(object):
+            def __init__(self, header, username, password):
+                self.header = header
+                self.username = username
+                self.password = password
+
+
+        @wraps(fn)
+        def wrap(cls, *args, **kwargs):
+            try:
+                self.bauth_user = getattr(cls, self.bauth_user_attrib)
+            except:
+                raise AttributeError("Attribute containing Basic Auth user credentials missing.")
+
+            user_doc = create_user(**self.bauth_user)
+
+            header = build_basic_auth_header(**self.bauth_user)
+
+            setattr(cls, self.bauth_info_attrib, BAuthInfo(header, **self.bauth_user))
+
+            try:
+                return fun(cls, *args, **kwargs)
+            except Exception as e:
+                raise e
+            finally:
+                delete_user(user_doc)
+
+
+
+
