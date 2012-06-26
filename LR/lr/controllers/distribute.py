@@ -192,8 +192,10 @@ class DistributeController(BaseController):
                 
             replicationOptions['target'] = destinationUrl
             
+            authz_header = h.getBasicAuthHeaderFromURL(appConfig['couchdb.url.dbadmin']);
+            authz_header.update( { 'Content-Type': 'application/json'})
             request = urllib2.Request(urlparse.urljoin(appConfig['couchdb.url'], '_replicator'),
-                                    headers={'Content-Type':'application/json' },
+                                    headers=authz_header,
                                     data = json.dumps(replicationOptions))
             
             log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(

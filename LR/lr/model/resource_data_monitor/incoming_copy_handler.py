@@ -1,5 +1,4 @@
 import logging
-from threading import Thread
 import pprint
 import urllib2
 import couchdb
@@ -29,16 +28,16 @@ _DOCUMENT_UPDATE_THRESHOLD = 100
 
 class IncomingCopyHandler(BaseChangeHandler):
     def __init__(self):
-        self._serverUrl = config["couchdb.url"]
+        self._serverUrl = config["couchdb.url.dbadmin"]
         self._targetName = config["couchdb.db.resourcedata"]
         self.documents = []     
         s = couchdb.Server(self._serverUrl)
         self._db = s[self._targetName]
 
-    def _canHandle(self, change, database):
-        if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
-            return True
-        return False
+	def _canHandle(self, change, database):
+		if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
+			return True
+		return False
 
 
     def _handle(self, change, database):
@@ -66,8 +65,3 @@ class IncomingCopyHandler(BaseChangeHandler):
                 t = Thread(target=handleDocument, args=(doc,))
                 t.start()           
             self.documents = []
-        
-
-
-
-

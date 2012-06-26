@@ -22,12 +22,18 @@ def parse_token(serviceid, token):
         
     return decoded
 
-def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
+def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None):
     payload = {}
 
     payload["startkey"] = startkey
     payload["endkey"] = endkey
     
+    if key:
+        payload["key"] = key
+
+    if keys:
+        payload["keys"] = keys
+
     if startkey_docid:
         payload["startkey_docid"] = startkey_docid
         
@@ -51,8 +57,8 @@ def get_offset_payload(offset=None, keys=None, maxResults=None):
     
     return payload
 
-def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None):
-    return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date), serviceid, __JWT_ALG)
+def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None):
+    return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date, key, keys), serviceid, __JWT_ALG)
 
 def get_offset_token(serviceid, offset=None, keys=None, maxResults=None):
     return jwt.encode(get_offset_payload(offset, keys, maxResults), serviceid, __JWT_ALG)

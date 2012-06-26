@@ -20,9 +20,22 @@ def install(server, dbname, setupInfo):
     custom_opts["doc_limit"] = int(active)
 
     active = getInput("Enter message size limit in octet. \n"+
-                    "This should the maximum data size the the node will accept", None, isInt)
+                    "This should the maximum data size the the node will accept", 4194304, isInt)
 
     custom_opts["msg_size_limit"] = int(active)
+
+    custom_opts["authz"] = []
+    active = getInput("Secure publish with Basic Authentication?", "T", isBoolean)
+    if active:
+        custom_opts["authz"].append("basicauth")
+
+    active = getInput("Secure publish with OAuth and enable Node Signing?", "T", isBoolean)
+    if active:
+        custom_opts["authz"].append("oauth")
+        setupInfo["oauth"] = True
+
+    if len(custom_opts["authz"]) == 0:
+        del custom_opts["authz"]
 
     custom_opts["node_endpoint"] = setupInfo["nodeUrl"]
     custom_opts["service_id"] = uuid.uuid4().hex

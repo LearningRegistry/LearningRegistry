@@ -20,3 +20,7 @@ LR/*.backup
 
 /data-pumps/oai-pmh-data-pump-config.json
 /utils/testconfig.ini
+
+env
+couchdb/apps/kanso/oauth-key-management/packages
+couchdb/apps/kanso/restrict-writers/packages
