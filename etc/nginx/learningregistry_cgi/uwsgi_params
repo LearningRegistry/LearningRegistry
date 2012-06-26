@@ -13,3 +13,5 @@ uwsgi_param     REMOTE_PORT             $remote_port;
 uwsgi_param     SERVER_PORT             $server_port;
 uwsgi_param     SERVER_NAME             $server_name;
 uwsgi_param     SCRIPT_NAME             /;
+
+uwsgi_param     UWSGI_SCHEME            $scheme;

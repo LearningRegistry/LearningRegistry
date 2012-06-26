@@ -11,7 +11,7 @@ import urllib2
 
 log = logging.getLogger(__name__)
 
-_COUCH_SERVER = config['app_conf']['couchdb.url']
+_COUCH_SERVER = config['app_conf']['couchdb.url.dbadmin']
 _RESOURCE_DATA = config['app_conf']['couchdb.db.resourcedata']
 _DESIGN_DOC = '_design/filter'
 

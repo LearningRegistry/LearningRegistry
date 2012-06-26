@@ -34,7 +34,7 @@ class SliceController(BaseController):
         self.fc_id_limit = None
         self.fc_doc_limit = None
         
-        self.serviceDoc = h.getServiceDocument("access:slice")
+        self.serviceDoc = h.getServiceDocument(appConfig['lr.slice.docid'])
         if self.serviceDoc != None:
             if 'service_id' in self.serviceDoc:
                 self.service_id = self.serviceDoc['service_id']
