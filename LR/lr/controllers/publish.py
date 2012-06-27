@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 def _continue_if_missing_oauth():
     try:
-        nosig = (session["oauth-sign"]["status"] == oauth.authorize.NoSignature)
+        nosig = (session["oauth-sign"]["status"] == oauth.status.NoSignature)
         if nosig:
             session["oauth-sign"] = None
         return nosig
