@@ -17,7 +17,7 @@ appConfig = config['app_conf']
 def continue_if_missing_oauth():
     try:
         log.error("continue_if_missing_oauth"+repr(session["prefer-verify"]))
-        nosig = (session["prefer-verify"]["status"] == oauth.authorize.NoSignature)
+        nosig = (session["prefer-verify"]["status"] == oauth.status.NoSignature)
         if nosig:
             session["prefer-verify"] = None
         return nosig
