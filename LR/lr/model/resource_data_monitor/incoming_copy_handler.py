@@ -34,10 +34,10 @@ class IncomingCopyHandler(BaseChangeHandler):
         s = couchdb.Server(self._serverUrl)
         self._db = s[self._targetName]
 
-	def _canHandle(self, change, database):
-		if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
-			return True
-		return False
+    def _canHandle(self, change, database):
+        if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
+            return True
+        return False
 
     def _handle(self, change, database):
         def handleDocument(newDoc):
