@@ -6,6 +6,7 @@ import json
 import urlparse
 import ConfigParser
 import os
+from threading import Thread
 from pylons import config
 from lr.lib import ModelParser, SpecValidationException,helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
