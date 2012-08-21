@@ -1,14 +1,8 @@
 import logging
-import pprint
-import urllib2
 import couchdb
-import json
-import urlparse
-import ConfigParser
-import os
 from threading import Thread
 from pylons import config
-from lr.lib import ModelParser, SpecValidationException,helpers as h
+from lr.lib import SpecValidationException, helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
 from lr.model import ResourceDataModel
 from couchdb import ResourceConflict
@@ -27,16 +21,19 @@ _DOC = "doc"
 _ID = "id"
 _DOCUMENT_UPDATE_THRESHOLD = 100
 
+
 class IncomingCopyHandler(BaseChangeHandler):
     def __init__(self):
         self._serverUrl = config["couchdb.url.dbadmin"]
         self._targetName = config["couchdb.db.resourcedata"]
-        self.documents = []     
+        self.documents = []
         s = couchdb.Server(self._serverUrl)
         self._db = s[self._targetName]
 
     def _canHandle(self, change, database):
-        if ((_DOC in change) and (change[_DOC].get(_DOC_TYPE) ==_RESOURCE_DISTRIBUTABLE_TYPE or change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
+        if ((_DOC in change) and \
+            (change[_DOC].get(_DOC_TYPE) == _RESOURCE_DISTRIBUTABLE_TYPE or \
+            change[_DOC].get(_DOC_TYPE) == _RESOURCE_TYPE)):
             return True
         return False
 
@@ -46,22 +43,22 @@ class IncomingCopyHandler(BaseChangeHandler):
             try:
                 newDoc['node_timestamp'] = h.nowToISO8601Zformat()
                 rd = ResourceDataModel(newDoc)
-                rd.save(log_exceptions=False)               
+                rd.save(log_exceptions=False)
             except SpecValidationException as e:
-                log.error(newDoc['_id'] + str(e) )
+                log.error(newDoc['_id'] + str(e))
             except ResourceConflict:
                 log.error('conflict')
             except Exception as ex:
-                should_delete = False # don't delete something unexpected happend
+                should_delete = False  # don't delete something unexpected happend
                 log.error(ex)
             if should_delete:
                 try:
                     del database[newDoc['_id']]
                 except Exception as ex:
-                    log.error(ex)            
-        self.documents.append(change[_DOC])     
-        if len(self.documents) >= _DOCUMENT_UPDATE_THRESHOLD or len(self.documents) >= database.info()['doc_count']:            
+                    log.error(ex)
+        self.documents.append(change[_DOC])
+        if len(self.documents) >= _DOCUMENT_UPDATE_THRESHOLD or len(self.documents) >= database.info()['doc_count']:
             for doc in self.documents:
                 t = Thread(target=handleDocument, args=(doc,))
-                t.start()           
+                t.start()
             self.documents = []

@@ -29,13 +29,13 @@ class BaseChangeThresholdHandler(BaseChangeHandler):
             self._lastActionTime = datetime.now()
 
     def _shouldTakeAction(self):
-        log.debug("class: {0} count: {1} countThreshold: {2} timedelta: {3} timethreshold: {4}\n\n".format(
-                     self.__class__.__name__, self._changeCount, self._countThreshold, 
-                     (datetime.now() -self._lastActionTime) , self._timeThreshold))
+        # log.debug("class: {0} count: {1} countThreshold: {2} timedelta: {3} timethreshold: {4}\n\n".format(
+        #              self.__class__.__name__, self._changeCount, self._countThreshold, 
+        #              (datetime.now() -self._lastActionTime) , self._timeThreshold))
 
         if ((self._changeCount >= self._countThreshold) or
             ((datetime.now() - self._lastActionTime)  >= self._timeThreshold)):
-            log.debug("class: {0} Willl take action ...".format(self.__class__.__name__))
+            # log.debug("class: {0} Willl take action ...".format(self.__class__.__name__))
             return True
         return False
 
