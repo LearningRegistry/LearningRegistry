@@ -96,14 +96,15 @@ class MonitorChanges(BaseChangeMonitor):
 
         while(self._removeHandlerQueue.empty() == False):
             self._changeHandlerSet.remove(self._removeHandlerQueue.get())
-        
+
     def  _handleChange(self, change):
         #call all change handlers
         for handler in self._changeHandlerSet:
             try:
+                log.debug(self._database.resource.credentials)
                 handler.handle(change, self._database)
             except Exception as e:
-                log.error("Cannot run handler "+str(handler.handle))
+                log.error("Cannot run handler " + str(handler.handle))
                 log.exception(e)
         #check to see if there is any update in the change handler set
         self._updateChangeHandlerSet()
