@@ -56,6 +56,17 @@ function setMessage(msg, wait, cb) {
     }
 }
 
+function resetForms() {
+    $(".oauth").hide(500);
+    $("#password").val("");
+    $("#verify_password").val("");
+    $("#password_set").prop("checked", false);
+    $("#consumer_key").val("");
+    $("#consumer_secret").val("");
+    $("#token_secret").val("");
+    $("#full_name").val("");
+}
+
 function setSigningInfo() {
     full_name = $("#full_name").val();
     if ($.trim(full_name) !== "") {
@@ -160,9 +171,16 @@ function savePassword() {
 exports.registerCallbacks = function() {
     $.couch.browserid.login(function(evt, err, info) { 
         try {
-            if (info && info.email) {
-                console.log(info.email);
-                getUserInfo(info.email);
+            var email = null;
+            if (info && info.name) {
+                email = info.name;
+            } else if (info && info.email) {
+                email = info.email
+            }
+
+            if (email) {
+                console.log(email);
+                getUserInfo(email);
             }
         } catch (error) {
 
@@ -172,7 +190,7 @@ exports.registerCallbacks = function() {
     });
 
     $.couch.browserid.logout(function(evt, err, info){
-        window.location.reload();
+        resetForms();
     });
 
     $("#info_update").bind('click', setSigningInfo);
