@@ -15,20 +15,21 @@ class CouchDBBasicAuthUtil(object):
 
             self.session_url = "{0}/_session".format(couchdb_url)
             self.users_url = "{0}/{1}/org.couchdb.user:".format(couchdb_url, users_db)
-
     def _get_user_from_session(self, auth_header):
-        h = {}
-        h.update(json_header)
-        h.update(auth_header)
-        log.error("headers: "+json.dumps(h))
-        req = urllib2.Request(self.session_url, headers=h)
-        res = urllib2.urlopen(req)
-        j_res = json.load(res)
-        log.error("j_res: "+json.dumps(j_res))
-        user = None
-        if "userCtx" in j_res and "name" in j_res["userCtx"] and j_res["userCtx"]["name"] is not None:
-            user = j_res["userCtx"]
-        return user
+        try:
+            h = {}
+            h.update(json_header)
+            h.update(auth_header)
+            req = urllib2.Request(self.session_url, headers=h)
+            res = urllib2.urlopen(req)
+            j_res = json.load(res)
+            user = None
+            if "userCtx" in j_res and "name" in j_res["userCtx"] and j_res["userCtx"]["name"] is not None:
+                user = j_res["userCtx"]
+            return user
+        except Exception as ex:
+            log.error(ex)
+            abort(401, "Basic Authorization Required", headers=h)
 
     def _check_user_has_roles(self, user, roles=None):
         hasRoles = True
