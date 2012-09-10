@@ -1,6 +1,6 @@
 from lr.tests import *
 from lr.util import decorators
-from lr.lib import oauth
+from lr.lib import oauth, bauth
 
 from pylons import config, request
 import couchdb, oauth2,urlparse, json
