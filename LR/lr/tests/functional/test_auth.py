@@ -44,28 +44,31 @@ class TestAuthController(TestController):
           "password": "ABC_123"
         }
 
-
     # def test_index(self):
     #     response = self.app.get(url(controller='oauth', action='index'))
     #     # Test response...
 
     @decorators.OAuthRequest(path="/auth/oauth_verify")
     def test_oauth_verify(self):
-    
+
         response = self.app.get(self.oauth.path, headers=self.oauth.header, extra_environ=self.oauth.env)
 
         res = response.json
-        print res.keys()
         assert res["status"] == oauth.status.Okay, "Should be Okay"
         assert res["user"]["name"] == self.oauth_info["name"], "Email Address Does not match"
         assert res["user"]["lrsignature"]["full_name"] == self.oauth_info["full_name"], "Full Name Does not match"
 
     @decorators.BasicAuthRequest(bauth_user_attrib="bauth_user", bauth_info_attrib="bauth")
     def test_basic_verify(self):
-    
+
         response = self.app.get("/auth/basic_verify", headers=self.bauth.header)
 
         res = response.json
-        print res.keys()
         assert res["status"] == bauth.status.Okay, "Should be Okay"
-        assert res["user"]["name"] == self.bauth.username, "Username Does not match"  
+        assert res["user"]["name"] == self.bauth.username, "Username Does not match"
+
+    @decorators.BasicAuthRequest(bauth_user_attrib="bauth_user", bauth_info_attrib="bauth")
+    def test_basic_auth_fail(self):
+        test_headers = {}
+        test_headers['Authorization'] = "Basic 123564"
+        self.app.get("/auth/basic_verify", headers=test_headers, status=401)
