@@ -369,7 +369,6 @@ class BasicAuthRequest(object):
             except:
                 pass
             finally:
-                print user_doc
                 _, user_doc["_rev"] = self.users.save(user_doc)
                 return user_doc
 
