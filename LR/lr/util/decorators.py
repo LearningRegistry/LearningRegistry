@@ -283,6 +283,7 @@ class OAuthRequest(object):
             except:
                 pass
             finally:
+                print oauth_user
                 self.users.save(oauth_user)
 
         def remove_user(oauth_user):
@@ -359,7 +360,7 @@ class BasicAuthRequest(object):
             user_doc = {
               "_id"          : "org.couchdb.user:{0}".format(name),
               "type"         : "user",
-              "name"         : "{0}".format(name),
+              "name"     : "{0}".format(name),
               "roles"        : roles,
               "password"     : password
             }
@@ -381,9 +382,9 @@ class BasicAuthRequest(object):
 
 
         class BAuthInfo(object):
-            def __init__(self, header, username, password):
+            def __init__(self, header, name, password):
                 self.header = header
-                self.username = username
+                self.username = name
                 self.password = password
 
 
@@ -401,12 +402,12 @@ class BasicAuthRequest(object):
             setattr(cls, self.bauth_info_attrib, BAuthInfo(header, **self.bauth_user))
 
             try:
-                return fun(cls, *args, **kwargs)
+                return fn(cls, *args, **kwargs)
             except Exception as e:
                 raise e
             finally:
                 delete_user(user_doc)
 
-
+        return wrap
 
 
