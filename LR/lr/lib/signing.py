@@ -40,8 +40,15 @@ _signer = Sign.Sign_0_21(**_signOpts)
 
 def get_node_public_key():
     return gpg.export_keys(privateKeyID)
+def _is_document_signed(document):
+    return "digital_signature" in document and "signature" in document['digital_signature']
 
 def sign_doc(doc, cb=None, session_key="oauth-sign"):
+    if _is_document_signed(doc):
+        if cb is not None:
+            return cb(doc)
+        else:
+            return doc
     if session_key in session and session[session_key]["status"] == oauth.status.Okay:
 
         if isinstance(doc,unicode):
