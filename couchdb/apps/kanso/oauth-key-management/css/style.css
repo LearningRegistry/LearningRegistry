@@ -46,4 +46,6 @@ img {
     float: right;
 }
 
-.clear: both;
+.clear {
+    clear: both;
+}

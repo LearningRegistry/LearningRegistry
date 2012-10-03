@@ -3,6 +3,15 @@ var session = require("session"),
     users = require("users"),
     _ = require("underscore")._;
 
+function log(msg) {
+    try{
+        console.log(msg)
+    } catch (e) {
+
+    }
+}
+
+
 function getOAuth(email, doc, regenerate) {
     if (regenerate || !(doc.oauth 
         && doc.oauth.consumer_keys 
@@ -24,7 +33,7 @@ function getOAuth(email, doc, regenerate) {
 
         users.update(email, null, doc, function(err) {
             if (err) {
-                console.log(err);
+                log(err);
             } else {
                 getUserInfo(email);
             }
@@ -78,7 +87,7 @@ function setSigningInfo() {
 
                     users.update(session_info.userCtx.name, null, doc, function(err) {
                         if (err) {
-                            console.log(err);
+                            log(err);
                             setMessage("Unable to save signing information.");
                         } else {
                             setMessage("Information saved.")
@@ -150,7 +159,7 @@ function savePassword() {
 
                     users.update(session_info.userCtx.name, null, doc, function(err) {
                         if (err) {
-                            console.log(err);
+                            log(err);
                             setMessage("Unable to save publish password.");
                         } else {
                             setMessage("Password saved.");
@@ -179,7 +188,7 @@ exports.registerCallbacks = function() {
             }
 
             if (email) {
-                console.log(email);
+                log(email);
                 getUserInfo(email);
             }
         } catch (error) {
