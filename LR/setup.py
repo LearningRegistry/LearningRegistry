@@ -7,7 +7,7 @@ except ImportError:
 
 setup(
     name='LR',
-    version='0.23.8',
+    version='0.23.9',
     description='',
     author='',
     author_email='',
