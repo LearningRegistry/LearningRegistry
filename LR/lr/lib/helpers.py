@@ -28,6 +28,8 @@ def getBasicAuthHeaderFromURL(basic_auth_url):
         if "username" in urlparts and "password" in urlparts and urlparts.username != None and urlparts.password != None:
             base64_enc = base64.encodestring("%s:%s" % (urlparts.username, urlparts.password)).replace("\n", "")
             return { "Authorization": "Basic %s" % base64_enc }
+        else:
+            return { }
     except:
         return { }
         
