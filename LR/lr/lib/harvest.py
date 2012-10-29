@@ -40,7 +40,8 @@ class harvest:
       return None
   def list_identifiers(self, from_date, until_date,resumption_token=None,limit=None):
     return self.getViewRows(False,until_date,from_date,limit,resumption_token)
-  def getViewRows(self,includeDocs, untilDate,fromDate,limit=None,resumption_token=None):    
+
+  def getViewRows(self, includeDocs, untilDate, fromDate, limit=None, resumption_token=None):
     params = {
         'stale':appConfig['couchdb.stale.flag'],
         'include_docs':includeDocs,
@@ -54,8 +55,6 @@ class harvest:
         params['skip'] = 1
     if limit is not None:
         params['limit'] = limit
-    import json
-    log.debug(json.dumps(params))
     return h.getView(database_url=self.db_url,view_name='_design/learningregistry-by-date/_view/docs',**params)    
 if __name__ == "__main__":
   h = harvest()

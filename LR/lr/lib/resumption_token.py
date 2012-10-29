@@ -57,7 +57,7 @@ def get_offset_payload(offset=None, keys=None, maxResults=None):
     
     return payload
 
-def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None):
+def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None, maxResults=None, offset=None):
     return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date, key, keys), serviceid, __JWT_ALG)
 
 def get_offset_token(serviceid, offset=None, keys=None, maxResults=None):

@@ -8,8 +8,8 @@ import json
 import logging
 import types
 import base64
-from iso8601 import iso8601
-
+from iso8601 import iso8601, parse_date
+import math
 log = logging.getLogger(__name__)
 """Helper functions
 
@@ -21,7 +21,7 @@ available to Controllers. This module is available to templates as 'h'.
 from iso8601.iso8601 import ISO8601_REGEX
 import re
 from stream import StreamingCouchDBDocHandler
-
+EPOCH_STRING = "1970-01-01T00:00:00Z"
 def getBasicAuthHeaderFromURL(basic_auth_url):
     try:
         urlparts = urlparse.urlparse(basic_auth_url)
@@ -296,4 +296,11 @@ class Granularity(object):
                 return cmp(self.order, other.order)
         else:
             return cmp(str(self), str(other))
-        
+
+
+def convertDateTime(dt):
+    epoch = parse_date(EPOCH_STRING)
+    if isinstance(dt, str) or isinstance(dt, unicode):
+        dt = parse_date(dt)
+    dt = dt - epoch
+    return int(math.floor(dt.total_seconds()))

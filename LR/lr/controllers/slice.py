@@ -1,28 +1,28 @@
-import logging, urllib2, json, couchdb
+import logging
+import json
+import couchdb
 from lr.model.base_model import appConfig
 import lr.lib.helpers as h
-import couchdb
-from pylons import request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect
-
-from lr.lib.base import BaseController, render
+from pylons import request
+from pylons.controllers.util import abort
+from lr.lib.base import BaseController
 from datetime import datetime, timedelta
 from lr.lib.oaipmherrors import *
-import types
 from lr.lib import resumption_token
 
 log = logging.getLogger(__name__)
-
+ANY_TAGS = "any_tags"
+IDENTITY = "identity"
 END_DATE = 'until'
 START_DATE = 'from'
-IDENTITY = 'identity'
-ANY_TAGS = 'any_tags'
 #FULL_DOCS = 'full_docs'
 IDS_ONLY = 'ids_only'
 CALLBACK = 'callback'
 RESUMPTION_TOKEN = 'resumption_token'
 
 SLICE_SERVICE_DOC = "access:slice"
+SLICE_DOCUMENT = '_design/learningregistry-slicelite'
+
 
 class SliceController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
@@ -33,243 +33,134 @@ class SliceController(BaseController):
         self.enable_flow_control = False
         self.fc_id_limit = None
         self.fc_doc_limit = None
-        
+
         self.serviceDoc = h.getServiceDocument(appConfig['lr.slice.docid'])
         if self.serviceDoc != None:
             if 'service_id' in self.serviceDoc:
                 self.service_id = self.serviceDoc['service_id']
-                
+
             if 'service_data' in self.serviceDoc:
                 serviceData = self.serviceDoc['service_data']
                 if 'flow_control' in serviceData:
                     self.enable_flow_control = serviceData['flow_control']
-                
+
                 if self.enable_flow_control and 'id_limit' in serviceData:
                     self.fc_id_limit = serviceData['id_limit']
                 elif self.enable_flow_control:
                     self.fc_id_limit = 100
-                
+
                 if self.enable_flow_control and 'doc_limit' in serviceData:
                     self.fc_doc_limit = serviceData['doc_limit']
                 elif self.enable_flow_control:
                     self.fc_doc_limit = 100
-    
 
     def _get_params(self):
         req_params = {}
-        
         if request.method == "POST":
             req_params = dict(request.params.copy(), **self._parameterizePOSTBody())
         else:
             req_params = request.params.copy()
         return req_params
-    
+
     def _validate_params(self, req_params):
-        if req_params.has_key(END_DATE) and not req_params.has_key(START_DATE):
-            raise BadArgumentError('if an end_date is specified a start_date must also be specified')
-            return False
-        else :
-            return True
-    
+        if END_DATE in req_params and not START_DATE in req_params:
+            abort(500, 'if an end_date is specified a start_date must also be specified')
+        if IDENTITY in req_params and ANY_TAGS in req_params:
+            abort(500, "Only support for either any_tags or identity not both")
+
     def _parse_params(self, req_params):
         params = {}
-        param_count = 0
-        
-        def _set_string_param(paramKey, setifempty=True, defaultWhenEmpty=""):
-            if req_params.has_key(paramKey):
-                params[paramKey] = str(req_params[paramKey])
-                return True
-            elif setifempty:
-                params[paramKey] = defaultWhenEmpty
-                return False
-            else:
-                return False
-                
-        def _set_int_param(paramKey, setifempty=True):
-            if req_params.has_key(paramKey):
-                params[paramKey] = int(req_params[paramKey])
-                return True
-            elif setifempty:
-                params[paramKey] = None
-                return False
-            else:
-                return False
-            
-        def _set_boolean_param(paramKey, setifempty=True):
-            if req_params.has_key(paramKey):
-                params[paramKey] = req_params[paramKey].lower() in ["t", "true", "y", "yes"]
-                return True
-            elif setifempty:
-                params[paramKey] = False
-                return False
-            else:
-                return False
-        
-        if _set_string_param(START_DATE) : param_count += 1
-        if _set_string_param(IDENTITY) : param_count += 1
-        if _set_string_param(ANY_TAGS) : param_count += 1
-        _set_string_param(END_DATE)
-        _set_boolean_param(IDS_ONLY)
-        _set_string_param(CALLBACK, False)
-        _set_string_param(RESUMPTION_TOKEN, True, None)
-        
-        if params[RESUMPTION_TOKEN] is not None:
+        start, end = self._get_dates(req_params)
+        if start is not None:
+            params[START_DATE] = start
+            params[END_DATE] = end
+        if IDENTITY in req_params:
+            params[IDENTITY] = req_params[IDENTITY]
+        elif ANY_TAGS in req_params:
+            params[ANY_TAGS] = req_params[ANY_TAGS]
+        if IDS_ONLY in req_params:
+            params[IDS_ONLY] = req_params[IDS_ONLY] in ['T', 't', 'True', 'true', True]
+        else:
+            params[IDS_ONLY] = False
+        if RESUMPTION_TOKEN in params and params[RESUMPTION_TOKEN] is not None:
             params[RESUMPTION_TOKEN] = resumption_token.parse_token(self.service_id, params[RESUMPTION_TOKEN])
-            if len([i for i in ["offset", "keys"] if i in params[RESUMPTION_TOKEN]]) != 2:
+            if len([i for i in ["offset", "search"] if i in params[RESUMPTION_TOKEN]]) != 2:
                 msg = ": Unknown Error"
                 if "error" in params[RESUMPTION_TOKEN]:
                     msg = ": %s" % params[RESUMPTION_TOKEN]["error"]
                 raise BadArgumentError("Bad Resumption Token%s" % msg)
-                    
-        params['param_count'] = param_count
-        log.debug(json.dumps(params))
         return params
 
-    def _get_view(self,view_name = '_design/learningregistry-slice/_view/docs',keys=[], include_docs = False, resumptionToken=None, limit=None):
-        db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
-        
-        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": False }
-        
+    def _get_view(self, view_name, params, include_docs=False, resumptionToken=None, limit=None):
+        db_url = '/'.join([appConfig['couchdb.url'], appConfig['couchdb.db.resourcedata']])
+        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": False}
         if include_docs:
             opts["include_docs"] = True
-        
         if self.enable_flow_control and resumptionToken != None:
             if resumptionToken != None:
                 opts["skip"] = resumptionToken["offset"]
-                opts["keys"] = resumptionToken["keys"]
+                opts['startkey'] = resumptionToken['startkey']
+                opts['endkey'] = resumptionToken['endkey']
         else:
-            opts["keys"] = keys
-
+            opts.update(self._get_couch_opts(params))
         if limit != None:
-                    opts["limit"] = limit
-        
-        if len(opts["keys"]) > 0:
-            view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)#,stale='ok'):
-        else:
-            view = h.getView(database_url=db_url,view_name=view_name, **opts)#,stale='ok'):
+            opts["limit"] = limit
+        view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
         return view
-    
-    def _get_view_total(self,view_name = '_design/learningregistry-slice/_view/docs',keys=[], resumptionToken=None):
-        
-        if resumptionToken and "maxResults" in resumptionToken and resumptionToken["maxResults"] != None :
-            return resumptionToken["maxResults"];
-            
-        
-        db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])
-        
-        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": True, "group": True }
-        
+
+    def _get_couch_opts(self, params):
+        opts = {}
+        if START_DATE in params and IDENTITY in params:
+            opts['startkey'] = [params[IDENTITY], params[START_DATE]]
+            opts['endkey'] = [params[IDENTITY], params[END_DATE]]
+        elif START_DATE in params and ANY_TAGS in params:
+            opts['startkey'] = [params[ANY_TAGS], params[START_DATE]]
+            opts['endkey'] = [params[ANY_TAGS], params[END_DATE]]
+        if START_DATE in params:
+            params['startkey'] = params[START_DATE]
+            params['endkey'] = params[END_DATE]
+        elif IDENTITY in params:
+            opts["key"] = params[IDENTITY]
+        elif ANY_TAGS in params:
+            params['key'] = params[ANY_TAGS]
+        return opts
+
+    def _get_index(self, params):
+        if START_DATE in params and IDENTITY in params:
+            return SLICE_DOCUMENT + "/_view/identity-by-date"
+        elif START_DATE in params and ANY_TAGS in params:
+            return SLICE_DOCUMENT + "/_view/any-tags-by-date"
+        if START_DATE in params:
+            return SLICE_DOCUMENT + "/_view/by-date"
+        elif IDENTITY in params:
+            return SLICE_DOCUMENT + "/_view/identity"
+        elif ANY_TAGS in params:
+            return SLICE_DOCUMENT + "/_view/any-tags"
+
+    def _get_view_total(self, view_name, params, resumptionToken=None):
+        if resumptionToken and "maxResults" in resumptionToken and resumptionToken["maxResults"] != None:
+            return resumptionToken["maxResults"]
+        db_url = '/'.join([appConfig['couchdb.url'], appConfig['couchdb.db.resourcedata']])
+        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": True}
         if self.enable_flow_control and resumptionToken != None:
-            opts["keys"] = resumptionToken["keys"]
+            if resumptionToken != None:
+                opts['startkey'] = resumptionToken['startkey']
+                opts['endkey'] = resumptionToken['endkey']
         else:
-            opts["keys"] = keys
-            
-        if len(opts["keys"]) > 0:
-            view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)#,stale='ok'):
-        else:
-            view = h.getView(database_url=db_url,view_name=view_name, **opts)#,stale='ok'):
-            
+            opts.update(self._get_couch_opts(params))
+        view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
         totalDocs = 0
         for row in view:
             if "value" in row:
                 totalDocs += row["value"]
-        
-        #resumptionToken["maxResults"] = totalDocs;
         return totalDocs
-    
-    def _get_keys(self, params):
-        log.debug("gettingslicekeys")
-        keys = []
-        dates = []
-        if params[END_DATE] != "" :
-            dates = self._get_dates(params);
-        else :
-            if params[START_DATE] != "" :
-                dates = [params[START_DATE]]
-        identity = params[IDENTITY].lower()
-        any_tags = params[ANY_TAGS].lower()
-        
-        param_count = params['param_count']
-        
-        if any_tags != "" :
-            any_tag_list = any_tags.split(",")
-            wrapped_any_tag_list = []
-            for tag in any_tag_list:
-                try:
-                    #tag = "{\"tag\":\""+tag+"\"}"
-                    tag = {"tag":tag}
-                    wrapped_any_tag_list.append(tag)
-                    print("wrapped tag: " + str(tag))
-                except:
-                    print("failed to wrap tag: " + str(tag))
-                    pass
-            any_tag_list = wrapped_any_tag_list
-        if(identity != ""):
-            try:
-                #identity = "{\"tag\":\""+identity+"\"}"
-                identity = {"id":identity}
-                print("wrapped identity: " + str(identity))
-            except:
-            	pass
-        
-        wrapped_dates = []
-        for date in dates:
-            try:
-                #date = "{\"tag\":\""+date+"\"}"
-                date = {"date":date}
-                wrapped_dates.append(date)
-                print("wrapped date: " + str(date))
-            except:
-                print("failed to wrap date: " + str(date))
-                pass
-        dates = wrapped_dates
-        
-        if param_count == 1:
-            if len(dates)>0 :
-                for date in dates :
-                    keys.append(date)
-            elif identity != "" :
-                keys.append(identity)
-            elif any_tags != "" :
-                for tag in any_tag_list:
-                    keys.append(tag)
-        elif param_count == 2:
-            if len(dates) == 0 :
-                for tag in any_tag_list:
-                    keys.append([identity, tag])
-            elif identity == "" :
-                for tag in any_tag_list:
-                    for date in dates:
-                        log.debug("slicegotdateandtag: " + str([date, tag]))
-                        keys.append([date, tag])
-            elif any_tags == "" :
-                for date in dates:
-                    keys.append([date, identity])
-        elif param_count == 3:
-            for tag in any_tag_list:
-                for date in dates:
-                    keys.append([date, identity, tag])
-         
-        print("final slice keys: " + str(keys))
-        return keys
-    
-    
-        
+
     def _get_dates(self, params):
-        cur = datetime.strptime(params[START_DATE],"%Y-%m-%d")
-        end = datetime.strptime(params[END_DATE], "%Y-%m-%d")
-        day = timedelta(days=1)
-    
-        dates = []
-        while cur != end:
-            date = datetime.strftime(cur,"%Y-%m-%d")
-            dates.append(date)
-            cur += day
-        log.debug(repr(dates))
-        return dates
-        
-        
-    def format_data(self,keys_only,docs, keys, forceUnique, current_rt=None):
+        cur = h.convertDateTime(params.get(START_DATE, h.EPOCH_STRING))
+        end = h.convertDateTime(params.get(END_DATE, datetime.utcnow().isoformat() + "Z"))
+        return (cur, end)
+
+    def format_data(self, keys_only, docs, params, forceUnique, maxResults, current_rt=None):
         sentIDs = []
         prefix = '{"documents":[\n'
         num_sent = 0
@@ -282,13 +173,13 @@ class SliceController(BaseController):
                 if not alreadySent or not forceUnique:
                     sentIDs.append(row["id"])
                     if keys_only:
-                        return_data = {"doc_ID":row["id"]}
+                        return_data = {"doc_ID": row["id"]}
                     else:
                         # Get the resource data and update with the node timestamp data
                         # That the view has in value['timestamp']
                         resourceData = {}
                         resourceData = row["doc"]
-                        return_data = {"doc_ID":row["id"], "resource_data_description":resourceData}
+                        return_data = {"doc_ID": row["id"], "resource_data_description": resourceData}
                     yield prefix + json.dumps(return_data)
                     num_sent += 1
                     prefix = ",\n"
@@ -296,68 +187,58 @@ class SliceController(BaseController):
                     log.debug("{0} skipping: alreadySent {1} / forceUnique {2}".format(doc_count, repr(alreadySent), forceUnique))
                     if update_resumption_max_results:
                         current_rt["maxResults"] = current_rt["maxResults"] - 1
-        
+
         if doc_count == 0:
             yield prefix
-        
-        maxResults = self._get_view_total(keys=keys,resumptionToken=current_rt)
-        
+
         rt = " "
         if self.enable_flow_control:
+            pass
             if current_rt != None and "offset" in current_rt and current_rt["offset"] is not None:
                 offset = current_rt["offset"]
             else:
                 offset = 0
-                
-            if offset+doc_count < maxResults:
-                rt = ''' "resumption_token":"{0}", '''.format(resumption_token.get_offset_token(self.service_id, offset=offset+doc_count, keys=keys, maxResults=maxResults))
+            if offset + doc_count < maxResults:
+                token = resumption_token.get_token(self.service_id, offset=offset + doc_count, maxResults=maxResults,
+                                                   startkey=params.get('startkey', None), endkey=params.get('endkey', None), keys=params.get('keys', None))
+                rt = ''' "resumption_token":"{0}", '''.format(token)
+        db = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
+        yield '\n],' + rt + '"resultCount":' + str(maxResults) + ',"viewUpToDate":' + h.isViewUpdated(db, SLICE_DOCUMENT) + '}'
 
-        
-        db  = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
-        yield '\n],'+rt+'"resultCount":'+str(maxResults) +',"viewUpToDate":'+h.isViewUpdated(db,'_design/learningregistry-slice')+'}'
-        
 # if __name__ == '__main__':
 # param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
 # keys(param)
 
-
-    
-    
     def index(self, format='html'):
         """GET /slices: All items in the collection"""
         # url('slices')
-        
-        def getResponse(keys, params):
-            if len(keys) > 0 :
-                limit = None
-                if self.enable_flow_control:
-                    if params[IDS_ONLY]:
-                        limit = self.fc_id_limit
-                    else:
-                        limit = self.fc_doc_limit 
 
-                if CALLBACK in params:
-                    yield "{0}(".format(params[CALLBACK])
-                docs = self._get_view('_design/learningregistry-slice/_view/docs', keys, not params[IDS_ONLY], params[RESUMPTION_TOKEN], limit)
-                for i in self.format_data(params[IDS_ONLY],docs,keys,True,params[RESUMPTION_TOKEN]):
-                    yield i
-                if CALLBACK in params:
-                    yield ");"
-        try:
-            req_params = self._get_params()
-            valid = self._validate_params(req_params)
-            if valid :
-                params = self._parse_params(req_params)
-                keys = self._get_keys(params)
-                return getResponse(keys, params)
-    
-            else :
-                raise BadArgumentError()
-        except BadArgumentError as bae:
-            return '{ "error": "{0}" }'.format(bae.msg)
-        except Exception as e:
-            log.error(e.message)
-            return '{ "error": "Unknown Error, check log." }'
+        def getResponse(params):
+            limit = None
+            if self.enable_flow_control:
+                if params[IDS_ONLY]:
+                    limit = self.fc_id_limit
+                else:
+                    limit = self.fc_doc_limit
+            if CALLBACK in params:
+                yield "{0}(".format(params[CALLBACK])
+            current_rt = params.get(RESUMPTION_TOKEN, None)
+            docs = self._get_view(self._get_index(params), params, not params[IDS_ONLY], current_rt, limit)
+            maxResults = self._get_view_total(self._get_index(params), params, resumptionToken=current_rt)
+            for i in self.format_data(params[IDS_ONLY], docs, params, True, maxResults, params.get(RESUMPTION_TOKEN, None)):
+                yield i
+            if CALLBACK in params:
+                yield ");"
+        # try:
+        req_params = self._get_params()
+        self._validate_params(req_params)
+        params = self._parse_params(req_params)
+        return getResponse(params)
+        # except BadArgumentError as bae:
+        #     return '{ "error": "{0}" }'.format(bae.msg)
+        # except Exception as e:
+        #     log.error(e)
+        #     return '{ "error": "Unknown Error, check log." }'
         #return params["start_date"] + " " + params["identity"] + " " + params["search_key"] + "\n" + str(self.format_data(False,data))
         # url('obtain')
 
@@ -394,7 +275,8 @@ class SliceController(BaseController):
     def edit(self, id, format='html'):
         """GET /slices/id/edit: Form to edit an existing item"""
         # url('edit_slice', id=ID)
-        
+
+
 class BadArgumentError(Exception):
     def __init__(self, msg):
         self.msg = msg
