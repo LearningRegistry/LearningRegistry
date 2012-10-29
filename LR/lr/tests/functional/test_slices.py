@@ -312,6 +312,15 @@ class TestSlicesController(TestController):
             data = json.loads(response.body)
             docs.extend(data["documents"])
         return docs
+    def _validate_page(self, parameters, response, test, max_pages):
+        data = json.loads(response.body)
+        while "resumption_token" in data and max_pages > 0:
+            max_pages -= 1
+            test(data['documents'])
+            resumption_token = data["resumption_token"]
+            parameters[RESUMPTION] = resumption_token
+            response = self._slice(parameters)
+            data = json.loads(response.body)
 
     @DataCleaner('test_by_date')
     def test_by_date(self):
@@ -340,6 +349,41 @@ class TestSlicesController(TestController):
         start_int = helpers.convertDateTime(self.test_start_date_string)
         end_int = helpers.convertDateTime(self.test_end_date_string)
         assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
+
+    @DataCleaner("test_by_date_range_and_identity")
+    def test_by_date_range_and_identity(self):
+        data = json.loads(self.test_data_response.body)
+        self.updateTestDataWithMultipleTestDates(data, "test_by_date_range")
+        parameters = {}
+        parameters[START_DATE] = self.test_start_date_string
+        parameters[END_DATE] = self.test_end_date_string
+        parameters[IDENTITY] = self.identities[1]
+        parameters[IDS_ONLY] = False
+        response = self._slice(parameters)
+        docs = json.loads(response.body)
+        docs = docs['documents']
+        start_int = helpers.convertDateTime(self.test_start_date_string)
+        end_int = helpers.convertDateTime(self.test_end_date_string)
+        assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
+        for doc in docs:
+            assert self._checkIdentity(doc['resource_data_description'], self.identities[1])
+
+    @DataCleaner('test_by_date_range_and_key')
+    def test_by_date_range_and_key(self):
+        data = json.loads(self.test_data_response.body)
+        self.updateTestDataWithMultipleTestDates(data, "test_by_date_range")
+        parameters = {}
+        parameters[START_DATE] = self.test_start_date_string
+        parameters[END_DATE] = self.test_end_date_string
+        parameters[ANY_TAGS] = self.testKeys[0]
+        parameters[IDS_ONLY] = False
+        response = self._slice(parameters)
+        docs = json.loads(response.body)
+        docs = docs['documents']
+        start_int = helpers.convertDateTime(self.test_start_date_string)
+        end_int = helpers.convertDateTime(self.test_end_date_string)
+        assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
+        assert len([x for x in docs if self.testKeys[0] in x['resource_data_description']['keys']]) == len(docs)
 
     # # #test that there are 3 documents with identity = identities[0]
     @DataCleaner("test_by_identity")
@@ -379,15 +423,9 @@ class TestSlicesController(TestController):
         parameters[START_DATE] = self.test_start_date_string
         parameters[IDS_ONLY] = False
         response = self._slice(parameters)
-        data = json.loads(response.body)
-        docs = data["documents"]
-        assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
-        assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
-        assert "resumption_token" in data, data.keys()
-        resumption_token = data["resumption_token"]
-        parameters[RESUMPTION] = resumption_token
-        response = self._slice(parameters)
-        data = json.loads(response.body)
-        docs = data["documents"]
-        assert len(docs) <= page_size
-        assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
+        result = json.loads(response.body)
+        assert "resumption_token" in result
+        def validate_page(docs):
+            assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
+            assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
+        self._validate_page(parameters, response, validate_page, 10)
