@@ -205,18 +205,18 @@ class TestSlicesController(TestController):
     test_mid_date_string = "2111-03-01"
     test_end_date_string = "2111-05-01"
     test_post_date_string = "2112-01-01"
-    
+
     #start_date = datetime.strptime(test_start_date_string,"%Y-%m-%d")
     #end_date = datetime.strptime("2011-01-01","%Y-%m-%d")
-    
+
     couch_url = config['couchdb.url']
     couch_dba_url = config['couchdb.url.dbadmin']
     database='resource_data'
     server = couchdb.Server(couch_dba_url)
     db = server[database]
-    
+
     setupCount=0
-    
+
     #slice for test docs containing the signature test key
     def _sliceForAllTestDocs(self):
         parameters = {}
@@ -225,7 +225,7 @@ class TestSlicesController(TestController):
         data = json.loads(response.body)
         docs = data["documents"]
         return docs
-    
+
     #take an array of docs and apply the test start date as all their node timestamps
     def updateTestDataWithTestDates(self, docs):
         for result in docs['document_results'] :
@@ -234,7 +234,7 @@ class TestSlicesController(TestController):
             doc["node_timestamp"] = self.test_start_date_string + self.test_time_string
             self.db[doc.id] = doc
         urlopen(self.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
-            
+
     #take an array of docs and apply a number of test dates to their node timestamps
     def updateTestDataWithMultipleTestDates(self, docs, testName):
         for result in docs['document_results'] :
@@ -242,19 +242,19 @@ class TestSlicesController(TestController):
             doc = self.db[doc_id]
             identity = doc["identity"]
             submitter = identity["submitter"]
-            if(submitter==self.identities[0]+testName): 
+            if(submitter==self.identities[0]+testName):
                 doc["node_timestamp"] = self.test_start_date_string + self.test_time_string
-            elif(submitter==self.identities[1]+testName): 
+            elif(submitter==self.identities[1]+testName):
                 doc["node_timestamp"] = self.test_mid_date_string + self.test_time_string
-            else: 
+            else:
                 doc["node_timestamp"] = self.test_end_date_string + self.test_time_string
-            
+
             self.db[doc.id] = doc
         urlopen(self.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
-        
+
     #returns true if one of the doc's indentities matches the argument
     def _checkIdentity(self, doc, identity) :
-        
+
         if doc[IDENTITY].has_key('submitter') :
             if doc[IDENTITY]['submitter'].lower() == identity.lower() : return True
         if doc[IDENTITY].has_key('author') :
@@ -263,38 +263,38 @@ class TestSlicesController(TestController):
             if doc[IDENTITY]['owner'].lower() == identity.lower() : return True
         if doc[IDENTITY].has_key('signer') :
             if doc[IDENTITY]['signer'].lower() == identity.lower() : return True
-            
+
         return False;
-    
+
     #tests that the doc's node_timestamp matches the argument
     def _checkTimestamp(self, doc, timestamp) :
-        
+
         if doc.has_key('node_timestamp') :
             if doc['node_timestamp'].lower() == timestamp.lower() : return True
-            
+
         return False;
-    
+
     #check that the doc has the argument tag
     def _checkTag(self, doc, tag) :
         for key in doc['keys'] :
             if key.lower() == tag.lower() : return True
-        
+
         for schema in doc['payload_schema'] :
             if schema.lower() == tag.lower() : return True
-    
+
         if doc.resource_data_type.lower() == tag.lower() : return True
-        
+
         return False
-    
+
     def _checkSchema(self, doc, testSchema) :
         for schema in doc['payload_schema'] :
             if schema.lower() == testSchema.lower() : return True
-            
+
         return False
-   
-    
+
+
     #paramKeys = ['start_date', 'identity', 'any_tags', 'full_docs']
-    
+
     #call slice with the supplied parameters
     def _slice(self, parameters):
         response = self.app.get('/slice', params=parameters, headers=json_headers)
@@ -333,6 +333,7 @@ class TestSlicesController(TestController):
         date_int = helpers.convertDateTime(self.test_start_date_string)
         docs = json.loads(response.body)
         docs = docs['documents']
+        assert len(docs) > 0
         assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
 
     @DataCleaner("test_by_date_range")
@@ -348,7 +349,33 @@ class TestSlicesController(TestController):
         docs = docs['documents']
         start_int = helpers.convertDateTime(self.test_start_date_string)
         end_int = helpers.convertDateTime(self.test_end_date_string)
+        assert len(docs) > 0
         assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
+
+    # # #test that there are 3 documents with identity = identities[0]
+    @DataCleaner("test_by_identity")
+    def test_by_identity(self):
+        parameters = {}
+        parameters[IDENTITY] = self.identities[1] + 'test_by_identity'
+        parameters[IDS_ONLY] = False
+        response = self._slice(parameters)
+        docs = json.loads(response.body)
+        docs = docs['documents']
+        assert len(docs) > 0
+        for doc in docs:
+            assert self._checkIdentity(doc['resource_data_description'], self.identities[1] + 'test_by_identity')
+
+    # #test that there are 3 documents with key = testKeys[0]
+    @DataCleaner("test_by_single_key")
+    def test_by_single_key(self):
+        parameters = {}
+        parameters[ANY_TAGS] = self.testKeys[0] + "test_by_single_key"
+        parameters[IDS_ONLY] = False
+        response = self._slice(parameters)
+        docs = json.loads(response.body)
+        docs = docs['documents']
+        assert len(docs) > 0
+        assert len([x for x in docs if self.testKeys[0] + "test_by_single_key" in x['resource_data_description']['keys']]) == len(docs)
 
     @DataCleaner("test_by_date_range_and_identity")
     def test_by_date_range_and_identity(self):
@@ -357,16 +384,17 @@ class TestSlicesController(TestController):
         parameters = {}
         parameters[START_DATE] = self.test_start_date_string
         parameters[END_DATE] = self.test_end_date_string
-        parameters[IDENTITY] = self.identities[1]
+        parameters[IDENTITY] = self.identities[1] + "test_by_date_range_and_identity"
         parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         docs = json.loads(response.body)
         docs = docs['documents']
         start_int = helpers.convertDateTime(self.test_start_date_string)
         end_int = helpers.convertDateTime(self.test_end_date_string)
+        assert len(docs) > 0
         assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
         for doc in docs:
-            assert self._checkIdentity(doc['resource_data_description'], self.identities[1])
+            assert self._checkIdentity(doc['resource_data_description'], self.identities[1] + "test_by_date_range_and_identity")
 
     @DataCleaner('test_by_date_range_and_key')
     def test_by_date_range_and_key(self):
@@ -375,42 +403,22 @@ class TestSlicesController(TestController):
         parameters = {}
         parameters[START_DATE] = self.test_start_date_string
         parameters[END_DATE] = self.test_end_date_string
-        parameters[ANY_TAGS] = self.testKeys[0]
+        parameters[ANY_TAGS] = self.testKeys[0] + 'test_by_date_range_and_key'
         parameters[IDS_ONLY] = False
         response = self._slice(parameters)
         docs = json.loads(response.body)
         docs = docs['documents']
         start_int = helpers.convertDateTime(self.test_start_date_string)
         end_int = helpers.convertDateTime(self.test_end_date_string)
+        assert len(docs) > 0
         assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
-        assert len([x for x in docs if self.testKeys[0] in x['resource_data_description']['keys']]) == len(docs)
-
-    # # #test that there are 3 documents with identity = identities[0]
-    @DataCleaner("test_by_identity")
-    def test_by_identity(self):
-        parameters = {}
-        parameters[IDENTITY] = self.identities[1]
-        parameters[IDS_ONLY] = False
-        response = self._slice(parameters)
-        docs = json.loads(response.body)
-        docs = docs['documents']
-        for doc in docs:
-            assert self._checkIdentity(doc['resource_data_description'], self.identities[1])
-
-    # # #test that there are 3 documents with key = testKeys[0]
-    @DataCleaner("test_by_single_key")
-    def test_by_single_key(self):
-        parameters = {}
-        parameters[ANY_TAGS] = self.testKeys[0]
-        parameters[IDS_ONLY] = False
-        response = self._slice(parameters)
-        docs = json.loads(response.body)
-        docs = docs['documents']
-        assert len([x for x in docs if self.testKeys[0] in x['resource_data_description']['keys']]) == len(docs)
+        assert len([x for x in docs if self.testKeys[0] + 'test_by_date_range_and_key' in x['resource_data_description']['keys']]) == len(docs)
 
 
-    # # #test that there are 100 docs in the first result and 50 in the result after 1 resumption
-    # # #grab the service document for slice: http://127.0.0.1:5984/node/access%3Aslice
+
+
+    # # # #test that there are 100 docs in the first result and 50 in the result after 1 resumption
+    # # # #grab the service document for slice: http://127.0.0.1:5984/node/access%3Aslice
     @SetFlowControl(True, config["lr.slice.docid"])
     @DataCleaner("test_resumption", "Resumption")
     def test_resumption(self):
@@ -429,3 +437,20 @@ class TestSlicesController(TestController):
             assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
             assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
         self._validate_page(parameters, response, validate_page, 10)
+
+    # # #test that there are 3 documents with key = testKeys[0]
+    @DataCleaner("test_by_multiple_key")
+    def test_by_multiple_key(self):
+        parameters = {}
+        parameters[ANY_TAGS] = ','.join([x + "test_by_multiple_key" for x in self.testKeys[0:3]])
+        parameters[IDS_ONLY] = False
+        response = self._slice(parameters)
+        docs = json.loads(response.body)
+        docs = docs['documents']
+        assert len(docs) > 0
+
+        def test(keys):
+            test_set = set(parameters[ANY_TAGS].split(',')).intersection(set(keys))
+            pprint(test_set)
+            return len(test_set) > 0
+        assert len([x for x in docs if test(x['resource_data_description']['keys'])]) == len(docs)

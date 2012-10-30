@@ -1,3 +1,4 @@
+import pdb
 import logging
 import json
 import couchdb
@@ -9,7 +10,7 @@ from lr.lib.base import BaseController
 from datetime import datetime, timedelta
 from lr.lib.oaipmherrors import *
 from lr.lib import resumption_token
-
+from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
 ANY_TAGS = "any_tags"
 IDENTITY = "identity"
@@ -75,9 +76,9 @@ class SliceController(BaseController):
             params[START_DATE] = start
             params[END_DATE] = end
         if IDENTITY in req_params:
-            params[IDENTITY] = req_params[IDENTITY]
-        elif ANY_TAGS in req_params:
-            params[ANY_TAGS] = req_params[ANY_TAGS]
+            params[IDENTITY] = req_params[IDENTITY].lower()
+        if ANY_TAGS in req_params:
+            params[ANY_TAGS] = req_params[ANY_TAGS].lower()
         if IDS_ONLY in req_params:
             params[IDS_ONLY] = req_params[IDS_ONLY] in ['T', 't', 'True', 'true', True]
         else:
@@ -105,8 +106,19 @@ class SliceController(BaseController):
             opts.update(self._get_couch_opts(params))
         if limit != None:
             opts["limit"] = limit
-        view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
-        return view
+        if 'keys' not in opts:
+            view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
+            for doc in view:
+                yield doc
+        else:
+            keys = opts["keys"]
+            del opts['keys']
+            for key in keys:
+                opts.update(key)
+                print(opts)
+                view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
+                for doc in view:
+                    yield doc
 
     def _get_couch_opts(self, params):
         opts = {}
@@ -114,15 +126,18 @@ class SliceController(BaseController):
             opts['startkey'] = [params[IDENTITY], params[START_DATE]]
             opts['endkey'] = [params[IDENTITY], params[END_DATE]]
         elif START_DATE in params and ANY_TAGS in params:
-            opts['startkey'] = [params[ANY_TAGS], params[START_DATE]]
-            opts['endkey'] = [params[ANY_TAGS], params[END_DATE]]
+            if ',' in params[ANY_TAGS]:
+                tags = params[ANY_TAGS].split(',')
+                keys = []
+                for t in tags:
+                    keys.append({"startkey": [t, params[START_DATE]], "endkey": [t, params[END_DATE]]})
+                opts["keys"] = keys
+            else:
+                opts['startkey'] = [params[ANY_TAGS], params[START_DATE]]
+                opts['endkey'] = [params[ANY_TAGS], params[END_DATE]]
         if START_DATE in params:
             params['startkey'] = params[START_DATE]
             params['endkey'] = params[END_DATE]
-        elif IDENTITY in params:
-            opts["key"] = params[IDENTITY]
-        elif ANY_TAGS in params:
-            params['key'] = params[ANY_TAGS]
         return opts
 
     def _get_index(self, params):
@@ -148,15 +163,27 @@ class SliceController(BaseController):
                 opts['endkey'] = resumptionToken['endkey']
         else:
             opts.update(self._get_couch_opts(params))
-        view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
         totalDocs = 0
-        for row in view:
-            if "value" in row:
-                totalDocs += row["value"]
+        if 'keys' not in opts:
+            view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
+            for row in view:
+                if "value" in row:
+                    totalDocs += row["value"]
+        else:
+            keys = opts["keys"]
+            del opts['keys']
+            for key in keys:
+                opts.update(key)
+                print(opts)
+                view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
+                for row in view:
+                    if "value" in row:
+                        totalDocs += row["value"]
         return totalDocs
 
     def _get_dates(self, params):
-        cur = h.convertDateTime(params.get(START_DATE, h.EPOCH_STRING))
+        har = harvest()
+        cur = h.convertDateTime(params.get(START_DATE, har.earliestDate()))
         end = h.convertDateTime(params.get(END_DATE, datetime.utcnow().isoformat() + "Z"))
         return (cur, end)
 

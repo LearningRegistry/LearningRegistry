@@ -4,3 +4,6 @@ heart_beat_timeout = 11
 
 heart_beat_kill_pid = 2938
 heart_beat_timeout = 11
+
+heart_beat_kill_pid = 7853
+heart_beat_timeout = 11
