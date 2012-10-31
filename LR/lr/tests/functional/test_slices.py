@@ -1,15 +1,12 @@
 from functools import wraps
 from lr.lib import helpers as helpers
 from lr.tests import *
-from lr.util.decorators import SetFlowControl, ModifiedServiceDoc, update_authz, ForceCouchDBIndexing
+from lr.util.decorators import SetFlowControl, ModifiedServiceDoc, update_authz
 from pylons.configuration import config
 from urllib2 import urlopen, quote
 import couchdb
 import json
 import logging
-import time
-import urllib2
-from pprint import pprint
 log = logging.getLogger(__name__)
 json_headers = {'content-type': 'application/json'}
 
@@ -138,9 +135,11 @@ def DataCleaner(testName, type="Basic"):
         while True:
             deleteFail = 0
             deleteDistributableFail = 0
-            del_key = quote("{\"tag\": \"" + obj.testDataKey + "\"}")
             #del_key = quote("{\"tag\": \"metadata\"}")
-            response = urlopen(obj.couch_url + "/resource_data/_design/learningregistry-slicelite/_view/any-tags?reduce=false&key=" + del_key)
+            url = obj.couch_url + "/resource_data/_design/learningregistry-slicelite/_view/any-tags-by-date?reduce=false"
+            #url = url % obj.testDataKey
+            #fragment = &startkey=[\"%s\", 0]
+            response = urlopen(url)
             data = json.loads(response.read())
             rows = data["rows"]
             for row in rows:
@@ -150,18 +149,12 @@ def DataCleaner(testName, type="Basic"):
                 except Exception:
                     #print "error deleting doc_id: " + doc_id + ". Message: " + e.message
                     deleteFail = deleteFail + 1
-                try:
-                    del obj.db[doc_id + "-distributable"]
-                except Exception:
-                    #print "error deleting doc_id: " + doc_id+"-distributable" + ". Message: " + e.message
-                    deleteDistributableFail = deleteDistributableFail + 1
 
             deleteAttempts = deleteAttempts + 1
             if (deleteFail == 0 and deleteDistributableFail == 0) or deleteAttempts > 10:
                 break
             else:
-                print "deleteFail: " + str(deleteFail) + ", deleteDistributableFail: " + str(deleteDistributableFail)
-
+                pass  # print "deleteFail: " + str(deleteFail) + ", deleteDistributableFail: " + str(deleteDistributableFail)
 
     #a decorator to wrap each test case in that writes test data before the test is run and removes is after
     def test_decorator(fn):
@@ -211,11 +204,11 @@ class TestSlicesController(TestController):
 
     couch_url = config['couchdb.url']
     couch_dba_url = config['couchdb.url.dbadmin']
-    database='resource_data'
+    database = 'resource_data'
     server = couchdb.Server(couch_dba_url)
     db = server[database]
 
-    setupCount=0
+    setupCount = 0
 
     #slice for test docs containing the signature test key
     def _sliceForAllTestDocs(self):
@@ -228,43 +221,43 @@ class TestSlicesController(TestController):
 
     #take an array of docs and apply the test start date as all their node timestamps
     def updateTestDataWithTestDates(self, docs):
-        for result in docs['document_results'] :
+        for result in docs['document_results']:
             doc_id = result["doc_ID"]
             doc = self.db[doc_id]
             doc["node_timestamp"] = self.test_start_date_string + self.test_time_string
             self.db[doc.id] = doc
-        urlopen(self.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
+        urlopen(self.couch_url + "/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
 
     #take an array of docs and apply a number of test dates to their node timestamps
     def updateTestDataWithMultipleTestDates(self, docs, testName):
-        for result in docs['document_results'] :
+        for result in docs['document_results']:
             doc_id = result["doc_ID"]
             doc = self.db[doc_id]
             identity = doc["identity"]
             submitter = identity["submitter"]
-            if(submitter==self.identities[0]+testName):
+            if(submitter == self.identities[0] + testName):
                 doc["node_timestamp"] = self.test_start_date_string + self.test_time_string
-            elif(submitter==self.identities[1]+testName):
+            elif(submitter == self.identities[1] + testName):
                 doc["node_timestamp"] = self.test_mid_date_string + self.test_time_string
             else:
                 doc["node_timestamp"] = self.test_end_date_string + self.test_time_string
 
             self.db[doc.id] = doc
-        urlopen(self.couch_url+"/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
+        urlopen(self.couch_url + "/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
 
     #returns true if one of the doc's indentities matches the argument
-    def _checkIdentity(self, doc, identity) :
+    def _checkIdentity(self, doc, identity):
 
-        if doc[IDENTITY].has_key('submitter') :
-            if doc[IDENTITY]['submitter'].lower() == identity.lower() : return True
-        if doc[IDENTITY].has_key('author') :
-            if doc[IDENTITY]['author'].lower() == identity.lower() : return True
-        if doc[IDENTITY].has_key('owner') :
-            if doc[IDENTITY]['owner'].lower() == identity.lower() : return True
-        if doc[IDENTITY].has_key('signer') :
-            if doc[IDENTITY]['signer'].lower() == identity.lower() : return True
+        if doc[IDENTITY].has_key('submitter'):
+            if doc[IDENTITY]['submitter'].lower() == identity.lower(): return True
+        if doc[IDENTITY].has_key('author'):
+            if doc[IDENTITY]['author'].lower() == identity.lower(): return True
+        if doc[IDENTITY].has_key('owner'):
+            if doc[IDENTITY]['owner'].lower() == identity.lower(): return True
+        if doc[IDENTITY].has_key('signer'):
+            if doc[IDENTITY]['signer'].lower() == identity.lower(): return True
 
-        return False;
+        return False
 
     #tests that the doc's node_timestamp matches the argument
     def _checkTimestamp(self, doc, timestamp) :
@@ -414,9 +407,6 @@ class TestSlicesController(TestController):
         assert len([x for x in docs if start_int <= helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) <= end_int]) == len(docs)
         assert len([x for x in docs if self.testKeys[0] + 'test_by_date_range_and_key' in x['resource_data_description']['keys']]) == len(docs)
 
-
-
-
     # # # #test that there are 100 docs in the first result and 50 in the result after 1 resumption
     # # # #grab the service document for slice: http://127.0.0.1:5984/node/access%3Aslice
     @SetFlowControl(True, config["lr.slice.docid"])
@@ -433,6 +423,7 @@ class TestSlicesController(TestController):
         response = self._slice(parameters)
         result = json.loads(response.body)
         assert "resumption_token" in result
+
         def validate_page(docs):
             assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
             assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
@@ -451,6 +442,5 @@ class TestSlicesController(TestController):
 
         def test(keys):
             test_set = set(parameters[ANY_TAGS].split(',')).intersection(set(keys))
-            pprint(test_set)
             return len(test_set) > 0
         assert len([x for x in docs if test(x['resource_data_description']['keys'])]) == len(docs)

@@ -10,7 +10,6 @@ from lr.lib.base import BaseController
 from datetime import datetime, timedelta
 from lr.lib.oaipmherrors import *
 from lr.lib import resumption_token
-from lr.lib.harvest import harvest
 log = logging.getLogger(__name__)
 ANY_TAGS = "any_tags"
 IDENTITY = "identity"
@@ -115,7 +114,6 @@ class SliceController(BaseController):
             del opts['keys']
             for key in keys:
                 opts.update(key)
-                print(opts)
                 view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
                 for doc in view:
                     yield doc
@@ -147,16 +145,12 @@ class SliceController(BaseController):
             return SLICE_DOCUMENT + "/_view/any-tags-by-date"
         if START_DATE in params:
             return SLICE_DOCUMENT + "/_view/by-date"
-        elif IDENTITY in params:
-            return SLICE_DOCUMENT + "/_view/identity"
-        elif ANY_TAGS in params:
-            return SLICE_DOCUMENT + "/_view/any-tags"
 
     def _get_view_total(self, view_name, params, resumptionToken=None):
         if resumptionToken and "maxResults" in resumptionToken and resumptionToken["maxResults"] != None:
             return resumptionToken["maxResults"]
         db_url = '/'.join([appConfig['couchdb.url'], appConfig['couchdb.db.resourcedata']])
-        opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": True}
+        opts = {"stale": appConfig['couchdb.stale.flag'], "groub": True}
         if self.enable_flow_control and resumptionToken != None:
             if resumptionToken != None:
                 opts['startkey'] = resumptionToken['startkey']
@@ -182,55 +176,59 @@ class SliceController(BaseController):
         return totalDocs
 
     def _get_dates(self, params):
-        har = harvest()
-        cur = h.convertDateTime(params.get(START_DATE, har.earliestDate()))
+        cur = h.convertDateTime(params.get(START_DATE, h.EPOCH_STRING))
         end = h.convertDateTime(params.get(END_DATE, datetime.utcnow().isoformat() + "Z"))
         return (cur, end)
 
     def format_data(self, keys_only, docs, params, forceUnique, maxResults, current_rt=None):
-        sentIDs = []
-        prefix = '{"documents":[\n'
-        num_sent = 0
-        doc_count = 0
-        update_resumption_max_results = current_rt and "maxResults" in current_rt and current_rt["maxResults"] != None
-        if docs is not None:
-            for row in docs:
-                doc_count += 1
-                alreadySent = (row["id"] in sentIDs)
-                if not alreadySent or not forceUnique:
-                    sentIDs.append(row["id"])
-                    if keys_only:
-                        return_data = {"doc_ID": row["id"]}
+        try:
+            sentIDs = []
+            prefix = '{"documents":[\n'
+            num_sent = 0
+            doc_count = 0
+            startkey_docid = None
+            update_resumption_max_results = current_rt and "maxResults" in current_rt and current_rt["maxResults"] != None
+            if docs is not None:
+                for row in docs:
+                    doc_count += 1
+                    alreadySent = (row["id"] in sentIDs)
+                    if not alreadySent or not forceUnique:
+                        sentIDs.append(row["id"])
+                        startkey_docid = row["id"]
+                        if keys_only:
+                            return_data = {"doc_ID": row["id"]}
+                        else:
+                            # Get the resource data and update with the node timestamp data
+                            # That the view has in value['timestamp']
+                            resourceData = {}
+                            resourceData = row["doc"]
+                            return_data = {"doc_ID": row["id"], "resource_data_description": resourceData}
+                        yield prefix + json.dumps(return_data)
+                        num_sent += 1
+                        prefix = ",\n"
                     else:
-                        # Get the resource data and update with the node timestamp data
-                        # That the view has in value['timestamp']
-                        resourceData = {}
-                        resourceData = row["doc"]
-                        return_data = {"doc_ID": row["id"], "resource_data_description": resourceData}
-                    yield prefix + json.dumps(return_data)
-                    num_sent += 1
-                    prefix = ",\n"
+                        log.debug("{0} skipping: alreadySent {1} / forceUnique {2}".format(doc_count, repr(alreadySent), forceUnique))
+                        if update_resumption_max_results:
+                            current_rt["maxResults"] = current_rt["maxResults"] - 1
+
+            if doc_count == 0:
+                yield prefix
+
+            rt = " "
+            if self.enable_flow_control:
+                pass
+                if current_rt != None and "offset" in current_rt and current_rt["offset"] is not None:
+                    offset = current_rt["offset"]
                 else:
-                    log.debug("{0} skipping: alreadySent {1} / forceUnique {2}".format(doc_count, repr(alreadySent), forceUnique))
-                    if update_resumption_max_results:
-                        current_rt["maxResults"] = current_rt["maxResults"] - 1
-
-        if doc_count == 0:
-            yield prefix
-
-        rt = " "
-        if self.enable_flow_control:
-            pass
-            if current_rt != None and "offset" in current_rt and current_rt["offset"] is not None:
-                offset = current_rt["offset"]
-            else:
-                offset = 0
-            if offset + doc_count < maxResults:
-                token = resumption_token.get_token(self.service_id, offset=offset + doc_count, maxResults=maxResults,
-                                                   startkey=params.get('startkey', None), endkey=params.get('endkey', None), keys=params.get('keys', None))
-                rt = ''' "resumption_token":"{0}", '''.format(token)
-        db = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
-        yield '\n],' + rt + '"resultCount":' + str(maxResults) + ',"viewUpToDate":' + h.isViewUpdated(db, SLICE_DOCUMENT) + '}'
+                    offset = 0
+                if offset + doc_count < maxResults:
+                    token = resumption_token.get_token(self.service_id, maxResults=maxResults,
+                                                       startkey=params.get('startkey', None), endkey=params.get('endkey', None), keys=params.get('keys', None))
+                    rt = ''' "resumption_token":"{0}", '''.format(token)
+            db = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
+            yield '\n],' + rt + '"resultCount":' + str(maxResults) + ',"viewUpToDate":' + h.isViewUpdated(db, SLICE_DOCUMENT) + '}'
+        except Exception as ex:
+            print(ex)
 
 # if __name__ == '__main__':
 # param = {START_DATE: "2011-03-10", END_DATE: "2011-05-01", IDENTITY: "NSDL 2 LR Data Pump", 'search_key': 'Arithmetic'}
