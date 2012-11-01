@@ -105,18 +105,7 @@ class SliceController(BaseController):
             opts.update(self._get_couch_opts(params))
         if limit != None:
             opts["limit"] = limit
-        if 'keys' not in opts:
-            view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
-            for doc in view:
-                yield doc
-        else:
-            keys = opts["keys"]
-            del opts['keys']
-            for key in keys:
-                opts.update(key)
-                view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
-                for doc in view:
-                    yield doc
+        return h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
 
     def _get_couch_opts(self, params):
         opts = {}
@@ -124,15 +113,8 @@ class SliceController(BaseController):
             opts['startkey'] = [params[IDENTITY], params[START_DATE]]
             opts['endkey'] = [params[IDENTITY], params[END_DATE]]
         elif START_DATE in params and ANY_TAGS in params:
-            if ',' in params[ANY_TAGS]:
-                tags = params[ANY_TAGS].split(',')
-                keys = []
-                for t in tags:
-                    keys.append({"startkey": [t, params[START_DATE]], "endkey": [t, params[END_DATE]]})
-                opts["keys"] = keys
-            else:
-                opts['startkey'] = [params[ANY_TAGS], params[START_DATE]]
-                opts['endkey'] = [params[ANY_TAGS], params[END_DATE]]
+            opts['startkey'] = [params[ANY_TAGS], params[START_DATE]]
+            opts['endkey'] = [params[ANY_TAGS], params[END_DATE]]
         if START_DATE in params:
             params['startkey'] = params[START_DATE]
             params['endkey'] = params[END_DATE]
@@ -150,7 +132,7 @@ class SliceController(BaseController):
         if resumptionToken and "maxResults" in resumptionToken and resumptionToken["maxResults"] != None:
             return resumptionToken["maxResults"]
         db_url = '/'.join([appConfig['couchdb.url'], appConfig['couchdb.db.resourcedata']])
-        opts = {"stale": appConfig['couchdb.stale.flag'], "groub": True}
+        opts = {"stale": appConfig['couchdb.stale.flag'], "group": True}
         if self.enable_flow_control and resumptionToken != None:
             if resumptionToken != None:
                 opts['startkey'] = resumptionToken['startkey']
@@ -158,21 +140,10 @@ class SliceController(BaseController):
         else:
             opts.update(self._get_couch_opts(params))
         totalDocs = 0
-        if 'keys' not in opts:
-            view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
-            for row in view:
-                if "value" in row:
-                    totalDocs += row["value"]
-        else:
-            keys = opts["keys"]
-            del opts['keys']
-            for key in keys:
-                opts.update(key)
-                print(opts)
-                view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
-                for row in view:
-                    if "value" in row:
-                        totalDocs += row["value"]
+        view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
+        for row in view:
+            if "value" in row:
+                totalDocs += row["value"]
         return totalDocs
 
     def _get_dates(self, params):
@@ -222,8 +193,8 @@ class SliceController(BaseController):
                 else:
                     offset = 0
                 if offset + doc_count < maxResults:
-                    token = resumption_token.get_token(self.service_id, maxResults=maxResults,
-                                                       startkey=params.get('startkey', None), endkey=params.get('endkey', None), keys=params.get('keys', None))
+                    token = resumption_token.get_token(self.service_id, maxResults=maxResults, startkey_docid=startkey_docid,
+                                                       startkey=params.get('startkey', None), endkey=params.get('endkey', None))
                     rt = ''' "resumption_token":"{0}", '''.format(token)
             db = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
             yield '\n],' + rt + '"resultCount":' + str(maxResults) + ',"viewUpToDate":' + h.isViewUpdated(db, SLICE_DOCUMENT) + '}'

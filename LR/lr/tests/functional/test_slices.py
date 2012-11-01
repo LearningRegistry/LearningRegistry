@@ -428,19 +428,3 @@ class TestSlicesController(TestController):
             assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
             assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
         self._validate_page(parameters, response, validate_page, 10)
-
-    # # #test that there are 3 documents with key = testKeys[0]
-    @DataCleaner("test_by_multiple_key")
-    def test_by_multiple_key(self):
-        parameters = {}
-        parameters[ANY_TAGS] = ','.join([x + "test_by_multiple_key" for x in self.testKeys[0:3]])
-        parameters[IDS_ONLY] = False
-        response = self._slice(parameters)
-        docs = json.loads(response.body)
-        docs = docs['documents']
-        assert len(docs) > 0
-
-        def test(keys):
-            test_set = set(parameters[ANY_TAGS].split(',')).intersection(set(keys))
-            return len(test_set) > 0
-        assert len([x for x in docs if test(x['resource_data_description']['keys'])]) == len(docs)
