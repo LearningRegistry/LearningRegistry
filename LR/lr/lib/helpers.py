@@ -82,7 +82,7 @@ def getServiceDocument(serviceName):
 
 
 def getResponse(database_url, view_name, method="GET", **kwargs):
-    json_headers = { "Content-Type": "application/json; charset=\"utf-8\"" }
+    json_headers = {"Content-Type": "application/json; charset=\"utf-8\""}
     get_head_args = ["key", "startkey", "startkey_docid", "endkey",
                      "endkey_docid", "limit", "stale", "descending", "skip",
                      "group", "group_level", "reduce", "include_docs",
@@ -90,7 +90,7 @@ def getResponse(database_url, view_name, method="GET", **kwargs):
     post_args = ["keys"]
     # Certain keys must be proper JSON values
     for foo in kwargs:
-        if foo in ['startkey','endkey','key']:
+        if foo in ['startkey', 'endkey', 'key']:
             kwargs[foo] = json.dumps(kwargs[foo])
 
     query_args = {}
@@ -106,18 +106,21 @@ def getResponse(database_url, view_name, method="GET", **kwargs):
             post_data[key] = val
 
     if method is "POST" or post_data != {}:
-        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)])
+        view_url = '?'.join(['/'.join([database_url, view_name]), urllib.urlencode(query_args)])
         post_data = json.dumps(post_data)
         # log.debug("POST "+view_url)
         # log.debug("DATA " + post_data)
+        print(view_url)
         view_req = urllib2.Request(view_url, data=post_data, headers=json_headers)
     else:
-        view_url = '?'.join(['/'.join([database_url,view_name]),urllib.urlencode(query_args)])
+        view_url = '?'.join(['/'.join([database_url, view_name]), urllib.urlencode(query_args)])
         print(view_url)
         view_req = urllib2.Request(view_url, headers=json_headers)
-        log.debug("GET "+view_url)
+        log.debug("GET " + view_url)
     resp = urllib2.urlopen(view_req)
     return resp
+
+
 def getView(database_url, view_name, method="GET", documentHandler=None, **kwargs):
     dh = StreamingCouchDBDocHandler(documentHandler)
     resp = getResponse(database_url,view_name,method,**kwargs)
