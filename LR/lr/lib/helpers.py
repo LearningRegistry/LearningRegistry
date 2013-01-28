@@ -21,18 +21,22 @@ available to Controllers. This module is available to templates as 'h'.
 from iso8601.iso8601 import ISO8601_REGEX
 import re
 from stream import StreamingCouchDBDocHandler
+EPOCH_STRING = "1970-01-01T00:00:00Z"
+
 
 def getBasicAuthHeaderFromURL(basic_auth_url):
     try:
         urlparts = urlparse.urlparse(basic_auth_url)
-        if "username" in urlparts and "password" in urlparts and urlparts.username != None and urlparts.password != None:
+        if urlparts.username != None and urlparts.password != None:
             base64_enc = base64.encodestring("%s:%s" % (urlparts.username, urlparts.password)).replace("\n", "")
             return { "Authorization": "Basic %s" % base64_enc }
         else:
-            return { }
-    except:
-        return { }
-        
+            return {}
+    except Exception as ex:
+        log.error("Problem parsing basic auth info " + str(ex))
+        return {}
+
+
 def dictToObject(dictionary):
     class DictToObject(dict):
         def __init__(self, data):
