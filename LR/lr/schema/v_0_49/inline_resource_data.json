@@ -1,0 +1,59 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "resource_data",
+    "description": "Resource Data version 0.49 for inline payload",
+    
+    "extends":{
+        "$ref": "file:lr/schema/abstract_inline_resource_data.json"
+    },
+    "properties":{
+        "doc_type": {},
+        "doc_ID": {},
+        "resource_data_type":{},
+        "active":{},
+        "identity": {},
+        "submitter_timestamp":{},
+        "submitter_TTL":{},
+        "publishing_node":{},
+        "node_timestamp": {},
+        "create_timestamp": {},
+        "update_timestamp": {},
+        "TOS": {},
+        "do_not_distribute": {},
+        "weight": {},
+        "digital_signature": {},
+        "resource_locator": {
+            "type": ["array", "string"],
+            "minItems": 1,
+            "required": true
+        },
+        "keys": {},
+        "resource_TTL": {},
+        "payload_schema": {},
+        "payload_placement": {},
+        "payload_schema_locator": {},
+        "payload_schema_format": {},
+        "resource_data": {},
+        "replaces" : {
+            "type": "array",
+            "required": false,
+            "minItems": 0,
+            "items": {
+                "type": "string"
+            },
+            "description": "A list of doc_ID that refer to RD3 that this RD3 should replace"
+    
+        },
+        "doc_version": {
+            "type": "string",
+            "enum": ["0.49.0"],
+            "required": true
+        }
+
+    },
+    "patternProperties": {
+        "X_.*" : {}
+    },
+    "additionalProperties": false
+
+}
