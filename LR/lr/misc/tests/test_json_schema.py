@@ -2,7 +2,7 @@ from jsonschema import validate, Draft3Validator, ValidationError
 from lr.schema.validate import LRDraft3Validator
 from unittest import TestCase
 from urllib import urlopen
-import copy, glob, os, re
+import copy, glob, os, re, uuid
 import logging, json
 
 log = logging.getLogger(__name__)
@@ -137,7 +137,7 @@ class TestJSONSchemaValidation(TestCase):
 
 
 
-def make_case(schema, data, valid, cls):
+def make_case(schema, data, valid, cls):    
     def test_case(self):
         try:
             if valid:
@@ -155,6 +155,7 @@ def make_case(schema, data, valid, cls):
 
 def load_json_cases(test_dir):
     def add_test_methods(test_class):
+        test_num = 0;
         for filename in glob.iglob(os.path.join(test_dir, "*.json")):
             validating, _ = os.path.splitext(os.path.basename(filename))
 
@@ -172,7 +173,7 @@ def load_json_cases(test_dir):
 
 
                         if "rm_data" in test:
-                            print test["description"]
+                            # print test["description"]
                             for rm in test["rm_data"]:
                                 if rm in tdata:
                                     del tdata[rm]
@@ -185,10 +186,11 @@ def load_json_cases(test_dir):
                             test_class.validator_class,
                         )
 
-                        test_name = "test_%s_%s_%s" % (
+                        test_name = "test_%s_%s_%s__%s" % (
                             validating,
                             re.sub(r"[\W ]+", "_", case["description"]),
                             re.sub(r"[\W ]+", "_", test["description"]),
+                            uuid.uuid1().hex
                         )
 
                         
@@ -196,6 +198,9 @@ def load_json_cases(test_dir):
                         a_test.__name__ = test_name
 
                         setattr(test_class, test_name, a_test)
+                        test_num += 1
+
+                        print "Test #%d: %s" % (test_num, test_name)
 
         return test_class
     return add_test_methods
