@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from datetime import datetime
-from jsonschema import validate, Draft3Validator, ValidationError, validates, RefResolver
+from jsonschema import validate, Draft3Validator, ValidationError, validates, RefResolver, _list, _types_msg
 from urllib import urlopen
 from lr.lib.uri_validate import URI
 import re, iso8601, urlparse
@@ -36,6 +36,9 @@ class LRDraft3Validator(Draft3Validator):
     ISO8601_DATE_TIME_REGEX = re.compile(r"^(?P<year>[0-9]{4})-(?P<month>[0-9]{1,2})-(?P<day>[0-9]{1,2})"
         r"(?P<separator>T)(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2}):(?P<second>[0-9]{2})(?P<timezone>Z)$")
 
+    ISO8601_DATE_TIME_MS_REGEX = re.compile(r"^(?P<year>[0-9]{4})-(?P<month>[0-9]{1,2})-(?P<day>[0-9]{1,2})"
+        r"(?P<separator>T)(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2}):(?P<second>[0-9]{2})(\.(?P<microsecond>[0-9]{1,6}))?(?P<timezone>Z)$")
+
     ISO8601_DATE_REGEX = re.compile(r"^(?P<year>[0-9]{4})-(?P<month>[0-9]{1,2})-(?P<day>[0-9]{1,2})$")
 
     # URI regex from https://gist.github.com/138549/download
@@ -46,6 +49,49 @@ class LRDraft3Validator(Draft3Validator):
             resolver = LRRefResolver.from_schema(schema)
 
         super(LRDraft3Validator, self).__init__(schema, types, resolver)
+
+    def is_valid(self, instance, _schema=None, errors=None):
+        errorsIter = self.iter_errors(instance, _schema)
+        error = next(errorsIter, None)
+
+        if not (errors is None):
+            errors.append(error)
+            errors.extend(errorsIter)
+
+        return error is None
+
+    def validate_type(self, types, instance, schema):
+        types = _list(types)
+        all_errors = list()
+
+        for type in types:
+
+            # We will need this a couple of times
+            is_object = self.is_type(type, "object")
+
+            # Ouch. Brain hurts. Two paths here, either we have a schema, then
+            # check if the instance is valid under it
+            if (
+                is_object and 
+                self.is_valid(instance, type, all_errors)
+                ):
+                    all_errors = []
+                    return
+            
+            # Or we have a type as a string, just check if the instance is that
+            # type. Also, HACK: we can reach the `or` here if skip_types is
+            # something other than error. If so, bail out.
+
+            if self.is_type(type, "string"):
+                if (self.is_type(instance, type) or type not in self._types):               
+                    return
+
+            if not is_object:
+                all_errors.append(ValidationError(_types_msg(instance, type)))
+        else:
+            for error in all_errors:
+                yield error
+
 
     def validate_format(self, format, instance, schema):
 
@@ -70,6 +116,25 @@ class LRDraft3Validator(Draft3Validator):
                     try:
                         datetime(int(groups["year"]), int(groups["month"]), int(groups["day"]),
                             int(groups["hour"]), int(groups["minute"]), int(groups["second"]),
+                            tzinfo=iso8601.iso8601.UTC)
+                        return True
+                    except ValueError:
+                        pass
+            return False
+
+        def is_date_time_us(val):
+            if self.is_type(val, "string"):
+                m =  LRDraft3Validator.ISO8601_DATE_TIME_MS_REGEX.match(val)
+                if m:
+                    groups = m.groupdict()
+                    try:
+                        if groups["microsecond"] is None:
+                            groups["microsecond"] = 0
+                        else:
+                            groups["microsecond"] = int(float("0.%s" % groups["microsecond"]) * 1e6)
+
+                        datetime(int(groups["year"]), int(groups["month"]), int(groups["day"]),
+                            int(groups["hour"]), int(groups["minute"]), int(groups["second"]), int(groups["microsecond"]),
                             tzinfo=iso8601.iso8601.UTC)
                         return True
                     except ValueError:
@@ -114,6 +179,7 @@ class LRDraft3Validator(Draft3Validator):
 
         formats = {
             "date-time": is_date_time,
+            "date-time-us": is_date_time_us,
             "date": is_date,
             "time": unsupported,
             "utc-millisec": is_utc_millisec,
@@ -148,7 +214,7 @@ LRDraft3Validator.META_SCHEMA = Draft3Validator.META_SCHEMA
 LRDraft3Validator.META_SCHEMA["properties"]["format"].update(
     {
         "type": "string",
-        "enum": ["date-time", "date", "utc-millisec", "regex", "uri"]
+        "enum": ["date-time", "date-time-us", "date", "utc-millisec", "regex", "uri"]
     }
 )           
 

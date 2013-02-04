@@ -61,13 +61,13 @@
             "description": "submitter-created timestamp",
             "type": "string",
             "required": false,
-            "format": "date-time"
+            "format": "date-time-us"
         },
         "submitter_TTL": {
             "description": "submitter statement of TTL of validity of submission",
             "type": "string",
             "required": false,
-            "format": "date-time"
+            "format": "date-time-us"
         },
         "publishing_node": {
             "description": "node_id of node where injected into the network; provided by the initial publish node (not distribution)",
@@ -78,19 +78,19 @@
             "description": "timestamp of when received by the current node",
             "type": "string",
             "required": true,
-            "format": "date-time"
+            "format": "date-time-us"
         },
         "create_timestamp": {
             "description": "timestamp of when first published to the network independent of updates; immutable; provided by the initial publishing node on first publish not by a distribution node or not an update",
             "type": "string",
             "required": true,
-            "format": "date-time"
+            "format": "date-time-us"
         },
         "update_timestamp": {
             "description": "??? UNKNOWN !!!",
             "type": "string",
             "required": true,
-            "format": "date-time"
+            "format": "date-time-us"
         },
         "TOS": {
             "description": "terms of service",
@@ -143,6 +143,10 @@
                     "type": "string",
                     "enum": ["LR-PGP.1.0"],
                     "required": true
+                },
+                "key_owner": {
+                    "type": "string",
+                    "required": false
                 }
             },
             "additionalProperties": false
