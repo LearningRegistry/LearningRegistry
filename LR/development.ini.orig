@@ -98,6 +98,7 @@ lr.policy.docid = administrative:Resource Distribution Network Policy service
 lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
 lr.distribute_incoming_url = http://localhost/incoming
+schema.resource_data = file:lr/schema/any/resource_data.json
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 
