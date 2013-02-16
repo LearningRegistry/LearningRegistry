@@ -1,11 +1,16 @@
-import gnupg, json, re
+import gnupg, json, logging, re
 from pylons import session, config
 from lr.lib import oauth
+from lr.util import lrgpg
 from LRSignature.sign import Sign
+from LRSignature.verify import Verify
+from LRSignature.errors import MissingPublicKey
+from LRSignature import util
 
-_appConfig = config["app_conf"]
+log = logging.getLogger(__name__)
 
-def _cmp_version(version1, version2):
+
+def cmp_version(version1, version2):
     def normalize(v):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
     return cmp(normalize(version1), normalize(version2))
@@ -17,26 +22,87 @@ def lrsignature_mapper(row_result, row):
         row_result["lrsignature"] = { }
 
 
-_gpgOpts = {
-    "gpgbinary": _appConfig["lr.publish.signing.gpgbin"],
-    "gnupghome": _appConfig["lr.publish.signing.gnupghome"],
-}
 
-privateKeyID = _appConfig["lr.publish.signing.privatekeyid"]
-signer = _appConfig["lr.publish.signing.signer"]
-_signOpts = {
-    "privateKeyID": privateKeyID,
-    "passphrase": _appConfig["lr.publish.signing.passphrase"],
-    "gnupgHome": _gpgOpts["gnupghome"],
-    "gpgbin": _gpgOpts["gpgbinary"],
-    "publicKeyLocations": json.loads(_appConfig["lr.publish.signing.publickeylocations"]),
-    "sign_everything": False
-}
+gpg = None
+privateKeyID = None
+signer = None
+_signer = None
+_verifier = None
 
-gpg = gnupg.GPG(**_gpgOpts)
+_KEYSERVERS = [ "pool.sks-keyservers.net" ]
 
-_signer = Sign.Sign_0_21(**_signOpts)
 
+def reloadGPGConfig(appConfig=config["app_conf"]):
+    global gpg, privateKeyID, signer, _signer, _verifier
+
+    _gpgOpts = {
+        "gpgbinary": appConfig["lr.publish.signing.gpgbin"],
+        "gnupghome": appConfig["lr.publish.signing.gnupghome"],
+    }
+    gpg = lrgpg.LRGPG(**_gpgOpts)
+
+    privateKeyID = appConfig["lr.publish.signing.privatekeyid"]
+    signer = appConfig["lr.publish.signing.signer"]
+
+    _signOpts = {
+        "privateKeyID": privateKeyID,
+        "passphrase": appConfig["lr.publish.signing.passphrase"],
+        "gnupgHome": _gpgOpts["gnupghome"],
+        "gpgbin": _gpgOpts["gpgbinary"],
+        "publicKeyLocations": json.loads(appConfig["lr.publish.signing.publickeylocations"]),
+        "sign_everything": False
+    }
+    _vfyOpts = {
+        "gnupgHome": _gpgOpts["gnupghome"],
+        "gpgbin": _gpgOpts["gpgbinary"]
+    }
+
+
+    _signer = Sign.Sign_0_21(**_signOpts)
+    _verifier = Verify.Verify_0_21(**_vfyOpts)
+
+reloadGPGConfig(config["app_conf"])
+
+
+def get_verification_info(document, attempt=0):
+    try:
+        info = _verifier.get_and_verify(document)
+        return info
+    except MissingPublicKey, e:
+        # first try the public keyservers
+        if attempt >= 0 and attempt < len(_KEYSERVERS):
+            try:
+                v = gpg.verify(document["digital_signature"]["signature"])
+                res = gpg.recv_keys(_KEYSERVERS[attempt], v.key_id)
+            except Exception, e:
+                log.info("Problem with getting keys from keyserver: %s", e)
+                pass
+
+            # try again...
+            return get_verification_info(document, attempt+1)
+        # ran out of key servers, try locations in envelope.
+        elif attempt == len(_KEYSERVERS):
+            try:
+                for loc in document["digital_signature"]["key_location"]:
+                    try:
+                        keys = util.fetchkeys(loc)
+                        for key in keys:
+                            util.storekey(key, this.gpg.gnupghome, this.gpg.gpgbinary)
+                    except Exception, e:
+                        log.info("Problem importing or storing key from location: %s", e)
+                
+                # try again...
+                return get_verification_info(document, attempt+1)
+            except:
+                pass
+
+
+    return None
+
+       
+
+def get_node_key_info():
+    return gpg.list_keys(privateKeyID)[0]
 
 def get_node_public_key():
     return gpg.export_keys(privateKeyID)
@@ -62,7 +128,7 @@ def sign_doc(doc, cb=None, session_key="oauth-sign"):
         except:
             pass
             
-        if _cmp_version(doc["doc_version"], "0.21.0") >= 0:
+        if cmp_version(doc["doc_version"], "0.21.0") >= 0:
             if "identity" not in doc:
                 doc["identity"] = {}
 
@@ -74,7 +140,7 @@ def sign_doc(doc, cb=None, session_key="oauth-sign"):
             doc["submitter_type"] = "user"
 
 
-        if _cmp_version(doc["doc_version"], "0.20.0") >= 0:
+        if cmp_version(doc["doc_version"], "0.20.0") >= 0:
             if cb == None:
                 return _signer.sign(doc)
             else:

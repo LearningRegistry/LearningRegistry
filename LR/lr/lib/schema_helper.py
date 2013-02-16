@@ -6,7 +6,7 @@ from pylons import config
 from uuid import uuid4
 
 
-import couchdb, logging
+import couchdb, logging, pprint
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def _createDB(name, server=_defaultCouchServer):
     return server[name]
 
 
-class SchemaBackedModelHelper():
+class SchemaBackedModelHelper(object):
     validator_class = LRDraft3Validator
 
     def __init__(self, schemaRef, defaultDBName, server=_defaultCouchServer):
@@ -35,9 +35,10 @@ class SchemaBackedModelHelper():
         self.defaultDB = _createDB(defaultDBName, server)
 
     def validate_model(self, model):
+        
+        model_ref = deepcopy(model)
         #strip couchdb specific stuff before validation
-        if _ID in model or _REV in model:
-            model_ref = deepcopy(model)
+        if _ID in model_ref or _REV in model_ref:
             try:
                 del model_ref[_ID]
             except:
@@ -47,8 +48,6 @@ class SchemaBackedModelHelper():
                 del model_ref[_REV]
             except:
                 pass
-        else:
-            model_ref = model
 
         try:
             validate(model_ref, self.schema, cls=self.validator_class)
@@ -59,11 +58,13 @@ class SchemaBackedModelHelper():
 
             raise SpecValidationException(",\n".join(msgs))
 
-    def save(self,  model, database=None, log_exceptions=True):
+
+    def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
             
             # Make sure the spec data conforms to the spec before saving
             # it to the database
-            self.validate_model(model)
+            if not skip_validation:
+                self.validate_model(model)
                 
             db = database
             # If no database is provided use the default one.
@@ -85,8 +86,7 @@ class SchemaBackedModelHelper():
                 result['OK'] = False
                 result['ERROR'] = "CouchDB save error:  "+str(e)
                 if log_exceptions:
-                    log.exception("\n"+pprint.pformat(result, indent=4)+"\n"+
-                          pprint.pformat(document, indent=4)+"\n\n")
+                    log.exception("CouchDB save error:\n%s\n" % (pprint.pformat({ "result": result, "model": model}, indent=4),))
                         
             return result
 
@@ -94,29 +94,37 @@ class SchemaBackedModelHelper():
 _db_resource_data = appConfig['couchdb.db.resourcedata']
 
 _schemaRef_Resource_Data = appConfig['schema.resource_data']
-
+_schemaRef_tombstone = appConfig['schema.tombstone']
 
 class ResourceDataHelper(SchemaBackedModelHelper):
     DOC_ID = _DOC_ID
     TIME_STAMPS = ['create_timestamp', 'update_timestamp', 'node_timestamp']
     REPLICATION_FILTER = "filtered-replication/replication_filter"
 
+    def __init__(self, schemaRef, defaultDBName, server=_defaultCouchServer):
+        super(ResourceDataHelper, self).__init__(schemaRef, defaultDBName, server)
+
     def set_timestamps(self, model, timestamp=helpers.nowToISO8601Zformat()):
         for stamp in ResourceDataHelper.TIME_STAMPS:
+            if stamp not in model or stamp is 'node_timestamp':
                 model[stamp] = timestamp
         return model
 
-    def save(self, model, database=None, log_exceptions=True):
+    def assign_id(self, model):
         if _DOC_ID not in model:
             model[_DOC_ID] = uuid4().hex
 
         if _ID not in model:
             model[_ID] = model[_DOC_ID]
 
-        return SchemaBackedModelHelper.save(self, model, database, log_exceptions)
+    def save(self, model, database=None, log_exceptions=True, skip_validation=False):
+        self.assign_id(model)        
+
+        return SchemaBackedModelHelper.save(self, model, database, log_exceptions, skip_validation)
 
 ResourceDataModelValidator = ResourceDataHelper(_schemaRef_Resource_Data, _db_resource_data, _defaultCouchServer)
 
 
+TombstoneValidator = SchemaBackedModelHelper(_schemaRef_tombstone, _db_resource_data, _defaultCouchServer)
 
 

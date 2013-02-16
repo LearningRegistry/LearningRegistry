@@ -1,17 +1,499 @@
 from lr.tests import *
 from lr.model import ResourceDataModel
 from lr.util import decorators
+from lr.lib.schema_helper import TombstoneValidator, ResourceDataModelValidator
+from lr.lib.signing import reloadGPGConfig
 from time import sleep
 from pylons import config
-import couchdb, json, re, uuid, socket
+import copy, couchdb, gnupg, json, re, uuid, socket
 from LRSignature.sign.Sign  import Sign_0_21
 from couchdb import Server
+from functools import wraps
+import tempfile, shutil
+
 headers={'Content-Type': 'application/json'}
 
 def _cmp_version(version1, version2):
     def normalize(v):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
     return cmp(normalize(version1), normalize(version2))
+
+
+def backup(prop_list=[]):
+    backup = {}
+    for prop in prop_list:
+        backup[prop] = config["app_conf"][prop]
+    return backup
+
+def restore(backup={}):
+    config["app_conf"].update(backup)
+
+class make_gpg_keys(object):
+    '''decorator that makes at least 1 gpg key.  first key is set at the node key'''
+    def __init__(self, count=1):
+        self.count = count
+        self.gnupghome = tempfile.mkdtemp(prefix="gnupg_", dir=".")
+        self.gpgbin = "gpg"
+        self.gpg = gnupg.GPG(gnupghome=self.gnupghome, gpgbinary=self.gpgbin)
+        self.gpg.encoding = 'utf-8'
+        self.keys = []
+        
+
+    def __call__(self, f):
+        @wraps(f)
+        def wrapped(*args, **kw):
+                for i in range(self.count):
+                    cfg = {
+                        "key_type": "RSA",
+                        "key_length": 1024,
+                        "name_real": "Test Key #%d" % i,
+                        "name_comment": "Test key for %s" % f.__class__.__name__,
+                        "name_email": "test-%d@example.com" % i,
+                        "passphrase": "secret"
+                    }
+                    key = self.gpg.gen_key(self.gpg.gen_key_input(**cfg))
+                    assert key is not None, "GPG key not generated"
+                    assert key.fingerprint is not None, "Key missing fingerprint"
+
+                    cfg.update({
+                        "key": key,
+                        "fingerprint": key.fingerprint,
+                        "key_id": key.fingerprint[-16:],
+                        "locations": ["http://www.example.com/pubkey/%s" % key.fingerprint[-16:] ] 
+                        })
+                    self.keys.append(cfg)
+                    kw["pgp_keys"] = self.keys
+                    kw["gnupghome"] = self.gnupghome
+                    kw["gpgbin"] = self.gpgbin
+
+                backup_props = [
+                    "lr.publish.signing.privatekeyid",
+                    "lr.publish.signing.passphrase",
+                    "lr.publish.signing.gnupghome",
+                    "lr.publish.signing.gpgbin",
+                    "lr.publish.signing.publickeylocations",
+                    "lr.publish.signing.signer"
+                ]
+                backup_conf = backup(backup_props)
+
+                config["app_conf"].update({
+                    "lr.publish.signing.privatekeyid": self.keys[0]["key_id"],
+                    "lr.publish.signing.passphrase": self.keys[0]["passphrase"],
+                    "lr.publish.signing.gnupghome": self.gnupghome,
+                    "lr.publish.signing.gpgbin": self.gpgbin,
+                    "lr.publish.signing.publickeylocations": '''["http://localhost/pubkey"]''',
+                    "lr.publish.signing.signer": "%s (%s)" % (self.keys[0]["name_real"], self.keys[0]["name_email"])
+                    })
+
+                reloadGPGConfig(config["app_conf"])
+
+                try:
+                    return f(*args, **kw)
+                finally:
+                    shutil.rmtree(self.gnupghome)
+                    restore(backup_conf)
+                    reloadGPGConfig(config["app_conf"])
+
+        return wrapped
+
+
+
+
+class TestReplacementDocsController(TestController):
+    _PUBLISH_UNSUCCESSFUL_MSG = "Publish was not successful"
+
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "publish"
+        
+        self.oauth_info = {
+                "name": "tester@example.com",
+                "full_name": "Joe Tester"
+        }
+
+        self.oauth_user = {
+           "_id": "org.couchdb.user:{0}".format(self.oauth_info["name"]),
+           "type": "user",
+           "name": self.oauth_info["name"],
+           "roles": [
+               "browserid"
+           ],
+           "browserid": True,
+           "oauth": {
+               "consumer_keys": {
+                   self.oauth_info["name"] : "ABC_consumer_key_123"
+               },
+               "tokens": {
+                   "node_sign_token": "QWERTY_token_ASDFGH",
+               }
+           },
+           "lrsignature": {
+               "full_name": self.oauth_info["full_name"]
+           }
+        }
+
+        self.bauth_user = {
+                "name": "mrbasicauth",
+                "password": "ABC_123"
+        }
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    @make_gpg_keys(1)
+    def test_publish_replacement_docs(self, **kw):
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        def gen_doc_id():
+            base_doc_id = 'urn:{domain}:nosetest:{uuid}'.format(domain=socket.gethostname(), uuid=uuid.uuid1())
+            rev = 0
+            while True:
+                yield "%s-%d" % (base_doc_id, rev)
+                rev += 1
+        doc_id = gen_doc_id();
+          
+        base_rd3 = {
+            'TOS': {
+                      'submission_attribution': 'Example', 
+                      'submission_TOS': 'http://example.com/terms'
+                    }, 
+            'payload_placement': 'inline', 
+            'active': True, 
+            'resource_locator': 'http://example.com', 
+            'identity': {
+                'submitter': 'Test Agent', 
+                'submitter_type': 'agent'
+            }, 
+            'doc_type': 'resource_data', 
+            'resource_data': {
+                "testing":"data", 
+                "version":0
+            },
+            'resource_data_type': 'metadata', 
+            'payload_schema_locator': 'http://example.com/schema/locator', 
+            'payload_schema': ['example'], 
+            'doc_version': '0.23.0'
+        }
+
+        key = kw["pgp_keys"][0]
+
+        signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        replacements = []
+        for i in range(10):
+            rd3 = copy.deepcopy(base_rd3)
+            new_id = doc_id.next()
+            rd3.update({
+                    "doc_ID": new_id,
+                    "resource_data": {
+                        "testing": "data",
+                        "version": i
+                    }
+                })
+            if len(replacements) > 0:
+                rd3["replaces"] = [ replacements[-1]["doc_ID"] ]
+                rd3["doc_version"] = '0.49.0'
+
+            signed_rd3 = signer.sign(rd3)
+
+            replacements.append(signed_rd3)
+
+            data = { "documents": [signed_rd3] }
+
+            result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+                assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+                assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
+                assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                published_document = db[docResults['doc_ID']]
+                assert published_document['digital_signature']['key_owner'] == replacements[-1]['digital_signature']['key_owner'], "key_owner doesn't match"
+                assert published_document['digital_signature']['signature'] == replacements[-1]['digital_signature']['signature'], "signature doesn't match"
+
+                if "replaces" in published_document:
+                    for repl_doc_id in published_document["replaces"]:
+                        repl_doc = db[repl_doc_id]
+
+                        TombstoneValidator.validate_model(repl_doc)
+
+                        assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
+  
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    @make_gpg_keys(1)
+    def test_publish_resource_over_tombstone(self, **kw):
+        '''This creates a resource, tombstones it with a replacement, then tries to publish a resource
+           with the same doc_ID as the tombstoned resource, which is expected to fail.'''
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        def gen_doc_id():
+            base_doc_id = 'urn:{domain}:nosetest:{uuid}'.format(domain=socket.gethostname(), uuid=uuid.uuid1())
+            rev = 0
+            while True:
+                yield "%s-%d" % (base_doc_id, rev)
+                rev += 1
+        doc_id = gen_doc_id();
+          
+        base_rd3 = {
+            'TOS': {
+                      'submission_attribution': 'Example', 
+                      'submission_TOS': 'http://example.com/terms'
+                    }, 
+            'payload_placement': 'inline', 
+            'active': True, 
+            'resource_locator': 'http://example.com', 
+            'identity': {
+                'submitter': 'Test Agent', 
+                'submitter_type': 'agent'
+            }, 
+            'doc_type': 'resource_data', 
+            'resource_data': {
+                "testing":"data", 
+                "version":0
+            },
+            'resource_data_type': 'metadata', 
+            'payload_schema_locator': 'http://example.com/schema/locator', 
+            'payload_schema': ['example'], 
+            'doc_version': '0.23.0'
+        }
+
+        key = kw["pgp_keys"][0]
+
+        signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        replacements = []
+        for i in range(2):
+            rd3 = copy.deepcopy(base_rd3)
+            new_id = doc_id.next()
+            rd3.update({
+                    "doc_ID": new_id,
+                    "resource_data": {
+                        "testing": "data",
+                        "version": i
+                    }
+                })
+            if len(replacements) > 0:
+                rd3["replaces"] = [ replacements[-1]["doc_ID"] ]
+                rd3["doc_version"] = '0.49.0'
+
+            signed_rd3 = signer.sign(rd3)
+
+            replacements.append(signed_rd3)
+
+            data = { "documents": [signed_rd3] }
+
+
+            result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+                assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+                assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
+                assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                published_document = db[docResults['doc_ID']]
+                assert published_document['digital_signature']['key_owner'] == replacements[-1]['digital_signature']['key_owner'], "key_owner doesn't match"
+                assert published_document['digital_signature']['signature'] == replacements[-1]['digital_signature']['signature'], "signature doesn't match"
+
+                if "replaces" in published_document:
+                    for repl_doc_id in published_document["replaces"]:
+                        repl_doc = db[repl_doc_id]
+
+                        TombstoneValidator.validate_model(repl_doc)
+
+                        assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
+
+        data = { "documents": replacements[0:1] }
+        result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+        assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+        assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+        for index, docResults in enumerate(result['document_results']):
+            # import pdb; pdb.set_trace()
+            assert(docResults['OK'] == False), "Publish should not have succeeded for doc_ID: {0}.".format(data['documents'][index]['doc_ID'])      
+            
+            published_document = db[data['documents'][index]['doc_ID']]
+
+            TombstoneValidator.validate_model(published_document)
+
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    @make_gpg_keys(1)
+    def test_publish_replacement_existing_tombstone(self, **kw):
+        '''publishes 1 resource, 2 updates.  1st update should successfully tombstone the first, and the second should
+           try to tombstone both 1 and 2, however should fail on first, succeed on second'''
+
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        def gen_doc_id():
+            base_doc_id = 'urn:{domain}:nosetest:{uuid}'.format(domain=socket.gethostname(), uuid=uuid.uuid1())
+            rev = 0
+            while True:
+                yield "%s-%d" % (base_doc_id, rev)
+                rev += 1
+        doc_id = gen_doc_id();
+          
+        base_rd3 = {
+            'TOS': {
+                      'submission_attribution': 'Example', 
+                      'submission_TOS': 'http://example.com/terms'
+                    }, 
+            'payload_placement': 'inline', 
+            'active': True, 
+            'resource_locator': 'http://example.com', 
+            'identity': {
+                'submitter': 'Test Agent', 
+                'submitter_type': 'agent'
+            }, 
+            'doc_type': 'resource_data', 
+            'resource_data': {
+                "testing":"data", 
+                "version":0
+            },
+            'resource_data_type': 'metadata', 
+            'payload_schema_locator': 'http://example.com/schema/locator', 
+            'payload_schema': ['example'], 
+            'doc_version': '0.23.0'
+        }
+
+        key = kw["pgp_keys"][0]
+
+        signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        replacements = []
+        tombstoned_by = { }
+        for i in range(5):
+            rd3 = copy.deepcopy(base_rd3)
+            new_id = doc_id.next()
+            rd3.update({
+                    "doc_ID": new_id,
+                    "resource_data": {
+                        "testing": "data",
+                        "version": i
+                    }
+                })
+
+            # tombstone all previous docs
+            if len(replacements) > 0:
+                rd3["replaces"] = map(lambda x: x["doc_ID"], replacements)
+                rd3["doc_version"] = '0.49.0'
+                tombstoned_by[replacements[-1]["doc_ID"]] = rd3["doc_ID"]
+
+            signed_rd3 = signer.sign(rd3)
+
+            replacements.append(signed_rd3)
+
+            data = { "documents": [signed_rd3] }
+
+            result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+                assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+                assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
+                assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                published_document = db[docResults['doc_ID']]
+                assert published_document['digital_signature']['key_owner'] == replacements[-1]['digital_signature']['key_owner'], "key_owner doesn't match"
+                assert published_document['digital_signature']['signature'] == replacements[-1]['digital_signature']['signature'], "signature doesn't match"
+
+                if "replaces" in published_document:
+                    for repl_doc_id in published_document["replaces"]:
+                        repl_doc = db[repl_doc_id]
+
+                        TombstoneValidator.validate_model(repl_doc)
+
+                        assert repl_doc["replaced_by"]["doc_ID"] == tombstoned_by[repl_doc["doc_ID"]], "Tombstone has wrong replacement doc_ID."
+                          
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    @make_gpg_keys(2)
+    def test_publish_replacement_conflict(self, **kw):
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        def gen_doc_id():
+            base_doc_id = 'urn:{domain}:nosetest:{uuid}'.format(domain=socket.gethostname(), uuid=uuid.uuid1())
+            rev = 0
+            while True:
+                yield "%s-%d" % (base_doc_id, rev)
+                rev += 1
+        doc_id = gen_doc_id();
+          
+        base_rd3 = {
+            'TOS': {
+                      'submission_attribution': 'Example', 
+                      'submission_TOS': 'http://example.com/terms'
+                    }, 
+            'payload_placement': 'inline', 
+            'active': True, 
+            'resource_locator': 'http://example.com', 
+            'identity': {
+                'submitter': 'Test Agent', 
+                'submitter_type': 'agent'
+            }, 
+            'doc_type': 'resource_data', 
+            'resource_data': {
+                "testing":"data", 
+                "version":0
+            },
+            'resource_data_type': 'metadata', 
+            'payload_schema_locator': 'http://example.com/schema/locator', 
+            'payload_schema': ['example'], 
+            'doc_version': '0.49.0'
+        }
+
+        replacements = []
+        for i in range(2):
+            key = kw["pgp_keys"][i]
+
+            signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+            rd3 = copy.deepcopy(base_rd3)
+            new_id = doc_id.next()
+            rd3.update({
+                    "doc_ID": new_id,
+                    "resource_data": {
+                        "testing": "data",
+                        "version": i
+                    }
+                })
+            if len(replacements) > 0:
+                rd3["replaces"] = [ replacements[-1]["doc_ID"] ]
+                rd3["doc_version"] = '0.49.0'
+
+            signed_rd3 = signer.sign(rd3)
+
+            last_id = new_id
+            replacements.append(signed_rd3)
+
+            data = { "documents": [signed_rd3] }
+
+            result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+                assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+                assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
+                assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                published_document = db[docResults['doc_ID']]
+                assert published_document['digital_signature']['key_owner'] == replacements[-1]['digital_signature']['key_owner'], "key_owner doesn't match"
+                assert published_document['digital_signature']['signature'] == replacements[-1]['digital_signature']['signature'], "signature doesn't match"
+
+                if "replaces" in published_document:
+                    for repl_doc_id in published_document["replaces"]:
+                        repl_doc = db[repl_doc_id]
+                        
+                        ## since the replacement is invalid (uses different signing key, no tombstone should have been)
+                        ResourceDataModelValidator.validate_model(repl_doc)
+
+
+
+
 
 class TestPublisherController(TestController):
 
@@ -56,6 +538,9 @@ class TestPublisherController(TestController):
 
     def test_index(self):
         pass
+
+               
+
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_publish_specified_doc_id(self):
