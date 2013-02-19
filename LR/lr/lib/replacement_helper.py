@@ -2,8 +2,8 @@ from pylons import config
 from lr.lib import SpecValidationException
 from lr.lib.signing import get_verification_info
 from lr.lib.helpers import nowToISO8601Zformat
-from lr.plugins import LRPluginManager, ITombstonePolicy
-from lr.lib.schema_helper import ResourceDataModelValidator
+from lr.plugins import LRPluginManager, ITombstonePolicy, DoNotPublishError
+from lr.lib.schema_helper import ResourceDataModelValidator, TombstoneValidator
 
 import copy, couchdb, logging
 
@@ -89,6 +89,8 @@ class ResourceDataReplacement():
         for plugin in LRPluginManager.getPlugins(ITombstonePolicy.ID):
             try:
                 allowTombstone = allowTombstone & plugin.permit(orig_doc, orig_doc_info, replacement_rd3, replacement_rd3_info)
+            except DoNotPublishError, e:
+                raise e
             except Exception, e:
                 log.exception("Plugin raised exception: %s", e)
                 allowTombstone = False
@@ -100,20 +102,22 @@ class ResourceDataReplacement():
 
         return allowTombstone
 
-    def _has_graveyard_permit(self, replacement_rd3, replacement_rd3_info, graveyard):
-        grantPermit = True
-        for plugin in LRPluginManager.getPlugins(ITombstonePolicy.ID):
+    def _has_graveyard_permit(self, replacement_rd3, replacement_rd3_info, graveyard, existing_gravestones):
+        grantPermit = False
+        numPlugins = LRPluginManager.getPluginCount(ITombstonePolicy.ID)
+        for num, plugin in enumerate(LRPluginManager.getPlugins(ITombstonePolicy.ID), 1):
             try:
                 grantPermit = grantPermit | plugin.permit_burial(replacement_rd3, replacement_rd3_info, graveyard)
             except Exception, e:
                 log.exception("Plugin raised exception: %s", e)
                 grantPermit = False
                 
-            if not grantPermit:
+            if grantPermit or num == numPlugins:
                 break
         else:
             grantPermit = True
 
+        log.debug("graveyard permit granted? %s", grantPermit)
         return grantPermit
 
     def handle(self, replacement_rd3):
@@ -128,6 +132,7 @@ class ResourceDataReplacement():
             replacement_rd3_info = get_verification_info(replacement_rd3)
             if replacement_rd3_info is not None:
                 graveyard = []
+                existing_gravestones = []
                 for orig_doc_id in replacement_rd3[_REPLACES]:
                     try:
                         orig_doc = self.db[orig_doc_id]
@@ -136,8 +141,13 @@ class ResourceDataReplacement():
                         orig_doc = None
                         orig_doc_info = None
 
-                    # verify that tombstones
-                    permitted = self._check_if_permitted(replacement_rd3, replacement_rd3_info, orig_doc, orig_doc_info)
+                    if orig_doc is not None and orig_doc["doc_type"] == "tombstone":
+                        permitted = True
+                        existing_gravestones.append(orig_doc)
+                    else:
+                        # verify that tombstones
+                        permitted = self._check_if_permitted(replacement_rd3, replacement_rd3_info, orig_doc, orig_doc_info)
+                    
                     log.debug("handle: permitted? {0}".format(permitted))
                     if permitted:
                         tombstone = self._make_tombstone(replacement_rd3, replacement_rd3_info, orig_doc_id, orig_doc)               
@@ -145,16 +155,21 @@ class ResourceDataReplacement():
                     else:
                         log.debug("Replacement resource not permitted to be saved.")
 
+                # this should save unless a permit plugin has thrown an exception to disallow saving
+                result = ResourceDataModelValidator.save(replacement_rd3, skip_validation=True)
 
-                if self._has_graveyard_permit(replacement_rd3, replacement_rd3_info, graveyard):
-                    result = ResourceDataModelValidator.save(replacement_rd3, skip_validation=True)
+                if self._has_graveyard_permit(replacement_rd3, replacement_rd3_info, graveyard, existing_gravestones):
                     for tombstone in graveyard:
-                        self.db[tombstone["_id"]] = tombstone 
-                    return result
+                        try:
+                            self.db[tombstone["_id"]] = tombstone
+                        except:
+                            # if this is already a tombstone, then it's okay - first wins
+                            TombstoneValidator.validate_model(self.db[tombstone["_id"]])
+                # else:
+                #     # import pdb; pdb.set_trace()
+                #     raise SpecValidationException("Node policy does not permit this resource published.")
 
-                else:
-                    # import pdb; pdb.set_trace()
-                    raise SpecValidationException("Node policy does not permit this resource published.")
+                return result
 
         # we get here because it's not a replacement.
         return ResourceDataModelValidator.save(replacement_rd3, skip_validation=True)

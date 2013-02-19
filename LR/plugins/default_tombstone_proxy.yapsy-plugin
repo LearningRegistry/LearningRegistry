@@ -1,5 +1,5 @@
 [Core]
-Name = Default Tombstoning Plugin
+Name = Default Proxy Tombstone Plugin
 Module = default_tombstone_proxy
    
 [Documentation]

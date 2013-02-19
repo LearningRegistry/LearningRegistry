@@ -100,9 +100,12 @@ def get_verification_info(document, attempt=0):
     return None
 
        
-
+_node_key_info = None
 def get_node_key_info():
-    return gpg.list_keys(privateKeyID)[0]
+    global _node_key_info
+    if _node_key_info == None or _node_key_info['fingerprint'][-16:] != config["app_conf"]["lr.publish.signing.privatekeyid"][-16:]:
+        _node_key_info = gpg.list_keys(privateKeyID)[0]
+    return _node_key_info
 
 def get_node_public_key():
     return gpg.export_keys(privateKeyID)

@@ -2,6 +2,9 @@
 
 from lr.plugins.base import BasePlugin
 
+class DoNotPublishError(Exception):
+  pass
+
 class ITombstonePolicy(BasePlugin):
     
     def __init__(self):
@@ -14,7 +17,7 @@ class ITombstonePolicy(BasePlugin):
 
         raise NotImplementedError("permit function must be implemented.")
 
-    def permit_burial(self, replacement_rd3=None, replacement_crypto=None, graveyard=[]):
+    def permit_burial(self, replacement_rd3=None, replacement_crypto=None, graveyard=[], existing_gravestones=[]):
         '''This is executed to validate that for the specified replacement_rd3, all tombstones in
            the graveyard are allowed to be buried. Use this to implement a specific node policy.
            Return True to permit tombstone persistence and replacement_rd3 persistence, False otherwise.'''

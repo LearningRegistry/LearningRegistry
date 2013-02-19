@@ -3,10 +3,10 @@ import imp, os, sys
 from pylons import config
 from yapsy.PluginManager import PluginManager
 from yapsy import log, NormalizePluginNameForModuleName, IPlugin
-from lr.plugins.tombstones import ITombstonePolicy
+from lr.plugins.tombstones import ITombstonePolicy, DoNotPublishError
 import lr.loaded_plugins
 
-__ALL__ = ["init_plugins", "LRPluginManager", "ITombstonePolicy"]
+__ALL__ = ["init_plugins", "LRPluginManager", "ITombstonePolicy", "DoNotPublishError"]
 
 
 
@@ -125,6 +125,12 @@ class __PluginManager(object):
         if category is not None:
             for pluginInfo in self.manager.getPluginsOfCategory(category):
                 yield pluginInfo.plugin_object
+
+    def getPluginCount(self, category=None):
+        if category is not None:
+            return len(self.manager.getPluginsOfCategory(category))
+        else:
+            return 0
 
 _LRPluginManager = None
 def init_plugins():

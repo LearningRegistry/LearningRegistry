@@ -59,12 +59,15 @@ class make_gpg_keys(object):
                         "key": key,
                         "fingerprint": key.fingerprint,
                         "key_id": key.fingerprint[-16:],
-                        "locations": ["http://www.example.com/pubkey/%s" % key.fingerprint[-16:] ] 
+                        "locations": ["http://www.example.com/pubkey/%s" % key.fingerprint[-16:] ],
+                        "owner": "%s (%s)" % (cfg["name_real"], cfg["name_email"]) 
                         })
                     self.keys.append(cfg)
-                    kw["pgp_keys"] = self.keys
-                    kw["gnupghome"] = self.gnupghome
-                    kw["gpgbin"] = self.gpgbin
+
+                kw["pgp_keys"] = self.keys
+                kw["gnupghome"] = self.gnupghome
+                kw["gpgbin"] = self.gpgbin
+                kw["gpg"] = self.gpg
 
                 backup_props = [
                     "lr.publish.signing.privatekeyid",
@@ -82,7 +85,7 @@ class make_gpg_keys(object):
                     "lr.publish.signing.gnupghome": self.gnupghome,
                     "lr.publish.signing.gpgbin": self.gpgbin,
                     "lr.publish.signing.publickeylocations": '''["http://localhost/pubkey"]''',
-                    "lr.publish.signing.signer": "%s (%s)" % (self.keys[0]["name_real"], self.keys[0]["name_email"])
+                    "lr.publish.signing.signer": self.keys[0]["owner"]
                     })
 
                 reloadGPGConfig(config["app_conf"])
@@ -132,6 +135,33 @@ class TestReplacementDocsController(TestController):
            }
         }
 
+
+        self.oauth_info2 = {
+                "name": "tester2@example.com",
+                "full_name": "Jane Tester"
+        }
+
+        self.oauth_user2 = {
+           "_id": "org.couchdb.user:{0}".format(self.oauth_info2["name"]),
+           "type": "user",
+           "name": self.oauth_info2["name"],
+           "roles": [
+               "browserid"
+           ],
+           "browserid": True,
+           "oauth": {
+               "consumer_keys": {
+                   self.oauth_info2["name"] : "XXX_ABC_consumer_key_123"
+               },
+               "tokens": {
+                   "node_sign_token": "XXX_QWERTY_token_ASDFGH",
+               }
+           },
+           "lrsignature": {
+               "full_name": self.oauth_info2["full_name"]
+           }
+        }
+
         self.bauth_user = {
                 "name": "mrbasicauth",
                 "password": "ABC_123"
@@ -140,6 +170,8 @@ class TestReplacementDocsController(TestController):
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     @make_gpg_keys(1)
     def test_publish_replacement_docs(self, **kw):
+        '''test_publish_replacement_docs: publishes 10 docs. each subsequent doc replaces the previous.
+           the first document published is version 0.23.0'''
         s = Server(config["app_conf"]['couchdb.url.dbadmin'])
         db = s[config["app_conf"]['couchdb.db.resourcedata']]
 
@@ -219,11 +251,224 @@ class TestReplacementDocsController(TestController):
 
                         assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
   
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
+    @make_gpg_keys(1)
+    @decorators.OAuthRequest(path="/publish", http_method="POST")
+    def test_publish_proxy_signed_replacement_docs(self, **kw):
+        '''test_publish_proxy_signed_replacement_docs: publishes 10 documents by proxy signing. subsequent documents
+           are published to replace the previous document.'''
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        def gen_doc_id():
+            base_doc_id = 'urn:{domain}:nosetest:{uuid}'.format(domain=socket.gethostname(), uuid=uuid.uuid1())
+            rev = 0
+            while True:
+                yield "%s-%d" % (base_doc_id, rev)
+                rev += 1
+        doc_id = gen_doc_id();
+          
+        base_rd3 = {
+            'TOS': {
+                      'submission_attribution': 'Example', 
+                      'submission_TOS': 'http://example.com/terms'
+                    }, 
+            'payload_placement': 'inline', 
+            'active': True, 
+            'resource_locator': 'http://example.com', 
+            'doc_type': 'resource_data', 
+            'resource_data': {
+                "testing":"data", 
+                "version":0
+            },
+            'resource_data_type': 'metadata', 
+            'payload_schema_locator': 'http://example.com/schema/locator', 
+            'payload_schema': ['example'], 
+            'doc_version': '0.23.0'
+        }
+
+        key = kw["pgp_keys"][0]
+        gpg = kw["gpg"]
+
+        # signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        replacements = []
+        for i in range(10):
+            rd3 = copy.deepcopy(base_rd3)
+            new_id = doc_id.next()
+            rd3.update({
+                    "doc_ID": new_id,
+                    "resource_data": {
+                        "testing": "data",
+                        "version": i
+                    }
+                })
+            if len(replacements) > 0:
+                rd3["replaces"] = [ replacements[-1]["doc_ID"] ]
+                rd3["doc_version"] = '0.49.0'
+
+            # signed_rd3 = signer.sign(rd3)
+
+            replacements.append(rd3)
+
+            data = { "documents": [rd3] }
+
+            h={}
+            h.update(headers)
+            h.update(self.oauth.header)
+
+            result = json.loads(self.app.post(self.oauth.path, params=json.dumps(data), headers=h, extra_environ=self.oauth.env).body)
+
+            # result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+                assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+                assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
+                assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                published_document = db[docResults['doc_ID']]
+                assert published_document['identity']['signer'] == key['owner'], "unexpected signer."
+                
+                v = gpg.verify(published_document['digital_signature']['signature'])
+                assert v.fingerprint == key["fingerprint"], "signature does not use node key."
+
+                if "replaces" in published_document:
+                    for repl_doc_id in published_document["replaces"]:
+                        repl_doc = db[repl_doc_id]
+
+                        TombstoneValidator.validate_model(repl_doc)
+
+                        assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
+
+    
+    @decorators.OAuthRequest(path="/publish", http_method="POST", oauth_user_attrib="oauth_user")
+    def publish_user_1(self, data):
+        h={}
+        h.update(headers)
+        h.update(self.oauth.header)
+
+        result = json.loads(self.app.post(self.oauth.path, params=json.dumps(data), headers=h, extra_environ=self.oauth.env).body)
+        return result
+
+    @decorators.OAuthRequest(path="/publish", http_method="POST", oauth_user_attrib="oauth_user2")
+    def publish_user_2(self, data):
+        h={}
+        h.update(headers)
+        h.update(self.oauth.header)
+
+        result = json.loads(self.app.post(self.oauth.path, params=json.dumps(data), headers=h, extra_environ=self.oauth.env).body)
+        return result
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
+    @make_gpg_keys(1)
+    def test_multi_user_publish_proxy_signed_replacement_docs(self, **kw):
+        '''test_multi_user_publish_proxy_signed_replacement_docs: publishes 2 documents by proxy signing with different users. second document
+           published attempts to replace the previous document, however should fail in replacement AND in publishing.'''
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+
+        def gen_doc_id():
+            base_doc_id = 'urn:{domain}:nosetest:{uuid}'.format(domain=socket.gethostname(), uuid=uuid.uuid1())
+            rev = 0
+            while True:
+                yield "%s-%d" % (base_doc_id, rev)
+                rev += 1
+        doc_id = gen_doc_id();
+          
+        base_rd3 = {
+            'TOS': {
+                      'submission_attribution': 'Example', 
+                      'submission_TOS': 'http://example.com/terms'
+                    }, 
+            'payload_placement': 'inline', 
+            'active': True, 
+            'resource_locator': 'http://example.com', 
+            'doc_type': 'resource_data', 
+            'resource_data': {
+                "testing":"data", 
+                "version":0
+            },
+            'resource_data_type': 'metadata', 
+            'payload_schema_locator': 'http://example.com/schema/locator', 
+            'payload_schema': ['example'], 
+            'doc_version': '0.49.0'
+        }
+
+        key = kw["pgp_keys"][0]
+        gpg = kw["gpg"]
+
+        # signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        publish_it = [
+            self.publish_user_1,
+            self.publish_user_2
+        ]
+
+        replacements = []
+        for i in range(2):
+            rd3 = copy.deepcopy(base_rd3)
+            new_id = doc_id.next()
+            rd3.update({
+                    "doc_ID": new_id,
+                    "resource_data": {
+                        "testing": "data",
+                        "version": i
+                    }
+                })
+            if len(replacements) > 0:
+                rd3["replaces"] = [ replacements[-1]["doc_ID"] ]
+                rd3["doc_version"] = '0.49.0'
+
+            # signed_rd3 = signer.sign(rd3)
+
+            replacements.append(rd3)
+
+            data = { "documents": [rd3] }
+
+            result = publish_it[i](data)
+
+            # h={}
+            # h.update(headers)
+            # h.update(self.oauth.header)
+
+            # result = json.loads(self.app.post(self.oauth.path, params=json.dumps(data), headers=h, extra_environ=self.oauth.env).body)
+
+            # result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+                
+                if "replaces" not in data['documents'][index]:
+                    assert(docResults['OK'] == True), "Publish should succeed for doc_ID {0}".format(data['documents'][index]['doc_ID'])
+                    assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
+                    assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                    published_document = db[docResults['doc_ID']]
+                    
+                    ResourceDataModelValidator.validate_model(published_document)
+
+                    assert published_document['identity']['signer'] == key['owner'], "unexpected signer."
+                    
+                    v = gpg.verify(published_document['digital_signature']['signature'])
+                    assert v.fingerprint == key["fingerprint"], "signature does not use node key."
+
+                elif "replaces" in data['documents'][index]:
+                    assert(docResults['OK'] == False), "Publish should fail for doc_ID {0}".format(data['documents'][index]['doc_ID'])
+                    for repl_doc_id in data['documents'][index]["replaces"]:
+                        repl_doc = db[repl_doc_id]
+
+                        ResourceDataModelValidator.validate_model(repl_doc)
+
+                        # assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
+
+
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     @make_gpg_keys(1)
     def test_publish_resource_over_tombstone(self, **kw):
-        '''This creates a resource, tombstones it with a replacement, then tries to publish a resource
+        '''test_publish_resource_over_tombstone: This creates a resource, tombstones it with a replacement, then tries to publish a resource
            with the same doc_ID as the tombstoned resource, which is expected to fail.'''
         s = Server(config["app_conf"]['couchdb.url.dbadmin'])
         db = s[config["app_conf"]['couchdb.db.resourcedata']]
@@ -322,7 +567,7 @@ class TestReplacementDocsController(TestController):
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     @make_gpg_keys(1)
     def test_publish_replacement_existing_tombstone(self, **kw):
-        '''publishes 1 resource, 2 updates.  1st update should successfully tombstone the first, and the second should
+        '''test_publish_replacement_existing_tombstone: publishes 1 resource, 2 updates.  1st update should successfully tombstone the first, and the second should
            try to tombstone both 1 and 2, however should fail on first, succeed on second'''
 
         s = Server(config["app_conf"]['couchdb.url.dbadmin'])
@@ -401,17 +646,23 @@ class TestReplacementDocsController(TestController):
                 assert published_document['digital_signature']['signature'] == replacements[-1]['digital_signature']['signature'], "signature doesn't match"
 
                 if "replaces" in published_document:
-                    for repl_doc_id in published_document["replaces"]:
+                    for pos, repl_doc_id in enumerate(published_document["replaces"]):
                         repl_doc = db[repl_doc_id]
 
                         TombstoneValidator.validate_model(repl_doc)
 
-                        assert repl_doc["replaced_by"]["doc_ID"] == tombstoned_by[repl_doc["doc_ID"]], "Tombstone has wrong replacement doc_ID."
+                        if pos < (len(published_document["replaces"])-1):
+                            assert repl_doc["replaced_by"]["doc_ID"] != tombstoned_by[repl_doc["doc_ID"]], "Tombstone was expected to be set by some other doc_ID."
+                        else:
+                            assert repl_doc["replaced_by"]["doc_ID"] == tombstoned_by[repl_doc["doc_ID"]], "Tombstone was expected to have been set by the replacement."
                           
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     @make_gpg_keys(2)
     def test_publish_replacement_conflict(self, **kw):
+        '''test_publish_replacement_conflict: Publish 2 documents each signed with different keys. The 
+           second document tries to replace the first, which should fail, however the first document is
+           permited to be published'''
         s = Server(config["app_conf"]['couchdb.url.dbadmin'])
         db = s[config["app_conf"]['couchdb.db.resourcedata']]
 
@@ -477,7 +728,7 @@ class TestReplacementDocsController(TestController):
             assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
             assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
             for index, docResults in enumerate(result['document_results']):
-                assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+                assert(docResults['OK'] == True), "Publish should work for doc_ID {0}".format(data['documents'][index]['doc_ID'])
                 assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])  
                 assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
                 published_document = db[docResults['doc_ID']]
@@ -532,14 +783,7 @@ class TestPublisherController(TestController):
         self.bauth_user = {
                 "name": "mrbasicauth",
                 "password": "ABC_123"
-        }
-
-
-
-    def test_index(self):
-        pass
-
-               
+        }          
 
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
