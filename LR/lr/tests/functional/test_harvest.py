@@ -81,7 +81,8 @@ class TestHarvestController(TestController):
     def validate_getrecord_id_doesnot_exist(self,resp):
         doc = json.loads(resp.body)
         assert doc.has_key("OK") and not doc["OK"]
-        assert doc.has_key("error") and doc['error'] == "idDoesNotExist"        
+        assert doc.has_key("error") and doc['error'] == "idDoesNotExist"
+
     @ForceCouchDBIndexing()
     def test_getrecord_get_by_doc_id(self):
         response = self.app.get(url('harvest', id='getrecord',request_ID=self.ids[0], by_doc_ID=True))

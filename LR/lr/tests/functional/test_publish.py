@@ -987,6 +987,7 @@ class TestPublisherController(TestController):
             published_document = db[docResults['doc_ID']]
             assert published_document['digital_signature']['key_owner'] == document['digital_signature']['key_owner'], "key_owner doesn't match"
             assert published_document['digital_signature']['signature'] == document['digital_signature']['signature'], "signature doesn't match"
+            assert published_document['identity']['signer'] == document['identity']['signer'], "signer doesn't match"
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
     @decorators.OAuthRequest(path="/publish", http_method="POST")
@@ -1029,6 +1030,57 @@ class TestPublisherController(TestController):
             published_document = db[docResults['doc_ID']]
             assert 'digital_signature' in published_document
             assert 'signature' in published_document['digital_signature']
+
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=True, oauth=False))
+    @decorators.BasicAuthRequest(bauth_user_attrib="bauth_user", bauth_info_attrib="bauth")
+    def test_auto_signature_dont_sign_basic(self):
+        document = {'update_timestamp': '2011-11-07T14:51:07.137671Z',
+                    'TOS': {
+                              'submission_attribution': 'Smithsonian Education',
+                              'submission_TOS': 'http://si.edu/Termsofuse'
+                            },
+                            'payload_placement': 'inline',
+                            'active': True,
+                            'resource_locator': 'http://example.com',
+                            'digital_signature': {
+                                'key_location': ['http://www.example.com/key'],
+                                'key_owner': u'walt grata <wegrata@gmail.com>',
+                                'signing_method': 'LR-PGP.1.0',
+                                'signature': '-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\n\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1.4.11 (GNU/Linux)\n\niQEcBAEBAgAGBQJQUzHaAAoJEMNbqtmn2aps0CwH/j63/T2tkLv2dCp3cU7vlPwG\n/vmi0Bq3dDvXOVDkFobY3mQcXxsLjExtN2PKKjqYZ+KWdLfOq36/77QAI7VOQ1+r\nXy3b7aWGMYEjtRmAUcO9Ov39aj2OCGZ8k2aPDhvL968v89X7B1v53wD1wi7+Lges\n1WfAfEyXrnWIVBNubNtuazLA4322K+CAI4bvYiecz4cw7J51xlhf7dacCZb+wts3\n+q1HxTMg3fIQ3l3Xd3SyHc48jXqyBlFpLr56UR0thwRC54fICgd/gEnebSbfVRXQ\nqAZXP6lF7/C9/m3ZDDjvV+vkQCmLLg8LMn7WStenJR1tB+KE/6MTVcY6JOucZIo=\n=DhqM\n-----END PGP SIGNATURE-----\n'
+                                },
+                                'identity': {
+                                    'signer': 'Smithsonian Education <learning@si.edu>',
+                                    'submitter': 'Brokers of Expertise on behalf of Smithsonian Education',
+                                    'submitter_type': 'agent',
+                                    'curator': 'Smithsonian Education',
+                                    'owner': 'Smithsonian American Art Museum'
+                                },
+                                'doc_type': 'resource_data',
+                                'resource_data': '\n<nsdl_dc:nsdl_dc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n xmlns:dc="http://purl.org/dc/elements/1.1/"\n xmlns:dct="http://purl.org/dc/terms/"\n xmlns:ieee="http://www.ieee.org/xsd/LOMv1p0"\n xmlns:nsdl_dc="http://ns.nsdl.org/nsdl_dc_v1.02/"\n schemaVersion="1.02.020"\n xsi:schemaLocation="http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd">\n <dc:identifier xsi:type="dct:URI">http://www.myboe.org/go/resource/23466</dc:identifier>\n <dc:title>Posters to Go</dc:title>\n <dc:description>PDF version of a set of fifteen posters from the National Portrait Gallery and the Smithsonian American Art Museum. Includes an application for receiving the actual posters for the classroom. Arranged into themes: Westward Expansion Civil War Harlem Renaissance World War II and the Sixties.</dc:description>\n <dc:creator/>\n <dc:language>en-US</dc:language>\n <dct:accessRights xsi:type="nsdl_dc:NSDLAccess">Free access</dct:accessRights>\n <dc:format>text/html</dc:format>\n <dc:date>2010-07-26</dc:date>\n <dct:modified>2010-07-26</dct:modified>\n</nsdl_dc:nsdl_dc>',
+                                'resource_data_type': 'metadata',
+                                'payload_schema_locator': 'http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd',
+                                'payload_schema': ['NSDL DC 1.02.020'],
+                                'doc_version': '0.23.0'}
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+        data = {
+            "documents":
+                    [document]
+                }
+        h = {}
+        h.update(headers)
+        h.update(self.bauth.header)
+
+        result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=h).body)
+        assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+        for index, docResults in enumerate(result['document_results']):
+            assert(docResults['OK'] == True), "Publish should work for doc version {0}".format(data['documents'][index]['doc_version'])
+            assert('doc_ID' in docResults), "Publish should return doc_ID for doc version {0}".format(data['documents'][index]['doc_version'])
+            published_document = db[docResults['doc_ID']]
+            assert published_document['digital_signature']['key_owner'] == document['digital_signature']['key_owner'], "key_owner doesn't match"
+            assert published_document['digital_signature']['signature'] == document['digital_signature']['signature'], "signature doesn't match"
+
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
     @decorators.OAuthRequest(path="/publish", http_method="POST")
