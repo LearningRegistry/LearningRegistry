@@ -90,7 +90,7 @@ def ForceCouchDBIndexing():
     }
 
     def indexTestData(obj):
-        
+
         opts = {
                 "startkey":"_design/",
                 "endkey": "_design0",
@@ -108,7 +108,10 @@ def ForceCouchDBIndexing():
                     # log.debug("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
-                    res = urllib2.urlopen(req)
+                    try:
+                        res = urllib2.urlopen(req)
+                    except Exception, e:
+                        log.info("Problem indexing: %s", req)
 #                    view_result = obj.db.view(view_name, **index_opts)
                     # log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
             else:
@@ -177,7 +180,10 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
                     # log.error("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
-                    res = urllib2.urlopen(req)
+                    try:
+                        res = urllib2.urlopen(req)
+                    except Exception, e:
+                        log.info("Problem forcing index: %s", e)
 #                    view_result = obj.db.view(view_name, **index_opts)
                     # log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
             else:

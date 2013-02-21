@@ -810,7 +810,7 @@ class TestOaiPmhController(TestController):
         
         try:
             (from_, until_) = self._get_timestamps(doc1, doc2)
-                
+             
             response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
             validate_xml_content_type(response)
             try:

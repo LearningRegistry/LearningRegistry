@@ -112,15 +112,18 @@ class oaipmh(harvest):
 
 
     def list_opts(self, metadataPrefix, from_date=None, until_date=None):
+        from datetime import datetime
         opts = {}
         if from_date != None:
-            opts["startkey"] = [metadataPrefix, from_date.isoformat()]
+            from_date_no_ms = datetime(from_date.year, from_date.month, from_date.day, from_date.hour, from_date.minute, from_date.second, 0, from_date.tzinfo)
+            opts["startkey"] = [metadataPrefix, from_date_no_ms.isoformat()]
         else:
             # empty string should sort before anything else.
             opts["startkey"] = [metadataPrefix, None]
 
         if until_date != None:
-            opts["endkey"] = [metadataPrefix, until_date.isoformat()]
+            until_date_no_ms = datetime(until_date.year, until_date.month, until_date.day, until_date.hour, until_date.minute, until_date.second, 0, until_date.tzinfo)
+            opts["endkey"] = [metadataPrefix, until_date_no_ms.isoformat()]
         else:
             # {} sorts at end of string sequence.
             opts["endkey"] = [metadataPrefix, {}]
