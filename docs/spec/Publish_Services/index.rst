@@ -1,22 +1,18 @@
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Publish Services: **Learning** **Registry** **Technical** **Specification** **V** **PS****:0.**49**.0**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+=======================================================================
+Publish Services: Learning Registry Technical Specification V PS:0.49.0
+=======================================================================
 
 Draft in Progress.
+
 See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
 
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
-
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
 This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
@@ -149,51 +145,51 @@ Do we need more to support trust?
 
 **API**
 
-        POST <node-service-endpoint-URL>/publish
+::
 
-    
+        POST <node-service-endpoint-URL>/publish
 
         Arguments:
 
             None
 
-        Request Object:                    // resource data to be published
+        Request Object:                 // resource data to be published
 
             {"documents": 
 
-                 [                    // array of
-
-             {resource_data_description}        // resource data description documents
-
-            ]}
+                [                       // array of
+                    {resource_data_description}   
+                                        // resource data description documents
+                ]
+                
+            }
 
         Results Object:
 
         {
 
-         "OK":        boolean,        // T if successful
+         "OK": boolean,                 // T if successful
 
-         "error":        "string",            // text describing global error
+         "error": "string",             // text describing global error
 
-                            // present only if NOT OK
+                                        // present only if NOT OK
 
         "document_results":
 
-        [                    // array of per document results
+        [                               // array of per document results
 
          {
 
-         "doc_ID":    "string",            // ID of the document
+         "doc_ID": "string",            // ID of the document
 
-         "OK":        boolean            // T if document was published
+         "OK": boolean                  // T if document was published
 
-         "error":        "string"            // text describing error or filter failure
+         "error": "string"              // text describing error or filter failure
 
-                            // present only if NOT OK
-
+                                        // present only if NOT OK
          }
 
-         ]
+        ]
 
         }
 
@@ -201,8 +197,8 @@ Do we need more to support trust?
 
             200
 
-            500
-
+            500            
+            
 **Basic** **Publish**
 
     // Publish each resource data description document in the supplied list
@@ -435,13 +431,11 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.jl9f1nnwcev4:
 
-**SWORD** **Publish** **Service**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+=====================
+SWORD Publish Service
+=====================
 
 `SWORD <http://www.google.com/url?q=http%3A%2F%2Fswordapp.org%2F&sa=D&sntz=1&usg=AFQjCNHNjbuSIPXGlVbbWTlOZJYcQXnMSQ>`_ (Simple Web-service Offering Repository Deposit) is a profile of the Atom Publishing Protocol (known as APP or ATOMPUB).
 The SWORD APP API provides a mechanism for a repository to publish its metadata or paradata to a node in the resource distribution network.
@@ -476,13 +470,11 @@ The service end points for the protocol operations are:
 Each of the protocol operations are specified separately.
 The Service Description document SHALL apply to the entire API.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.ku7eedtbq15d:
 
-**Retrieve** **Service** **Document**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+=========================
+Retrieve Service Document
+=========================
 
 The SWORD Service Document endpoint SHALL return an XML SWORD Service Document with the following settings:
 
@@ -617,13 +609,11 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 
                 </service>
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.2o7qqzkocz2j:
 
-**Create** **a** **Resource**
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+=================
+Create a Resource
+=================
 
     in a future draft of the specification
 
@@ -641,47 +631,50 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 
 **Service** **Description**
 
+::
+
     {
 
-         "doc_type":        "service_description",    
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "publish",
+        "service_type": "publish",
 
-     "service_name":    "SWORD APP Publish V1.3",
+        "service_name": "SWORD APP Publish V1.3",
 
-    "service_description":    "Service to publish resource description documents to a node using the SWORD 1.3 protocol",        
+        "service_description": "Service to publish resource description documents to a node using the SWORD 1.3 protocol",
 
-     "service_version":    "0.10.0",
+        "service_version": "0.10.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
+        "service_auth":                     // service authentication and authorization descriptions
 
-     {
+        {
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_authz": ["<authvalue>"], 
+                                            // authz values for the service
 
-     "service_key":        <T/F>,        // does service use an access key            
+            "service_key": < T / F > ,      // does service use an access key            
 
-     "service_https":    <T/F>        // does service require https
+            "service_https": < T / F >      // does service require https
 
-     },
+        },
 
-      "service_data":
+        "service_data":
 
-         {
+        {
 
-     "version":        "1.3"
+            "version": "1.3"
 
-     }
+        }
 
     }
 
@@ -689,13 +682,11 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.rfe7ga-6sbjly:
 
-**Basic** **Delete** **Service**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+====================
+Basic Delete Service
+====================
 
 The basic delete service "deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.
 
@@ -734,31 +725,34 @@ An implementation SHALL indicate any size limits in the service description.
 
             None
 
-        Request Object:                    // list of resource data descriptions to delete
+        Request Object:                 // list of resource data descriptions to delete
 
                 {"request_IDs":
 
-                [                    // array of
+                    [                   // array of
 
-                 doc_ID                    // resource data description document ID
+                     doc_ID             // resource data description document ID
 
-                                    // required
-
-            ]}
+                                        // required
+                    ]
+                
+                }
 
         Results Object:
 
                 {
 
-                 "OK":        boolean,        // T if successful
+                 "OK":        boolean,  
+                                        // T if successful
 
-                 "error":        "string",            // text describing global error
+                 "error":        "string",            
+                                        // text describing global error
 
-                                    // present only if NOT OK
+                                        // present only if NOT OK
 
                 "document_results":
 
-                [                    // array of per document results
+                [                       // array of per document results
 
                  {
 
