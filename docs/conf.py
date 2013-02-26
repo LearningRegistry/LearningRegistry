@@ -91,7 +91,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'haiku'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -165,6 +165,8 @@ html_static_path = ['_static']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'LearningRegistrydoc'
+
+html_style = "main.css"
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -240,3 +242,11 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+rst_prolog = '''
+.. role:: deprecation
+
+.. role:: deletions
+
+.. role:: changes
+'''

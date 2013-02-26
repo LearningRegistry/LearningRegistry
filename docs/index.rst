@@ -13,7 +13,7 @@ Contents:
 
    Services Specification <spec/Technical_Spec/index>
 
-   Python API <pyapi/modules>
+   Node Installation <install/index>
 
 
 

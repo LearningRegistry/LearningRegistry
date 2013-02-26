@@ -1,32 +1,27 @@
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.yz89tlej507o:
-
+==================================================
 Learning Registry Technical Specification V 0.49.0
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+==================================================
 
-**Draft** **in** **Progress****.
-****See** **the** :ref:`**Change**<h.q7vwu59mjki6>` :ref:`**Log**<h.q7vwu59mjki6>` **for** **links** **to** **prior** **stable** **versions****.
-**
+**Draft in Progres**.
+**See the  :ref:`Change Log**<h.q7vwu59mjki6>` for links to prior stable versions**.
 
-:changes:`**Shading**`:changes:` `:changes:`**indicates**`:changes:` `:changes:`**major**`:changes:` `:changes:`**changes**`:changes:` `:changes:`**and**`:changes:` `:changes:`**additions**`:changes:` `:changes:`**from**`:changes:` `:changes:`**the**`:changes:` `:changes:`**prior**`:changes:` `:changes:`**version**`:changes:`** (0.24.0).
-**`:changes:`**Also**`:changes:` `:changes:`**indicated**`:changes:` `:changes:`**with**`:changes:` `▲:changes:`.`
+:changes:`**Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with** ▲.`
 
-:deletions:`**Significant**`:deletions:` `:deletions:`**deletions**`:deletions:` `:deletions:`**are**`:deletions:` `:deletions:`**shaded**`:deletions:`**.**`
+:deletions:`**Significant deletions are shaded.**`
 
-:deprecation:`**Features**`:deprecation:` `:deprecation:`**to**`:deprecation:` `:deprecation:`**be**`:deprecation:` `:deprecation:`**deprecated**`:deprecation:` `:deprecation:`**in**`:deprecation:` `:deprecation:`**a**`:deprecation:` `:deprecation:`**future**`:deprecation:` `:deprecation:`**version**`:deprecation:` `:deprecation:`**are**`:deprecation:` `:deprecation:`**shaded**`:deprecation:` `:deprecation:`**and**`:deprecation:` `:deprecation:`**indicated**`:deprecation:` `:deprecation:`**with**`**▼**:deprecation:`**.**`
+:deprecation:`**Features to be deprecated in a future version are shaded and indicated with** ▼.`
 
-**This** **document** **is** **the** **whole** **of** **the** **Learning** **Registry** **Technical** **Specification****.**
+**This document is the whole of the Learning Registry Technical Specification.**
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 .. _h.c7bnrod3e0k:
-
+------------------------------------
 Technical Specification Introduction
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------
 
 This document provides the technical specification for the Learning Registry.
 It specifies the network model, data models and APIs.
@@ -37,25 +32,44 @@ While targeted at a document-oriented infrastructure, the specification itself i
 The document is currently a work in progress; its structure, organization and content are subject to change.
 
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.mus9vqexu2or:
-
+------------------------------------
 Technical Specification Contents
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------
 
-    **General** **Matter** **V** **GM****:0.50.0**
+.. toctree::
+    :maxdepth: 2
+    :numbered:
 
-        `Learning <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.t8dv95qkagu4>`_ `Registry <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.t8dv95qkagu4>`_ `Overview <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.t8dv95qkagu4>`_ x
+    ../General_Matter/index
+    ../Resource_Distribution_Network_Model/index
+    ../Resource_Data_Data_Model/index
+    ../Identity_Trust_Auth_and_Security/index
+    ../Data_Model_and_API_Attributes_and_Behaviors/index
+    ../Services_and_APIs/index
+    ../Distribution_Services/index
+    ../Publish_Services/index
+    ../Access_Services/index
+    ../Broker_Services/index
+    ../Mgmt_Admin_and_Discovery_Services/index
+    ../Operations/index
 
-        `Specification <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.bflimlt80rpq>`_ `License <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.bflimlt80rpq>`_ x
+
+
+OLD TOC
+
+
+    General Matter V GM:0.50.0
+
+        `Learning Registry Overview <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.t8dv95qkagu4>`_ x
+
+        `Specification License <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.bflimlt80rpq>`_ x
 
         `Notation <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.cu2ipktikrsa>`_ x
 
         `Conformance <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.whmj37vjr0jk>`_ x
 
-        `Specification <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.lisx85v54wl>`_ `Versioning <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.lisx85v54wl>`_ x
+        `Specification Versioning <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.lisx85v54wl>`_ x
 
         `Technical <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.o12ejzxfggen>`_ `Specification <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.o12ejzxfggen>`_ `Overview <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.o12ejzxfggen>`_ x
 
@@ -65,7 +79,7 @@ Technical Specification Contents
 
         `References <https://docs.google.com/a/learningregistry.org/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit?hl=en_US#heading=h.76rvgj-gh9lot>`_ x
 
-    **Resource** **Distribution** **Network** **Model** **V** **NM****:0.49.0**
+    Resource Distribution Network Model V NM:0.49.0
 
         `Resource <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ x
 
@@ -91,7 +105,7 @@ Technical Specification Contents
 
             `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_ `Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_ x
 
-    **Resource** **Data** **Data** **Model** **V** **RM****:0.49.0**
+    Resource Data Data Model V RM:0.49.0
 
         `Resource <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ `Models <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ x
 
@@ -103,7 +117,7 @@ Technical Specification Contents
 
             `Resource <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ x
 
-    **Identity****, ****Trust****, ****Auth** **and** **Security** **V** **IT****:0.49.0**
+    Identity, Trust, Auth and Security V IT:0.49.0
 
         `Identity <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `Digital <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `Signatures <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ x
 
@@ -125,7 +139,7 @@ Technical Specification Contents
 
         `Security <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `Information <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `Assurance <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ x
 
-    **Data** **Model** **and** **API** **Attributes** **and** **Behaviors** **V** **RQ****:0.49.0**
+    Data Model and API Attributes and Behaviors V RQ:0.49.0
 
         `Common <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `API <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `Attributes <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ `Behaviors <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.i6djle3var4b>`_ x
 
@@ -151,15 +165,15 @@ Technical Specification Contents
 
                 `Resource <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `Filtering <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ x
 
-    **Services** **and** **APIs** **V** **SA****:0.50.0**
+    Services and APIs V SA:0.50.0
 
         `Services <https://docs.google.com/a/learningregistry.org/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit?hl=en_US#heading=h.d08onhltt4u1>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit?hl=en_US#heading=h.d08onhltt4u1>`_ `APIs <https://docs.google.com/a/learningregistry.org/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit?hl=en_US#heading=h.d08onhltt4u1>`_ x
 
-    **Distribution** **Services** **V** **DS****:0.49.0**
+    Distribution Services V DS:0.49.0
 
         `Resource <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ x
 
-    **Publish** **Services** **V** **PS****:0.49.0**
+    Publish Services V PS:0.49.0
 
         `Resource <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Publish <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ x
 
@@ -173,7 +187,7 @@ Technical Specification Contents
 
                 `Basic <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.rfe7ga-6sbjly>`_ `Delete <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.rfe7ga-6sbjly>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.rfe7ga-6sbjly>`_ x
 
-    **Access** **Services** **V** **AS****:0.49.0**
+    Access Services V AS:0.49.0
 
         `Resource <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Access <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ x
 
@@ -207,11 +221,11 @@ Technical Specification Contents
 
                     `List <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.v3mu36o8erz0>`_ `Sets <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.v3mu36o8erz0>`_ x
 
-    **Broker** **Services** **V** **BS****:0.50.0**
+    Broker Services V BS:0.50.0
 
         `Broker <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_ x
 
-    **Management****, ****Administrative** **and** **Discovery** **Services** **V** **MS****:0.49.0**
+    Management, Administrative and Discovery Services V MS:0.49.0
 
         `Administrative <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ x
 
@@ -223,7 +237,7 @@ Technical Specification Contents
 
                 `Resource <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.jlubtj-czhato>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.jlubtj-czhato>`_ `Network <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.jlubtj-czhato>`_ `Policy <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.jlubtj-czhato>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.jlubtj-czhato>`_ x
 
-    **Learning** **Registry** **Operation** **V** **OP****:0.49.0**
+    Learning Registry Operation V OP:0.49.0
 
         `Operations <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.mkv6i5cksheq>`_ x
 
