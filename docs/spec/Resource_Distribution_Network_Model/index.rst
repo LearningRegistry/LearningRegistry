@@ -1,83 +1,79 @@
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Resource Distribution Network Model: **Learning** **Registry** **Technical** **Specification** **V** **N**M:**0.**5x**.0**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+==========================================================================================
+Resource Distribution Network Model: Learning Registry Technical Specification V NM:0.5x.0
+==========================================================================================
 
 Draft in Progress.
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the :ref:`Change Log<h.e1519o-y653zc>` for links to prior stable versions.
 
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.49.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
-
-This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+This document is part of one or more versions of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Resource<h.u6sbhsuktqyj>` :ref:`Distribution<h.u6sbhsuktqyj>` :ref:`Network<h.u6sbhsuktqyj>` :ref:`Model<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`NM<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
+    :ref:`Resource Distribution Network Model :  Learning Registry Technical Specification V NM :0.49.0<h.u6sbhsuktqyj>`
 
-        :ref:`Resource<h.v9pspv7cuh5h>` :ref:`Distribution<h.v9pspv7cuh5h>` :ref:`Network<h.v9pspv7cuh5h>` :ref:`Model<h.v9pspv7cuh5h>`
+        :ref:`Resource Distribution Network Model<h.v9pspv7cuh5h>`
 
-            :ref:`Network<h.vpp8gzlkb4ag>` :ref:`Nodes<h.vpp8gzlkb4ag>` :ref:`and<h.vpp8gzlkb4ag>` :ref:`Node<h.vpp8gzlkb4ag>` :ref:`Services<h.vpp8gzlkb4ag>`
+            :ref:`Network Nodes and Node Services<h.vpp8gzlkb4ag>`
 
-            :ref:`Network<h.7a6j0fur21i3>` :ref:`Topology<h.7a6j0fur21i3>`
+            :ref:`Network Topology<h.7a6j0fur21i3>`
 
-            :ref:`Network<h.2hcwpd1wq9oo>` :ref:`Data<h.2hcwpd1wq9oo>` :ref:`Models<h.2hcwpd1wq9oo>`
+            :ref:`Network Data Models<h.2hcwpd1wq9oo>`
 
-                :ref:`Network<h.18vbt1hxuutv>` :ref:`Node<h.18vbt1hxuutv>` :ref:`Description<h.18vbt1hxuutv>` :ref:`Data<h.18vbt1hxuutv>` :ref:`Model<h.18vbt1hxuutv>`
+                :ref:`Network Node Description Data Model<h.18vbt1hxuutv>`
 
-                :ref:`Network<h.z0spjmvlcbb9>` :ref:`Node<h.z0spjmvlcbb9>` :ref:`Service<h.z0spjmvlcbb9>` :ref:`Description<h.z0spjmvlcbb9>` :ref:`Data<h.z0spjmvlcbb9>` :ref:`Model<h.z0spjmvlcbb9>`
+                :ref:`Network Node Service Description Data Model<h.z0spjmvlcbb9>`
 
-                :ref:`Network<h.1cq79ogiyvxn>` :ref:`Node<h.1cq79ogiyvxn>` :ref:`Connectivity<h.1cq79ogiyvxn>` :ref:`Description<h.1cq79ogiyvxn>` :ref:`Data<h.1cq79ogiyvxn>` :ref:`Model<h.1cq79ogiyvxn>`
+                :ref:`Network Node Connectivity Description Data Model<h.1cq79ogiyvxn>`
 
-                :ref:`Network<h.1cq79ogiyvxn>` :ref:`Node<h.1cq79ogiyvxn>` :ref:`Filter<h.1cq79ogiyvxn>` :ref:`Description<h.1cq79ogiyvxn>` :ref:`Data<h.1cq79ogiyvxn>` :ref:`Model<h.1cq79ogiyvxn>`
+                :ref:`Network Node Filter Description Data Model<h.1cq79ogiyvxn>`
 
-                :ref:`Resource<h.425s9yjzhp5f>` :ref:`Distribution<h.425s9yjzhp5f>` :ref:`Network<h.425s9yjzhp5f>` :ref:`Description<h.425s9yjzhp5f>` :ref:`Data<h.425s9yjzhp5f>` :ref:`Model<h.425s9yjzhp5f>`
+                :ref:`Resource Distribution Network Description Data Model<h.425s9yjzhp5f>`
 
-                :ref:`Resource<h.5txlehgykaso>` :ref:`Distribution<h.5txlehgykaso>` :ref:`Network<h.5txlehgykaso>` :ref:`Policy<h.5txlehgykaso>` :ref:`Data<h.5txlehgykaso>` :ref:`Model<h.5txlehgykaso>`
+                :ref:`Resource Distribution Network Policy Data Model<h.5txlehgykaso>`
 
-                :ref:`Network<h.uthscj877bjr>` :ref:`Community<h.uthscj877bjr>` :ref:`Description<h.uthscj877bjr>` :ref:`Data<h.uthscj877bjr>` :ref:`Model<h.uthscj877bjr>`
+                :ref:`Network Community Description Data Model<h.uthscj877bjr>`
 
-            :ref:`Network<h.ugg6hzrtv6ho>` :ref:`Description<h.ugg6hzrtv6ho>`
+            :ref:`Network Description<h.ugg6hzrtv6ho>`
 
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
+        :ref:`Change Log<h.e1519o-y653zc>`
 
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
+        :ref:`Working Notes and Placeholder Text<h.tph0s9vmrwxu>`
 
-This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the model of the resource distribution network and the data models used to describe the network.
+This document is part of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It describes the model of resource data that is transported through the network.
 
 This document is not standalone.
 The reader should be familiar with other parts of the specification, including, but not limited to:
 
-- :doc:`General <../General_Matter/index>` :doc:`Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References
+- :doc:`General Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References
 
-- :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>`
+- :doc:`Resource Distribution Network Model <../Resource_Distribution_Network_Model/index>`
 
-- :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>`
+- :doc:`Identity, Trust, Authentication, Security <../Identity_Trust_Auth_and_Security/index>`
 
-- :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>`
+- :doc:`Data Model and API Attributes and Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>`
 
 - :doc:`Services <../Services_and_APIs/index>` including :doc:`Distribution <../Distribution_Services/index>`, :doc:`Publish <../Publish_Services/index>`, :doc:`Access <../Access_Services/index>`, :doc:`Broker <../Broker_Services/index>`, :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
 
 - :doc:`Learning <../Operations/index>` :doc:`Registry <../Operations/index>` :doc:`Operations <../Operations/index>`
 
-In particular, the reader needs to be aware that specific criteria for the Network Model are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part.
+In particular, the reader needs to be aware that specific criteria for the Network Model are presented in the :doc:`Data Model and API Attributes and Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.v9pspv7cuh5h:
 
-**Resource** **Distribution** **Network** **Model**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------------
+Resource Distribution Network Model
+-----------------------------------
 
 The core of the Learning Registry is the network of loosely connected master-master synchronizing broker nodes distributing resources, metadata and paradata.
 Consumers and producers (edge node consumer and producer agents) connect to network nodes to inject information into the network or to extract information for external processing.
@@ -86,12 +82,12 @@ The network model is defined in terms of nodes, their services, the assembly of 
 This two-tiered model of networks and communities supports security requirements for partitioning of resource data between different communities.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.vpp8gzlkb4ag:
 
-**Network** **Nodes** **and** **Node** **Services**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-------------------------------
+Network Nodes and Node Services
+-------------------------------
 
 A **node** is a server process with network connectivity to either other nodes or to edge services.
 Nodes process **resource** **data** (e.g., network messages about resources, metadata, paradata, etc.).
@@ -127,12 +123,12 @@ Provisioning requirements MAY be established by the policies of a particular net
 This specification permits non operational or non accessible networks.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.7a6j0fur21i3:
 
-**Network** **Topology**
-""""""""""""""""""""""""""""""""""""""""""""""
+----------------
+Network Topology
+----------------
 
 A **resource** **distribution** **network** is a group of one or more connected nodes, with each node providing node services.
 All nodes in a resource distribution network operate under the same policies.
@@ -217,12 +213,12 @@ Resource distribution network A also connects to network C and network C connect
 |picture_0|
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.2hcwpd1wq9oo:
 
-**Network** **Data** **Models**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""
+-------------------
+Network Data Models
+-------------------
 
 The description of a network is maintained in a set of documents that includes:
 
@@ -247,7 +243,7 @@ The description of a network is maintained in a set of documents that includes:
   - The description of the network community that the node is a part of.
 
 All data models MAY be extended with additional elements.
-The name of any extension element SHALL begin with the characters "X_" designating an extension element.
+The name of any extension element SHALL begin with the characters "X\_" designating an extension element.
 Any document that includes any element that is not in the defined data model or is not an extension element is non conforming and SHALL be rejected by any service.
 
 All data models have a named attribute that is a “type” element (doc_type).
@@ -259,143 +255,135 @@ The data model description specifies the literal value for this element for all 
 All data models have a named attribute that indicates if the document instance is in use (active).
 Network data model document instances are never deleted; they transition from active to not active.
 
-Additional constraints on attributes values are detailed in `Data <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_ `Attributes <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_.
+Additional constraints on attributes values are detailed in `Data Model Attributes <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.18vbt1hxuutv:
 
-**Network** **Node** **Description** **Data** **Model**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------------
+Network Node Description Data Model
+-----------------------------------
 
 The data model describing a node document.
 Once the data model has been instantiated for a node, the value of an immutable element SHALL NOT change.
 Other values MAY be changed only by the owner of the node document.
 
-        {
 
-         "doc_type":        "node_description",    // the literal "node_description"
+::
 
-                                // required, immutable
+    {
 
-        :changes:` `"doc_version":        "0.23.0",    // the literal for the current version -- "0.23.0"
+      "doc_type": "node_description",
+                                                                  // the literal "node_description"
+                                                                  // required, immutable
 
-                            // required, immutable
+      "doc_version": "0.23.0",
+                                                                  // the literal for the current version -- "0.23.0"
+                                                                  // required, immutable
 
-         "doc_scope":        "node",        // the literal "node"
+      "doc_scope": "node",
+                                                                  // the literal "node"
+                                                                  // required, immutable
 
-                            // required, immutable
+      "active": boolean,
+                                                                  // is the network node active
+                                                                  // required, mutable from T to F only
 
-         "active":        boolean,    // is the network node active
+      "node_id": "string",
+                                                                  // id of the node, required
+                                                                  // unique within scope of the LR
+                                                                  // immutable
 
-                            // required, mutable from T to F only
+      "node_name": "string",
+                                                                  // name of the node, optional
 
-         "node_id":        "string",        // id of the node, required
+      "node_description": "string",
+                                                                  // description of the node, optional
 
-                                                // unique within scope of the LR
+      "node_admin_identity": "string",
+                                                                  // identity of node admin, optional
 
-                                                // immutable
+      "network_id": "string",
+                                                                  // id of the network that this node is a part of 
+                                                                  // recommended (required for gateway distribution)
+                                                                  // immutable
 
-         "node_name":         "string",         // name of the node, optional
+      "community_id": "string",
+                                                                  // id of the community that this node is a part of
+                                                                  // recommended (required for gateway distribution)
+                                                                  // immutable
 
-         "node_description":    "string",        // description of the node, optional
+      "gateway_node": boolean,
+                                                                  // T if node is a gateway node
+                                                                  // recommended, F if not present, immutable
 
-         "node_admin_identity":    "string",        // identity of node admin, optional
+      "open_connect_source": boolean,
+                                                                  // T if node is willing to be the source to
+                                                                  // connect to any other node
+                                                                  // F if node connectivity is restricted
+                                                                  // recommended; F if not present
 
-         "network_id":        "string",        // id of the network that this node is a part of 
+      "open_connect_dest": boolean,
+                                                                  // T if node is willing to be the destination
+                                                                  // to connect to any other node
+                                                                  // F if node connectivity is restricted
+                                                                  // recommended; F if not present
 
-                                                // recommended (required for gateway distribution)
+      // node-specific policies, optional
+      "node_policy":  
+      {
 
-                                                // immutable
+        "sync_frequency": integer,
+                                                                  // target time between synchronizations in minutes
+                                                                  // optional
+        "deleted_data_policy": "string",
+                                                                  // fixed vocabulary ["no", "persistent", "transient"]
+                                                                  // see `Resource <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_
 
-    "community_id":        "string",        // id of the community that this node is a part of
+        "TTL": integer,
+                                                                  // minimum time to live for resource data in the node
+                                                                  // in days, optional
+                                                                  // overrides network policy TTL is larger than network TTL
 
-                        // recommended (required for gateway distribution)
+        "accepted_version": ["string"],
+                                                                  // list of resource data description document versions
+                                                                  // that the node can process, optional
 
-                        // immutable
+        "accepted_TOS": ["string"],
+                                                                  // list of ToS that the node will accept, optional
+        "accepts_anon": boolean,
+                                                                  // T if node is willing to take anonymous submissions
+                                                                  // F if all submissions must be identified
+                                                                  // optional, T if not present
 
-    "gateway_node":    boolean,    // T if node is a gateway node
+        "accepts_unsigned": boolean,
+                                                                  // T if node is willing to take unsigned submissions
+                                                                  // F if all data must be signed
+                                                                  // optional, T if not present
 
-                        // recommended, F if not present, immutable
+        "validates_signature": boolean,
+                                                                  // T if node will validate signatures
+                                                                  // F if node does not validate signatures
+                                                                  // optional, F if not present
 
-    "open_connect_source":boolean,    // T if node is willing to be the source to
+        "check_trust": boolean,
+                                                                  // T if node will evaluate trust of submitter
+                                                                  // F if node does not check trust
+                                                                  // optional, F if not present
 
-                                                // connect to any other node
+        "max_doc_size": integer 
+                                                                  // maximum size of a document that a node will store
+                                                                  // in bytes
+                                                                  // optional, if not present behavior is not defined
+      },
 
-                        // F if node connectivity is restricted
-
-                        // recommended; F if not present
-
-    "open_connect_dest":    boolean,    // T if node is willing to be the destination
-
-                                                // to connect to any other node
-
-                        // F if node connectivity is restricted
-
-                        // recommended; F if not present
-
-    "node_policy":                // node-specific policies, optional
-
-     {
-
-         "sync_frequency":    integer,        // target time between synchronizations in minutes
-
-                                                // optional
-
-     "deleted_data_policy":    "string",        // fixed vocabulary ["no", "persistent", "transient"]
-
-                                // see `Resource <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_
-
-     "TTL":            integer,        // minimum time to live for resource data in the node
-
-                         // in days, optional
-
-                        // overrides network policy TTL is larger than network TTL
-
-     "accepted_version":    ["string"],    // list of resource data description document versions
-
-                        // that the node can process, optional
-
-     "accepted_TOS":    ["string"],    // list of ToS that the node will accept, optional
-
-     "accepts_anon":    boolean,    // T if node is willing to take anonymous submissions
-
-                        // F if all submissions must be identified
-
-                        // optional, T if not present
-
-         "accepts_unsigned":    boolean,    // T if node is willing to take unsigned submissions
-
-                        // F if all data must be signed
-
-                        // optional, T if not present
-
-         "validates_signature":    boolean    ,    // T if node will validate signatures
-
-                        // F if node does not validate signatures
-
-                        // optional, F if not present
-
-         "check_trust":        boolean,    // T if node will evaluate trust of submitter
-
-                        // F if node does not check trust
-
-                        // optional, F if not present
-
-        "max_doc_size":    integer        // maximum size of a document that a node will store
-
-                                                // in bytes
-
-                                                // optional, if not present behavior is not defined
-
-     },
-
-     "node_key":        "string",        // node public key, optional
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
+      "node_key": "string",
+      // node public key, optional
+      "X_xxx": ? ? ? ? ? // placeholder for extensibility, optional
     }
+
+
 
 *NB*: The node admin identity SHOULD be a URL, e.g., an email address.
 A deployment MAY specify that the identity be used to look up the node’s public key in a key server.
@@ -436,12 +424,12 @@ A node MUST explicitly state the policies it enforces.
 *Open* *Question*: Have a list of accepted document versions, or just make this a filter?
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.z0spjmvlcbb9:
 
-**Network** **Node** **Service** **Description** **Data** **Model**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-------------------------------------------
+Network Node Service Description Data Model
+-------------------------------------------
 
 The data model describing a service description document; one document per service available at a node.
 Once the data model has been instantiated for a service, the value of an immutable element SHALL NOT change.
@@ -450,75 +438,80 @@ Other values MAY be changed only by the owner of the node document.
 
 *NB*: Ownership and control of the node description document and of the node service description document are vested in the same identity.
 
+
+::
+
     {
 
-         "doc_type":        "service_description",    // the literal "node_description"
+        "doc_type": "service_description",
+                                                      // the literal "node_description"
+                                                      // required, immutable
 
-                                // required, immutable
+        "doc_version": "0.20.0",
+                                                      // the literal for the current version -- "0.20.0"
+                                                      // required, immutable
 
-         "doc_version":        "0.20.0",    // the literal for the current version -- "0.20.0"
+        "doc_scope": "node",
+                                                      // the literal "node"
+                                                      // required, immutable
 
-                            // required, immutable
+        "active": boolean,
+                                                      // is the service active
+                                                      // required, mutable from T to F only
 
-         "doc_scope":        "node",        // the literal "node"
+        "service_id": "string",
+                                                      // id of the service, required
+                                                      // unique within scope of the LR
+                                                      // immutable
 
-                            // required, immutable
+        "service_type": "string",
+                                                      // fixed vocabulary ["publish", "access", 
+                                                      // "distribute", "broker", "administrative"]
+                                                      // required, immutable
 
-         "active":        boolean,    // is the service active
+        "service_name": "string",
+                                                      // name of the service, optional
 
-                            // required, mutable from T to F only
+        "service_description": "string",
+                                                      // description of the service, optional
 
-         "service_id":        "string",        // id of the service, required
+        "service_version": "string",
+                                                      // version number of the service description, required
+                                                      // version is local to the Learning Registry
+                                                      // not the version of some underlying spec for the service
 
-                                                // unique within scope of the LR
+        "service_endpoint": "string",
+                                                      // URL of service, required
 
-                                                // immutable
+        // service authentication and authorization descriptions                                              
+        "service_auth": 
+        {
 
-        "service_type":        "string",        // fixed vocabulary ["publish", "access", 
+            "service_authz": ["string"],
+                                                        // fixed vocabulary
+                                                        // ["none", "basicauth", "oauth", "ssh", ...]
+                                                        // required, mutable from "none" to any stronger auth
 
-                                                // "distribute", "broker", "administrative"]
+            "service_key": boolean,
+                                                        // is a service key required to use the service
+                                                        // optional, immutable, default F
 
-                                                // required, immutable
+            "service_https": boolean 
+                                                        // does service require https
+                                                        // optional, immutable, default F
+        },
 
-    "service_name":        "string",        // name of the service, optional
+        // service-specific key-value pairs, optional
+        "service_data": { 
+            < key - value pairs >
+        },
 
-    "service_description":    "string",        // description of the service, optional
 
-    "service_version":    "string",        // version number of the service description, required
-
-                        // version is local to the Learning Registry
-
-                        // not the version of some underlying spec for the service
-
-    "service_endpoint":    "string",        // URL of service, required
-
-    "service_auth":                // service authentication and authorization descriptions
-
-     {
-
-    "service_authz":        ["string"],     // fixed vocabulary
-
-                                                // ["none", "basicauth", "oauth", "ssh", ...]
-
-                        // required, mutable from "none" to any stronger auth
-
-    "service_key":        boolean,    // is a service key required to use the service
-
-                        // optional, immutable, default F
-
-    "service_https":        boolean        // does service require https
-
-                        // optional, immutable, default F
-
-     },
-
-    "service_data":        {<key-value pairs>},        // service-specific key-value pairs
-
-                        // optional
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
+        "X_xxx": ? ? ? ? ?                            
+                                                      // placeholder for extensibility, optional
     }
+
+
 
 *NB*: A service description document is required for each service.
 Services SHALL fail if they do not find a valid, active, service description document.
@@ -534,12 +527,12 @@ If no service data is required, the service_data element SHOULD be omitted.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.1cq79ogiyvxn:
 
-**Network** **Node** **Connectivity** **Description** **Data** **Model**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------------------
+Network Node Connectivity Description Data Model
+------------------------------------------------
 
 The data model describing a node connectivity document; one document per connection at a node.
 Once the data model has been instantiated for a connection, the value of an immutable element SHALL NOT change.
@@ -548,49 +541,49 @@ Other values MAY be changed only by the owner of the node document.
 
 *NB*: Ownership and control of the node description document and of the node connectivity description document are vested in the same identity.
 
-        {
+::
 
-         "doc_type":        "connection_description",    // the literal "connection_description"
+    {
 
-                                    // required, immutable
+        "doc_type": "connection_description",
+                                                    // the literal "connection_description"
+                                                    // required, immutable
 
-         "doc_version":        "0.10.0",    // the literal for the current version -- "0.10.0"
+        "doc_version": "0.10.0",
+                                                    // the literal for the current version -- "0.10.0"
+                                                    // required, immutable
 
-                            // required, immutable
+        "doc_scope": "node",
+                                                    // the literal "node"
+                                                    // required, immutable
 
-         "doc_scope":        "node",        // the literal "node"
+        "active": boolean,
+                                                    // is the connection active
+                                                    // required, mutable from T to F only
 
-                            // required, immutable
+        "connection_id": "string",
+                                                    // id of the connection, required
+                                                    // unique within scope of the LR
+                                                    // immutable
 
-         "active":        boolean,    // is the connection active
+        "source_node_url": "string",
+                                                    // URL of the source of the connection
+                                                    // required, immutable
 
-                            // required, mutable from T to F only
+        "destination_node_url": "string",
+                                                    // URL of the destination of the connection
+                                                    // required, immutable
 
-         "connection_id":    "string",        // id of the connection, required
+        "gateway_connection": boolean,
+                                                    // T if this is a connection to a gateway node
+                                                    // F for a common node
+                                                    // recommended; F if not present (common node)
+                                                    // immutable
 
-                                                // unique within scope of the LR
-
-                                                // immutable
-
-    "source_node_url":    "string",        // URL of the source of the connection
-
-                                                // required, immutable
-
-    "destination_node_url":    "string",        // URL of the destination of the connection
-
-                        // required, immutable
-
-    "gateway_connection":    boolean,    // T if this is a connection to a gateway node
-
-                                                // F for a common node
-
-                        // recommended; F if not present (common node)
-
-                        // immutable
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
+        "X_xxx": ? ? ? ? ? 
+                                                    // placeholder for extensibility, optional
     }
+
 
 *NB*: By policy, there SHALL be only one document with an active value of T and gateway_connection value of T per node.
 
@@ -600,9 +593,9 @@ It is present to enable `building <https://docs.google.com/a/learningregistry.or
 *Working* *Assumption*: It is assumed that a vocabulary to describe additional types of connections is not needed.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-**Network** **Node** **Filter** **Description** **Data** **Model**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------------
+Network Node Filter Description Data Model
+------------------------------------------
 
 The data model describing a node filter; one document per node.
 Filters are used to restrict the resource data that is held at a node.
@@ -612,120 +605,122 @@ Other values MAY be changed only by the owner of the node document.
 
 *NB*: Ownership and control of the node description document and of the node filter description document are vested in the same identity.
 
-        {
+::
 
-         "doc_type":        "filter_description",    // the literal "filter_description"
+    {
 
-                                // required, immutable
+        "doc_type": "filter_description",
+                                            // the literal "filter_description"
+                                            // required, immutable
 
-         "doc_version":        "0.10.0",    // the literal for the current version -- "0.10.0"
+        "doc_version": "0.10.0",
+                                            // the literal for the current version -- "0.10.0"
+                                            // required, immutable
 
-                            // required, immutable
 
-         "doc_scope":        "node",        // the literal "node"
+        "doc_scope": "node",
+                                            // the literal "node"
+                                            // required, immutable
 
-                            // required, immutable
+        "active": boolean,
+                                            // is the filter active
+                                            // required, mutable from T to F only
 
-         "active":        boolean,    // is the filter active
+        "filter_name": "string",
+                                            // name of the filter, optional
 
-                            // required, mutable from T to F only
+        "custom_filter": boolean,
+                                            // is this a custom filter (implemented in code, not rules)
+                                            // required, if T, filter rules are ignored
 
-         "filter_name":         "string",         // name of the filter, optional
+        "include_exclude": boolean,
+                                            // T if the filters describe what documents to accept
+                                            // all others are rejected
+                                            // F if the filters describe what documents to reject
+                                            // all others are accepted
+                                            // optional, T if not present
 
-         "custom_filter":        boolean,    // is this a custom filter (implemented in code, not rules)
+        "filter": // array of filter rules
+        [
 
-                            // required, if T, filter rules are ignored
+            {
+              "filter_key": "string",
+                                            // REGEX that matches names in the
+                                            // resource data description
+                                            // required
 
-        "include_exclude":    boolean,    // T if the filters describe what documents to accept
+              "filter_value": "string" 
+                                            // REGEX that matches values in the 
+                                            // resource data description
+                                            // optional, if not present, any value matches
+            }
 
-                            // all others are rejected
+        ],
 
-                            // F if the filters describe what documents to reject
-
-                            // all others are accepted
-
-                            // optional, T if not present
-
-         "filter":                    // array of filter rules
-
-         [
-
-         {"filter_key":        "string",        // REGEX that matches names in the
-
-                            // resource data description
-
-                            // required
-
-         "filter_value":        "string"        // REGEX that matches values in the 
-
-                                                // resource data description
-
-                                                // optional, if not present, any value matches
-
-     }
-
-     ],
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
+        "X_xxx": ? ? ? ? ?                  // placeholder for extensibility, optional
     }
+
 
 *NB*: Filters are optional.
 
 *NB*: The same set of filters is applied in both the publication and distribution processes.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.425s9yjzhp5f:
 
-**Resource** **Distribution** **Network** **Description** **Data** **Model**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------------------------
+Resource Distribution Network Description Data Model
+----------------------------------------------------
 
 The data model describing a resource distribution network document.
 Once the data model has been instantiated for a network, the value of an immutable element SHALL NOT change.
 Other values MAY be changed only by the owner of the network description document.
 
-        {
+::
 
-         "doc_type":        "network_description",    // the literal "network_description"
+    {
 
-                                // required, immutable
+      "doc_type": "network_description",
+                                                // the literal "network_description"
+                                                // required, immutable
 
-         "doc_version":        "0.20.0",    // the literal for the current version -- "0.20.0"
+      "doc_version": "0.20.0",
+                                                // the literal for the current version -- "0.20.0"
+                                                // required, immutable
 
-                            // required, immutable
+      "doc_scope": "network",
+                                                // the literal "network"
+                                                // required, immutable
 
-         "doc_scope":        "network",    // the literal "network"
+      "active": boolean,
+                                                // is the resource distribution network active
+                                                // required, mutable from T to F only
 
-                            // required, immutable
-
-         "active":        boolean,    // is the resource distribution network active
-
-                            // required, mutable from T to F only
-
-         "network_id":        "string",        // id of the network, required
-
+      "network_id": "string",
+                                                // id of the network, required
                                                 // unique within scope of the LR
+                                                // immutable
+                                                
+      "network_name": "string",
+                                                // name of the network, optional
 
+      "network_description": "string",
+                                                // description of the network, optional
+
+      "network_admin_identity": "string",
+                                                // identity of network admin, optional
+
+      "community_id": "string",
+                                                // id of the community that this node is a part of
+                                                // recommended
                                                 // immutable
 
-         "network_name":     "string",        // name of the network, optional
+      "network_key": "string",
+                                                // network public key, optional
 
-         "network_description":    "string",        // description of the network, optional
-
-         "network_admin_identity":    "string",        // identity of network admin, optional
-
-     "community_id":    "string",        // id of the community that this node is a part of
-
-                        // recommended
-
-                        // immutable
-
-     "network_key":        "string",        // network public key, optional
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
+      "X_xxx": ? ? ? ? ? 
+                                                // placeholder for extensibility, optional
     }
 
 *NB*: The network admin identity SHOULD be a URL, e.g., an email address.
@@ -734,12 +729,12 @@ A deployment MAY specify that the identity be used to look up the network’s pu
 *NB*: The network MAY advertise its public key in the data model instance versus requiring key server lookup.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.5txlehgykaso:
 
-**Resource** **Distribution** **Network** **Policy** **Data** **Model**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------------------------
+Resource Distribution Network Policy Data Model
+-----------------------------------------------
 
 The data model describing the policies of a resource distribution network document.
 Once the data model has been instantiated for a network, the value of an immutable element SHALL NOT change.
@@ -748,105 +743,114 @@ Other values MAY be changed only by the owner of the network *description* docum
 
 *NB*: Ownership and control of the network description document and of the policy description document are vested in the same identity.
 
+::
+
     {
 
-         "doc_type":        "policy_description",    // the literal "policy_description"
+        "doc_type": "policy_description",
+                                              // the literal "policy_description"
+                                              // required, immutable
 
-                                // required, immutable
+        "doc_version": "0.10.0",
+                                              // the literal for the current version -- "0.10.0"
+                                              // required, immutable
 
-         "doc_version":        "0.10.0",    // the literal for the current version -- "0.10.0"
+        "doc_scope": "network",
+                                              // the literal "network"
+                                              // required, immutable
 
-                            // required, immutable
+        "active": boolean,
+                                              // are the policies active
+                                              // required, mutable from T to F only
 
-         "doc_scope":        "network",    // the literal "network"
+        "network_id": "string",
+                                              // id of the network, required
+                                              // unique within scope of the LR
+                                              // immutable
 
-                            // required, immutable
+        "policy_id": "string",
+                                              // id of the policy description, required
+                                              // unique within scope of the LR
+                                              // immutable
 
-         "active":        boolean,    // are the policies active
+        "policy_version": "string",
+                                              // version identifier for the policy
 
-                            // required, mutable from T to F only
+        "TTL": integer,
+                                              // minimum time to live for resource data in the network
+                                              // in days, required
 
-         "network_id":        "string",        // id of the network, required
+        "policy_element_x": ? ? ? ? ? ,
+                                              // placeholder for more policy elements
 
-                                                // unique within scope of the LR
-
-                                                // immutable
-
-         "policy_id":        "string",         // id of the policy description, required
-
-                                                // unique within scope of the LR
-
-                                                // immutable
-
-     "policy_version":    "string",        // version identifier for the policy
-
-     "TTL":            integer,        // minimum time to live for resource data in the network
-
-                         // in days, required
-
-     "policy_element_x":    ?????,        // placeholder for more policy elements
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
+        "X_xxx" : ? ? ? ? ? 
+                                              // placeholder for extensibility, optional
     }
+
 
 *NB*: The list of policy elements is currently incomplete.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.uthscj877bjr:
 
-**Network** **Community** **Description** **Data** **Model**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------------
+Network Community Description Data Model
+----------------------------------------
 
 The data model describing a network community document.
 Once the data model has been instantiated for a community description, the value of an immutable element SHALL NOT change.
 Other values MAY be changed only by the owner of the network community description.
 
-        {
+::
 
-         "doc_type":        "community_description",    // the literal "community_description"
+    {
 
-                                    // required, immutable
+        "doc_type": "community_description",
+                                            // the literal "community_description"
+                                            // required, immutable
 
-         "doc_version":        "0.20.0",    // the literal for the current version -- "0.20.0"
+        "doc_version": "0.20.0",
+                                            // the literal for the current version -- "0.20.0"
+                                            // required, immutable
 
-                            // required, immutable
+        "doc_scope": "community",
+                                            // the literal "community"
+                                            // required, immutable
 
-         "doc_scope":        "community",    // the literal "community"
+        "active": boolean,
+                                            // is the network community active
+                                            // required, mutable from T to F only
 
-                            // required, immutable
+        "community_id": "string",
+                                            // id of the community, required
+                                            // unique within scope of the LR
+                                            // immutable
 
-         "active":        boolean,    // is the network community active
+        "community_name": "string",
+                                            // name of the community, optional
 
-                            // required, mutable from T to F only
+        "community_description”: "string",
+                                            // description of the community, optional
 
-         "community_id":    "string" ,    // id of the community, required
 
-                                                // unique within scope of the LR
+        "community_admin_identity" :"string",
+                                            // identity of community admin, optional
 
-                                                // immutable
+        "social_community": boolean,    
+                                            // T if the community is a social community
+                                            // F if the community is a closed community
+                                            // recommended; F if not present (closed community)
+                                            // immutable
 
-         "community_name":     "string",         // name of the community, optional
+        "community_key": "string",        
+                                            // node public key, optional                
 
-         "community_description”:"string",    // description of the community, optional
+        "X_xxx ": ?????        
+                                            // placeholder for extensibility, optional
 
-         "community_admin_identity":"string",    // identity of community admin, optional
+    }
 
-         "social_community":    boolean    ,    // T if the community is a social community
-
-                            // F if the community is a closed community
-
-                            // recommended; F if not present (closed community)
-
-                            // immutable
-
-         "community_key":    "string",        // node public key, optional                
-
-        "X_xxx":        ?????        // placeholder for extensibility, optional
-
-        }
 
 *NB*: The community admin identity SHOULD be a URL, e.g., an email address.
 A deployment MAY specify that the identity be used to look up the community’s public key in a key server.
@@ -854,38 +858,38 @@ A deployment MAY specify that the identity be used to look up the community’s 
 *NB*: Policies are described at the node or network level, not the community level.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.ugg6hzrtv6ho:
 
-**Network** **Description**
-"""""""""""""""""""""""""""""""""""""""""""""""""
+-------------------
+Network Description
+-------------------
 
 A valid, consistent network SHALL be described through a set of documents stored at each node in the network.
 
-- Each node SHALL store one instance of the :ref:`network<h.18vbt1hxuutv>` :ref:`node<h.18vbt1hxuutv>` :ref:`description<h.18vbt1hxuutv>` :ref:`document<h.18vbt1hxuutv>`.
+- Each node SHALL store one instance of the :ref:`network node description document<h.18vbt1hxuutv>`.
   A document SHALL be unique per node.
 
-- Each node SHALL store one instance of the :ref:`network<h.qcccycq7iols>` :ref:`node<h.qcccycq7iols>` :ref:`services<h.qcccycq7iols>` :ref:`document<h.qcccycq7iols>` for each service that it provides.
+- Each node SHALL store one instance of the :ref:`network node services document<h.z0spjmvlcbb9>` for each service that it provides.
   A document SHALL be unique per node.
 
-- Each node SHALL store one instance of the :ref:`network<h.pg6m0ojhlsb>` :ref:`node<h.pg6m0ojhlsb>` :ref:`connectivity<h.pg6m0ojhlsb>` :ref:`documen<h.pg6m0ojhlsb>`t for each connection to the node.
+- Each node SHALL store one instance of the :ref:`network node connectivity document<h.1cq79ogiyvxn>` for each connection to the node.
   A document SHALL be unique per node.
 
-- Each node MAY store one instance of the :ref:`network<h.1cq79ogiyvxn>` :ref:`node<h.1cq79ogiyvxn>` :ref:`filter<h.1cq79ogiyvxn>` :ref:`document<h.1cq79ogiyvxn>`.
+- Each node MAY store one instance of the :ref:`network node filter document<h.1cq79ogiyvxn>`.
   A document SHALL be unique per node.
 
-- Each node SHALL store one instance of the :ref:`resource<h.425s9yjzhp5f>` :ref:`distribution<h.425s9yjzhp5f>` :ref:`network<h.425s9yjzhp5f>` :ref:`description<h.425s9yjzhp5f>` :ref:`document<h.425s9yjzhp5f>`.
+- Each node SHALL store one instance of the :ref:`resource distribution network description document<h.425s9yjzhp5f>`.
   This document SHALL describe the network that the node is a part of.
   The contents of this document SHALL be identical for all nodes in the network.
   
 
-- Each node SHALL store one instance of the :ref:`resource<h.5txlehgykaso>` :ref:`distribution<h.5txlehgykaso>` :ref:`network<h.5txlehgykaso>` :ref:`policy<h.5txlehgykaso>` :ref:`document<h.5txlehgykaso>`.
+- Each node SHALL store one instance of the :ref:`resource distribution network policy document<h.5txlehgykaso>`.
   This document SHALL describe the policies of the network that the node is a part of.
   The contents of this document SHALL be identical for all nodes in the network.
   
 
-- The node SHALL store one instance of the :ref:`network<h.uthscj877bjr>` :ref:`community<h.uthscj877bjr>` :ref:`description<h.uthscj877bjr>` :ref:`document<h.uthscj877bjr>`.
+- The node SHALL store one instance of the :ref:`network community description document<h.uthscj877bjr>`.
   This document SHALL describe the community that the network is a part of.
   The contents of this document SHALL be identical for all nodes in the community.
   
@@ -899,12 +903,12 @@ The illustration shows the mapping of documents to nodes and the distribution an
 |picture_1|
 
 
-"""""""""""""""""""""""""""""""""""""""""
 
 .. _h.e1519o-y653zc:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -916,9 +920,9 @@ The illustration shows the mapping of documents to nodes and the distribution an
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en\_US>`_ (V 0.24.0)                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.`Archived <https://docs.google.com/document/d/1q5ysL1pjMVB7aBBus1qsKoKSsEgiDJSrKpClsfHe3X8/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1q5ysL1pjMVB7aBBus1qsKoKSsEgiDJSrKpClsfHe3X8/edit?hl=en_US>`_ (V NM:0.49.0)            |
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.`Archived copy <https://docs.google.com/document/d/1q5ysL1pjMVB7aBBus1qsKoKSsEgiDJSrKpClsfHe3X8/edit?hl=en\_US>`_ (V NM:0.49.0)                                                                                                              |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Add page size as service doc setting with flow control.Archived copy location TBD. (V NM:0.50.0)                                                                |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -926,12 +930,12 @@ The illustration shows the mapping of documents to nodes and the distribution an
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 .. |picture_1| image:: images/picture_1.png
 

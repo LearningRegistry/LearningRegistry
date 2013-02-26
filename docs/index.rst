@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   Services Specification <spec/Technical_Spec/index>
+   spec/Technical_Spec/index
 
    Node Installation <install/index>
 
