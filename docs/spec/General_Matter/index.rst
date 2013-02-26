@@ -1,11 +1,9 @@
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-General Matter: **Learning** **Registry** **Technical** **Specification** - V **GM****:0.**50**.0**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+=========================================================================
+General Matter: Learning Registry Technical Specification - V GM:0.50.0
+=========================================================================
 
 Draft in Progress.
 See the :ref:`Change<h.vqkk28dmgzlf>` :ref:`Log<h.vqkk28dmgzlf>` for links to prior stable versions.
@@ -50,12 +48,12 @@ This document is part of the  :doc:`Learning <../Technical_Spec/index>` :doc:`Re
 Readers of the other parts of the Learning Registry Technical Specification should be aware of the contents of this part.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.t8dv95qkagu4:
 
-**Learning** **Registry** **Overview**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------
+Learning Registry Overview
+--------------------------
 
 The Learning Registry [`http <http://www.google.com/url?q=http%3A%2F%2Flearningregistry.org%2F&sa=D&sntz=1&usg=AFQjCNH0Q7yFYPqAD-Zg9qiJ8rq8DVYYKg>`_://`learningregistry <http://www.google.com/url?q=http%3A%2F%2Flearningregistry.org%2F&sa=D&sntz=1&usg=AFQjCNH0Q7yFYPqAD-Zg9qiJ8rq8DVYYKg>`_.`org <http://www.google.com/url?q=http%3A%2F%2Flearningregistry.org%2F&sa=D&sntz=1&usg=AFQjCNH0Q7yFYPqAD-Zg9qiJ8rq8DVYYKg>`_/] aims to make “learning resources easier to **find**, easier to **access** and easier to **integrate** into learning environments *wherever* they are stored -- around the country and the world.” It defines a learning resource distribution network model and a set of open APIs and open interoperability standards to provide three fundamental, enabling capabilities:
 
@@ -73,12 +71,12 @@ Organizations may build consumer-facing, value-added services at the edge nodes 
 The Learning Registry provides *social* *networking* *for* *metadata* (trusted social collaboration around learning resources), enabling a *learning* *layer* on the social web.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.bflimlt80rpq:
 
-**Specification** **License**
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+---------------------
+Specification License
+---------------------
 
 :deletions:`This`:deletions:` `:deletions:`specification`:deletions:` `:deletions:`is`:deletions:` `:deletions:`being`:deletions:` `:deletions:`developed`:deletions:` `:deletions:`under`:deletions:` `:deletions:`the`:deletions:` `:deletions:`Open`:deletions:` `:deletions:`Web`:deletions:` `:deletions:`Foundation`:deletions:` `:deletions:`Contributor`:deletions:` `:deletions:`License`:deletions:` `:deletions:`Agreement`:deletions:` - `:deletions:`Contributor`:deletions:` `:deletions:`Copyright`:deletions:` `:deletions:`Grant`:deletions:` (`:deletions:`CLA`:deletions:` 0.9`:deletions:`).
 `:deletions:`The`:deletions:` `:deletions:`intent`:deletions:` `:deletions:`is`:deletions:` `:deletions:`that`:deletions:` `:deletions:`the`:deletions:` `:deletions:`final`:deletions:` `:deletions:`specification`:deletions:` `:deletions:`will`:deletions:` `:deletions:`be`:deletions:` `:deletions:`released`:deletions:` `:deletions:`under`:deletions:` `:deletions:`the`:deletions:` `:deletions:`Open`:deletions:` `:deletions:`Web`:deletions:` `:deletions:`Foundation`:deletions:` `:deletions:`Agreement`:deletions:` (`:deletions:`OWFa`:deletions:` 0.9`:deletions:`).
@@ -94,12 +92,12 @@ The Learning Registry provides *social* *networking* *for* *metadata* (trusted s
         IN NO EVENT WILL ANY PARTY BE LIABLE TO ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS SPECIFICATION OR ITS GOVERNING AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-""""""""""""""""""""""""""""""""""
 
 .. _h.cu2ipktikrsa:
 
-**Notation**
-""""""""""""""""""""""""""""""""""
+--------
+Notation
+--------
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the Learning Registry Technical Specification are to be interpreted as described in `RFC <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Fhtml%2Frfc2119&sa=D&sntz=1&usg=AFQjCNEifotriMBsHSbNZlbtV_IVSzvraQ>`_` 2119 <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Fhtml%2Frfc2119&sa=D&sntz=1&usg=AFQjCNEifotriMBsHSbNZlbtV_IVSzvraQ>`_.
 
@@ -113,12 +111,12 @@ This model is used for convenience in early prototyping.
 A future version of the specification may describe the data models and their implementation binding independently.
 
 
-"""""""""""""""""""""""""""""""""""""
 
 .. _h.whmj37vjr0jk:
 
-**Conformance**
-"""""""""""""""""""""""""""""""""""""
+-----------
+Conformance
+-----------
 
 There is no overall conformance statement for the Learning Registry Technical Specification.
 The Learning Registry Test Suite (link TBD) MAY be used to test an implementation.
@@ -133,12 +131,12 @@ An organization MAY place tighter requirements on an implementation than those s
 It MAY NOT relax any constraint.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.lisx85v54wl:
 
+------------------------
 Specification Versioning
-"""""""""""""""""""""""""""""""""""""""""""""
+------------------------
 
 ▲:changes:`The`:changes:` `:changes:`following`:changes:` `:changes:`section`:changes:` `:changes:`is`:changes:` `:changes:`new`:changes:` `:changes:`in`:changes:` `:changes:`this`:changes:` `:changes:`version`:changes:` `:changes:`of`:changes:` `:changes:`the`:changes:` `:changes:`part`:changes:`.
 `:changes:`The`:changes:` `:changes:`remainder`:changes:` `:changes:`is`:changes:` `:changes:`not`:changes:` `:changes:`highlighted`:changes:`.`
@@ -207,12 +205,12 @@ Version numbers of different components may be updated independently and version
   - A deployment of the Learning Registry includes any number of services, each of which has their own implementation version number.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.o12ejzxfggen:
 
-**Technical** **Specification** **Overview**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------
+Technical Specification Overview
+--------------------------------
 
 The Learning Registry Technical Specification is split into several parts:
 
@@ -233,12 +231,12 @@ The Learning Registry Technical Specification is split into several parts:
 - **Operations**: Operational procedures that apply to any implementation.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.9vpjmlmi28mv:
 
-**Design** **Principles**
-"""""""""""""""""""""""""""""""""""""""""""""""
+-----------------
+Design Principles
+-----------------
 
 The learning registry design and technical specification is based on several key principles:
 
@@ -271,12 +269,12 @@ The learning registry design and technical specification is based on several key
 - **Web**** 2.0 ****Friendly**: The design is based on current, widely implemented Web 2.0 technologies.
 
 
-""""""""""""""""""""""""""""""""""
 
 .. _h.8n9oub9badbo:
 
-**Glossary**
-""""""""""""""""""""""""""""""""""
+--------
+Glossary
+--------
 
 The following terms are used in this document as defined.
 
@@ -334,12 +332,12 @@ Additional terms may be provided in a future draft or version of the specificati
         *service* (n): a process applied to resource data or system descriptive and operational data operating on a network node.
 
 
-"""""""""""""""""""""""""""""""""""""
 
 .. _h.76rvgj-gh9lot:
 
-**References**
-"""""""""""""""""""""""""""""""""""""
+----------
+References
+----------
 
 References below contain both normative and informative references.
 Unless otherwise noted, this specification references specific versions of other normative standards.
@@ -387,12 +385,12 @@ Additional references may be provided in a future draft or version of the specif
 - UTF-8: TBC (where in Unicode 6.0.0 doc?)
 
 
-""""""""""""""""""""""""""""""""
 
 .. _h.vqkk28dmgzlf:
 
+----------
 Change Log
-""""""""""""""""""""""""""""""""
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -412,12 +410,12 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 .. role:: deprecation
 
