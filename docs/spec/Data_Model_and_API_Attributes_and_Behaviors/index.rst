@@ -1,0 +1,599 @@
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.u6sbhsuktqyj:
+
+Data Model and API Attributes and Behaviors: **Learning** **Registry** **Technical** **Specification** **V** **RQ****:0.**49**.0**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Draft in Progress.
+See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+
+
+:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
+`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+
+:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+
+:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+
+This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
+Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
+
+    :ref:`Data<h.u6sbhsuktqyj>` :ref:`Model<h.u6sbhsuktqyj>` :ref:`and<h.u6sbhsuktqyj>` :ref:`API<h.u6sbhsuktqyj>` :ref:`Attributes<h.u6sbhsuktqyj>` :ref:`and<h.u6sbhsuktqyj>` :ref:`Behaviors<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`RQ<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
+
+        :ref:`Common<h.i6djle3var4b>` :ref:`Data<h.i6djle3var4b>` :ref:`Model<h.i6djle3var4b>` :ref:`and<h.i6djle3var4b>` :ref:`API<h.i6djle3var4b>` :ref:`Attributes<h.i6djle3var4b>` :ref:`and<h.i6djle3var4b>` :ref:`Behaviors<h.i6djle3var4b>`
+
+            :ref:`Data<h.3h25kjtjey9j>` :ref:`Model<h.3h25kjtjey9j>` :ref:`Attributes<h.3h25kjtjey9j>`
+
+                :ref:`Identifiers<h.3yyq9awq43ia>`
+
+                :ref:`Strings<h.24hd1gg6oeak>` :ref:`and<h.24hd1gg6oeak>` :ref:`Internationalization<h.24hd1gg6oeak>`
+
+                :ref:`Time<h.davnw03urmtp>` :ref:`and<h.davnw03urmtp>` :ref:`Date<h.davnw03urmtp>`
+
+            :ref:`API<h.iser5w-jiok98>` :ref:`Attributes<h.iser5w-jiok98>` :ref:`and<h.iser5w-jiok98>` :ref:`Behaviors<h.iser5w-jiok98>`
+
+                :ref:`Service<h.bjbfxxm61faq>` :ref:`Instantiation<h.bjbfxxm61faq>` :ref:`Validation<h.bjbfxxm61faq>`
+
+                :ref:`Transactional<h.xzwjyolpx52v>` :ref:`Behaviors<h.xzwjyolpx52v>` :ref:`and<h.xzwjyolpx52v>` :ref:`Data<h.xzwjyolpx52v>` :ref:`Consistency<h.xzwjyolpx52v>`
+
+                :ref:`Resource<h.rw8jrb-9tha8>` :ref:`Data<h.rw8jrb-9tha8>` :ref:`Validation<h.rw8jrb-9tha8>` :ref:`and<h.rw8jrb-9tha8>` :ref:`Publication<h.rw8jrb-9tha8>`
+
+                :ref:`Resource<h.seu03yccp8ld>` :ref:`Data<h.seu03yccp8ld>` :ref:`ToS<h.seu03yccp8ld>`:ref:`, <h.seu03yccp8ld>`:ref:`Signatures<h.seu03yccp8ld>` :ref:`and<h.seu03yccp8ld>` :ref:`Trust<h.seu03yccp8ld>` :ref:`Policy<h.seu03yccp8ld>` :ref:`Enforcement<h.seu03yccp8ld>`
+
+                :ref:`Operational<h.aj5me7w75zd3>` :ref:`Policy<h.aj5me7w75zd3>` :ref:`Enforcement<h.aj5me7w75zd3>`
+
+                :ref:`Resource<h.mm60gf-1u077v>` :ref:`Data<h.mm60gf-1u077v>` :ref:`Filtering<h.mm60gf-1u077v>`
+
+        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
+
+        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
+
+This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes common requirements for all APIs and data models.
+
+This document is not standalone.
+The reader should be familiar with other parts of the specification, including, but not limited to:
+
+- :doc:`General <../General_Matter/index>` :doc:`Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References,
+
+- :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>`
+
+- :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>`
+
+- :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>`
+
+- :doc:`Services <../Services_and_APIs/index>` including :doc:`Distribution <../Distribution_Services/index>`, :doc:`Publish <../Publish_Services/index>`, :doc:`Access <../Access_Services/index>`, :doc:`Broker <../Broker_Services/index>`, :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
+
+- :doc:`Learning <../Operations/index>` :doc:`Registry <../Operations/index>` :doc:`Operations <../Operations/index>`
+
+In particular, the reader needs to be aware that information from this part of the Technical Specification applies to all services and data models.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.i6djle3var4b:
+
+**Common** **Data** **Model** **and** **API** **Attributes** **and** **Behaviors**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The definition of several common attributes shared across all data models and APIs, along with common API behaviors are specified here as a single point of specification.
+In case of a discrepancy, the definition here SHALL take precedence over the definition elsewhere in this specification.
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.3h25kjtjey9j:
+
+**Data** **Model** **Attributes**
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+"""""""""""""""""""""""""""""""""""""
+
+.. _h.3yyq9awq43ia:
+
+**Identifiers**
+"""""""""""""""""""""""""""""""""""""
+
+Most data models include one or more *identifiers*.
+An identifier SHALL be unique within a defined scope or context.
+Unless otherwise specified, the scope for all identifiers SHALL be all implementations of the Learning Registry.
+Unless otherwise specified by an implementation, an identifier SHALL conform to ISO/IEC 11578:1998, ISO/IEC 9834-8, RFC 4122, and SHOULD use Version 5 (SHA-1 Hash).
+These specifications standardize the generic OSF DCE UUID.
+As a data type, an identifier is commonly encoded as a string.
+
+*NB*: What is called an identifier in a data model is more precisely just a label.
+The use of the label to identify an instance of the data model within the scope or context of the Learning Registry makes it an identifier (within that scope).
+
+*NB*: For many items, the scope could be all implementations of the Learning Registry within one network 
+
+community.
+Extending the scope to all implementations is an intentional simplification.
+
+*Open* *Question*: UUID Version 1 (MAC Address) Version 5 (SHA-1 Hash)?
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.24hd1gg6oeak:
+
+**Strings** **and** **Internationalization**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+All character strings SHALL support full UTF-8 encoding of Unicode character representation.
+
+*NB*: JSON strings default to UTF-8 encoding.
+ECMAScript strings are UTC-16.
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.davnw03urmtp:
+
+**Time** **and** **Date**
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+The format for all times and dates SHALL conform to ISO 8601-2004. All encoded dates and times SHALL  be UTC 0. All *stored* times SHALL be expressed to at least second precision.
+More precise values MAY be used.
+
+Unless specified elsewhere, the JSON encoding of a time and date SHALL be a single string that is the complete, extended ISO 8601-2004 format, e.g., "YYYY-MM-DDThh:mm:ss.sZ" The string SHALL have all of these elements and separators and MAY have any precision of decimal fraction of a second.
+
+*NB*: The above notation follows ISO 8601-2004, and the underscore on the decimal fractional portion of second implies any number of digits (zero or more) may follow the decimal point.
+
+*NB*: Some data models and APIs MAY place additional restrictions on times and dates, including requiring less precision (e.g., days only) in arguments and results.
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.iser5w-jiok98:
+
+**API** **Attributes** **and** **Behaviors**
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Description here about RESTful APIs, CoolURIs, Context negotiation, application/JSON vs text/plain
+
+HTTP requests SHALL use HTTP 1.1. Communications MAY use TLS.
+
+HTTP requests SHOULD include a CONTENT-TYPE header.
+Unless noted, the header SHOULD be 
+
+CONTENT-TYPE: application/JSON
+
+HTTP responses SHOULD include a CONTENT-TYPE header.
+Unless noted, the header SHOULD be CONTENT-TYPE: text/plain; charset=utf=8
+
+Unless noted, all APIs that return JSON via an HTTP GET request SHALL support return of JSON-P to enable processing of the results by a ECMA-Script client.
+GET requests SHALL support an optional jsonp argument.
+If the jsonp argument is present, the API SHALL return the result padded into the function named in the jsonp argument.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.bjbfxxm61faq:
+
+**Service** **Instantiation** **Validation**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+A service at a node SHALL verify that a valid *service* *description* *documen*t exists for the service.
+If the service description document does not exist, is invalid, or indicates that the service is not active, the service SHALL return an HTTP status code.
+
+If the service description document does not exist, the status code SHALL be 501 and the response SHALL include the statement: "Service not implemented".
+
+If the service description document is not valid, the status code SHALL be 501 and the response SHALL include the statement: "Service misconfigured".
+
+If the service description document indicates that the service is not active, the status code SHALL be 501 and the response SHALL include the statement: "Service is not active".
+
+*NB*: These validation checks are performed by the service.
+If the service is not instantiated at a node, the returned HTTP status code SHALL be 404.
+
+*NB*: A service description document and installed code are both required in a valid service instantiation.
+One SHOULD NOT exist without the other.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.xzwjyolpx52v:
+
+**Transactional** **Behaviors** **and** **Data** **Consistency**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Unless stated in an individual API specification, transactional atomicity SHALL BE document granularity.
+
+
+Requirements for consistency of documents across multiple nodes apply only when the nodes are consistent.
+Prior to, or during document distribution, documents MAY be inconsistent.
+
+*NB*: The distribution model assumes the underlying system SHALL produce *eventual* *consistency*.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.rw8jrb-9tha8:
+
+**Resource** **Data** **Validation** **and** **Publication**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+All resource data publishing and distribution services SHALL validate all documents before the document is stored at the node.
+
+- All required fields SHALL be present.
+
+- Only mutable fields MAY be changed in an update.
+
+- The node SHALL reject a submission where the payload does not correspond with the declared payload.
+
+- The node MAY validate an attached or linked payload.
+
+- The node MAY validate an inline payload.
+
+- Prior attachments SHALL be deleted in an update.
+
+- Default values SHALL be filled in.
+
+- Node-specific fields SHALL be filled in.
+
+**Resource** **Data** **Validation** **and** **Publication**
+
+    // Validate a *resource* *data* *description* document
+
+    // is the submission well formed
+
+    IF any required element is missing
+
+        THEN
+
+                        REJECT the document
+
+                        EXIT    
+
+    // changes in mutable fields are only allowed in an update
+
+    IF submission is an update
+
+        IF any immutable field in the new document does not match old field
+
+            THEN
+
+                                REJECT the document
+
+                                EXIT
+
+    // does the payload match the declaration
+
+    IF payload_placement = "linked" and no payload_locator provided
+
+        THEN
+
+                        REJECT the document
+
+                        EXIT
+
+    IF payload_placement = "inline" and no resource_document in the submission 
+
+        THEN
+
+                        REJECT the document
+
+                        EXIT
+
+    IF payload_placement = "attached" and no attachment
+
+        THEN
+
+                        REJECT the document
+
+                        EXIT
+
+    // payload must match the schema and validate
+
+    IF payload_schema does not correspond to resource_data_type
+
+        THEN
+
+                        REJECT the document
+
+                        EXIT
+
+    VALIDATE the payload
+
+    // updates invalidate existing attachments
+
+    IF submission is an update
+
+        THEN delete any attachments
+
+    // Generate the ID if required
+
+        IF doc_ID isn’t provided
+
+        THEN generate a doc_ID
+
+    // Set local node data
+
+    publish_node := node_id
+
+    IF submission is an update
+
+        THEN 
+
+                        update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time // granularity of seconds
+
+                ELSE
+
+                    create_timestamp :=update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time
+
+    IF frbr_level not specified
+
+        THEN frbr_level := "copy"
+
+ 
+
+*Open* *Question*: Should an update delete the attachments automatically, or should this be an option?
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.seu03yccp8ld:
+
+**Resource** **Data** **ToS****, ****Signatures** **and** **Trust** **Policy** **Enforcement**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+All resource data publishing services and resource data distribution services MAY apply ToS, digital signature and submitter identity checks to resource data.
+
+- The node MAY reject an anonymous submission or any other submission according to its policy.
+
+- The node MAY reject a submission from an untrusted submitter.
+
+- The node MAY reject a submission without a known terms of service.
+
+- The node MAY reject a submission that is not signed.
+
+- The node MAY reject the submission if the signature cannot be verified.
+
+*NB*: The acceptable node policies and terms of service are not defined in this specification.
+The specification requires that ToS, digital signatures and trust checks be performed according to node policies.
+The outcome of those checks, and the actions taken, are governed by node, network or community-specific policies that are out of scope for this specification.
+
+*NB*: Declared policies SHOULD be applied consistently in both publication and distribution.
+
+*NB*: A node MAY apply other policies or MAY apply policies without declaring them in the node description.
+
+*NB*: An implementation MAY check policies in any order.
+It MAY evaluate all policies or do a short-circuit evaluation and stop when any policy violation is found.
+
+**Resource** **Data** **ToS****, ****Signatures** **and** **Trust** **Policy** **Enforcement**
+
+    // Check Policies
+
+        IF the service applies ToS checks
+
+                AND the *resource* *data* *description* document TOS is unacceptable
+
+            THEN // indicate ToS was rejected
+
+                REJECT the document
+
+                EXIT
+
+    IF the service does not accept anonymous submissions
+
+                AND the *resource* *data* *description* document has submitter_type=="anonymous"
+
+            THEN // indicate submitter type was rejected
+
+                        REJECT the document
+
+                EXIT
+
+        IF the service validates the submitter or submitter trust
+
+                AND the *resource* *data* *description* document submitter cannot be verified or trusted
+
+                THEN // indicate submitter was rejected
+
+                        REJECT the document
+
+                EXIT
+
+        IF the service requires a signature
+
+                AND the *resource* *data* *description* document signature not present
+
+                THEN // indicate signature was rejected
+
+                        REJECT the document
+
+                EXIT
+
+        IF the service validates the signature
+
+                AND the *resource* *data* *description* document signature cannot be verified
+
+                THEN // indicate signature was rejected
+
+                        REJECT the document
+
+                EXIT
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.aj5me7w75zd3:
+
+Operational Policy Enforcement
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+All resource data publishing services and resource data distribution services MAY enforce operational policies
+
+- The node MAY reject the size of a document as being too large according to its policy.
+
+*NB*: Declared policies SHOULD be applied consistently in both publication and distribution.
+
+*NB*: A node MAY apply other policies or MAY apply policies without declaring them in the node description.
+
+*NB*: An implementation MAY check policies in any order.
+It MAY evaluate all policies or do a short-circuit evaluation and stop when any policy violation is found.
+
+**Operational** **Policy** **Enforcement**
+
+        // Check Policies
+
+        IF the service applies ToS checks
+
+                AND the *resource* *data* *description* document TOS is unacceptable
+
+            THEN // indicate ToS was rejected
+
+                REJECT the document
+
+                EXIT
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.mm60gf-1u077v:
+
+**Resource** **Data** **Filtering**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+All resource data publishing services and resource data distribution services apply filters to resource data.
+If a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Node <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Filter <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Document <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ is stored at a node, the filter SHALL be applied to a resource data description document before the document is stored at the node.
+
+Either a custom filter or expression-based filters MAY be defined.
+If there is a custom filter (expressed in custom code at the node), expression-based filters SHALL be ignored.
+A custom filter SHOULD NOT be used when the filters can be expressed using expression-based filters.
+
+A filter defines either the resource data documents that pass the filter (and are stored; all other resource data documents are not stored), or resource data documents that are rejected by the filter (and are not stored, all other documents are stored).
+
+An expression-based filter contains a list of regular expressions that are used to match keywords/names in the resource data description document, and a regular expression that is used to match values for the keywords.
+If the filter key matches any keyword/name in the resource data, and if any value for that key in the resource data matches the filter value, the filter is successful, i.e., for an “include” filter, the document is included; for an exclude filter, the document is “excluded”. Matching is an “or”. A successful match short circuits further matching.
+
+The filter SHALL be applied against all top-level elements in the resource data description document.
+Behavior for filtering against linked resource data, attachments or the inline resource data is not currently defined.
+
+*NB*: Resource data filtering is in addition to the prerequisite manditory filtering of any document that contains a do_not_distribute key-value pair.
+
+**Resource** **Data** **Filtering**
+
+    // Filter a *resource* *data* *description* document
+
+    // No filter test
+
+    IF the *network* *node* *filter* *description* document does NOT exist
+
+        THEN store the *resource* *data* *description* document 
+
+            EXIT
+
+    // Filter not active test
+
+    IF NOT active in the *network* *node* *filter* *description* document
+
+        THEN store the *resource* *data* *description* document
+
+            EXIT
+
+    // Use custom filter if defined
+
+    IF custom_filter in the the *network* *node* *filter* *description* document
+
+        THEN eval the custom filter code
+
+            IF the code returns true 
+
+                                THEN store the *resource* *data* *description* document
+
+                        EXIT
+
+    // Expression-based filtering
+
+    // Does the filter match the document
+
+    match := F
+
+    FOR EACH filter in the *network* *node* *filter* *description* document
+
+        FOR EACH key/name in the *resource* *data* *description* document
+
+        IF the filter_key REGEX matches the key/name
+
+            IF the filter_value is NULL
+
+                THEN match := T
+
+                    SKIP ALL
+
+            FOR EACH value of the key/name in the *resource* *data* *description* document
+
+                IF the filter_value REGEX matches the value 
+
+                    THEN match := T
+
+                        SKIP ALL
+
+    // Store or reject
+
+    IF include_exclude 
+
+                IF match // matches what to include
+
+            THEN store the *resource* *data* *description* document
+
+                EXIT
+
+            ELSE EXIT // don’t store
+
+        IF NOT match // doesn’t match what to exclude
+
+            THEN store the *resource* *data* *description* document
+
+                EXIT
+
+            ELSE EXIT // don’t store
+
+
+"""""""""""""""""""""""""""""""""""""""""
+
+.. _h.e1519o-y653zc:
+
+**Change** **Log**
+"""""""""""""""""""""""""""""""""""""""""
+
+*NB*: The change log only lists major updates to the specification.
+
+
+*NB*: Updates and edits may not results in a version update.
+
+*NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
+
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V RQ:0.49.0)                                                                                                                                                                                                    |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Archived copy location TBD. (V RQ:0.50.0)                                                                                                                                                                                                |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | RESTful APIsArchived copy location TBD. (V RQ:x.xx.x)                                                                                                                                                                                                                                        |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.tph0s9vmrwxu:
+
+**Working** **Notes** **and** **Placeholder** **Text**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+- Flow control consistency
+
+- How does a service find its service doc
+
+.. role:: deprecation
+
+.. role:: deletions
+
+.. role:: changes

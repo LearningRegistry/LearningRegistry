@@ -1,0 +1,524 @@
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.u6sbhsuktqyj:
+
+Resource Data Data Model: **Learning** **Registry** **Technical** **Specification** **V** **RM****:0.**49**.0**
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Draft in Progress.
+See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+
+
+:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
+`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+
+:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+
+:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+
+This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
+Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
+
+    :ref:`Resource<h.u6sbhsuktqyj>` :ref:`Data<h.u6sbhsuktqyj>` :ref:`Data<h.u6sbhsuktqyj>` :ref:`Model<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`RM<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
+
+        :ref:`Resource<h.cbvxf-xys34q>` :ref:`Data<h.cbvxf-xys34q>` :ref:`Data<h.cbvxf-xys34q>` :ref:`Models<h.cbvxf-xys34q>`
+
+            :ref:`Resource<h.kdtam7-568cce>` :ref:`Data<h.kdtam7-568cce>` :ref:`Description<h.kdtam7-568cce>` :ref:`Data<h.kdtam7-568cce>` :ref:`Model<h.kdtam7-568cce>`
+
+            :ref:`Metadata<h.ykraw8-ientp5>` :ref:`Formats<h.ykraw8-ientp5>`
+
+            :ref:`Paradata<h.5bpp9l-ncbjqy>` :ref:`Formats<h.5bpp9l-ncbjqy>`
+
+            :ref:`Resource<h.hphvlw-1cw6xc>` :ref:`Data<h.hphvlw-1cw6xc>`
+
+        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
+
+        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
+
+This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the model of resource data that is transported through the network.
+
+This document is not standalone.
+The reader should be familiar with other parts of the specification, including, but not limited to:
+
+- :doc:`General <../General_Matter/index>` :doc:`Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References
+
+- :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>`
+
+- :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>`
+
+- :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>`
+
+- :doc:`Services <../Services_and_APIs/index>` including :doc:`Distribution <../Distribution_Services/index>`, :doc:`Publish <../Publish_Services/index>`, :doc:`Access <../Access_Services/index>`, :doc:`Broker <../Broker_Services/index>`, :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
+
+- :doc:`Learning <../Operations/index>` :doc:`Registry <../Operations/index>` :doc:`Operations <../Operations/index>`
+
+In particular, the reader needs to be aware that specific criteria for the Network Model are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part.
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.cbvxf-xys34q:
+
+**Resource** **Data** **Data** **Models**
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The resource distribution network and its nodes process and distribute **resource** **data** (e.g., network messages about resources, metadata, paradata, etc.).
+Producer edge nodes publish resource data to a node of the network; the resource distribution network moves it to other nodes, and consumer edge nodes pull resource data for external use from nodes.
+
+All data models MAY be extended with additional elements.
+The name of any extension element SHALL begin with the characters "X_" designating an extension element.
+Any document that includes any element that is not is the defined data model or is not an extension element is non conforming and SHALL be rejected by any service.
+
+All data models have a named attribute that is a “type” element (doc_type).
+The data model description specifies the literal value for this element for all instances of each type of document.
+
+All data models have a named attribute that is a “version” element (doc_version).
+The data model description specifies the literal value for this element for all document instances.
+
+Additional constraints on attributes values are detailed in `Data <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_ `Attributes <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_.
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.kdtam7-568cce:
+
+**Resource** **Data** **Description** **Data** **Model**
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The data model describing resources, metadata, paradata, etc., that is distributed by the resource distribution network.
+The data model MAY be extended with additional optional, mutable elements that describe a resource and have a character string value space.
+The name of such an element SHALL begin with the characters "resource_".
+Once the data model has been instantiated the value of an immutable element SHALL NOT change.
+Other values MAY be changed only by the owner of the document.
+
+        {
+
+         "doc_type":        "resource_data",    // the literal "resource_data"
+
+                            // required, immutable
+
+         "doc_version":        "0.23.0",    // the literal for the current version -- "0.23.0"
+
+                            // required, immutable
+
+         // general elements about the submission
+
+         "doc_ID":        "string",        // unique ID for this resource data description document
+
+                                                // unique within scope of the LR
+
+                                                // immutable
+
+                                                // user optional, required for storage
+
+                                                // system generated when publishing
+
+                                                // the document if not provided
+
+         "resource_data_type":    "string",        // open (best practices) vocabulary
+
+                                                // ["metadata", "paradata", "resource", "assertion", ...]
+
+                                                // required, immutable
+
+         "active":        boolean,    // is the resource data description document active
+
+                            // required, mutable from T to F only
+
+         // information about the submission, independent of the resource data
+
+         "identity": {                // identity and curation
+
+         "submitter_type":    "string",        // fixed vocabulary ["anonymous", "user", "agent"]
+
+                            // required, immutable
+
+                            // "anonymous" -- submitter is unknown
+
+                            // "user" -- submitter is a user or has a user identity
+
+                            // "agent" -- submitter is an agent, e.g., a repository, LMS
+
+                            // or an organization
+
+         "submitter":        "string",        // identity of the submitter of the resource data
+
+                            // required, immutable
+
+                                                // use "anonymous" for type "anonymous"
+
+         "curator":        "string",        // identity of the curator of the resource data description
+
+                        // who manages the resource data description
+
+                        // optional
+
+         "owner":        "string",        // identity of the owner of the resource
+
+                        // who owns what is referenced in the resource locator
+
+                        // optional
+
+         "signer":        "string"        // identity of key owner used to sign the submission
+
+                                                // optional
+
+    },
+
+    // submission and distribution workflow information
+
+         "submitter_timestamp":    "string",        // submitter-created timestamp
+
+                                                // time/date encoding
+
+                            // optional
+
+         "submitter_TTL":    "string",        // submitter statement of TTL of validity of submission
+
+                                                // time/date encoding
+
+                            // optional
+
+         "publishing_node":    "string",        // node_id of node where injected into the network
+
+                            // required
+
+                            // provided by the initial publish node (not distribution)
+
+        ▼":deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:`":    "`:deprecation:`string`:deprecation:`",        // `:deprecation:`timestamp`:deprecation:` `:deprecation:`of`:deprecation:` `:deprecation:`when`:deprecation:` `:deprecation:`received`:deprecation:` `:deprecation:`by`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`current`:deprecation:` `:deprecation:`node`
+
+                                                :deprecation:`// `:deprecation:`time`:deprecation:`/`:deprecation:`date`:deprecation:` `:deprecation:`encoding`
+
+                                                :deprecation:`// `:deprecation:`required`
+
+                                                :deprecation:`// `:deprecation:`provided`:deprecation:` `:deprecation:`by`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`current`:deprecation:` `:deprecation:`distribution`:deprecation:` `:deprecation:`node`
+
+                                                :deprecation:`//`:deprecation:` `:deprecation:`NOT`:deprecation:` `:deprecation:`distributed`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`other`:deprecation:` `:deprecation:`nodes`
+
+                                                :deprecation:`// `:deprecation:`Planned`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`after`:deprecation:` 20110930`
+
+         "node_timestamp":    "string",        // timestamp of when received by the current node
+
+                                                // time/date encoding
+
+                                                // required
+
+                                                // provided by the current distribution node
+
+                                                // NOT distributed to other nodes
+
+         "create_timestamp":    "string",        // timestamp of when first published to the network
+
+                            // independent of updates
+
+                                                // time/date encoding
+
+                                                // required, immutable
+
+                                                // provided by the initial publishing node on first publish
+
+                                                // not by a distribution node or not an update
+
+        "TOS": {                // terms of service
+
+         "submission_TOS":    "string",        // agreed terms of service by submitter
+
+                                    // required
+
+         "submission_attribution":"string"        // attribution statement from submitter
+
+                            // optional
+
+         },
+
+        "do_not_distribute":    "string",        // system provided key-value pair
+
+                        // optional
+
+         "weight":        "integer",    // submitter assigned weight (strength)
+
+                            // -100:100
+
+                            // optional
+
+        "digital_signature": {             // digital signature of the submission, optional
+
+         "signature":        "string",        // signature string, required
+
+         "key_location":    ["string"],    // array of public key locations,, required
+
+         "signing_method":    "string"        // fixed vocabulary ["LR-PGP.1.0"]
+
+                            // required
+
+         },
+
+         // information about the resource, independent of the resource data
+
+         "resource_locator":    "string",        // unique locator for the resource described
+
+                                                // SHALL resolve to a single unique resource
+
+                                                // required
+
+:changes:`    ` "keys":            ["string"],    // array of hashtag, keyword value list used for filtering
+
+                        // optional
+
+         "resource_TTL":    integer,        // TTL from resource owner for the resource itself, in days
+
+                                        // optional
+
+     // the actual resource data description elements
+
+     // these elements are optional as a block if the submission is a resource
+
+     "payload_placement":    "string",        // fixed vocabulary ["inline", "linked", "attached"]
+
+                                            // "inline" -- resource data is in an object that follows
+
+                                            // "linked" -- resource data is at the link provided
+
+                                            // "attached" -- resource data is in an attachment
+
+                                            // required
+
+     "payload_schema":    ["string"],    // array of schema description/keywords
+
+                                                // for the resource data
+
+                                            // required
+
+                        // defined :ref:`metadata<h.ykraw8-ientp5>` :ref:`schema<h.ykraw8-ientp5>` :ref:`values<h.ykraw8-ientp5>`
+
+                        // defined :ref:`paradata<h.5bpp9l-ncbjqy>` :ref:`schema<h.5bpp9l-ncbjqy>` :ref:`values<h.5bpp9l-ncbjqy>`
+
+         "payload_schema_locator":"string",    // schema locator for the resource data
+
+                                            // optional
+
+         "payload_schema_format":"string",    // schema MIME type
+
+                                            // optional
+
+         "payload_locator":    "string",        // locator if payload_placement value is "linked"
+
+                                        // required if "linked", otherwise ignored
+
+     "resource_data":            // the actual inline resource data
+
+     <the resource data object>,        // the resource data itself (resource.
+metadata, paradata)
+
+                        // maybe a JSON object, or
+
+                                                // a string encoding XML or some other format, or
+
+                                                // a string encoding binary
+
+                                                // required if "inline" otherwise ignored
+
+         "X_xxx":        ?????        // placeholder for extensibility, optional
+
+        }
+
+Timestamp values for update_timestamp:deprecation:`, `▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`, and create_timestamp SHALL be UTC 0.
+
+*Open* *Question*: Is there a use case that requires create_timestamp?
+
+*Open* *Question*: Is locator sufficient, or do we still need an ID for the resource?
+
+*NB*: The doc_ID is not required when a user creates a resource data description document.
+If missing, it SHALL be provided by a publishing service when the document is first published.
+
+*NB*: Need to agree on the conventions for valid submitter, owner and TOS strings.
+
+*NB*: Separating owner from submitter enables 3rd party submissions.
+
+*NB*: If the key owner is not included in the digital signature, the submitter is assumed to be the key owner.
+
+*NB*: Separating the key owner from the submitter enables 3rd party signing of submissions.
+
+*NB*: The signing mechanism is described under `Identity <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `Digital <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `Signatures <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_.
+
+*NB*: Providing the signing method enables different signing algorithms.
+
+*NB*: The supplied resource_locator SHALL be a unique ID within the scope of the Learning Registry and SHALL resolve to a single resource from which someone may uniquely access the resource.
+The resource_locator is used to correlate multiple resource data descriptions about a single resource.
+Thus the locator needs to be specific to the resource.
+
+*NB*: A resource data description document contains only one set of resource data (metadata, paradata).
+
+*NB*: The weight is used let the submitter assign a confidence level to the data.
+
+*NB*: To submit data only for a resource (no metadata or paradata), the payload attributes MAY be omitted.
+
+*NB*: There is currently no mechanism to update the resource_* attributes without resubmitting the metadata or paradata about the resource.
+This is consistent with document-oriented transactional atomicity.
+
+*NB*: There are no restrictions on the actual resource data.
+The format and encoding are based on the defined payload_schema and payload_schema_format values.
+
+*NB*: Best practices of how to use the resource_* attributes and how to encode values are not provided.
+
+*NB*: Some elements MAY be mapped to DC terms or LOM schema elements.
+
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| **Resource** **Data** **Description** | **Dublin** **Core**              | **IEEE** **LOM**                                                                                     |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_data_owner                   |                                  | 3.3.2: LifeCycle.Contribute.Entity when 2.3.1: LifeCycle.Contribute.Role has a value of “Submitter.” |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_description                  | dc:description                   | 1.4: General.Description                                                                             |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_format                       | dc:format                        | 4.1: Technical.Format                                                                                |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_language                     | dc:language                      | 1.3: General.Language                                                                                |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_locator                      | dc:ID                            | 1.1: General.Identifier or 4.3: Technical.Location                                                   |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_owner                        | dc:publisher                     | 2.3.2: LifeCycle.Contribute.Entity when 2.3.1:LifeCycle.Contribute.Role has a value of “Publisher.”  |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_rights                       | dc:rights                        | 6.3: Rights.Description                                                                              |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_relationship                 | dc:resource refinement qualifier | 7.1: Relation.Kind                                                                                   |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_subject                      | dc:subject                       | 1.5: General.Keyword                                                                                 |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_title                        | dc:title                         | 1.2: General.Title                                                                                   |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_TTL                          |                                  |                                                                                                      |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| resource_type                         | dc:type                          | 5.2: Educational.LearningResourceType                                                                |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+| related_resource                      | dc:resource                      | 7.2.1: Relation.Identifier.Identifier                                                                |
++---------------------------------------+----------------------------------+------------------------------------------------------------------------------------------------------+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.ykraw8-ientp5:
+
+**Metadata** **Formats**
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+The metadata in a resource data description MAY be defined using any metadata standard.
+Metadata documents SHALL include the reference to the defining standard or schema.
+The following list of schema values SHALL be used to refer to common schemata.
+Implementations MAY extend this list.
+
++---------------------------+--------------------------+
+| **Metadata** **Standard** | payload_schema **value** |
++---------------------------+--------------------------+
+| Dublin Core 1.1           | "DC 1.1"                 |
++---------------------------+--------------------------+
+| IEEE LOM 2002             | "IEEE LOM 2002"          |
++---------------------------+--------------------------+
+| OAI\-PMH Dublin Core      | "oai_dc"                 |
++---------------------------+--------------------------+
+
+Attached and linked metadata SHALL include appropriate schema definitions and schema locators in the metadata file.
+
+
+*NB*.
+There is currently no machine-readable list of schemata.
+Such a list could be defined in additional network description documents.
+
+Inline metadata SHALL be encoded in JSON structure or as a single JSON string wrapping the entire metadata document.
+
+JSON encodings of metadata schemata (primarily for inline resource data) will be provided in a future draft of the specification.
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.5bpp9l-ncbjqy:
+
+**Paradata** **Formats**
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+The paradata in a resource data description MAY be defined using any paradata standard.
+Paradata documents SHALL include the reference to the defining standard or schema.
+The following list of schema values SHALL be used to refer to common schemata.
+Implementations MAY extend this list.
+
++---------------------------+--------------------------+
+| **Paradata** **Standard** | payload_schema **value** |
++---------------------------+--------------------------+
+|                           |                          |
++---------------------------+--------------------------+
+
+Attached and linked paradata SHALL include appropriate schema definitions and schema locators in the paradata file.
+
+
+*NB*.
+There is currently no machine-readable list of schemata.
+Such a list could be defined in additional network description documents.
+
+Inline paradata SHALL be encoded in JSON structure or as a single JSON string wrapping the entire paradata document.
+
+JSON encodings of paradata schemata (primarily for inline resource data) will be provided in a future draft of the specification.
+
+
+""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.hphvlw-1cw6xc:
+
+**Resource** **Data**
+""""""""""""""""""""""""""""""""""""""""""""
+
+The resource data SHALL be maintained in a set of documents stored at each node in the network.
+
+- Each node MAY store one or more instances of the :ref:`resource<h.kdtam7-568cce>` :ref:`data<h.kdtam7-568cce>` :ref:`description<h.kdtam7-568cce>` :ref:`documents<h.kdtam7-568cce>`.
+  All document instances stored at a node SHALL be unique.
+  A document MAY be replicated at many nodes.
+
+Any resource description document with a "do_not_distribute" key is consdered to be a local document stored only at the node (independent of the value of the key).
+A document with this key-value pair SHALL be unconditionally rejected during publishing or distribution.
+
+Additional types of resource data documents (documents that differ in purpose from resource data description documents) MAY be defined, but SHALL be defined as unique per node.
+Other types of resource data description documents SHALL NOT be defined and SHALL NOT be replicated.
+Other organizational classifications SHALL NOT be used.
+*NB*: These constraints are meant to restrict placing resource data in multiple different databases.
+
+
+"""""""""""""""""""""""""""""""""""""""""
+
+.. _h.e1519o-y653zc:
+
+**Change** **Log**
+"""""""""""""""""""""""""""""""""""""""""
+
+*NB*: The change log only lists major updates to the specification.
+
+
+*NB*: Updates and edits may not results in a version update.
+
+*NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
+
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V RM:0.49.0)                                                                                                                                                                                                    |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Add page size as service doc setting with flow control.Archived copy location TBD. (V RM:0.50.0)                                                                |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | Assertion (relation/sameas) and trust documents.Archived copy location TBD. (V RM:x.xx.x)                                                                                                                                                                                                    |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.tph0s9vmrwxu:
+
+**Working** **Notes** **and** **Placeholder** **Text**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. role:: deprecation
+
+.. role:: deletions
+
+.. role:: changes

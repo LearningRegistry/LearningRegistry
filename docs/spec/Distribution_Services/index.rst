@@ -1,0 +1,407 @@
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.u6sbhsuktqyj:
+
+Distribution Services: **Learning** **Registry** **Technical** **Specification** **V** **DS****:0.**49**.0**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Draft in Progress.
+See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+
+
+:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
+`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+
+:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+
+:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+
+This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
+Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
+
+    :ref:`Distribution<h.u6sbhsuktqyj>` :ref:`Services<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`DS<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
+
+        :ref:`Resource<h.vb0xt6mhzmg2>` :ref:`Data<h.vb0xt6mhzmg2>` :ref:`Distribution<h.vb0xt6mhzmg2>` :ref:`Service<h.vb0xt6mhzmg2>`
+
+        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
+
+        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
+
+This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the Learning Registry services used to distribute resource documents throughout a distribution network.
+
+This document is not standalone.
+The reader should be familiar with other parts of the specification, including, but not limited to:
+
+- :doc:`General <../General_Matter/index>` :doc:`Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References
+
+- :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>`
+
+- :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>`
+
+- :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>`
+
+- :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>`
+
+- :doc:`Other <../Services_and_APIs/index>` :doc:`Services <../Services_and_APIs/index>` including :doc:`Publish <../Publish_Services/index>`, :doc:`Access <../Access_Services/index>`, :doc:`Broker <../Broker_Services/index>`, :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
+
+- :doc:`Learning <../Operations/index>` :doc:`Registry <../Operations/index>` :doc:`Operations <../Operations/index>`
+
+In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>` part describes the network model, the :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>` part describes the data that distribution services process, and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.vb0xt6mhzmg2:
+
+Resource Data Distribution Service
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The resource data distribution service is used to distribute (synchronize or replicate) the resource data from one node to its connected nodes (unidirectional).
+The resource data distribution service SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_, if present at the destination node, to restrict the resource data that is distributed.
+The resource data distribution service SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ `validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is stored at the destination node.
+A destination node MAY reject any resource data description document based on the node’s `p <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.seu03yccp8ld>`_`olicies <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.seu03yccp8ld>`_: from an unverified or untrusted submitter, that is not signed or where the signature cannot be verified, that does not contain an accepted ToS, etc.
+The destination node MAY reject any document that is larger than the node can store.
+The destination node SHALL reject any document with a "do_not_distribute" key-value pair; this verification SHALL be performed before any other verification and SHALL short circuit all other verification.
+
+*NB*: There is no defined mechanism to define the acceptable ToS for a node.
+
+*NB*: How the resource data distribution service decides if it accepts or rejects resource data that does not come from a verified submitter, is not signed or that does not conform to the destination node’s ToS is determined by the the node’s policy and is not defined in this specification.
+
+Future drafts or versions of this specification MAY define additional resource data distribution services.
+
+The resource data distribution service is used in resource distribution network operations.
+Access to the service SHOULD be restricted to network operational procedures.
+
+The resource data distribution service examines the network topology and verifies the rules that govern network structure for each connection and the associated nodes.
+On a connection-by-connection basis, a malformed connection between two nodes SHALL be skipped.
+Distribution occurs across all valid connections.
+
+*NB*: There is no assumption that one type of document (node description or connection) is more authoritative.
+
+A task scheduler SHOULD trigger resource data distribution from a source node to all of its destination nodes according to the frequency specified by the sync_frequency in the node description document.
+
+
+The service provides three distinct functions:
+
+- A service with an API at the source node which is used to trigger the resource data distribution.
+  
+
+- A service at each destination node that processes the incoming resource data.
+
+- A service and API at each destination node that is used to return descriptive information from the destination node to the source node to validate the connection.
+  
+
+**API****: ****Data** **Distribution**
+
+        POST <node-service-endpoint-URL>/distribute
+
+    
+
+        Arguments:
+
+            None
+
+        Request Object:
+
+            None
+
+        Results Object:                    // results summary and errors
+
+        {
+
+         "OK":        boolean,        // T if successful
+
+         "error":        "string"            // text describing error
+
+        }
+
+        
+
+    Return Codes:
+
+        200    Successful
+
+        500    An error
+
+**Resource** **Distribution****: ****Source** **Node** **Process**
+
+    // Distribute a resource data description document collection from one node to its connected nodes
+
+    VALIDATE resource_document_database.doc_type = "resource_data"
+
+    // only distributing resource data
+
+        GET the *network* *node* *description* document for the source node to obtain
+
+            source.network_id
+
+            source.community_id
+
+            source.gateway_node
+
+        GET the *network* *community* *description* document for the source node to obtain
+
+            source.social_community
+
+        GET the *network* *node* *connectivity* documents for the source node
+
+        IF > 1 connectivity document with active = T AND gateway_connection = T
+
+            THEN ABORT 
+
+                        // only one active gateway is allowed, faulty network description
+
+        FOR EACH node connectivity document
+
+            GET the *network* *node* *description* document for the destination node
+
+                        (via the destination_node_url) to obtain
+
+                            destination.network_id
+
+                            destination.community_id
+
+                            destination.gateway_node
+
+                        GET the *network* *community* *description* document for the destination node
+
+                        to obtain
+
+                    destination.social_community
+
+                        IF source.community_id <> destination.community_id
+
+                         AND ((NOT source,social_community) 
+
+                                OR (NOT destination.social_community))
+
+                            THEN SKIP
+
+                        // cannot distribute across non social communities
+
+                        IF (NOT gateway_connection) AND
+
+                         source.network_id <> destination.network_id
+
+                            THEN SKIP
+
+                        // cannot distribute across networks (or communities) unless gateway
+
+                        IF gateway_connection AND
+
+                         source.network_id = destination.network_id
+
+                            THEN SKIP
+
+                        // gateway must only distribute across different networks
+
+                        IF gateway_connection
+
+                         AND    ((NOT source.gateway_node)
+
+                            (OR (NOT destination.gateway_node))
+
+                            THEN SKIP
+
+                        // gateways can only distribute to gateways
+
+                        COMMIT all outstanding resource data description database operations
+
+                        PERFORM distribution service between source and destination nodes
+
+                        // this is the distribution primitive
+
+*NB*: There may be a better way to do the validations via map-reduce.
+
+*NB*: Since all attributes of the network that model its topology are immutable, the replication process should be transactionally safe.
+
+*NB*: The process is only designed to distribute resource data.
+It encodes specific business rules about gateway processing.
+It SHOULD NOT be used to distribute network descriptions.
+
+*NB*: The process does not return errors when there are bad connection descriptions; they are skipped.
+A bad connection should never have been accepted; the checks are included to ensure consistency.
+
+*NB*: The process does not return errors when a distribution fails, either directly or because the destination node is not available.
+The process SHOULD verify that the destination node is reachable and operational before performing data distribution.
+
+**Resource** **Distribution****: ****Destination** **Node** **Process**
+
+        // Process and filter inbound resource data description documents at a node
+
+         REJECT the *resource* *data* *description* document if it contains a do_not_distribute key.
+
+        VALIDATE the *resource* *data* *description* document
+
+            // skip storing all documents that do not validate
+
+        REJECT the *resource* *data* *description* document if the submitter cannot be verified
+
+        REJECT the *resource* *data* *description* document if the submitter_TOS is unacceptable to the node
+
+         REJECT the *resource* *data* *description* document if it too large
+
+        IF the *network* *node* *filter* *description* document exists and contains active filters
+
+                THEN PERFORM filtering and store only documents that pass the filter
+
+        ▼:deprecation:`UPDATE`:deprecation:` `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` // `:deprecation:`when`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`document`:deprecation:` `:deprecation:`was`:deprecation:` `:deprecation:`stored`:deprecation:` `:deprecation:`at`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`node`
+
+*NB*: The process does not return indicators when documents are filtered.
+
+▼:deprecation:`*NB*`:deprecation:`: `:deprecation:`An`:deprecation:` `:deprecation:`implementation`:deprecation:` `:deprecation:`SHALL`:deprecation:` `:deprecation:`maintain`:deprecation:` `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`manner`:deprecation:` `:deprecation:`that`:deprecation:` `:deprecation:`does`:deprecation:` `:deprecation:`not`:deprecation:` `:deprecation:`trigger`:deprecation:` `:deprecation:`redistibution`:deprecation:` `:deprecation:`of`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`documen`:deprecation:`t`:deprecation:`; `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`is`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`local`:deprecation:` `:deprecation:`node`:deprecation:` `:deprecation:`value`:deprecation:`.
+-- `TO BE replaced by a local value that is not maintained as part of the resource data description document
+
+**API****: ****Destination** **Node** **Information**
+
+        GET <node-service-endpoint-URL>/destination
+
+    
+
+        Arguments:
+
+            None
+
+        Request Object:
+
+            None
+
+        Results Object:                    // results summary and errors
+
+        {
+
+         "OK":        boolean,        // T if successful
+
+         "error":        "string",            // text describing error
+
+         "target_node_info":            // target distribution node data
+
+         {
+
+                 "active":        boolean,    // is the destination network node active
+
+                 "node_id":        "string",        // ID of the destination network node
+
+                 "network_id":        "string",        // id of the network of the destination
+
+                 "community_id":    "string",     // id of the community of the destination
+
+                 "gateway_node":    boolean,    // destination node is a gateway node
+
+                 "social_community":    boolean        // is community a social community
+
+                }
+
+        }
+
+        
+
+    Return Codes:
+
+        200    Successful
+
+        500    An error
+
+**Resource** **Distribution****: ****Destination** **Node** **Information**
+
+    // Return the description of a destination network node
+
+    DEFINE VIEW on
+
+                *network* *node* *description* document containing the required output fields
+
+                + *network* *community* *description* document containing the required output fields
+
+    QUERY
+
+        RETURN Results document
+
+    
+
+**Service** **Description**
+
+    {
+
+         "doc_type":        "service_description",    
+
+         "doc_version":        "0.20.0",
+
+         "doc_scope":        "node",
+
+         "active":        true,
+
+         "service_id":        "<uniqueid>",        
+
+         "service_type":        "distribute",
+
+     "service_name":    "Resource Data Distribution",
+
+        "service_description":    "Service used to distribute resource documents from one node to other nodes",        
+
+     "service_version":    "0.23.0",
+
+     "service_endpoint":    "<node-service-endpoint-URL>",
+
+     "service_auth":                // service authentication and authorization descriptions
+
+     {
+
+     "service_authz":    ["<authvalue>"],     // authz values for the service
+
+     "service_key":        <T/F>,        // does service use an access key            
+
+     "service_https":    <T/F>        // does service require https
+
+     }
+
+    }
+
+The service definition is only for the source node.
+There is no service definition for the target node API used to get the target node information.
+
+When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
+The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
+
+
+"""""""""""""""""""""""""""""""""""""""""
+
+.. _h.e1519o-y653zc:
+
+**Change** **Log**
+"""""""""""""""""""""""""""""""""""""""""
+
+*NB*: The change log only lists major updates to the specification.
+
+
+*NB*: Updates and edits may not results in a version update.
+
+*NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
+
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                             |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.Archived copy (V 0.24.0)                                                                                 |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V DS:0.49.0)                                                                              |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V DS:0.50.0) |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V DS:x.xx.x)                                                 |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. _h.tph0s9vmrwxu:
+
+**Working** **Notes** **and** **Placeholder** **Text**
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. role:: deprecation
+
+.. role:: deletions
+
+.. role:: changes
