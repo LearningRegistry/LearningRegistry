@@ -1,22 +1,19 @@
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Learning Registry Operations: **Learning** **Registry** **Technical** **Specification** **V** **OP****:0.**49**.0**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+===================================================================================
+Learning Registry Operations: Learning Registry Technical Specification V OP:0.49.0
+===================================================================================
 
 Draft in Progress.
+
 See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
 
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
-
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
 This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
@@ -65,31 +62,25 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware of the details of the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>`.
 
-
-""""""""""""""""""""""""""""""""""""
-
 .. _h.mkv6i5cksheq:
 
-**Operations**
-""""""""""""""""""""""""""""""""""""
+----------
+Operations
+----------
 
 This section outlines one approach of how to use the specified network model, data models and APIs to set up and operate a Learning Registry network community.
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.brri0fmvece8:
 
-**Networks** **and** **Communities**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------
+Networks and Communities
+------------------------
 
 .. _h.rawjykojy7ox:
 
-**Building** **the** **Network** **Description**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------
+Building the Network Description
+--------------------------------
 
 Node-specific information (i.e., description, filters, services and connectivity) SHALL be maintained on a per node basis.
 Authorized document updates MAY be applied only at the node.
@@ -165,19 +156,22 @@ The procedure exits without changing the state of any database if validation fai
 
 **Establish** **a** **Network** **Node**
 
-    // Create one new node
+::
+
+                                        // Create one new node
 
         FIND a source for the node software, e.g., the Learning Registry `GitHub <http://www.google.com/url?q=https%3A%2F%2Fgithub.com%2FLearningRegistry%2FLearningRegistry&sa=D&sntz=1&usg=AFQjCNHAIkwLpeW5nAGVfizrLcIwxe21wg>`_
 
-            // out of band process
+                                        // out of band process
 
-        INSTALL the node software on a hardware node // physical or virtual
+        INSTALL the node software on a hardware node 
+                                        // physical or virtual
 
         CONFIGURE the node software 
 
         CREATE an identity for the node owner 
 
-                // used to own node documents, proxy for document owner
+                                        // used to own node documents, proxy for document owner
 
         CREATE a *network* *node* *description* document for the node
 
@@ -219,11 +213,14 @@ The procedure exits without changing the state of any database if validation fai
 
 **Establish** **a** **Resource** **Distribution** **Network**
 
-    // Create a base, one-node network with a network description
+::
 
-    PREREQUISITE: one active node // denoted the base node 
+                                        // Create a base, one-node network with a network description
 
-                // via the *Establish* *a* *Node* process
+    PREREQUISITE: one active node 
+                                        // denoted the base node 
+
+                                        // via the *Establish* *a* *Node* process
 
         CREATE an identity for the network owner 
 
@@ -235,7 +232,8 @@ The procedure exits without changing the state of any database if validation fai
 
                 to the node’s *network* *document* database
 
-                VALIDATE // same network
+                VALIDATE 
+                                        // same network
 
                         network_id in the *network* *node* *description* document =
 
@@ -253,7 +251,8 @@ The procedure exits without changing the state of any database if validation fai
 
                 to the node’s *network* *document* database
 
-                VALIDATE // same network
+                VALIDATE 
+                                        // same network
 
                         network_id in the *network* *node* *description* document =
 
@@ -265,15 +264,18 @@ The procedure exits without changing the state of any database if validation fai
 
 **Establish** **a** **Network** **Community**
 
-    // Create a base, one-network community with a network description
+::
 
-    PREREQUISITE: one active node // denoted the base node 
+                                        // Create a base, one-network community with a network description
 
-                // via the *Establish* *a* *Network* *Node* process
+    PREREQUISITE: one active node 
+                                        // denoted the base node 
+
+                                        // via the *Establish* *a* *Network* *Node* process
 
         PREREQUISITE: one active network
 
-            // via the *Establish* *a* *Resource* *Distribution* *Network* process
+                                        // via the *Establish* *a* *Resource* *Distribution* *Network* process
 
         CREATE an identity for the network community owner
 
@@ -285,13 +287,15 @@ The procedure exits without changing the state of any database if validation fai
 
                 to the node’s *network* *community* *document* database
 
-                VALIDATE // same community in network and community descriptions
+                VALIDATE 
+                                        // same community in network and community descriptions
 
                     community_id in the *resource* *distribution* *network* *description* document =
 
                         community_id in the *network* *community* *description* document
 
-                VALIDATE // same community in node and community descriptions
+                VALIDATE 
+                                        // same community in node and community descriptions
 
                         community_id in the *network* *node* *description* document =
 
@@ -303,17 +307,22 @@ The procedure exits without changing the state of any database if validation fai
 
 **Add** **a** **Network** **Node** **to** **a** **Resource** **Distribution** **Network**
 
-    // Add a node to an existing network
+::
 
-    // NB: Nothing in this process loads resource data into the node
+                                        // Add a node to an existing network
 
-    PREREQUISITE: an established active network // one or more active nodes
+                                        // NB: Nothing in this process loads resource data into the node
 
-    PERFORM the *Establish* *a* *Network* *Node* process to create a node // denoted the new node
+    PREREQUISITE: an established active network 
+                                        // one or more active nodes
 
-    FIND another active node in the network to connect to // denoted the existing node
+    PERFORM the *Establish* *a* *Network* *Node* process to create a node 
+                                        // denoted the new node
 
-        // discovery and agreement to connect is out of band
+    FIND another active node in the network to connect to 
+                                        // denoted the existing node
+
+                                        // discovery and agreement to connect is out of band
 
     PERFORM the *Adding* *Connections* *within* *a* *Resource* *Distribution* *Network* process
 
@@ -325,15 +334,17 @@ The procedure exits without changing the state of any database if validation fai
 
                 from the source node to the destination node
 
-        // propagates network description and policy to only the new node
+                                        // propagates network description and policy to only the new node
 
-        // may proceed asynchronously
+                                        // may proceed asynchronously
 
 **Adding** **Connections** **within** **a** **Resource** **Distribution** **Network**
 
-        // Add connectivity between two existing nodes in a network
+::
 
-        // A source node connects to a destination node
+                                        // Add connectivity between two existing nodes in a network
+
+                                        // A source node connects to a destination node
 
     PREREQUISITE: an established network with two or more nodes
 
@@ -341,15 +352,17 @@ The procedure exits without changing the state of any database if validation fai
 
     PREREQUISITE: the active destination node is known (connected node)
 
-                // discovery and agreement to connect is out of band
+                                        // discovery and agreement to connect is out of band
 
-        VALIDATE // same network
+        VALIDATE 
+                                        // same network
 
                 network_id in the source node’s *network* *node* *description* document =
 
                 network_id in the destination node’s *network* *node* *description* document
 
-        VALIDATE // same community
+        VALIDATE 
+                                        // same community
 
                 community_id in the source node’s *network* *node* *description* document =
 
@@ -375,9 +388,11 @@ The procedure exits without changing the state of any database if validation fai
 
 **Connect** **Networks** **within** **a** **Community**
 
-        // Add a gateway connection between two networks
+::
 
-        // NB: Nothing in this process distributes resource data across the gateway
+                                        // Add a gateway connection between two networks
+
+                                        // NB: Nothing in this process distributes resource data across the gateway
 
     PREREQUISITE: two established networks
 
@@ -385,21 +400,24 @@ The procedure exits without changing the state of any database if validation fai
 
     PREREQUISITE: the active destination node is known (connected node)
 
-                // discovery and agreement to connect is out of band
+                                        // discovery and agreement to connect is out of band
 
-        VALIDATE // different network
+        VALIDATE 
+                                        // different network
 
                 network_id in the source node’s *network* *node* *description* document <>
 
                 network_id in the destination node’s *network* *node* *description* document
 
-        VALIDATE // same community
+        VALIDATE 
+                                        // same community
 
                 community_id in the source node’s *network* *node* *description* document =
 
                 community_id in the destination node’s *network* *node* *description* document
 
-        VALIDATE // no gateway
+        VALIDATE 
+                                        // no gateway
 
             FOR EACH source node’s *network* *node* *connectivity* *description* document
 
@@ -425,9 +443,11 @@ The procedure exits without changing the state of any database if validation fai
 
 **Connect** **Communities**
 
-        // Add a gateway connection between two communities
+::
 
-        // NB: Nothing in this process distributes resource data across the gateway
+                                        // Add a gateway connection between two communities
+
+                                        // NB: Nothing in this process distributes resource data across the gateway
 
     PREREQUISITE: two communities networks
 
@@ -435,27 +455,31 @@ The procedure exits without changing the state of any database if validation fai
 
     PREREQUISITE: the active destination node is known (connected node)
 
-                // discovery and agreement to connect is out of band
+                                        // discovery and agreement to connect is out of band
 
-        VALIDATE // social communities
+        VALIDATE 
+                                        // social communities
 
-            social_community T in the source node’s *network* *community* *description* document
+                social_community T in the source node’s *network* *community* *description* document
 
                 social_community T in the destination node’s *network* *community* *description* document
 
-        VALIDATE // different network
+        VALIDATE
+                                        // different network
 
                 network_id in the source node’s *network* *node* *description* document <>
 
                 network_id in the destination node’s *network* *node* *description* document
 
-        VALIDATE // different community
+        VALIDATE 
+                                        // different community
 
                 community_id in the source node’s *network* *node* *description* document <>
 
                 community_id in the destination node’s *network* *node* *description* document
 
-        VALIDATE // no gateway
+        VALIDATE 
+                                        // no gateway
 
             FOR EACH source node’s *network* *node* *connectivity* *description* document
 
@@ -479,13 +503,11 @@ The procedure exits without changing the state of any database if validation fai
 
         REJECT if the same source -> destination active connection exists
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.kffq2k69jiwa:
 
-**Maintaining** **Networks** **and** **Communities**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------
+Maintaining Networks and Communities
+------------------------------------
 
 An established network or community MAY be maintained by updating descriptions of network nodes, their services, their connectivity, descriptions of resource distribution networks and of network communities.
 By definition, elements of the network model SHALL NOT be deleted; they are transitioned from active to not active.
@@ -496,7 +518,9 @@ If updating the description of a network node, its services or connectivity, the
 
 **Change** **Network** **Node** **Description**
 
-    // update the description of any node
+::
+
+                                        // update the description of any node
 
         PUBLISH the updated *network* *node* *description* document to the node
 
@@ -508,17 +532,19 @@ If updating the description of a network node, its services or connectivity, the
 
                 REJECT if the *network* *node* *description* document is not an update
 
-                // node may have only one network node description
+                                        // node may have only one network node description
 
 **Delete** **a** **Network** **Node**
 
-    // remove a node from a network
+::
 
-    // but the node remains, inaccessible
+                                        // remove a node from a network
 
-    // first sync the documents so that others have them
+                                        // but the node remains, inaccessible
 
-    // sync before delete is an operational policy choice; could be modeled in policy
+                                        // first sync the documents so that others have them
+
+                                        // sync before delete is an operational policy choice; could be modeled in policy
 
         COMMIT all outstanding resource data description database operations
 
@@ -528,7 +554,7 @@ If updating the description of a network node, its services or connectivity, the
 
         delete the document from the node’s *resource* *data* *description* *document* *database*
 
-        // this is an explicit delete
+                                        // this is an explicit delete
 
         PUBLISH the updated *network* *node* *description* document to the node
 
@@ -542,7 +568,7 @@ If updating the description of a network node, its services or connectivity, the
 
                 REJECT if the *network* *node* *description* document is not an update
 
-                // node may have only one network node description
+                                        // node may have only one network node description
 
     FOR EACH *network* *node* *services* *description* document
 
@@ -554,7 +580,9 @@ If updating the description of a network node, its services or connectivity, the
 
 **Change** **Node** **Service** **Description**
 
-    // update the description of a service at any node
+::
+
+                                        // update the description of a service at any node
 
         PUBLISH the updated *network* *node* *services* *description* document to the node
 
@@ -568,7 +596,9 @@ If updating the description of a network node, its services or connectivity, the
 
 **Add** **Node** **Service**
 
-    // add a service to any node
+::
+
+                                        // add a service to any node
 
         PUBLISH the new *network* *node* *services* *description* document to the node
 
@@ -582,7 +612,9 @@ If updating the description of a network node, its services or connectivity, the
 
 **Delete** **Node** **Service**
 
-    // delete a service from any node
+::
+
+                                        // delete a service from any node
 
         PUBLISH the updated *network* *node* *services* *description* document to the node
 
@@ -598,11 +630,13 @@ If updating the description of a network node, its services or connectivity, the
 
 **Change** **Node** **Network** **Connectivity**
 
-    // change the connectivity description of a connection from a node
+::
 
-    // unless there are mutable extension data elements, the process is a NO-OP
+                                        // change the connectivity description of a connection from a node
 
-    // all other data elements are immutable
+                                        // unless there are mutable extension data elements, the process is a NO-OP
+
+                                        // all other data elements are immutable
 
     PUBLISH the updated *network* *node* *connectivity* *description* document
 
@@ -616,9 +650,11 @@ If updating the description of a network node, its services or connectivity, the
 
 **Delete** **Node** **Network** **Connectivity**
 
-    // remove the connection from a node to another node
+::
 
-    // applies to intra-network or inter-network or inter-community
+                                        // remove the connection from a node to another node
+
+                                        // applies to intra-network or inter-network or inter-community
 
     PUBLISH the updated *network* *node* *connectivity* *description* document
 
@@ -634,7 +670,9 @@ If updating the description of a network node, its services or connectivity, the
 
 **Change** **Node** **Filters**
 
-    // change the filters at a node
+::
+
+                                        // change the filters at a node
 
     PUBLISH the updated *network* *node* *filter* *description* document
 
@@ -648,7 +686,9 @@ If updating the description of a network node, its services or connectivity, the
 
 **Delete** **Node** **Filters**
 
-    // delete ALL filters at a node
+::
+
+                                        // delete ALL filters at a node
 
     PUBLISH the updated *network* *node* *filter* *description* document
 
@@ -664,9 +704,11 @@ If updating the description of a network node, its services or connectivity, the
 
 **Change** **Resource** **Distribution** **Network** **Description**
 
-    // change the resource distribution network description
+::
 
-        // applied at some node
+                                        // change the resource distribution network description
+
+                                        // applied at some node
 
     PUBLISH the updated *resource* *distribution* *network* *description* document
 
@@ -682,15 +724,17 @@ If updating the description of a network node, its services or connectivity, the
 
                 to the other nodes in the network
 
-        // propagates resource distribution network description to all nodes in the network
+                                        // propagates resource distribution network description to all nodes in the network
 
-            // may proceed asynchronously
+                                        // may proceed asynchronously
 
 **Delete** **Resource** **Distribution** **Network** **Description**
 
-    // delete the resource distribution network description
+::
 
-        // applied at some node
+                                        // delete the resource distribution network description
+
+                                        // applied at some node
 
     PUBLISH the updated *resource* *distribution* *network* *description* document
 
@@ -708,15 +752,17 @@ If updating the description of a network node, its services or connectivity, the
 
                 to the other nodes in the network
 
-        // propagates resource distribution network description to all nodes in the network
+                                        // propagates resource distribution network description to all nodes in the network
 
-            // may proceed asynchronously
+                                        // may proceed asynchronously
 
 **Change** **Resource** **Distribution** **Network** **Policy**
 
-    // change the resource distribution network policy
+::
 
-        // applied at some node
+                                        // change the resource distribution network policy
+
+                                        // applied at some node
 
     PUBLISH the updated *resource* *distribution* *network* *policy* document
 
@@ -732,15 +778,17 @@ If updating the description of a network node, its services or connectivity, the
 
                 to the other nodes in the network
 
-        // propagates resource distribution network policy to all nodes in the network
+                                        // propagates resource distribution network policy to all nodes in the network
 
-            // may proceed asynchronously
+                                        // may proceed asynchronously
 
 **Delete** **Resource** **Distribution** **Network** **Policy**
 
-    // delete the resource distribution network policy
+::
 
-        // applied at some node
+                                        // delete the resource distribution network policy
+
+                                        // applied at some node
 
     PUBLISH the updated *resource* *distribution* *network* *policy* document
 
@@ -758,19 +806,21 @@ If updating the description of a network node, its services or connectivity, the
 
                 to the other nodes in the network
 
-        // propagates resource distribution network policy to all nodes in the network
+                                        // propagates resource distribution network policy to all nodes in the network
 
-            // may proceed asynchronously
+                                        // may proceed asynchronously
 
 **Change** **Network** **Community** **Description**
 
-    // change the network community description
+::
 
-        // applied at some node in some network in the community
+                                        // change the network community description
 
-        // node must have connectivity to reach all other networks
+                                        // applied at some node in some network in the community
 
-        // otherwise apply to multiple nodes
+                                        // node must have connectivity to reach all other networks
+
+                                        // otherwise apply to multiple nodes
 
     PUBLISH the updated *network* *community* *description* document
 
@@ -786,19 +836,21 @@ If updating the description of a network node, its services or connectivity, the
 
                 *community* *document* database to the other nodes in the community
 
-        // propagates community description to all nodes in the community
+                                        // propagates community description to all nodes in the community
 
-            // may proceed asynchronously
+                                        // may proceed asynchronously
 
 **Delete** **Network** **Community** **Description**
 
-    // delete the network community description
+::
 
-        // applied at some node in some network in the community
+                                        // delete the network community description
 
-        // node must have connectivity to reach all other networks
+                                        // applied at some node in some network in the community
 
-        // otherwise apply to multiple nodes
+                                        // node must have connectivity to reach all other networks
+
+                                        // otherwise apply to multiple nodes
 
     PUBLISH the updated *network* *community* *description* document
 
@@ -816,17 +868,15 @@ If updating the description of a network node, its services or connectivity, the
 
                 *community* *document* database to the other nodes in the community
 
-        // propagates community description to all nodes in the communities
+                                        // propagates community description to all nodes in the communities
 
-            // may proceed asynchronously
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""
+                                        // may proceed asynchronously
 
 .. _h.tcjl0w4wifiy:
 
-**Network** **Discovery**
-"""""""""""""""""""""""""""""""""""""""""""""""
+-----------------
+Network Discovery
+-----------------
 
 Finding all the nodes in a network or community is a non core service.
 One approach is to use replication and distribution to build a complete list of all network links at each node (an alternative is to traverse the network and build the link structure).
@@ -843,13 +893,11 @@ The tables of networks or communities with only inbound connectivity will includ
 *NB*: This process only builds the network link table at a point in time.
 It does not provide real-time connectivity status.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.3udx6s-e0sz0s:
 
-**Network** **Design**
-"""""""""""""""""""""""""""""""""""""""""""""
+--------------
+Network Design
+--------------
 
 Any resource distribution network is technically open; any node MAY connect.
 Managing connectivity and details of the topology and operations of any specific resource distribution network (and its connection to other resource distribution networks and network communities) SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
@@ -864,13 +912,11 @@ The illustration shows an example of such a gateway structure.
 
 |picture_0|
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.gqn64jl41k4j:
 
-**Resource** **Data** **Publication****, ****Distribution** **and** **Access**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------
+Resource Data Publication, Distribution and Access
+--------------------------------------------------
 
 Once a resource distribution network has been established, external agents use the publish services at network nodes to publish or update resource data to nodes in the resource distribution network.
 Network nodes SHALL store the valid, published resource data in their resource data description documents database.
@@ -916,13 +962,11 @@ Resource distribution network nodes MAY provide `Broker <https://docs.google.com
 
 Service provisioning (publish, access, distribution, broker) SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.a9luwl-3jrses:
 
-**Resource** **Data** **Persistence**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-------------------------
+Resource Data Persistence
+-------------------------
 
 A node SHALL persist resource data stored at a node for at least as many days as specified by the TTL (time to live) in the resource distribution network policy description.
 A node MAY “delete” documents that have been stored longer than the network’s TTL.
@@ -931,7 +975,7 @@ A node MAY “delete” documents that have been stored longer than the network�
 If the node supports harvest, the node SHALL maintain a value for earliestDatestamp.
 This value is the oldest publish, update or delete time for a resource data description document that can be accessed at the node via harvest.
 The timestamp SHALL be precise to the nearest second.
-The value is based on the time the resource data description documents are published at the node (▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`).
+The value is based on the time the resource data description documents are published at the node (▼node_timestamp).
 
 Access to information about the deletion of resource data is governed by a node-specific policy, deleted_data_policy:
 
@@ -954,13 +998,11 @@ Tracking of deletions MAY be independent of the actual TTL and the actual deleti
 This MAY invalidate the required information about the tracking and persistence of deletions.
 What is the model for deletion versus TTL and access to deletion status for harvest?
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u18wsr3gn1zm:
 
-**Network** **Administration**
-""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------
+Network Administration
+----------------------
 
 Resource distribution network nodes MAY provide `Administrative <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_. Operation of an administrative service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
@@ -968,13 +1010,11 @@ Provisioning of administrative services SHALL be determined by the governance an
 
 *Open* *Question*: Do we need a mechanism to control access to network data models beyond authentication controls?
 
-
-"""""""""""""""""""""""""""""""""""""""""
-
 .. _h.e1519o-y653zc:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -995,13 +1035,11 @@ Provisioning of administrative services SHALL be determined by the governance an
 | Future      | TBD      |            | Archived copy location TBD. (V OP:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 .. |picture_0| image:: images/picture_0.png
 

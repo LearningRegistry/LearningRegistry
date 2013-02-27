@@ -1,22 +1,19 @@
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Services and APIs: **Learning** **Registry** **Technical** **Specification** **V** **SA****:0.**50**.0**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+========================================================================
+Services and APIs: Learning Registry Technical Specification V SA:0.50.0
+========================================================================
 
 Draft in Progress.
+
 See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
 
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
-
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
 This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
@@ -59,13 +56,11 @@ Different types of services are detailed independently.
 
 - :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.d08onhltt4u1:
 
-**Services** **and** **APIs**
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------
+Services and APIs
+-----------------
 
 The services and their APIs provide the functionality that edge node producer and consumer agents use to push resource data into the distribution network and to discover and pull resource data from the network.
 They also define how to distribute the resource data throughout a network and how to manage, discover and observe resource distribution network behavior.
@@ -118,15 +113,13 @@ Additional constraints on API attributes, HTTP bindings (headers, HTTP errors), 
 Except as noted, services SHALL NOT be required to be provisioned at a node.
 An implementation SHALL NOT assume the provision of any service at any node, i.e., the implementation of one service cannot rely upon another service.
 
-▲:changes:`Except`:changes:` `:changes:`as`:changes:` `:changes:`noted`:changes:`, `:changes:`services`:changes:` `:changes:`SHALL`:changes:` `:changes:`be`:changes:` `:changes:`fully`:changes:` `:changes:`independent`:changes:`; `:changes:`the`:changes:` `:changes:`implementation`:changes:` `:changes:`and`:changes:` `:changes:`provisioning`:changes:` `:changes:`of`:changes:` `:changes:`a`:changes:` `:changes:`service`:changes:` `:changes:`at`:changes:` `:changes:`a`:changes:` `:changes:`node`:changes:` `:changes:`SHALL`:changes:` `:changes:`NOT`:changes:` `:changes:`assume`:changes:` `:changes:`that`:changes:` `:changes:`any`:changes:` `:changes:`other`:changes:` `:changes:`service`:changes:` `:changes:`is`:changes:` `:changes:`deployed`:changes:` `:changes:`at`:changes:` `:changes:`the`:changes:` `:changes:`node`:changes:`.`
-
-
-"""""""""""""""""""""""""""""""""""""""""
+▲Except as noted, services SHALL be fully independent; the implementation and provisioning of a service at a node SHALL NOT assume that any other service is deployed at the node.
 
 .. _h.e1519o-y653zc:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -145,13 +138,11 @@ An implementation SHALL NOT assume the provision of any service at any node, i.e
 | Future      | TBD      |            | Archived copy location TBD. (V SA:x.xx.x)                                                                                                                                                                                                                                                                                                                                                       |
 +-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 .. role:: deprecation
 
