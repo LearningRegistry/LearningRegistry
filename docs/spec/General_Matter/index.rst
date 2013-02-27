@@ -6,17 +6,16 @@ General Matter: Learning Registry Technical Specification - V GM:0.50.0
 =========================================================================
 
 Draft in Progress.
-See the :ref:`Change<h.vqkk28dmgzlf>` :ref:`Log<h.vqkk28dmgzlf>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
-This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+This document is part of one or more versions of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
@@ -55,13 +54,13 @@ The Learning Registry provides *social* *networking* *for* *metadata* (trusted s
 Specification License
 ---------------------
 
-:deletions:`This`:deletions:` `:deletions:`specification`:deletions:` `:deletions:`is`:deletions:` `:deletions:`being`:deletions:` `:deletions:`developed`:deletions:` `:deletions:`under`:deletions:` `:deletions:`the`:deletions:` `:deletions:`Open`:deletions:` `:deletions:`Web`:deletions:` `:deletions:`Foundation`:deletions:` `:deletions:`Contributor`:deletions:` `:deletions:`License`:deletions:` `:deletions:`Agreement`:deletions:` - `:deletions:`Contributor`:deletions:` `:deletions:`Copyright`:deletions:` `:deletions:`Grant`:deletions:` (`:deletions:`CLA`:deletions:` 0.9`:deletions:`).
-`:deletions:`The`:deletions:` `:deletions:`intent`:deletions:` `:deletions:`is`:deletions:` `:deletions:`that`:deletions:` `:deletions:`the`:deletions:` `:deletions:`final`:deletions:` `:deletions:`specification`:deletions:` `:deletions:`will`:deletions:` `:deletions:`be`:deletions:` `:deletions:`released`:deletions:` `:deletions:`under`:deletions:` `:deletions:`the`:deletions:` `:deletions:`Open`:deletions:` `:deletions:`Web`:deletions:` `:deletions:`Foundation`:deletions:` `:deletions:`Agreement`:deletions:` (`:deletions:`OWFa`:deletions:` 0.9`:deletions:`).
-`:deletions:`Later`:deletions:` `:deletions:`versions`:deletions:` `:deletions:`may`:deletions:` `:deletions:`apply`:deletions:`.`
+:deletions:`This specification is being developed under the Open Web Foundation Contributor License Agreement - Contributor Copyright Grant (CLA 0.9).
+The intent is that the final specification will be released under the Open Web Foundation Agreement (OWFa 0.9).
+Later versions may apply.`
 
-▲:changes:`The`:changes:` `:changes:`Learning`:changes:` `:changes:`Registry`:changes:` `:changes:`Technical`:changes:` `:changes:`Specification`:changes:` `:changes:`is`:changes:` `:changes:`being`:changes:` `:changes:`developed`:changes:` `:changes:`under`:changes:` `:changes:`the`:changes:` `:changes:`Open`:changes:` `:changes:`Web`:changes:` `:changes:`Foundation`:changes:` `:changes:`Contributor`:changes:` `:changes:`License`:changes:` `:changes:`Agreement`:changes:` 1.0 - `:changes:`Patent`:changes:` `:changes:`and`:changes:` `:changes:`Copyright`:changes:` (`:changes:`CLA`:changes:` 1.0).`:changes:`.
-`:changes:`The`:changes:` `:changes:`intent`:changes:` `:changes:`is`:changes:` `:changes:`that`:changes:` `:changes:`the`:changes:` `:changes:`final`:changes:` `:changes:`specification`:changes:` `:changes:`will`:changes:` `:changes:`be`:changes:` `:changes:`released`:changes:` `:changes:`under`:changes:` `:changes:`the`:changes:` `:changes:`Open`:changes:` `:changes:`Web`:changes:` `:changes:`Foundation`:changes:` `:changes:`Final`:changes:` `:changes:`Specification`:changes:` `:changes:`Agreement`:changes:` (`:changes:`OWFa`:changes:` `:changes:`1.0)`:changes:`.
-`:changes:`Later`:changes:` `:changes:`versions`:changes:` `:changes:`may`:changes:` `:changes:`apply`:changes:`.`
+▲:changes:`The Learning Registry Technical Specification is being developed under the Open Web Foundation Contributor License Agreement 1.0 - Patent and Copyright (CLA 1.0)..
+The intent is that the final specification will be released under the Open Web Foundation Final Specification Agreement (OWFa 1.0).
+Later versions may apply.`
 
         Your use of this Specification may be subject to other third party rights.
         THIS SPECIFICATION IS PROVIDED “AS IS.” The contributors expressly disclaim any warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or title, related to the Specification.
@@ -115,8 +114,8 @@ It MAY NOT relax any constraint.
 Specification Versioning
 ------------------------
 
-▲:changes:`The`:changes:` `:changes:`following`:changes:` `:changes:`section`:changes:` `:changes:`is`:changes:` `:changes:`new`:changes:` `:changes:`in`:changes:` `:changes:`this`:changes:` `:changes:`version`:changes:` `:changes:`of`:changes:` `:changes:`the`:changes:` `:changes:`part`:changes:`.
-`:changes:`The`:changes:` `:changes:`remainder`:changes:` `:changes:`is`:changes:` `:changes:`not`:changes:` `:changes:`highlighted`:changes:`.`
+▲:changes:`The following section is new in this version of the part.
+The remainder is not highlighted.`
 
 Different components of the Learning Registry Technical Specification and any implementation are versioned.
 Version numbers of different components may be updated independently and version numbers of one component are not correlated with version numbers of other components.
@@ -200,10 +199,10 @@ The Learning Registry Technical Specification is split into several parts:
 - **Services** **and** **APIs**: The APIs used to publish and consume data and those used to operate the network.
   The APIs are designed to abstract the logical behaviors of the Learning Registry from any particular implementation tools.
 
-- ▲:changes:`**General**`:changes:` `:changes:`**Requirements**`:changes:`: `:changes:`Common`:changes:` `:changes:`behaviors`:changes:` `:changes:`and`:changes:` `:changes:`attributes`:changes:` `:changes:`that`:changes:` `:changes:`apply`:changes:` `:changes:`to`:changes:` `:changes:`all`:changes:` `:changes:`data`:changes:` `:changes:`models`:changes:` `:changes:`and`:changes:` `:changes:`behaviors`:changes:`.`
+- ▲:changes:`**General** **Requirements**: Common behaviors and attributes that apply to all data models and behaviors.`
 
-- ▲:changes:`**Identity**`:changes:` `:changes:`**and**`:changes:` `:changes:`**Trust**`:changes:`**:**`:changes:` `:changes:`Models`:changes:` `:changes:`of`:changes:` `:changes:`trust`:changes:`, `:changes:`authentication`:changes:`, `:changes:`authorization`:changes:`, `:changes:`identity`:changes:` `:changes:`and`:changes:` `:changes:`security`:changes:`.
-  `:changes:`These`:changes:` `:changes:`models`:changes:` `:changes:`are`:changes:` `:changes:`applied`:changes:` `:changes:`to`:changes:` `:changes:`all`:changes:` `:changes:`data`:changes:` `:changes:`models`:changes:` `:changes:`and`:changes:` `:changes:`operations`:changes:`.`
+- ▲:changes:`**Identity** **and** **Trust****:** Models of trust, authentication, authorization, identity and security.
+  These models are applied to all data models and operations.`
 
 - **Operations**: Operational procedures that apply to any implementation.
 
@@ -257,56 +256,80 @@ The following terms are used in this document as defined.
 
 Additional terms may be provided in a future draft or version of the specification.
 
-        *access* (v)*: * to obtain resource data from a network node by an agent that is external to a resource distribution network.
+.. glossary::
 
-        *broker* (n): a server process that provides transformative or data amplification processing of resource data.
+        access (v)
+            to obtain resource data from a network node by an agent that is external to a resource distribution network.
 
-        *community* (n): see *network* *community*.
+        broker (n)
+            a server process that provides transformative or data amplification processing of resource data.
 
-        *common* *node* (n): a network node in a resource distribution network that may provide any service to process resource data and that may connect to any other node in the same resource distribution network for the distribution of resource data within the resource distribution network.
+        community (n)
+            see *network* *community*.
 
-        *distribute* (v): to copy or synchronize resource data from one network node to another.
+        common node (n)
+            a network node in a resource distribution network that may provide any service to process resource data and that may connect to any other node in the same resource distribution network for the distribution of resource data within the resource distribution network.
 
-        *gateway* *node* (n): a network node in a resource distribution network that provides an interconnection to a network node in a different resource distribution network (either in the same network community or in a different network community) for the distribution of resource data across the network boundary.
+        distribute (v)
+            to copy or synchronize resource data from one network node to another.
 
-        *harvest* (v): to access a network node and obtain sets of resource data; the accessing agent is the harvestor; the network node is the harvestee.
-        Harvest is typically based on timestamps used to identify new resource data held at the harvestee.
+        gateway node (n)
+            a network node in a resource distribution network that provides an interconnection to a network node in a different resource distribution network (either in the same network community or in a different network community) for the distribution of resource data across the network boundary.
 
-        *identifier* (n): the name (i.e., a label [e.g., a string] in an authoritative context) associated with a thing (anything that can be given an identifier).
+        harvest (v)
+            to access a network node and obtain sets of resource data; the accessing agent is the harvestor; the network node is the harvestee.
+            Harvest is typically based on timestamps used to identify new resource data held at the harvestee.
 
-        *learning* *resource* (n): any (digital) resource that is designed for, or has been used, in an educational context.
+        identifier (n)
+            the name (i.e., a label [e.g., a string] in an authoritative context) associated with a thing (anything that can be given an identifier).
 
-        *metadata* (n): formally authored and curated information describing a learning resource.
-        Also denoted *first* *party* metadata.
+        learning resource (n)
+            any (digital) resource that is designed for, or has been used, in an educational context.
 
-        *network* (n): see *resource* *distribution* *network**.
-        * A network need not correspond to a physical or logical network of computing devices.
+        metadata (n)
+            formally authored and curated information describing a learning resource.
+            Also denoted *first* *party* metadata.
 
-        *network* *community* (n): a group of interconnected resource distribution networks.
+        network (n)
+            see *resource* *distribution* *network**.
+            * A network need not correspond to a physical or logical network of computing devices.
+
+        network community (n)
+            a group of interconnected resource distribution networks.
         
 
-        *network* *node* (n): a service end point in a resource distribution network that may provide services to process resource data and that may connect to any other nodes to distribute resource data.
-        A network node need not correspond to a physical or logical computing device.
+        network node (n)
+            a service end point in a resource distribution network that may provide services to process resource data and that may connect to any other nodes to distribute resource data.
+            A network node need not correspond to a physical or logical computing device.
 
-        *node* (n): see *network* *node*.
+        node (n)
+            see *network* *node*.
 
-        *paradata* (n): information describing the contextual use of a learning resource.
-        It includes informally authored information and data obtained directly through monitoring the use of a learning resource, its metadata or its paradata.
-        Also denoted *second* *party* metadata.
+        paradata (n)
+            information describing the contextual use of a learning resource.
+            It includes informally authored information and data obtained directly through monitoring the use of a learning resource, its metadata or its paradata.
+            Also denoted *second* *party* metadata.
 
-        *publish* (v): to submit resource data to a network node from a source external to the node’s resource distribution network.
+        publish (v)
+            to submit resource data to a network node from a source external to the node’s resource distribution network.
 
-        *pull* (v): to distribute resource data from A to B, initiated by B.
+        pull (v)
+            to distribute resource data from A to B, initiated by B.
 
-        *push* (v): to distribute resource data from A to B, initiated by A.
+        push (v)
+            to distribute resource data from A to B, initiated by A.
 
-        *resource* (n): see *learning* *resource**.*
+        resource (n)
+            see *learning* *resource*.
 
-        *resource* *data* (n): any data that describes a learning resource, including, but not limited to metadata and paradata.
+        resource data (n)
+            any data that describes a learning resource, including, but not limited to metadata and paradata.
 
-        *resource* *distribution* *network* (n): a group of interconnected network nodes that operate under an agreed set of policies.
+        resource distribution network (n)
+            a group of interconnected network nodes that operate under an agreed set of policies.
 
-        *service* (n): a process applied to resource data or system descriptive and operational data operating on a network node.
+        service (n)
+            a process applied to resource data or system descriptive and operational data operating on a network node.
 
 
 
@@ -322,42 +345,41 @@ More recent versions SHALL NOT be used.
 
 Additional references may be provided in a future draft or version of the specification.
 
-- CoolURIs 2008: *Cool* *URIs* *for* *the* *Semantic* *Web*, `http <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_://`www <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_.`w <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_3.`org <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_/`TR <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_/`cooluris <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_/
+- CoolURIs 2008: *Cool URIs for the Semantic Web*, http://www.w3.org/TR/cooluris/
 
-- DC 1.1: *Dublin* *Core* *Metadata* *Element* *Set*, Version 1.1, `http <http://dublincore.org/documents/dces/>`_://`dublincore <http://dublincore.org/documents/dces/>`_.`org <http://dublincore.org/documents/dces/>`_/`documents <http://dublincore.org/documents/dces/>`_/`dces <http://dublincore.org/documents/dces/>`_/
+- DC 1.1: *Dublin Core Metadata Element Set*, Version 1.1, http://dublincore.org/documents/dces/
 
-- Benecode, *Bittorent* *Protocol* *Specification** 1.0*, `http <http://wiki.theory.org/BitTorrentSpecification#bencoding>`_://`wiki <http://wiki.theory.org/BitTorrentSpecification#bencoding>`_.`theory <http://wiki.theory.org/BitTorrentSpecification#bencoding>`_.`org <http://wiki.theory.org/BitTorrentSpecification#bencoding>`_/`BitTorrentSpecification <http://wiki.theory.org/BitTorrentSpecification#bencoding>`_#`bencoding <http://wiki.theory.org/BitTorrentSpecification#bencoding>`_
+- Benecode, *Bittorent Protocol Specification 1.0*, http://wiki.theory.org/BitTorrentSpecification#bencoding
 
-- ECMAScript: ECMAScript Language Specification, 5th Edition, December 2009, ECMA Standard 262, `http <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_://`www <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_.`ecma <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_-`international <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_.`org <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_/`publications <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_/`standards <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_/`Ecma <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_-262.`htm <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_
+- ECMAScript: ECMAScript Language Specification, 5th Edition, December 2009, ECMA Standard 262, http://www.ecma-international.org/publications/standards/Ecma-262.htm
 
-- FRBR: *Functional* *Requirements* *for* *Bibliographic* *Records**,* International Federation of Library Associations and Institutions, 1998, ISBN: 359811382X, `http <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_://`www <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_.`ifla <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_.`org <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_/`VII <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_/`s <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_13/`frbr <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_/`frbr <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_.`pdf <http://www.ifla.org/VII/s13/frbr/frbr.pdf>`_
+- FRBR: *Functional Requirements for Bibliographic Records*,  International Federation of Library Associations and Institutions, 1998, ISBN: 359811382X, http://www.ifla.org/VII/s13/frbr/frbr.pdf
 
-- GPG: *GNU* *Privacy* *Handbook*, `http <http://www.gnupg.org/gph/en/manual.html>`_://`www <http://www.gnupg.org/gph/en/manual.html>`_.`gnupg <http://www.gnupg.org/gph/en/manual.html>`_.`org <http://www.gnupg.org/gph/en/manual.html>`_/`gph <http://www.gnupg.org/gph/en/manual.html>`_/`en <http://www.gnupg.org/gph/en/manual.html>`_/`manual <http://www.gnupg.org/gph/en/manual.html>`_.`html <http://www.gnupg.org/gph/en/manual.html>`_
+- GPG: *GNU PrivacyHandbook*, http://www.gnupg.org/gph/en/manual.html
 
-- HKP: *The* *OpenPGP* *HTTP* *Keyserver* *Protocol** (**HKP**)* draft-shaw-openpgp-hkp-00.txt `http <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_://`tools <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_.`ietf <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_.`org <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_/`html <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_/`draft <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_-`shaw <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_-`openpgp <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_-`hkp <http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00>`_-00
+- HKP: *TheOpenPGPHTTPKeyserverProtocol (HKP)* draft-shaw-openpgp-hkp-00.txt http://tools.ietf.org/html/draft-shaw-openpgp-hkp-00
 
-- ISO 8601: *Data* *elements* *and* *interchange* *formats** -- **Information* *interchange** -- **Representation* *of* *dates* *and* *times**,* ISO 8601:2004, http://www.iso.org/iso/catalogue_detail?csnumber=40874
+- ISO 8601: *Data elements and interchange formats*  --  *Information interchange*  -- *Representation of dates and times*,  ISO 8601:2004, http://www.iso.org/iso/catalogue_detail?csnumber=40874
 
 - IEEE LOM: *IEEE* *Standard* *for* *Learning* *Object* *Metadata*, IEEE Std 1484.12.1™-2002, IEEE Computer Society, September 2002.
 
-- OAI-PMH: *The* *Open* *Archives* *Initiative* *Protocol* *for* *Metadata* *Harvesting*, V2.0, `http <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_://`www <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_.`openarchives <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_.`org <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_/`OAI <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_/`openarchivesprotocol <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_.`html <http://www.openarchives.org/OAI/openarchivesprotocol.html>`_
+- OAI-PMH: *The* *Open* *Archives* *Initiative* *Protocol* *for* *Metadata* *Harvesting*, V2.0, http://www.openarchives.org/OAI/openarchivesprotocol.html
 
-- OAUTH: *OAUTH*, `http <http://www.google.com/url?q=http%3A%2F%2Foauth.net%2F&sa=D&sntz=1&usg=AFQjCNEsWz0_k3G3issLX5KQo23b_xLQHA>`_://`oauth <http://www.google.com/url?q=http%3A%2F%2Foauth.net%2F&sa=D&sntz=1&usg=AFQjCNEsWz0_k3G3issLX5KQo23b_xLQHA>`_.`net <http://www.google.com/url?q=http%3A%2F%2Foauth.net%2F&sa=D&sntz=1&usg=AFQjCNEsWz0_k3G3issLX5KQo23b_xLQHA>`_/ 
+- OAUTH: *OAUTH*, http://oauth.net/
 
-- RFC 3880: *OpenPGP* *Messange* *Format**, *`http <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_://`tools <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_.`ietf <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_.`org <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_/`rfc <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_/`rfc <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_4880.`txt <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Frfc%2Frfc4880.txt&sa=D&sntz=1&usg=AFQjCNHmxOWQ8lg-tFMPALEIQDFGdV2ZHA>`_
+- RFC 3880: *OpenPGP* *Messange* *Format*, http://tools.ietf.org/rfc/rfc4880.txt
 
-- RFC 4122: *A* *Universally* *Unique* *Identifier** (**UUID**) **URN* *Namespace*, RFC 4122, `http <http://www.ietf.org/rfc/rfc4122.txt>`_://`www <http://www.ietf.org/rfc/rfc4122.txt>`_.`ietf <http://www.ietf.org/rfc/rfc4122.txt>`_.`org <http://www.ietf.org/rfc/rfc4122.txt>`_/`rfc <http://www.ietf.org/rfc/rfc4122.txt>`_/`rfc <http://www.ietf.org/rfc/rfc4122.txt>`_4122.`txt <http://www.ietf.org/rfc/rfc4122.txt>`_
+- RFC 4122: *A Universally Unique Identifier (UUID) URN Namespace*, RFC 4122, http://www.ietf.org/rfc/rfc4122.txt
 
-- RFC 4627: *The* *application**/**json* *Media* *Type* *for* *JavaScript* *Object* *Notation** (**JSON**), *`http <http://tools.ietf.org/html/rfc4627>`_://`tools <http://tools.ietf.org/html/rfc4627>`_.`ietf <http://tools.ietf.org/html/rfc4627>`_.`org <http://tools.ietf.org/html/rfc4627>`_/`html <http://tools.ietf.org/html/rfc4627>`_/`rfc <http://tools.ietf.org/html/rfc4627>`_`4627 <http://tools.ietf.org/html/rfc4627>`_
+- RFC 4627: *The application/json Media Type for JavaScript Object Notation (JSON),* http://tools.ietf.org/html/rfc4627
 
-- SHS, *Secure* *Hash* *Standard*, FIPS PUBS 180-3, `http <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_://`csrc <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_.`nist <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_.`gov <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_/`publications <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_/`fips <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_/`fips <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_180-3/`fips <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_180-3_`final <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_.`pdf <http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf>`_
+- SHS, *Secure* *Hash* *Standard*, FIPS PUBS 180-3, http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf
 
-- SRU: *Search**/**Retrieval* *via* *URL* *Specifications*, SRU Version 1.2 Specifications, The Library of Congress, August 2007, `http <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_://`www <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_.`loc <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_.`gov <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_/`standards <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_/`sru <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_/`specs <http://www.google.com/url?q=http%3A%2F%2Fwww.loc.gov%2Fstandards%2Fsru%2Fspecs%2F&sa=D&sntz=1&usg=AFQjCNFPhJ2d5J0c4yJlEhnLOXOcxTT63Q>`_/
+- SRU: *Search/Retrieval via URL Specifications*, SRU Version 1.2 Specifications, The Library of Congress, August 2007, http://www.loc.gov/standards/sru/specs/
 
-- SWORD: *SWORD* *AtomPub* *Provife* *V** 1.3*, `http <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_://`www <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_.`swordapp <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_.`org <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_/`docs <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_/`sword <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_-`profile <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_-1.3.`html <http://www.google.com/url?q=http%3A%2F%2Fwww.swordapp.org%2Fdocs%2Fsword-profile-1.3.html&sa=D&sntz=1&usg=AFQjCNHHkJja-e1jcO4fC66PfWz750Gy5A>`_
+- SWORD: *SWORD AtomPub Provife V 1.3*, http://www.swordapp.org/docs/sword-profile-1.3.html
 
-- Unicode: *The* *Unicode* *Consortium**.
-  **The* *Unicode* *Standard**, **Version** 6.0.0*, `http <http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fversions%2FUnicode6.0.0%2F&sa=D&sntz=1&usg=AFQjCNEA1ajNRmMGjqIGIqdNXH7OywKotQ>`_://`www <http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fversions%2FUnicode6.0.0%2F&sa=D&sntz=1&usg=AFQjCNEA1ajNRmMGjqIGIqdNXH7OywKotQ>`_.`unicode <http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fversions%2FUnicode6.0.0%2F&sa=D&sntz=1&usg=AFQjCNEA1ajNRmMGjqIGIqdNXH7OywKotQ>`_.`org <http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fversions%2FUnicode6.0.0%2F&sa=D&sntz=1&usg=AFQjCNEA1ajNRmMGjqIGIqdNXH7OywKotQ>`_/`versions <http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fversions%2FUnicode6.0.0%2F&sa=D&sntz=1&usg=AFQjCNEA1ajNRmMGjqIGIqdNXH7OywKotQ>`_/`Unicode <http://www.google.com/url?q=http%3A%2F%2Fwww.unicode.org%2Fversions%2FUnicode6.0.0%2F&sa=D&sntz=1&usg=AFQjCNEA1ajNRmMGjqIGIqdNXH7OywKotQ>`_6.0.0/
+- Unicode: *The Unicode Consortium*. The Unicode Standard, Version 6.0.0*, http://www.unicode.org/versions/Unicode6.0.0/
 
 - UTF-8: TBC (where in Unicode 6.0.0 doc?)
 
