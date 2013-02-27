@@ -1,7 +1,7 @@
 .. _h.u6sbhsuktqyj:
 
 =======================================================================
-Publish Services: Learning Registry Technical Specification V PS:0.49.0
+Publish Services: Learning Registry Technical Specification V PS:0.50.1
 =======================================================================
 
 Draft in Progress.
@@ -18,23 +18,9 @@ This document is part of one or more versions of the :doc:`Learning <../Technica
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Publish<h.u6sbhsuktqyj>` :ref:`Services<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`PS<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
 
-        :ref:`Resource<h.xf8fiul5s5dl>` :ref:`Data<h.xf8fiul5s5dl>` :ref:`Publish<h.xf8fiul5s5dl>` :ref:`Services<h.xf8fiul5s5dl>`
+.. toc::
 
-                :ref:`Basic<h.aera9k-4u6l42>` :ref:`Publish<h.aera9k-4u6l42>` :ref:`Service<h.aera9k-4u6l42>`
-
-                :ref:`SWORD<h.jl9f1nnwcev4>` :ref:`Publish<h.jl9f1nnwcev4>` :ref:`Service<h.jl9f1nnwcev4>`
-
-                    :ref:`Retrieve<h.ku7eedtbq15d>` :ref:`Service<h.ku7eedtbq15d>` :ref:`Document<h.ku7eedtbq15d>`
-
-                    :ref:`Create<h.2o7qqzkocz2j>` :ref:`a<h.2o7qqzkocz2j>` :ref:`Resource<h.2o7qqzkocz2j>`
-
-                :ref:`Basic<h.rfe7ga-6sbjly>` :ref:`Delete<h.rfe7ga-6sbjly>` :ref:`Service<h.rfe7ga-6sbjly>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the basic Learning Registry services used to publish (push) resource documents into a distribution network.
 
@@ -65,8 +51,8 @@ Resource Data Publish Services
 
 Publish services are used to push resource data into the network.
 They are used by external publishing edge nodes.
-All resource data publishing services SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ if present to restrict the resource data that is published to the node.
-All resource data publishing services SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ `validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is published to the node.
+All resource data publishing services SHALL `apply filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ if present to restrict the resource data that is published to the node.
+All resource data publishing services SHALL `apply validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is published to the node.
 The validation process MAY also provide local updates to the resource document prior to it being published.
 Any resource data publishing service MAY reject any resource data for any reason:
 
@@ -139,7 +125,8 @@ Do we need more to support trust?
 
 *NB*: The process currently does not handle attachments.
 
-**API**
+API
+===
 
 ::
 
@@ -149,45 +136,50 @@ Do we need more to support trust?
 
             None
 
-        Request Object:                 // resource data to be published
+        Request Object:                
 
-            {"documents": 
-
-                [                       // array of
-                    {resource_data_description}   
+            {
+                "documents": [ 
+                                        // array of
                                         // resource data description documents
+
+                    {resource_data_description} 
+                                        // resource data to be published
+
                 ]
-                
+
             }
 
         Results Object:
 
-        {
+            {
 
-         "OK": boolean,                 // T if successful
+                "OK": boolean,          
+                                        // T if successful
 
-         "error": "string",             // text describing global error
-
+                "error": "string",      
+                                        // text describing global error
                                         // present only if NOT OK
 
-        "document_results":
+                "document_results": [
+                                        // array of per document results
 
-        [                               // array of per document results
+                    {
 
-         {
+                        "doc_ID": "string",            
+                                        // ID of the document
 
-         "doc_ID": "string",            // ID of the document
+                        "OK": boolean   
+                                        // T if document was published
 
-         "OK": boolean                  // T if document was published
-
-         "error": "string"              // text describing error or filter failure
-
+                        "error": "string"              
+                                        // text describing error or filter failure
                                         // present only if NOT OK
-         }
+                    }
 
-        ]
+                ]
 
-        }
+            }
 
         Return Codes:
 
@@ -195,12 +187,13 @@ Do we need more to support trust?
 
             500            
             
-**Basic** **Publish**
+Basic Publish
+=============
 
 ::
 
                                         // Publish each resource data description document in the supplied list
-
+                                        
                                         // Perform Validation    
 
     VALIDATE the *resource* *data* *description* document does not contain a do_not_distribute key.
@@ -396,7 +389,8 @@ Do we need more to support trust?
 
     
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -534,7 +528,8 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 
   - <sword:treatment> and <sword:service> elements SHALL be omitted.
 
-**API**
+API
+===
 
 ::
 
@@ -548,45 +543,25 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 
         Well formed XML instance document that conforms to the SWORD 1.3 specification.
 
-                        <?xml version="1.0" encoding="utf-8"?>
+                <?xml version="1.0" encoding="utf-8"?>
+                <service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sword="http://purl.org/net/sword/">
+                  <sword:version>1.3</sword:version>
+                  <sword:verbose>true</sword:verbose>
+                  <sword:noOp>true</sword:noOp>
+                  <workspace>
+                    <atom:title>...</atom:title>
+                    <collection href="...">
+                      <atom:title>...</atom:title>
+                      <accept>application/json</accept>
+                      <sword:mediation>true</sword:mediation>
+                      <dcterms:abstract>...</dcterms:abstract>
+                      <sword:collectionPolicy>...</sword:collectionPolicy>
+                    </collection>
+                  </workspace>
+                </service>
 
-                        <service xmlns="http://www.w3.org/2007/app"
-
-                 xmlns:atom="http://www.w3.org/2005/Atom"
-
-                xmlns:sword="http://purl.org/net/sword/"
-
-                xmlns:dcterms="http://purl.org/dc/terms/">
-
-             <sword:version>1.3</sword:version>
-
-                        <sword:verbose>true</sword:verbose>
-
-                        <sword:noOp>true</sword:noOp>
-
-                         <workspace>
-
-                 <atom:title>...</atom:title>
-
-                 <collection href="..." >
-
-                  <atom:title>...</atom:title>
-
-                  <accept>application/json</accept>
-
-                 <sword:mediation>true</sword:mediation>
-
-                  <dcterms:abstract>...</dcterms:abstract>
-
-                                 <sword:collectionPolicy>...</sword:collectionPolicy>
-
-                 </collection>
-
-              </workspace>
-
-                        </service>
-
-**SWORD****: ****swordservice**
+SWORD: swordservice
+===================
 
 ::
 
@@ -599,44 +574,30 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
     EMIT the required elements
 
                 <sword:version>1.3</sword:version>
-
                 <sword:verbose>true</sword:verbose>
-
                 <sword:noOp>true</sword:verbose>
 
     EMIT the workspace elements
 
         <workspace>
-
-            <atom:title>community_name or community_id from the *network* *community*                 *description* *data* *model*<atom:title>
+            <atom:title>community_name or community_id from the *network community description data model*<atom:title>
 
     IF the [on-behalf-of-user] is permitted to publish to the node
 
         THEN EMIT the collection elements
 
-            <collection
-
-                href="URL of the network node">
-
-                     <atom:title>node_name or node_id from the *network* *node* 
-
-                                *description* *data* *model*</atom:title>
-
+                <collection href="URL of the network node">
+                  <atom:title>node_name or node_id from the *network node description data model*</atom:title>
                   <accept>application/json</accept>
-
-                 <sword:mediation>true</sword:mediation>
-
-                  <dcterms:abstract>node_description from the *network* *node*                             *description* *data* *model*</dcterms:abstract>
-
-                                <sword:collectionPolicy>Policy URL</sword:collectionPolicy>
-
-                 </collection>
+                  <sword:mediation>true</sword:mediation>
+                  <dcterms:abstract>node_description from the *network node description data model*</dcterms:abstract>
+                  <sword:collectionPolicy>Policy URL</sword:collectionPolicy>
+                </collection>
 
     Complete XML elements
 
-        </workspace>
-
-                </service>
+            </workspace>
+        </service>
 
 .. _h.2o7qqzkocz2j:
 
@@ -646,7 +607,8 @@ Create a Resource
 
     in a future draft of the specification
 
-**API**
+API
+===
 
 ::
 
@@ -656,13 +618,15 @@ Create a Resource
 
     Results XML
 
-**SWORD****: ****swordpub**
+SWORD: swordpub
+===============
 
 ::
 
     // pseudo code
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -724,8 +688,9 @@ The descriptive values (service_name, service_description) MAY be changed from w
 Basic Delete Service
 --------------------
 
-The basic delete service "deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.
+:deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
+The basic delete service "deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.
 
 Each resource data description document identified in the supplied set is deleted independently.
 In addition to the overall service return indicating status, there SHALL be one returned object per resource data description document, aligned 1:1 to the documents identified in the supplied resource data description document array, indicating deletion of the resource data description document.
@@ -751,7 +716,8 @@ An implementation SHALL indicate any size limits in the service description.
 
 *NB*: The deletion process SHALL be consistent with the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ policy.
 
-**API**
+API
+===
 
 ::
 
@@ -811,7 +777,8 @@ An implementation SHALL indicate any size limits in the service description.
 
             500
 
-**Basic** **Delete**
+Basic Delete
+============
 
 ::
 
@@ -869,7 +836,8 @@ An implementation SHALL indicate any size limits in the service description.
                                 trigger system level purge 
                                         // may run at some later time
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 

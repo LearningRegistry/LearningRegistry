@@ -20,29 +20,6 @@ This document is part of one or more versions of the :doc:`Learning <../Technica
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`General<h.u6sbhsuktqyj>` :ref:`Matter<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>`:ref:` - <h.u6sbhsuktqyj>`:ref:`V<h.u6sbhsuktqyj>` :ref:`GM<h.u6sbhsuktqyj>`:ref:`:0.50.0<h.u6sbhsuktqyj>`
-
-        :ref:`Learning<h.t8dv95qkagu4>` :ref:`Registry<h.t8dv95qkagu4>` :ref:`Overview<h.t8dv95qkagu4>`
-
-        :ref:`Specification<h.bflimlt80rpq>` :ref:`License<h.bflimlt80rpq>`
-
-        :ref:`Notation<h.cu2ipktikrsa>`
-
-        :ref:`Conformance<h.whmj37vjr0jk>`
-
-        :ref:`Specification<h.lisx85v54wl>` :ref:`Versioning<h.lisx85v54wl>`
-
-        :ref:`Technical<h.o12ejzxfggen>` :ref:`Specification<h.o12ejzxfggen>` :ref:`Overview<h.o12ejzxfggen>`
-
-            :ref:`Design<h.9vpjmlmi28mv>` :ref:`Principles<h.9vpjmlmi28mv>`
-
-        :ref:`Glossary<h.8n9oub9badbo>`
-
-        :ref:`References<h.76rvgj-gh9lot>`
-
-        :ref:`Change<h.vqkk28dmgzlf>` :ref:`Log<h.vqkk28dmgzlf>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the  :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. This part provides general information, including: an introduction to the Learning Registry, Licenses, Notation, Glossary, References, etc.
 Readers of the other parts of the Learning Registry Technical Specification should be aware of the contents of this part.
