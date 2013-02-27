@@ -1,22 +1,19 @@
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Access Services: **Learning** **Registry** **Technical** **Specification** **V** **AS****:0.**49**.0**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+======================================================================
+Access Services: Learning Registry Technical Specification V AS:0.49.0
+======================================================================
 
 Draft in Progress.
+
 See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
 
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
-
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
 This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
@@ -81,13 +78,11 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>` part describes the network model, the :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>` part describes the model of published data and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.kbv3x699el4w:
 
+-----------------------------
 Resource Data Access Services
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------
 
 Access services are used to pull resource data from the network.
 They are used by external access edge nodes to obtain one or more resource data description documents for “off network” processing.
@@ -97,13 +92,11 @@ Future drafts or versions of this specification MAY define additional resource d
 *NB*: The services do not currently define a specific process to find or maintain all resource data description documents in a collation for a specific resource locator, i.e., for a unique resource identifier.
 A future version of the specification MAY define additional resource data document types that maintain collation descriptions.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.23ll5s-2p4zua:
 
-**Basic** **Obtain** **Service**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------
+Basic Obtain Service
+--------------------
 
 The basic obtain service pulls an instance of a resource data description document (or a set of documents) directly from a node on a resource distribution network.
 It is the most basic, direct mechanism to access resource data.
@@ -183,6 +176,8 @@ An implementation SHALL indicate any size limits in the service description.
 
 **API**
 
+::
+
         GET <node-service-endpoint-URL>/obtain?request_id=<ID>
 
                 &by_doc_ID=<T|F>
@@ -199,37 +194,42 @@ An implementation SHALL indicate any size limits in the service description.
 
         Arguments (HTTP GET):
 
-        "request_ID":        ID,        // resource data description document ID or
+        "request_ID": ID,        
+                                        // resource data description document ID or
 
-                                                        // resource ID
+                                        // resource ID
 
-                                    // optional
+                                        // optional
 
-                                    // ignored if ids_only is TRUE
+                                        // ignored if ids_only is TRUE
 
-                                    // if missing return documents for ALL IDs
+                                        // if missing return documents for ALL IDs
 
-                "by_doc_ID":        boolean,    // request is for a single document
+        "by_doc_ID": boolean,    
+                                        // request is for a single document
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                                    // request_ID is a doc_ID
+                                        // request_ID is a doc_ID
 
-                "by_resource_ID":    boolean        // request is for a collation of all documents
+        "by_resource_ID": boolean        
+                                        // request is for a collation of all documents
 
-                                    // for the specified resource
+                                        // for the specified resource
 
-                                    // optional, default TRUE
+                                        // optional, default TRUE
 
-                                                        // request_ID is a resource_locator
+                                        // request_ID is a resource_locator
 
-                 "ids_only":        boolean,    // request is just for IDs, not documents
+        "ids_only": boolean,    
+                                        // request is just for IDs, not documents
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                *"*resumption_token":    "string",        // flow control resumption token
+        *"*resumption_token": "string",       
+                                        // flow control resumption token
 
-                                    // optional; provided as a result on prior calls
+                                        // optional; provided as a result on prior calls
 
         Arguments (HTTP POST):
 
@@ -241,75 +241,83 @@ An implementation SHALL indicate any size limits in the service description.
 
         Request Object (HTTP POST):            
 
-                {                    // list of resource data descriptions to obtain
+                {                       
+                                        // list of resource data descriptions to obtain
 
-                 "by_doc_ID":        boolean,    // request is for specific document for each ID
+                 "by_doc_ID": boolean,    
+                                        // request is for specific document for each ID
 
-                                    // request_ID is a doc_ID
+                                        // request_ID is a doc_ID
 
-                                    // optional, default FALSE,
+                                        // optional, default FALSE,
 
                   
 
-                "by_resource_ID":    boolean    ,    // request is for a collation of documents 
+                "by_resource_ID": boolean,    
+                                        // request is for a collation of documents 
 
-                                                        // for each ID
+                                        // for each ID
 
-                                    // optional, default TRUE
+                                        // optional, default TRUE
 
-                                    // request_ID is a resource_locator
+                                        // request_ID is a resource_locator
 
-                 "ids_only":        boolean,    // request is just for IDs, not documents
+                 "ids_only": boolean,    
+                                        // request is just for IDs, not documents
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                *▲"*resumption_token":    "string",        // flow control resumption token
+                *▲"*resumption_token": "string",        
+                                        // flow control resumption token
 
-                                    // optional; provided as a result on prior calls
+                                        // optional; provided as a result on prior calls
 
-                "request_IDs":         [request_ID]    // array of
+                "request_IDs": [request_ID]    
+                                        // array of
 
-                                     // resource ID or
+                                        // resource ID or
 
-                                                        // resource data description document ID
+                                        // resource data description document ID
 
-                                    // optional
+                                        // optional
 
-                                    // ignored if ids_only is TRUE
+                                        // ignored if ids_only is TRUE
 
-                                    // if missing return documents for ALL IDs
+                                        // if missing return documents for ALL IDs
 
             }
 
-        Results Object:                    // list of resource data description documents
+        Results Object:                 
+                                        // list of resource data description documents
 
-        {"documents": 
-
-                 [
+        {"documents": [
 
          {                
 
-                 "doc_ID":    ID,            // document ID
+                "doc_ID": ID,       
+                                        // document ID
 
-                  "document":
+                "document": [
+                        
+                        {resource_data_description}
+                                        // resource data description documents
+                  ]    
+                                        // array
 
-               [{resource_data_description}]    // resource data description documents
-
-                                // array
-
-                                // present only if ID is valid, otherwise NULL
+                                        // present only if ID is valid, otherwise NULL
 
              }    
 
-         ],
+        ],
 
-                ▲"resumption_token":    "string"        // flow control resumption token
+                ▲"resumption_token":  "string"        
+                                        // flow control resumption token
 
-                                    // present only if flow control is supported
+                                        // present only if flow control is supported
 
-                                    // present only if these results are paginated
+                                        // present only if these results are paginated
 
-                                    // NULL if this is the last set of paginated results
+                                        // NULL if this is the last set of paginated results
 
         }
 
@@ -321,13 +329,15 @@ An implementation SHALL indicate any size limits in the service description.
 
 **Basic** **Obtain**
 
-        // Obtain the resource data description documents for each supplied ID
+::
+
+                                        // Obtain the resource data description documents for each supplied ID
 
         IF by_doc_ID AND by_resource_ID
 
                 THEN
 
-                        error // only one can be true
+                        error           // only one can be true
 
                         EXIT
 
@@ -335,7 +345,7 @@ An implementation SHALL indicate any size limits in the service description.
 
         THEN
 
-            error // flow control error
+            error                       // flow control error
 
             EXIT
 
@@ -343,9 +353,9 @@ An implementation SHALL indicate any size limits in the service description.
 
          (resumption_token DOES NOT MATCH saved state for this this client 
 
-            // test must recognize that client did not get last resuts and is re-requesting last set
+                                        // test must recognize that client did not get last resuts and is re-requesting last set
 
-            // or client may be requesting next set
+                                        // or client may be requesting next set
 
             OR
 
@@ -353,7 +363,8 @@ An implementation SHALL indicate any size limits in the service description.
 
         THEN
 
-            error // flow control error
+            error                       
+                                        // flow control error
 
             EXIT
 
@@ -363,7 +374,7 @@ An implementation SHALL indicate any size limits in the service description.
 
                 THEN set doc_IDs in request_ID array
 
-                                // based on the values in the service description (none, ALL, subset)
+                                        // based on the values in the service description (none, ALL, subset)
 
                 FOR EACH request_ID 
 
@@ -383,11 +394,11 @@ An implementation SHALL indicate any size limits in the service description.
 
                         IF Successful 
 
-                         THEN PUT the r*esource* *data* *description* document in the results object
+                         THEN PUT the *resource* *data* *description* document in the results object
 
-                            // all stored key-value pairs or only those defined in the spec
+                                        // all stored key-value pairs or only those defined in the spec
 
-                            // as defined in the service description
+                                        // as defined in the service description
 
                          ELSE PUT NULL in the results object
 
@@ -411,7 +422,7 @@ An implementation SHALL indicate any size limits in the service description.
 
                         THEN set unique_resource_locations in request_ID array
 
-                                // based on the values in the service description (none, ALL, subset)
+                                        // based on the values in the service description (none, ALL, subset)
 
                 FOR EACH request_ID 
 
@@ -439,11 +450,11 @@ An implementation SHALL indicate any size limits in the service description.
 
                         GET the corresponding *resource* *data* *description* document
 
-                                        PUT the r*esource* *data* *description* document in the results object
+                                        PUT the *resource* *data* *description* document in the results object
 
-                :changes:`    `            // all stored key-value pairs or only those defined in the spec
+                                        // all stored key-value pairs or only those defined in the spec
 
-                                // as defined in the service description
+                                        // as defined in the service description
 
                         ELSE PUT NULL in the results object
 
@@ -463,73 +474,83 @@ An implementation SHALL indicate any size limits in the service description.
 
 **Service** **Description**
 
+::
+
     {
 
-         "doc_type":        "service_description",    
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "access",
+        "service_type": "access",
 
-     "service_name":    "Basic Obtain",
+        "service_name": "Basic Obtain",
 
-        "service_description":    "Service to access individual resource description documents given a list of one or more document IDs or resource URL",            
+        "service_description": "Service to access individual resource description documents given a list of one or more document IDs or resource URL",
 
-     "service_version":    "0.21.0",
+        "service_version": "0.21.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
-
-     {
-
-     "service_authz":    ["<authvalue>"],     // authz values for the service
-
-     "service_key":        <T/F>,        // does service use an access key            
-
-     "service_https":    <T/F>        // does service require https
-
-     },
-
-         "service_data":
+        "service_auth": 
+                                        // service authentication and authorization descriptions
 
         {
 
-     "id_limit":        integer,        // specify the maximum number of IDs
+            "service_authz": ["<authvalue>"], 
+                                        // authz values for the service
 
-                                                // the service will return when requesting ALL
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-                                                // 0 means ALL is not a valid request
+            "service_https": < T / F > 
+                                        // does service require https
 
-                                                // optional, return ALL if missing
+        },
 
-     "doc_limit":        integer,         // specify the maximum number of documents
+        "service_data":
 
-                                                // the service will return when requesting ALL
+        {
 
-                                                // 0 means ALL is not a valid request
+            "id_limit": integer,            
+                                            // specify the maximum number of IDs
 
-                                                // optional, return ALL if missing
+                                            // the service will return when requesting ALL
 
-     "spec_kv_only":    boolean,    // T to return only spec-defined key-value pairs
+                                            // 0 means ALL is not a valid request
 
-                        // F to return all stored key-value pairs
+                                            // optional, return ALL if missing
 
-                        // optional, default F
+            "doc_limit": integer, 
+                                            // specify the maximum number of documents
 
-     ▲"flow_control":    boolean        // T if the implementation supports flow control
+                                            // the service will return when requesting ALL
 
-                        // F if flow control is not supported
+                                            // 0 means ALL is not a valid request
 
-                        // optional, default F, no flow control
+                                            // optional, return ALL if missing
 
-         }
+            "spec_kv_only": boolean, 
+                                            // T to return only spec-defined key-value pairs
+
+                                            // F to return all stored key-value pairs
+
+                                            // optional, default F
+
+            ▲"flow_control": boolean 
+                                            // T if the implementation supports flow control
+
+                                            // F if flow control is not supported
+
+                                            // optional, default F, no flow control
+
+        }
 
     }
 
@@ -537,13 +558,11 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.s3sst6-69kzq1:
 
-**Basic** **Harvest** **Service**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+---------------------
+Basic Harvest Service
+---------------------
 
 The basic harvest service can be used by an external agent to connect to a node to harvest (pull) the resource data description documents held by the node.
 The service is patterned after the OAI-PMH specification.
@@ -613,13 +632,11 @@ The granularity of the timestamp SHALL be stored in the service description docu
 
 *NB*: All times are UTC 0.
 
-
-"""""""""""""""""""""""""""""""""""""""""
-
 .. _h.v57vz0-u0ge3y:
 
-**Get** **Record**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Get Record
+----------
 
 The Get Record verb returns the resource data description documents for the specified resource data document ID or resource ID.
 If the request ID is a resource data description document ID, the service SHALL return the single resource data description document that matches the ID.
@@ -636,6 +653,8 @@ The service SHALL return complete resource data description documents.
 
 **API**
 
+::
+
         GET <node-service-endpoint-URL>/harvest/getrecord?request_id=<id>
 
                 &by_doc_ID=<T|F>
@@ -646,25 +665,28 @@ The service SHALL return complete resource data description documents.
 
         Arguments (HTTP GET):
 
-        "request_ID":        ID,        // resource data description document ID or
+                "request_ID": ID,        
+                                        // resource data description document ID or
 
-                                                        // resource ID
+                                        // resource ID
 
-                            // required
+                                        // required
 
-                "by_doc_ID":        boolean,    // request is for a single document
+                "by_doc_ID": boolean,    
+                                        // request is for a single document
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                                    // request_ID is a doc_ID
+                                        // request_ID is a doc_ID
 
-                "by_resource_ID":    boolean        // request is for a collation of all documents
+                "by_resource_ID": boolean        
+                                        // request is for a collation of all documents
 
-                                    // for the specified resource
+                                        // for the specified resource
 
-                                    // optional, default TRUE
+                                        // optional, default TRUE
 
-                                                        // request_ID is a resource_locator
+                                        // request_ID is a resource_locator
 
         Arguments (HTTP POST):
 
@@ -676,113 +698,134 @@ The service SHALL return complete resource data description documents.
 
         Request Object (HTTP POST):
 
-        {"request_ID":        ID,        // resource data description document ID or
+                {"request_ID": ID,       
+                                        // resource data description document ID or
 
-                                                        // resource ID
+                                        // resource ID
 
-                                    // required
+                                        // required
 
-                 "by_doc_ID":        boolean,    // request is for a single document
+                "by_doc_ID":        boolean,    
+                                        // request is for a single document
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                                                        // request_ID is a doc_ID
+                                        // request_ID is a doc_ID
 
-                 "by_resource_ID",    boolean        // request is for a collation of all documents
+                "by_resource_ID",    boolean       
+                                        // request is for a collation of all documents
 
-                                    // for the specified resource
+                                        // for the specified resource
 
-                                    // optional, default TRUE
+                                        // optional, default TRUE
 
-                                                        // request_ID is a resource_locator
+                                        // request_ID is a resource_locator
 
                 }
 
         Results Object:
 
-                {
+                {"OK":            boolean,    
+                                        // T if successful
 
-         "OK":            boolean,    // T if successful
+                "error":            "string",        
+                                        // text describing error
 
-         "error":            "string",        // text describing error
+                                        // present only if NOT OK
 
-                            // present only if NOT OK
+                "responseDate":    "string",        
+                                        // time of report, time/date encoding
 
-                 "responseDate":    "string",        // time of report, time/date encoding
+                "request":                
+                                        // the API request
 
-                 "request":                // the API request
+                    {"verb": "getrecord",    
+                                        // the literal "getrecord"
 
-                 {
+                     "identifier": ID,        
+                                        // request ID
 
-                 "verb":            "getrecord",    // the literal "getrecord"
+                     "by_doc_ID": boolean,    
+                                        // request is for a single document
 
-                 "identifier":        ID,        // request ID
+                     "by_resource_ID": boolean,    
+                                        // request is for a collation of documents
 
-                 "by_doc_ID":        boolean,    // request is for a single document
+                     "HTTP_request": "string"        
+                                        // the HTTP request as a string
 
-                 "by_resource_ID":    boolean,    // request is for a collation of documents
+                    },
 
-                 "HTTP_request":    "string"        // the HTTP request as a string
+                    "getrecord":        // the resource data description documents
 
-                 },
+                                        // present only if ID is valid, otherwise NULL
 
-                 "getrecord":                // the resource data description documents
+                        {
 
-                                                        // present only if ID is valid, otherwise NULL
+                            "record": [                
+                                        // record container
 
-         {
+                            {"header":                
+                                        // header info
 
-         "record":                // record container
+                                {"identifier": ID,        
+                                        // resource data description document ID
 
-         [{
+                                ▼"datestamp": "string", 
+                                        // resource data timestamp date/time
 
-                 "header":                // header info
+                                        // requried, granularity of 1 second
 
-                 {                
+                                "status": "string"        
+                                        // fixed vocabulary ["active", "deleted"]                                
+                                        // optional, "active" if not present
 
-                 "identifier":        ID,        // resource data description document ID
+                                },
 
-                 :deprecation:` `▼:deprecation:` "`:deprecation:`datestamp`:deprecation:`":    "`:deprecation:`string`:deprecation:`",        // `:deprecation:`resource`:deprecation:` `:deprecation:`data`:deprecation:` `:deprecation:`timestamp`:deprecation:`, `:deprecation:`date`:deprecation:`/`:deprecation:`time`
+                            "resource_data": {resource_data_description}        
+                                        // resource data description documents
 
-                :deprecation:`                    // `:deprecation:`requried`:deprecation:`, `:deprecation:`granularity`:deprecation:` `:deprecation:`of`:deprecation:` 1 `:deprecation:`second`
+                            }
+                            
+                            ]
 
-                 "status":        "string"        // fixed vocabulary ["active", "deleted"]                                // optional, "active" if not present
+                        }
 
-                 },
-
-             "resource_data":    
-
-                 {resource_data_description}        // resource data description documents
-
-                 }:changes:`]`
-
-                 }
-
-            }
+                }
 
 **Basic** **Harvest****: ****GetRecord**
 
-        // Return the resource data description documents for the supplied ID
+::
+
+                                        // Return the resource data description documents for the supplied ID
 
     Build results object
 
-                responseDate := time of report         // time/date encoding
+                responseDate := time of report         
+                                        // time/date encoding
 
-                request :=                // the API request
+                request :=                
+                                        // the API request
 
-                 {"verb":            "getrecord",    // the literal "getrecord"
+                 {"verb": "getrecord",    
+                                        // the literal "getrecord"
 
-                 "identifier":        ID,        // request ID
+                 "identifier": ID,        
+                                        // request ID
 
-                 "by_doc_ID":        boolean,     // request value
+                 "by_doc_ID": boolean,     
+                                        // request value
 
-                 "by_resource_ID":    boolean,    // request value
+                 "by_resource_ID": boolean,    
+                                        // request value
 
-                 "HTTP_request":    "string"        // the HTTP request as a string
+                 "HTTP_request": "string"        
+                                        // the HTTP request as a string
 
                  }
 
-                IF request_ID not supplied // return error
+                IF request_ID not supplied 
+                                        // return error
 
                      THEN     OK := FALSE
 
@@ -794,11 +837,13 @@ The service SHALL return complete resource data description documents.
 
                         THEN    OK := FALSE
 
-                                error := "badArgument" // only one can be true
+                                error := "badArgument"
+                                        // only one can be true
 
                                 EXIT
 
-                IF by_resource_ID // get the list of documents otherwise it’s just the requested ID
+                IF by_resource_ID 
+                                        // get the list of documents otherwise it’s just the requested ID
 
                     THEN     FIND the collation of resource data description document IDs
 
@@ -810,31 +855,33 @@ The service SHALL return complete resource data description documents.
 
                 IF successful
 
-                     THEN // return resource data
+                     THEN 
+                                        // return resource data
 
-                                // header
+                                        // header
 
-                                ▼:deprecation:`datestamp`:deprecation:` := `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`from`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`r`:deprecation:`*esource*`:deprecation:` `:deprecation:`*data*`:deprecation:` `:deprecation:`*description*`
+                                ▼datestamp := node_timestamp from the *resource* *data* *description*
 
                                 identifier := resource data description document ID
 
                                 IF delete_data_policy <> "no"
 
-                                    AND the r*esource* *data* *description* document has been deleted
+                                    AND the *resource* *data* *description* document has been deleted
 
                                     THEN status := "deleted"
 
-                                // resource data
+                                        // resource data
 
-                                PUT the r*esource* *data* *description* document in the results object
+                                PUT the *resource* *data* *description* document in the results object
 
-                                    // all stored key-value pairs or only those defined in the spec
+                                        // all stored key-value pairs or only those defined in the spec
 
-                            // as defined in the service description
+                                        // as defined in the service description
 
                         OK := TRUE
 
-                     ELSE // not found error
+                     ELSE               
+                                        // not found error
 
                                 PUT NULL in the results object
 
@@ -844,13 +891,11 @@ The service SHALL return complete resource data description documents.
 
         TRANSFORM results to specified CONTENT-TYPE
 
-
-"""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.56c4qr-c1nbmq:
 
-**List** **Records**
-"""""""""""""""""""""""""""""""""""""""""""
+------------
+List Records
+------------
 
 The List Records verb returns the resource data description documents for document added to the node within a specified time/date range.
 The API only returns JSON.
@@ -867,23 +912,27 @@ Documents may only be accessed by document ID.
 
 **API**
 
+::
+
         GET <node-service-endpoint-URL>/harvest/listrecords?from=<date>&until=<date>
 
         POST <node-service-endpoint-URL>/harvest/listrecords
 
         Arguments (HTTP GET):
 
-        "from":        "string",            // start of harvest time/date range
+            "from": "string",            
+                                        // start of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // earliest resource data timestamp if not present
+                                        // earliest resource data timestamp if not present
 
-        "until":        "string"            // end of harvest time/date range
+            "until": "string"            
+                                        // end of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // latest resource data timestamp if not present
+                                        // latest resource data timestamp if not present
 
         Arguments (HTTP POST):
 
@@ -895,110 +944,123 @@ Documents may only be accessed by document ID.
 
         Request Object (HTTP POST):
 
-            {
+            {"from": "string",           
+                                        // start of harvest time/date range
 
-         "from":        "string",            // start of harvest time/date range
+                                        // optional, time/date
 
-                            // optional, time/date
+                                        // earliest resource data timestamp if not present
 
-                            // earliest resource data timestamp if not present
+            "until": "string"                        
+                                        // end of harvest time/date range
 
-         "until":        "string"            // end of harvest time/date range
+                                        // optional, time/date
 
-                            // optional, time/date
-
-                            // latest resource data timestamp if not present
-
-        }
-
-        Results Object:
-
-                {
-
-                 "OK":            boolean,    // T if successful
-
-                 "error":            "string",        // text describing error
-
-                                    // present only if NOT OK
-
-                 "responseDate":    "string",        // time of report, time/date encoding
-
-                 "request":                // the API request
-
-                 {
-
-                 "verb":            "listrecords",    // the literal "listrecords"
-
-         "from":            "string",        // specified start of harvest time/date range
-
-                            // time/date
-
-         "until":            "string".
-// specified end of harvest time/date range
-
-                            // time/date
-
-          "HTTP_request":    "string"        // the HTTP request as a string
-
-                 },
-
-         "listrecords":                // array of records
-
-         [
-
-         {
-
-                 "record":                // the resource data description document
-
-                                                        // present only if ID is valid, otherwise NULL
-
-                 {
-
-                 "header":
-
-                 {                
-
-                 "identifier":        ID,        // resource data description document ID
-
-                 :deprecation:` `▼":deprecation:`datestamp`:deprecation:`":        "`:deprecation:`string`:deprecation:`",        // `:deprecation:`resource`:deprecation:` `:deprecation:`data`:deprecation:` `:deprecation:`timestamp`:deprecation:`, `:deprecation:`date`:deprecation:`/`:deprecation:`time`
-
-                :deprecation:`                    // `:deprecation:`required`:deprecation:`, `:deprecation:`granularity`:deprecation:` `:deprecation:`of`:deprecation:` 1 `:deprecation:`second`
-
-                 "status":        "string"        // fixed vocabulary ["active", "deleted"]                                // optional, "active" if not present
-
-                 },
-
-                 resource_data:
-
-             {resource_data_description}        // resource data description documents                 }
-
-             }
-
-             ]
+                                        // latest resource data timestamp if not present
 
             }
 
+        Results Object:
+
+                {"OK": boolean,    
+                                        // T if successful
+
+                "error": "string",        
+                                        // text describing error
+
+                                        // present only if NOT OK
+
+                "responseDate": "string",        
+                                        // time of report, time/date encoding
+
+                "request":              // the API request
+
+                    {"verb": "listrecords",    
+                                        // the literal "listrecords"
+
+                    "from": "string",        
+                                        // specified start of harvest time/date range
+
+                                        // time/date
+
+                    "until": "string".
+                                        // specified end of harvest time/date range
+
+                                        // time/date
+
+                    "HTTP_request": "string"        
+                                        // the HTTP request as a string
+
+                    },
+
+                "listrecords":[                 
+                                        // array of records
+
+                    {"record":                
+                                        // the resource data description document
+
+                                        // present only if ID is valid, otherwise NULL
+
+                        {"header":
+
+                            {"identifier": ID,        
+                                        // resource data description document ID
+
+                            ▼"datestamp": "string" 
+                                        // resource data timestamp, date/time
+
+                                        // required granularity of 1 second
+
+                            "status": "string"        
+                                        // fixed vocabulary ["active", "deleted"]                                
+                                        
+                                        // optional, "active" if not present
+
+                            },
+
+                            resource_data:
+
+                                {resource_data_description}        
+                                        // resource data description documents                 
+                        
+                        }
+
+                    }      
+
+                    ]
+
+                }
+
 **Basic** **Harvest****: ****ListRecords**
 
-        // Return the resource data description documents for the specified time range
+::
+
+                                        // Return the resource data description documents for the specified time range
 
         Build results object
 
-                responseDate := time of report         // time/date encoding
+                responseDate := time of report         
+                                        // time/date encoding
 
-                request :=                // the API request
+                request :=                
+                                        // the API request
 
-                {"verb":            "listrecords",    // the literal "listrecords"
+                {"verb": "listrecords",    
+                                        // the literal "listrecords"
 
-         "from":            "string",        // specified start of harvest time/date range
+                "from": "string",        
+                                        // specified start of harvest time/date range
 
-         "until":            "string",        // specified end of harvest time/date range
+                "until": "string",        
+                                        // specified end of harvest time/date range
 
-                 "HTTP_request":    "string"        // the HTTP request as a string
+                "HTTP_request": "string"        
+                                        // the HTTP request as a string
 
-                 }
+                }
 
-                IF from > until // return error
+                IF from > until 
+                                        // return error
 
                      THEN     OK := FALSE
 
@@ -1006,7 +1068,8 @@ Documents may only be accessed by document ID.
 
                           EXIT
 
-                IF granularity of from time <> granularity of until time // return error
+                IF granularity of from time <> granularity of until time 
+                                        // return error
 
                      THEN     OK := FALSE
 
@@ -1016,7 +1079,7 @@ Documents may only be accessed by document ID.
 
                 IF granularity of from time < service granularity 
 
-                        // request is for seconds, service instance only supports days (not seconds)
+                                        // request is for seconds, service instance only supports days (not seconds)
 
                      THEN     OK := FALSE
 
@@ -1030,15 +1093,16 @@ Documents may only be accessed by document ID.
 
             FOR EACH *resource* *data* *description* document
 
-                        IF from <= ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` from the r*esource* *data* *description* document
+                        IF from <= ▼node_timestamp from the *resource* *data* *description* document
 
-                            <= until // timestamp inclusive in [from:until] range
+                            <= until 
+                                        // timestamp inclusive in [from:until] range
 
                      THEN
 
-                                // return header for resource data
+                                        // return header for resource data
 
-                                ▼:deprecation:`datestamp`:deprecation:` := `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`from`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`r`:deprecation:`*esource*`:deprecation:` `:deprecation:`*data*`:deprecation:` `:deprecation:`*description*`
+                                ▼datestamp := node_timestamp from the resource* *data* *description*
 
                                 identifier := resource data description document ID
 
@@ -1048,7 +1112,7 @@ Documents may only be accessed by document ID.
 
                                     THEN status := "deleted"
 
-                                // return the resource data
+                                        // return the resource data
 
                                 PUT the r*esource* *data* *description* document in the results object
 
@@ -1066,13 +1130,11 @@ Documents may only be accessed by document ID.
 
         TRANSFORM results to specified CONTENT-TYPE
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.fldcps-ri52yn:
 
-**List** **Identifiers**
-"""""""""""""""""""""""""""""""""""""""""""""""
+----------------
+List Identifiers
+----------------
 
 The List Identifiers verb returns the OAI-PMH header information from the resource data description documents for the specified resource data document IDs within a specified time/date range.
 The API only returns JSON.
@@ -1088,23 +1150,27 @@ Documents may only be accessed by document ID.
 
 **API**
 
+::
+
         GET <node-service-endpoint-URL>/harvest/listidentifiers?from=<date>&until=<date>
 
         POST <node-service-endpoint-URL>/harvest/listidentifiers
 
         Arguments (HTTP GET):
 
-        "from":        "string",            // start of harvest time/date range
+            "from": "string",            
+                                        // start of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // earliest resource data timestamp if not present
+                                        // earliest resource data timestamp if not present
 
-        "until":        "string"            // end of harvest time/date range
+            "until": "string"            
+                                        // end of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // latest resource data timestamp if not present
+                                        // latest resource data timestamp if not present
 
         Arguments (HTTP POST):
 
@@ -1116,100 +1182,110 @@ Documents may only be accessed by document ID.
 
         Request Object (HTTP POST):
 
-            {
+            {"from": "string",            
+                                        // start of harvest time/date range
 
-         "from":        "string",            // start of harvest time/date range
+                                        // optional, time/date
 
-                            // optional, time/date
+                                        // earliest resource data timestamp if not present
 
-                            // earliest resource data timestamp if not present
+            "until": "string"            
+                                        // end of harvest time/date range
 
-         "until":        "string"            // end of harvest time/date range
+                                        // optional, time/date
 
-                            // optional, time/date
+                                        // latest resource data timestamp if not present
 
-                            // latest resource data timestamp if not present
-
-        }
+            }
 
         Results Object:
 
-                {
+            {"OK": boolean,    
+                                        // T if successful
 
-                 "OK":            boolean,    // T if successful
+            "error": "string",        
+                                        // text describing error
 
-                 "error":            "string",        // text describing error
+                                        // present only if NOT OK
 
-                                    // present only if NOT OK
+            "responseDate": "string",        
+                                        // time of report, time/date encoding
 
-                 "responseDate":    "string",        // time of report, time/date encoding
+            "request":                
+                                        // the API request
 
-                 "request":                // the API request
+                {"verb": "listidentifiers",    
+                                        // the literal "listidentifiers"
 
-                 {
+                "from": "string",       
+                                        // specified start of harvest time/date range
 
-                 "verb":            "listidentifiers",    // the literal "listidentifiers"
+                                        // time/date
 
-         "from":            "string",        // specified start of harvest time/date range
+                "until": "string".
+                                        // specified end of harvest time/date range
 
-                            // time/date
+                                        // time/date
 
-         "until":            "string".
-// specified end of harvest time/date range
+                "HTTP_request": "string"        
+                                        // the HTTP request as a string
 
-                            // time/date
+                },
 
-          "HTTP_request":    "string"        // the HTTP request as a string
+            "listidentifiers":[                
+                                        // array of headers
 
-                 },
+                {"header":
 
-         "listidentifiers":                // array of headers
+                    {"identifier": ID,        
+                                        // resource data description document ID
 
-         [
+                    ▼"datestamp": "string",        
+                                        // resource data timestamp, date/time
+                                        // requried, granularity of 1 second
 
-         {
+                    "status": "string"        
+                                        // fixed vocabulary ["active", "deleted"]                                
+                                        // optional, "active" if not present
 
-                 "header":
+                    }
 
-                 {                
+                }
 
-                 "identifier":        ID,        // resource data description document ID
-
-                :deprecation:` `▼:deprecation:` "`:deprecation:`datestamp`:deprecation:`":    "`:deprecation:`string`:deprecation:`",        // `:deprecation:`resource`:deprecation:` `:deprecation:`data`:deprecation:` `:deprecation:`timestamp`:deprecation:`, `:deprecation:`date`:deprecation:`/`:deprecation:`time`
-
-                :deprecation:`                    // `:deprecation:`requried`:deprecation:`, `:deprecation:`granularity`:deprecation:` `:deprecation:`of`:deprecation:` 1 `:deprecation:`second`
-
-                 "status":        "string"        // fixed vocabulary ["active", "deleted"]                                // optional, "active" if not present
-
-                 }
-
-                 }
-
-             ]
+            ]
 
             }
 
 **Basic** **Harvest****: ****ListIdentifiers**
 
-        // Return the resource data description document headers for the specified time range
+::
+
+                                        // Return the resource data description document headers for the specified time range
 
         Build results object
 
-                responseDate := time of report         // time/date encoding
+                responseDate := time of report         
+                                        // time/date encoding
 
-                request :=                // the API request
+                request :=                
+                                        // the API request
 
-                {"verb":            "listidentifiers",    // the literal "listidentifiers"
+                {"verb": "listidentifiers",    
+                                        // the literal "listidentifiers"
 
-         "from":            "string",        // specified start of harvest time/date range
+                "from": "string",        
+                                        // specified start of harvest time/date range
 
-         "until":            "string",        // specified end of harvest time/date range
+                "until": "string",        
+                                        // specified end of harvest time/date range
 
-                 "HTTP_request":    "string"        // the HTTP request as a string
+                 "HTTP_request": "string"        
+                                        // the HTTP request as a string
 
-                 }
+                }
 
-                IF from > until // return error
+                IF from > until 
+                                        // return error
 
                      THEN     OK := FALSE
 
@@ -1217,7 +1293,8 @@ Documents may only be accessed by document ID.
 
                           EXIT
 
-                IF granularity of from time <> granularity of until time // return error
+                IF granularity of from time <> granularity of until time 
+                                        // return error
 
                      THEN     OK := FALSE
 
@@ -1227,7 +1304,7 @@ Documents may only be accessed by document ID.
 
                 IF granularity of from time < service granularity 
 
-                        // request is for seconds, service instance only supports days (not seconds)
+                                        // request is for seconds, service instance only supports days (not seconds)
 
                      THEN     OK := FALSE
 
@@ -1243,13 +1320,14 @@ Documents may only be accessed by document ID.
 
                         IF from <= node_ timestamp from the r*esource* *data* *description* document
 
-                            <= until // timestamp inclusive in [from:until] range
+                            <= until 
+                                        // timestamp inclusive in [from:until] range
 
                      THEN 
 
-                                // return header for resource data
+                                        // return header for resource data
 
-                                ▼:deprecation:`datestamp`:deprecation:` := `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`from`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`r`:deprecation:`*esource*`:deprecation:` `:deprecation:`*data*`:deprecation:` `:deprecation:`*description*`
+                                ▼datestamp := node_timestamp fromt the *resource* *data* *description*
 
                                 identifier := resource data description document ID
 
@@ -1273,13 +1351,10 @@ Documents may only be accessed by document ID.
 
         TRANSFORM results to specified CONTENT-TYPE
 
-
-"""""""""""""""""""""""""""""""""""
-
 .. _h.k5h4di-cvleu6:
-
-**Identify**
-"""""""""""""""""""""""""""""""""""
+--------
+Identify
+--------
 
 The Identify verb returns a description of the harvest end point.
 The service SHALL return the values in JSON.
@@ -1290,11 +1365,12 @@ A network node SHALL maintain all of the data necessary to return the required k
 
 **API**
 
+::
+
         GET <node-service-endpoint-URL>/harvest/identify
 
         POST <node-service-endpoint-URL>/harvest/identify
-
-            
+           
 
         Arguments:
 
@@ -1306,85 +1382,102 @@ A network node SHALL maintain all of the data necessary to return the required k
 
         Results Object:
 
-                {
+            {"OK": boolean,    
+                                        // T if successful
 
-         "OK":            boolean,    // T if successful
+            "error": "string",       
+                                        // text describing error
 
-         "error":            "string",        // text describing error
+                                        // present only if NOT OK
 
-                            // present only if NOT OK
+            "responseDate": "string",        
+                                        // time of report, time/date encoding
 
-                 "responseDate":    "string",        // time of report, time/date encoding
+            "request":                
+                                        // the API request
 
-                 "request":                // the API request
+                {"verb": "identify",    
+                                        // the literal "identify"
 
-                 {
+                "HTTP_request": "string"         
+                                        // the HTTP request as a string
 
-                 "verb":            "identify",    // the literal "identify"
+                },
 
-                 "HTTP_request":    "string"         // the HTTP request as a string
+            "identify":
 
-                 },
+                {"node_id": "string",        
+                                        // ID of the network node
 
-                 "identify":
+                "repositoryName": "string",        
+                                        // name of the network node
 
-                 {
+                "baseURL": "string",        
+                                        // URL of the network node
 
-                 "node_id":        "string",        // ID of the network node
+                "protocolVersion": "2.0",        
+                                        // the literal "2.0"
 
-                 "repositoryName":    "string",        // name of the network node
+                "service_version": "string",        
+                                        // version of the Harvest service API
 
-                 "baseURL":        "string",        // URL of the network node
+                "earliestDatestamp": "string",        
+                                        // time/date encoding
 
-                 "protocolVersion":    "2.0",        // the literal "2.0"
+                "deletedRecord": "string",        
+                                        // node delete policy
 
-                 "service_version":    "string",        // version of the Harvest service API
+                "granularity": "string",        
+                                        // granularity from the service policy
 
-                 "earliestDatestamp":    "string",        // time/date encoding
-
-                 "deletedRecord":    "string",        // node delete policy
-
-                 "granularity",        "string",        // granularity from the service policy
-
-                 "adminEmail",        "string"        // node admin URL
-
-                 }
+                "adminEmail": "string"        
+                                        // node admin URL
 
                 }
 
+            }
+
 **Basic** **Harvest****: ****Identify**
 
-    // Return the description of the harvest service
+::
+
+                                        // Return the description of the harvest service
 
     Build results object
 
         OK := TRUE
 
-                responseDate := time of report // time/date encoding
+                responseDate := time of report 
+                                        // time/date encoding
 
-                request := // the API request
+                request := 
+                                        // the API request
 
-                 {"verb":            "identify",    // the literal "identify"
+                {"verb": "identify",    
+                                        // the literal "identify"
 
-                 "HTTP_request":    "string"         // the HTTP request as a string
+                "HTTP_request": "string"         
+                                        // the HTTP request as a string
 
-                 }
+                }
 
                 node_id := node_id from the *network* *node* *description*
 
                 repositoryName := node_name from the *network* *node* *description*
 
-                baseURL := <node-service-endpoint-URL> // URL of the network node
+                baseURL := <node-service-endpoint-URL> 
+                                        // URL of the network node
 
-                protocolVersion := "2.0" // the OAI-PMH version
+                protocolVersion := "2.0" 
+                                        // the OAI-PMH version
 
                 service_version := service_version from the *Harvest* *service* *description* 
 
                 earliestDatestamp := timestamp 
 
-                        // the oldest guaranteed publish/update or delete timestamp
+                                        // the oldest guaranteed publish/update or delete timestamp
 
-                        // time/date encoding with service-specified granularity
+                                        // time/date encoding with service-specified granularity
 
                 deletedRecord := deleted_data_policy from the node_policy from the
 
@@ -1396,13 +1489,11 @@ A network node SHALL maintain all of the data necessary to return the required k
 
         TRANSFORM results to specified CONTENT-TYPE
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.eokref-1hyu2a:
 
-**List** **Metadata** **Formats**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+---------------------
+List Metadata Formats
+---------------------
 
 The List Metadata Formats verb returns the list of metadata formats available for harvests.
 The harvest API only returns JSON encoded resource data descriptions: this is the only metadata format defined in the service description.
@@ -1414,6 +1505,8 @@ The services does not support the retrieval of the metadata format for an indivi
 Including a ID in the request SHOULD produce an error.
 
 **API**
+
+::
 
         GET <node-service-endpoint-URL>/harvest/listmetadataformats
 
@@ -1431,83 +1524,88 @@ Including a ID in the request SHOULD produce an error.
 
         Results Object:
 
-                {
+            {"OK": boolean,    
+                                        // T if successful
 
-         "OK":            boolean,    // T if successful
+            "error": "string",        
+                                        // text describing error
 
-         "error":            "string",        // text describing error
+                                        // present only if NOT OK
 
-                            // present only if NOT OK
+            "responseDate": "string",        
+                                        // time of report, time/date encoding
 
-                 "responseDate":    "string",        // time of report, time/date encoding
+            "request":                  // the API request
 
-                 "request":                // the API request
+                {"verb": "listmetadataformats",    
+                                        // the literal "listmetadataformats"
 
-                 {
+                "HTTP_request": "string"         
+                                        // the HTTP request as a string 
 
-                 "verb":            "listmetadataformats",    // the literal "listmetadataformats"
+                },
 
-                 "HTTP_request":    "string"         // the HTTP request as a string 
+            "listmetadataformats":[            
+                                        // array of supported metadata formats
 
-                 },
+                {"metadataformat":
 
-                 "listmetadataformats":            // array of supported metadata formats
+                    {"metadataPrefix": "string"        
+                                        // metadata format name/prefix
 
-                 [
+                                        // other elements will go here
 
-                 {"metadataformat":
-
-                 {
-
-                 "metadataPrefix": "string"        // metadata format name/prefix
-
-                                    // other elements will go here
-
-                 }
-
-                 }
-
-                 ]
+                    }
 
                 }
 
+                ]
+
+            }
+
 **Basic** **Harvest****: ****List** **Metadata** **Formats**
 
-    // Return the description of the metadata formats supported for harvest
+::
+
+                                        // Return the description of the metadata formats supported for harvest
 
     Build results object
 
         OK := TRUE
 
-                responseDate := time of report // time/date encoding
+                responseDate := time of report 
+                                        // time/date encoding
 
-                request := // the API request
+                request := 
+                                        // the API request
 
-                 {"verb":            "listmetadataformats",    // the literal "listmetadataformats"
+                {"verb": "listmetadataformats",   
+                                        // the literal "listmetadataformats"
 
-                 "HTTP_request":    "string"            // the HTTP request as a string
+                 "HTTP_request": "string"            
+                                        // the HTTP request as a string
 
-                 }
+                }
 
                 metadataFormat := metadataformat structure from the *Harvest* *service* *description* 
 
-                    // the key-value pair [{"metadataPrefix": "LR_JSON_0.10.0"}]
+                                        // the key-value pair [{"metadataPrefix": "LR_JSON_0.10.0"}]
 
         TRANSFORM results to specified CONTENT-TYPE
 
-
-""""""""""""""""""""""""""""""""""""""""
-
 .. _h.aocxiz-yca3fl:
 
-**List** **Sets**
-""""""""""""""""""""""""""""""""""""""""
+---------
+List Sets
+---------
 
 The List Sets verb returns the list of sets used to organize resource data descriptions.
 Support for sets is not defined in this version of the specification.
 The API SHALL return a standard error indicating that sets are not available.
 
 **API**
+
+::
 
         GET <node-service-endpoint-URL>/harvest/listsets
 
@@ -1525,31 +1623,35 @@ The API SHALL return a standard error indicating that sets are not available.
 
         Results Object:
 
-                {
+            {"OK": boolean,        
+                                        // T if successful
 
-         "OK":        boolean,        // T if successful
+            "error": "string",            
+                                        // text describing error
 
-         "error":        "string",            // text describing error
+                                        // present only if NOT OK
 
-                            // present only if NOT OK
+            "responseDate": "string",        
+                                        // time of report, time/date encoding
 
-                 "responseDate":    "string",        // time of report, time/date encoding
+            "request":                
+                                        // the API request
 
-                 "request":                // the API request
+                {"verb": "listsets",    
+                                        // the literal "listsets"
 
-                 {
-
-                 "verb":            "listsets",    // the literal "listsets"
-
-                 "HTTP_request":    "string"         // the HTTP request as a string
-
-                 }
+                "HTTP_request": "string"         
+                                        // the HTTP request as a string
 
                 }
 
+            }
+
 **Basic** **Harvest****: ****List** **Sets**
 
-    // Return the description of the sets available for harvest
+::
+
+                                        // Return the description of the sets available for harvest
 
     Build results object
 
@@ -1557,13 +1659,17 @@ The API SHALL return a standard error indicating that sets are not available.
 
                 error := "noSetHierarchy"
 
-                responseDate := time of report // time/date encoding
+                responseDate := time of report 
+                                        // time/date encoding
 
-                request := // the API request
+                request := 
+                                        // the API request
 
-                 {"verb":            "listsets",    // the literal "listsets"
+                 {"verb": "listsets",    
+                                        // the literal "listsets"
 
-                 "HTTP_request":    "string"         // the HTTP request as a string
+                 "HTTP_request": "string"         
+                                        // the HTTP request as a string
 
                  }
 
@@ -1571,86 +1677,93 @@ The API SHALL return a standard error indicating that sets are not available.
 
 **Service** **Description**
 
+::
+
     {
 
-         "doc_type":        "service_description",    
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "access",
+        "service_type": "access",
 
-     "service_name":    "Basic Harvest",    
+        "service_name": "Basic Harvest",
 
-    "service_description":    "Service to retreieve full JSON resource description documents from a node.
-Patterned after OAI-PMH",
+        "service_description": "Service to retreieve full JSON resource description documents from a node.
+    Patterned after OAI-PMH",
 
-     "service_version":    "0.10.0",
+        "service_version": "0.10.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
+        "service_auth": 
+                                        // service authentication and authorization descriptions
 
-     {
+        {
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_authz": ["<authvalue>"], 
+                                        // authz values for the service
 
-     "service_key":        <T/F>,        // does service use an access key            
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-     "service_https":    <T/F>        // does service require https
+            "service_https": < T / F > 
+                                        // does service require https
 
-     },
+        },
 
-     "service_data":
+        "service_data":
 
-     {
+        {
 
-         "granularity":        "string",         // literal fixed vocabulary
+            "granularity": "string", 
+                                        // literal fixed vocabulary
 
-                                                // "YYYY-MM-DD" (day granularity)
+                                        // "YYYY-MM-DD" (day granularity)
 
-                        // or "YYYY-MM-DDThh:mm:ssZ" (second granularity)
+                                        // or "YYYY-MM-DDThh:mm:ssZ" (second granularity)
 
-     "flow_control":        FALSE,        // flow control not supported
+            "flow_control": FALSE, 
+                                        // flow control not supported
 
-     "setSpec":        NULL,        // sets are not supported
+            "setSpec": NULL, 
+                                        // sets are not supported
 
-     "spec_kv_only":    <T/F>        // T to return only spec-defined key-value pairs
+            "spec_kv_only": < T / F > 
+                                        // T to return only spec-defined key-value pairs
 
-                        // F to return all stored key-value pairs
+                                        // F to return all stored key-value pairs
 
-                        // optional, default F
+                                        // optional, default F
 
-     "metadataformats":            // array of supported metadata formats
+            "metadataformats":[ 
+                                        // array of supported metadata formats
 
-     [
+                {"metadataFormat": 
+                                        // description of a metadata format
 
-     {
+                    {"metadataPrefix": "LR_JSON_0.10.0" 
+                                        // the only supported harvest form
 
-     "metadataFormat":            // description of a metadata format
+                                        // the Full OAI-PMH service will define
 
-         {
+                                        // schema and metadataNamespace
 
-     "metadataPrefix":     "LR_JSON_0.10.0"    // the only supported harvest form
+                                        // where appropriate
 
-                            // the Full OAI-PMH service will define
+                    }
 
-                            // schema and metadataNamespace
+            }
 
-                            // where appropriate
+            ]
 
-     }
-
-     }
-
-     ]
-
-     }
+        }
 
     }
 
@@ -1658,13 +1771,11 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.art057-hbjxj4:
 
-**OAI****-****PMH** **Harvest** **Service**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------
+OAI-PMH Harvest Service
+-----------------------
 
 The OAI-PMH harvest services can be used by an external agent to connect to a node to harvest (pull) the resource data (e.g., the metadata or paradata) contained in the resource data description documents stored at the node.
 The service defines how to harvest a variety of metadata formats (DC, LOM), paradata formats, etc., along with full resource data description documents stored at the node.
@@ -1755,13 +1866,11 @@ The internal JSON storage of a resource data description document MAY include ad
 The service MAY return all stored key-value pairs, or only the key-value pairs defined in this specification for the resource data description document.
 The service document SHALL indicate if the returned documents are limited to the specification-defined key-value pairs only or if all stored key-value pairs are returned.
 
-
-""""""""""""""""""""""""""""""""""""""""
-
 .. _h.bto5ylf0qbe8:
 
-**Get** **Record**
-""""""""""""""""""""""""""""""""""""""""
+----------
+Get Record
+----------
 
 The Get Record verb returns resource data (e.g., the metadata or paradata) that matches the requested dissemination format for the specified resource data description document ID or resource ID.
 
@@ -1782,6 +1891,8 @@ This behavior is NOT specified in the pseudo code below.
 *ToDo*: Extend to produce (log) a usage record of the harvest.
 
 **API**
+
+::
 
         GET<node-service-endpoint-URL>/OAI-PMH?verb=GetRecord
 
@@ -1807,33 +1918,37 @@ This behavior is NOT specified in the pseudo code below.
 
     Request Key-Value Pairs (as per OAI-PMH Specification, with Learning Registry extensions)
 
-        verb        = GetRecord        // literal "GetRecord", required
+        verb = GetRecord        
+                                        // literal "GetRecord", required
 
-        identifier    = <string>        // resource data description document ID
+        identifier = <string>           // resource data description document ID
 
-                            // required
+                                        // required
 
-        metadataPrefix    = <string>        // requested metadata dissemination format
+        metadataPrefix = <string>        
+                                        // requested metadata dissemination format
 
-                            // required
+                                        // required
 
-                by_doc_ID    = boolean        // request is for a single document
+                by_doc_ID = boolean        
+                                        // request is for a single document
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                                                        // identifier is a doc_ID
+                                        // identifier is a doc_ID
 
-                                    // OAI-PMH extension
+                                        // OAI-PMH extension
 
-                by_resource_ID     = boolean    ,    // request is for a collation of all documents
+                by_resource_ID     = boolean,    
+                                        // request is for a collation of all documents
 
-                                    // for the specified resource
+                                        // for the specified resource
 
-                                    // optional, default TRUE
+                                        // optional, default TRUE
 
-                                                        // identifier is a resource_locator
+                                        // identifier is a resource_locator
 
-                                                        // OAI-PMH extension
+                                        // OAI-PMH extension
 
     Results XML
 
@@ -1843,21 +1958,27 @@ This behavior is NOT specified in the pseudo code below.
 
         Contains:
 
-            <responseDate />         // required XML element
+            <responseDate />            
+                                        // required XML element
 
-            <request />            // required XML element
+            <request />                 
+                                        // required XML element
 
-                            // includes extensions
+                                        // includes extensions
 
-            <error />            // XML element if errors
+            <error />            
+                                        // XML element if errors
 
-            <GetRecord />            // XML element with results if no errors
+            <GetRecord />            
+                                        // XML element with results if no errors
 
     
 
 **OAI****-****PMH****: ****GetRecord**
 
-        // Return the resource data from the resource data description document for the ID in the request
+::
+
+                                        // Return the resource data from the resource data description document for the ID in the request
 
         Build XML results document
 
@@ -1869,23 +1990,30 @@ This behavior is NOT specified in the pseudo code below.
 
                 <request 
 
-                    verb="GetRecord"            // the literal "GetRecord"
+                    verb="GetRecord"            
+                                        // the literal "GetRecord"
 
-                        identifier=<ID>                // request ID
+                    identifier=<ID>                
+                                        // request ID
 
-                        metadataPrefix=<metadataformat>    // requested metadata format
+                    metadataPrefix=<metadataformat>    
+                                        // requested metadata format
 
-                        by_doc_ID=<boolean>            // by document request flag
+                    by_doc_ID=<boolean>            
+                                        // by document request flag
 
-                        by_resource_ID=<boolean>        // by resource request flag
+                    by_resource_ID=<boolean>        
+                                        // by resource request flag
 
-                        >
+                    >
 
-                        HTTP_request                // the HTTP request as a string
+                    HTTP_request                
+                                        // the HTTP request as a string
 
                 </request>
 
-        IF identifier not supplied // return error element
+        IF identifier not supplied 
+                                        // return error element
 
                 <error code="badArgument" />
 
@@ -1893,7 +2021,8 @@ This behavior is NOT specified in the pseudo code below.
 
                 EXIT
 
-        IF metadataPrefix not supplied // return error element
+        IF metadataPrefix not supplied 
+                                        // return error element
 
                 <error code="badArgument" />
 
@@ -1903,13 +2032,14 @@ This behavior is NOT specified in the pseudo code below.
 
         IF by_doc_ID AND by_resource_ID
 
-                <error code="badArgument" /> // only one can be true
+                <error code="badArgument" /> 
+                                        // only one can be true
 
                 Complete XML
 
                 EXIT
 
-        // Does the document exist
+                                        // Does the document exist
 
         IF by_doc_ID AND
 
@@ -1929,7 +2059,8 @@ This behavior is NOT specified in the pseudo code below.
 
                         EXIT
 
-        IF by_resource_ID // get the list of documents otherwise it’s just the requested ID
+        IF by_resource_ID 
+                                        // get the list of documents otherwise it’s just the requested ID
 
                 THEN     FIND the collation of resource data description documents IDs as <identifier>
 
@@ -1937,7 +2068,7 @@ This behavior is NOT specified in the pseudo code below.
 
         FOR EACH resource data description document IDs
 
-        // Is there an acceptable metadata format
+                                        // Is there an acceptable metadata format
 
         IF payload_schema <> <resourcedataformat> OR
 
@@ -1971,7 +2102,7 @@ This behavior is NOT specified in the pseudo code below.
 
                 <identifier>resource data description document doc_ID</identifier>
 
-                <datastamp>▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` from the r*esource* *data* *description*</datestamp>
+                <datastamp>▼node_timestamp from the r*esource* *data* *description*</datestamp>
 
                 </header>
 
@@ -2009,13 +2140,11 @@ This behavior is NOT specified in the pseudo code below.
 
         </GetRecord>
 
-
-""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.8u0mmhr8juw2:
 
-**List** **Records**
-""""""""""""""""""""""""""""""""""""""""""
+------------
+List Records
+------------
 
 The List Records verb returns the resource data description documents for the specified resource data document IDs within a specified time/date range.
 Set-based harvesting is not currently supported.
@@ -2045,6 +2174,8 @@ Documents may only be accessed by document ID.
 
 **API**
 
+::
+
         GET<node-service-endpoint-URL>/OAI-PMH?verb=ListRecords
 
                 &from=<date>
@@ -2065,23 +2196,27 @@ Documents may only be accessed by document ID.
 
     Request Key-Value Pairs (as per OAI-PMH Specification, with Learning Registry extensions)
 
-        verb        = ListRecords        // literal "ListRecords", required
+        verb = ListRecords        
+                                        // literal "ListRecords", required
 
-        from        =<date>        // start of harvest time/date range
+        from =<date>        
+                                        // start of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // earliest resource data timestamp if not present
+                                        // earliest resource data timestamp if not present
 
-        until        =<date>        // end of harvest time/date range
+        until =<date>        
+                                        // end of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // latest resource data timestamp if not present
+                                        // latest resource data timestamp if not present
 
-        metadataPrefix    = <string>        // requested metadata dissemination format
+        metadataPrefix = <string>        
+                                        // requested metadata dissemination format
 
-                            // required
+                                        // required
 
     Results XML
 
@@ -2091,17 +2226,23 @@ Documents may only be accessed by document ID.
 
         Contains:
 
-            <responseDate />         // required XML element
+            <responseDate />            
+                                        // required XML element
 
-            <request />            // required XML element
+            <request />            
+                                        // required XML element
 
-            <error />            // XML element if errors
+            <error />            
+                                        // XML element if errors
 
-            <ListRecords />            // XML element with results if no errors
+            <ListRecords />           
+                                        // XML element with results if no errors
 
 **OAI****-****PMH****: ****ListRecords**
 
-        // Return the resource data description documents for the specified time range
+::
+
+                                        // Return the resource data description documents for the specified time range
 
         Build XML results document
 
@@ -2113,21 +2254,27 @@ Documents may only be accessed by document ID.
 
                 <request 
 
-                    verb="ListRecords"             // the literal "ListRecords"
+                    verb="ListRecords"             
+                                        // the literal "ListRecords"
 
-                        metadataPrefix=<metadataformat>    // requested metadata format
+                    metadataPrefix=<metadataformat>    
+                                        // requested metadata format
 
-                        from=<date>                // start of harvest time/date range
+                    from=<date>                
+                                        // start of harvest time/date range
 
-                        until=<date>                // end of harvest time/date range
+                    until=<date>                
+                                        // end of harvest time/date range
 
-                        >
+                    >
 
-                        HTTP_request                // the HTTP request as a string
+                    HTTP_request                
+                                        // the HTTP request as a string
 
                 </request>
 
-        IF from > until // return error
+        IF from > until 
+                                        // return error
 
                 <error code="badArgument" />
 
@@ -2135,7 +2282,8 @@ Documents may only be accessed by document ID.
 
                 EXIT
 
-        IF granularity of from time <> granularity of until time // return error
+        IF granularity of from time <> granularity of until time 
+                                        // return error
 
                 <error code="badArgument" />
 
@@ -2145,7 +2293,7 @@ Documents may only be accessed by document ID.
 
         IF granularity of from time < service granularity
 
-                // request is for seconds, service instance only supports days (not seconds)
+                                        // request is for seconds, service instance only supports days (not seconds)
 
                 <error code="badArgument" />
 
@@ -2163,9 +2311,10 @@ Documents may only be accessed by document ID.
 
         FOR EACH *resource* *data* *description* document
 
-                IF from <= ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` from the r*esource* *data* *description* document
+                IF from <= ▼node_timestamp from the *resource* *data* *description* document
 
-                        <= until // timestamp inclusive in [from:until] range
+                        <= until 
+                                        // timestamp inclusive in [from:until] range
 
                 THEN
 
@@ -2195,7 +2344,7 @@ Documents may only be accessed by document ID.
 
                 <identifier>resource data description document ID</identifier>
 
-                <datastamp>▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` from the r*esource* *data* *description*</datestamp>
+                <datastamp>▼node_timestamp from the *resource* *data* *description*</datestamp>
 
                 </header>
 
@@ -2245,13 +2394,11 @@ Documents may only be accessed by document ID.
 
                 EXIT
 
-
-""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.ig18pu2ue7vp:
 
-**List** **Identifiers**
-""""""""""""""""""""""""""""""""""""""""""""""
+----------------
+List Identifiers
+----------------
 
 The List Identifiers verb returns the header information for the resource data description documents for the specified resource data document IDs within a specified time/date range.
 Flow control is not currently supported.
@@ -2263,6 +2410,8 @@ The API is functionally equivalent to the List Records API, only header informat
 Documents may only be accessed by document ID.
 
 **API**
+
+::
 
         GET<node-service-endpoint-URL>/OAI-PMH?verb=ListIdentifiers
 
@@ -2284,23 +2433,27 @@ Documents may only be accessed by document ID.
 
     Request Key-Value Pairs (as per OAI-PMH Specification)
 
-        verb        = ListIdentifiers        // literal "ListIdentifiers", required
+        verb = ListIdentifiers        
+                                        // literal "ListIdentifiers", required
 
-        from        =<date>        // start of harvest time/date range
+        from =<date>        
+                                        // start of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // earliest resource data timestamp if not present
+                                        // earliest resource data timestamp if not present
 
-        until        =<date>        // end of harvest time/date range
+        until =<date>        
+                                        // end of harvest time/date range
 
-                            // optional, time/date
+                                        // optional, time/date
 
-                            // latest resource data timestamp if not present
+                                        // latest resource data timestamp if not present
 
-        metadataPrefix    = <string>        // requested metadata dissemination format
+        metadataPrefix = <string>        
+                                        // requested metadata dissemination format
 
-                            // required
+                                        // required
 
     Results XML
 
@@ -2308,17 +2461,23 @@ Documents may only be accessed by document ID.
 
         Contains:
 
-            <responseDate />         // required XML element
+            <responseDate />         
+                                        // required XML element
 
-            <request />            // required XML element
+            <request />            
+                                        // required XML element
 
-            <error />            // XML element if errors
+            <error />            
+                                        // XML element if errors
 
-            <ListIdentifiers />        // XML element with results if no errors
+            <ListIdentifiers />        
+                                        // XML element with results if no errors
 
 **OAI****-****PMH****: ****ListIdentifiers**
 
-        // Return the resource data description document headers for the specified time range
+::
+
+                                        // Return the resource data description document headers for the specified time range
 
         Build XML results document
 
@@ -2330,21 +2489,27 @@ Documents may only be accessed by document ID.
 
                 <request 
 
-                    verb="ListIdentifiers"            // the literal "ListIdentifiers"
+                    verb="ListIdentifiers"            
+                                        // the literal "ListIdentifiers"
 
-                        metadataPrefix=<metadataformat>    // requested metadata format
+                        metadataPrefix=<metadataformat>    
+                                        // requested metadata format
 
-                        from=<date>                // start of harvest time/date range
+                        from=<date>                
+                                        // start of harvest time/date range
 
-                        until=<date>                // end of harvest time/date range
+                        until=<date>               
+                                        // end of harvest time/date range
 
                         >
 
-                        HTTP_request                // the HTTP request as a string
+                        HTTP_request                
+                                        // the HTTP request as a string
 
                 </request>
 
-        IF from > until // return error
+        IF from > until 
+                                        // return error
 
                 <error code="badArgument" />
 
@@ -2352,7 +2517,8 @@ Documents may only be accessed by document ID.
 
                 EXIT
 
-        IF granularity of from time <> granularity of until time // return error
+        IF granularity of from time <> granularity of until time 
+                                        // return error
 
                 <error code="badArgument" />
 
@@ -2362,7 +2528,7 @@ Documents may only be accessed by document ID.
 
         IF granularity of from time < service granularity
 
-                // request is for seconds, service instance only supports days (not seconds)
+                                        // request is for seconds, service instance only supports days (not seconds)
 
                 <error code="badArgument" />
 
@@ -2380,9 +2546,10 @@ Documents may only be accessed by document ID.
 
         FOR EACH *resource* *data* *description* document
 
-                IF from <= ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `from the r*esource* *data* *description* document
+                IF from <= ▼node_timestamp from the *resource* *data* *description* document
 
-                        <= until // timestamp inclusive in [from:until] range
+                        <= until 
+                                        // timestamp inclusive in [from:until] range
 
                 THEN
 
@@ -2404,7 +2571,7 @@ Documents may only be accessed by document ID.
 
                         IF delete_data_policy <> "no"
 
-                        AND the r*esource* *data* *description* document has been deleted
+                        AND the *resource* *data* *description* document has been deleted
 
                         THEN status ="deleted"
 
@@ -2412,7 +2579,7 @@ Documents may only be accessed by document ID.
 
                 <identifier>resource data description document ID</identifier>
 
-                <datastamp>▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` from the r*esource* *data* *description*</datestamp>
+                <datastamp>▼node_timestamp from the *resource* *data* *description*</datestamp>
 
                 </header>
 
@@ -2432,13 +2599,11 @@ Documents may only be accessed by document ID.
 
                 EXIT
 
-
-""""""""""""""""""""""""""""""""""
-
 .. _h.1dvaj9ngizdi:
 
-**Identify**
-""""""""""""""""""""""""""""""""""
+--------
+Identify
+--------
 
 The Identify verb returns a description of the OAI-PMH harvest end point.
 The service SHALL return all of the values specified in the OAI-PMH specification, using the specified XML schema.
@@ -2448,6 +2613,8 @@ A network node SHALL maintain all of the data necessary to return the required e
 
 **API**
 
+::
+
         GET<node-service-endpoint-URL>/OAI-PMH?verb=Identify
 
         POST <node-service-endpoint-URL>/OAI-PMH
@@ -2456,7 +2623,8 @@ A network node SHALL maintain all of the data necessary to return the required e
 
     Request Key-Value Pairs (as per OAI-PMH Specification)
 
-        verb        = Identify        // literal "Identify", required
+        verb = Identify        
+                                        // literal "Identify", required
 
     Results XML
 
@@ -2464,17 +2632,23 @@ A network node SHALL maintain all of the data necessary to return the required e
 
         Contains:
 
-            <responseDate />         // required XML element
+            <responseDate />         
+                                        // required XML element
 
-            <request />            // required XML element
+            <request />            
+                                        // required XML element
 
-            <error />            // XML element if errors
+            <error />            
+                                        // XML element if errors
 
-            <Identify/>            // XML element with results if no errors
+            <Identify/>            
+                                        // XML element with results if no errors
 
 **OAI****-****PMH****: ****Identify**
 
-    // Return the description of the harvest service
+::
+
+                                        // Return the description of the harvest service
 
         Build XML results document
 
@@ -2486,11 +2660,13 @@ A network node SHALL maintain all of the data necessary to return the required e
 
                 <request 
 
-                    verb="Identify"            // the literal "Identify"
+                    verb="Identify"            
+                                        // the literal "Identify"
 
-                        >
+                    >
 
-                        HTTP_request            // the HTTP request as a string
+                    HTTP_request            
+                                        // the HTTP request as a string
 
                 </request>
 
@@ -2518,13 +2694,11 @@ A network node SHALL maintain all of the data necessary to return the required e
 
         </Identify>
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.rmgxadwnkcu:
 
-**List** **Metadata** **Formats**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
+---------------------
+List Metadata Formats
+---------------------
 
 The List Metadata Formats verb returns the list of metadata formats available for harvests.
 The service SHALL return all of the elements specified in the OAI-PMH specification, using the specified XML schema.
@@ -2564,6 +2738,8 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
 **API**
 
+::
+
         GET<node-service-endpoint-URL>/OAI-PMH?verb=ListMetadataFormats
 
                 &identifier=<id>
@@ -2584,25 +2760,29 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
     Request Key-Value Pairs (as per OAI-PMH Specification,with Learning Registry extensions)
 
-        verb        = ListMetadataFormats    // literal "ListMetadataFormats", required
+        verb = ListMetadataFormats    
+                                        // literal "ListMetadataFormats", required
 
-        identifier    = <string>        // resource data description document ID
+        identifier = <string>        
+                                        // resource data description document ID
 
-                            // optional
+                                        // optional
 
-                by_doc_ID    = boolean        // request is for a single document
+        by_doc_ID = boolean        
+                                        // request is for a single document
 
-                                    // optional, default FALSE
+                                        // optional, default FALSE
 
-                                    // OAI-PMH extension
+                                        // OAI-PMH extension
 
-                by_resource_ID     = boolean    ,    // request is for a collation of all documents
+        by_resource_ID = boolean,    
+                                        // request is for a collation of all documents
 
-                                    // for the specified resource
+                                        // for the specified resource
 
-                                    // optional, default TRUE
+                                        // optional, default TRUE
 
-                                                        // OAI-PMH extension
+                                        // OAI-PMH extension
 
     Results XML
 
@@ -2612,19 +2792,25 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
         Contains:
 
-            <responseDate />         // required XML element
+            <responseDate />         
+                                        // required XML element
 
-            <request />            // required XML element
+            <request />            
+                                        // required XML element
 
-                            // includes extensions
+                                        // includes extensions
 
-            <error />            // XML element if errors
+            <error />            
+                                        // XML element if errors
 
-            <ListMetadataFormats />    // XML element with results if no errors
+            <ListMetadataFormats />    
+                                        // XML element with results if no errors
 
 **OAI****-****PMH****: ****List** **Metadata** **Formats**
 
-    // Results View
+::
+
+                                        // Results View
 
     Define a view of the resource data description documents
 
@@ -2634,7 +2820,7 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                         IF by_doc_ID
 
-                                THEN use the resource data description document where                     doc_ID = <identifier>
+                                THEN use the resource data description document where doc_ID = <identifier>
 
                         IF by_resource_ID
 
@@ -2656,7 +2842,7 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
         Add all metadata formats that can be automatically generated
 
-        // Return the description of the metadata formats supported for harvest
+                                        // Return the description of the metadata formats supported for harvest
 
         Build XML results document
 
@@ -2668,23 +2854,29 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                 <request
 
-                    verb="ListMetadataFormats"         // the literal "ListMetadataFormats"
+                    verb="ListMetadataFormats"         
+                                        // the literal "ListMetadataFormats"
 
-                        identifier=<ID>                // request ID
+                    identifier=<ID>                
+                                        // request ID
 
-                        by_doc_ID=<boolean>            // by document request flag
+                    by_doc_ID=<boolean>            
+                                        // by document request flag
 
-                        by_resource_ID=<boolean>        // by resource request flag
+                    by_resource_ID=<boolean>        
+                                        // by resource request flag
 
-                        >
+                    >
 
-                        HTTP_request                // the HTTP request as a string
+                    HTTP_request                
+                                        // the HTTP request as a string
 
                 </request>
 
         IF by_doc_ID AND by_resource_ID
 
-                <error code="badArgument" />             // only one can be true
+                <error code="badArgument" />             
+                                        // only one can be true
 
                 Complete XML
 
@@ -2738,7 +2930,7 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                 </metadataFormat>
 
-        // Add Learning Registry Native JSON format
+                                        // Add Learning Registry Native JSON format
 
         <metadataFormat>
 
@@ -2746,7 +2938,7 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                         *Harvest* *service* *description*</metadataPrefix>
 
-                    // the value LR_JSON_0.10.0
+                                        // the value LR_JSON_0.10.0
 
                 </metadataFormat>
 
@@ -2764,19 +2956,19 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                 EXIT
 
-
-"""""""""""""""""""""""""""""""""""""""
-
 .. _h.v3mu36o8erz0:
 
-**List** **Sets**
-"""""""""""""""""""""""""""""""""""""""
+---------
+List Sets
+---------
 
 The List Sets verb returns the list of sets used to organize resource data descriptions.
 Support for sets is not defined in this version of the specification.
 The API SHALL return a standard error indicating that sets are not available.
 
 **API**
+
+::
 
         GET<node-service-endpoint-URL>/OAI-PMH?verb=ListSets
 
@@ -2786,7 +2978,8 @@ The API SHALL return a standard error indicating that sets are not available.
 
     Request Key-Value Pairs (as per OAI-PMH Specification)
 
-        verb        = ListSets        // literal "ListSets", required
+        verb = ListSets        
+                                        // literal "ListSets", required
 
     Results XML
 
@@ -2794,17 +2987,23 @@ The API SHALL return a standard error indicating that sets are not available.
 
         Contains:
 
-            <responseDate />         // required XML element
+            <responseDate />         
+                                        // required XML element
 
-            <request />            // required XML element
+            <request />           
+                                        // required XML element
 
-            <error />            // XML element if errors
+            <error />            
+                                        // XML element if errors
 
-            <ListSets/>            // XML element with results if no errors
+            <ListSets/>            
+                                        // XML element with results if no errors
 
 **OAI****-****PMH****: ****List** **Sets**
 
-    // Return the description of the sets available for harvest
+::
+
+                                        // Return the description of the sets available for harvest
 
         Build XML results document
 
@@ -2816,75 +3015,80 @@ The API SHALL return a standard error indicating that sets are not available.
 
                 <request 
 
-                    verb="ListSets"             // the literal "ListSets"
+                    verb="ListSets"             
+                                        // the literal "ListSets"
 
-                        >
+                    >
 
-                        HTTP_request            // the HTTP request as a string
+                    HTTP_request            
+                                        // the HTTP request as a string
 
                 </request>
 
-    // No Set Support
+                                        // No Set Support
 
         <error code="noSetHierarchy" />
 
 **Service** **Description**
 
+::
+
     {
+        "doc_type": "service_description",
 
-         "doc_type":        "service_description",    
+        "doc_version": "0.20.0",
 
-         "doc_version":        "0.20.0",
+        "doc_scope": "node",
 
-         "doc_scope":        "node",
+        "active": true,
 
-         "active":        true,
+        "service_id": "<uniqueid>",
 
-         "service_id":        "<uniqueid>",        
+        "service_type": "access",
 
-         "service_type":        "access",
+        "service_name": "OAI-PMH Harvest",
 
-     "service_name":    "OAI-PMH Harvest",
+        "service_description": "Service to retrieve metadata/paradata from resource description documents using the OAI-PMH 2.0 protocol",
 
-    "service_description":    "Service to retrieve metadata/paradata from resource description documents using the OAI-PMH 2.0 protocol",        
+        "service_version": "0.10.0",
 
-     "service_version":    "0.10.0",
+        "service_endpoint": "<node-service-endpoint-URL>/OAI-PMH",
 
-     "service_endpoint":    "<node-service-endpoint-URL>/OAI-PMH",
+        "service_auth":                     
+                                        // service authentication and authorization descriptions
 
-     "service_auth":                // service authentication and authorization descriptions
+            {"service_authz": ["<authvalue>"], 
+                                        // authz values for the service
 
-     {
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_https": < T / F > 
+                                        // does service require https
 
-     "service_key":        <T/F>,        // does service use an access key            
+            },
 
-     "service_https":    <T/F>        // does service require https
+        "service_data":
 
-     },
+            {"version": "OAI-PMH 2.0",
 
-     "service_data":
+            "schemalocation": "<XSD URL>", 
+                                        // location of the Learning Registry Extended OAI-PMH
 
-         {
+                                        // XSD used to validate service responses
 
-     "version":        "OAI-PMH 2.0",
+            "spec_kv_only": boolean 
+                                        // T to return only spec-defined key-value pairs
 
-     "schemalocation":    "<XSD URL>",    // location of the Learning Registry Extended OAI-PMH
+                                        // F to return all stored key-value pairs
 
-                        // XSD used to validate service responses
+                                        // optional, default F
 
-     "spec_kv_only":    boolean        // T to return only spec-defined key-value pairs
+                                        // Applies only when the requested output is 
 
-                        // F to return all stored key-value pairs
+                                        // LR_JSON_0.10.0
 
-                        // optional, default F
-
-                        // Applies only when the requested output is 
-
-                        // LR_JSON_0.10.0
-
-     }
+            }
 
     }
 
@@ -2897,13 +3101,11 @@ The descriptive values (service_name, service_description) MAY be changed from w
 There is no guarantee of persistence of this copy of the XSD.
 A deployed service instance SHOULD use an existing copy of the XSD or maintain a private copy of the XSD according to the node’s data persistence policies.
 
-
-"""""""""""""""""""""""""""""""""""""""""
-
 .. _h.e1519o-y653zc:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -2924,13 +3126,11 @@ A deployed service instance SHOULD use an existing copy of the XSD or maintain a
 | Future      | TBD      |            | ToS attribution output to OAI. Harvest flow control. Flow control to OAI. Logging/tracking emit as paradata to services. Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD .(V AS:x.xx.x)                                              |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 - Flow control consistency
 
