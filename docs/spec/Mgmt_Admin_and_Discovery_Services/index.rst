@@ -1,22 +1,19 @@
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Management, Administrative and Discovery Services: **Learning** **Registry** **Technical** **Specification** **V** **MS**:**0.**49**.0**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+========================================================================================================
+Management, Administrative and Discovery Services: Learning Registry Technical Specification V MS:0.49.0
+========================================================================================================
 
 Draft in Progress.
+
 See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
 
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
-
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
 This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
@@ -59,13 +56,11 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>` part describes the network model and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.kuf0re8u58qs:
 
+-----------------------
 Administrative Services
-"""""""""""""""""""""""""""""""""""""""""""""
+-----------------------
 
 Administrative services are used to trigger network node administrative operations, to determine node status or to retrieve descriptive information about a network node.
 They are used to support monitoring and discovery.
@@ -81,13 +76,11 @@ All administrative services SHALL support HTTP content negotiation.
 All administrative services SHALL support return of CONTENT-TYPE: text/plain.
 All administrative services SHOULD support return of text/html, text/xml, application/rdf+xml.
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.x3qh8x-kqmikf:
 
-**Network** **Node** **Status** **Service**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+---------------------------
+Network Node Status Service
+---------------------------
 
 The network node status service is used to return information and operational data about a network node.
 The service SHALL return all of the key-value pairs listed that have a valid value.
@@ -97,9 +90,10 @@ A network node SHALL maintain all of the data necessary to return the required k
 
 **API**
 
-        GET <node-service-endpoint-URL>/status
+::
 
-    
+        GET <node-service-endpoint-URL>/status
+   
 
         Arguments:
 
@@ -111,59 +105,72 @@ A network node SHALL maintain all of the data necessary to return the required k
 
         Results Object:
 
-                {
+                {"timestamp": "string",              
+                                        // time of report, time/date encoding
 
-                 "timestamp":        "string",        // time of report, time/date encoding
+                "active": boolean; 
+                                        // is the network node active
 
-                 "active":        boolean;    // is the network node active
+                "node_id": "string", 
+                                        // ID of the network node
 
-                 "node_id":        "string",        // ID of the network node
+                "node_name": "string", 
+                                        // name of the network node
 
-                 "node_name":        "string",        // name of the network node
+                "doc_count": integer, 
+                                        // number of unique:changes:` `resource data documents
 
-             "doc_count":        integer,        // number of unique:changes:` `resource data documents
+                                        // held by the node
 
-                                // held by the node
+                                        //  only count distributable documents
 
-                                //  only count distributable documents
+                "total_doc_count": integer, 
+                                        // number of unique resource data documents
 
-            "total_doc_count":    integer,        // number of unique resource data documents
+                                        // held by the node
 
-                                // held by the node
+                                        // including non distributable documents
 
-                                // including non distributable documents
+                "install_time": "string", 
+                                        // time/date of node install
 
-             "install_time":        "string",        // time/date of node install
+                "start_time": "string", 
+                                        // server restart time/date
 
-                 "start_time":        "string",        // server restart time/date
+                                        // last reboot 
 
-                                    // last reboot 
+                "last_in_sync": "string", 
+                                        // time of last inbound sync
 
-                 "last_in_sync":        "string",        // time of last inbound sync
+                                        // omit if node has not sync’ed
 
-                                    // omit if node has not sync’ed
+                "in_sync_node": "string", 
+                                        // id of the node from the last inbound sync
 
-                 "in_sync_node":    "string",        // id of the node from the last inbound sync
+                                        // omit if node has not sync’ed
 
-                                    // omit if node has not sync’ed
+                "last_out_sync": "string", 
+                                        // time of last outbound sync
 
-                 "last_out_sync":    "string",        // time of last outbound sync
+                                        // omit if node has not sync’ed
 
-                                    // omit if node has not sync’ed
+                "out_sync_node": "string", 
+                                        // id of the node for the last outbound sync
 
-                 "out_sync_node":    "string",        // id of the node for the last outbound sync
+                                        // omit if node has not sync’ed
 
-                                    // omit if node has not sync’ed
+                "earliestDatestamp": "string" 
+                                        // oldest timestamp for harvest
 
-                 "earliestDatestamp":    "string"        // oldest timestamp for harvest
+                                        // time/date encoding
 
-                                                        // time/date encoding
-
-        }
+                }
 
 **Network** **Node** **Status**
 
-    // Return the operational status of a network node
+::
+
+                                        // Return the operational status of a network node
 
     DEFINE VIEW on 
 
@@ -177,52 +184,55 @@ A network node SHALL maintain all of the data necessary to return the required k
 
 **Service** **Description**
 
-    {
+::
 
-         "doc_type":        "service_description",    
+    {   
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "access",
+        "service_type": "access",
 
-     "service_name":    "Network Node Status",    
+        "service_name": "Network Node Status",
 
-    "service_description":    "Service to retrieve basic operational status information for a node",    
+        "service_description": "Service to retrieve basic operational status information for a node",
 
-     "service_version":    "0.23.0",
+        "service_version": "0.23.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
+        "service_auth": 
+                                        // service authentication and authorization descriptions
 
-     {
+        {
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_authz": ["<authvalue>"], 
+                                        // authz values for the service
 
-     "service_key":        <T/F>,        // does service use an access key            
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-     "service_https":    <T/F>        // does service require https
+            "service_https": < T / F > 
+                                        // does service require https
 
-     }
+        }
 
     }
 
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.ixbka3-k9h0vx:
 
-**Network** **Node** **Description** **Service**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------
+Network Node Description Service
+--------------------------------
 
 The network node description service is used to return descriptive information about a network node, the resource distribution network that it is a part of and the network community that it is a part of.
 The service SHALL return all of the key-value pairs listed that have a valid value.
@@ -231,9 +241,10 @@ The service MAY return additional informational values.
 
 **API**
 
-        GET <node-service-endpoint-URL>/description
+::
 
-    
+        GET <node-service-endpoint-URL>/description
+   
 
         Arguments:
 
@@ -245,111 +256,146 @@ The service MAY return additional informational values.
 
         Results Object:
 
-                {
+                {"timestamp": "string",        
+                                        // time of report, time/date encoding
 
-                 "timestamp""        "string",        // time of report, time/date encoding
+                "active": boolean;    
+                                        // is the network node active
 
-                 "active":        boolean;    // is the network node active
+                "node_id": "string",        
+                                        // ID of the network node
 
-                 "node_id":        "string",        // ID of the network node
+                "node_name": "string",        
+                                        // name of the network node
 
-                 "node_name":        "string",        // name of the network node
+                "node_description": "string",        
+                                        // description of the node
 
-                 "node_description":    "string",        // description of the node
+                "node_admin_identity": "string",        
+                                        // identity of node admin
 
-                 "node_admin_identity":    "string",        // identity of node admin
+                "node_key": "string",        
+                                        // node public key
 
-                 "node_key":        "string",        // node public key
+                "network_id": "string",        
+                                        // id of the network
 
-                 "network_id":        "string",        // id of the network
+                "network_name": "string",        
+                                        // name of the network
 
-                 "network_name":     "string",        // name of the network
+                "network_description": "string",        
+                                        // description of the network
 
-                 "network_description":    "string",        // description of the network
+                "network_admin_identity": "string",        
+                                        // identity of network admin
 
-                 "network_admin_identity":    "string",        // identity of network admin
+                "network_key": "string",    
+                                        // network public key
 
-                 "network_key":        "string"    ,    // network public key
+                "community_id": "string",    
+                                        // id of the community
 
-                 "community_id":    "string" ,    // id of the community
+                "community_name": "string",        
+                                        // name of the community
 
-                 "community_name":     "string",         // name of the community
+                "community_description: "string",        
+                                        // description of the community
 
-                 "community_description:"string",        // description of the community
+                "community_admin_identity": "string",        
+                                        // identity of community admin
 
-                 "community_admin_identity":"string",        // identity of community admin
+                "community_key": "string",        
+                                        // community public key
 
-                 "community_key":    "string",        // community public key
+                "policy_id": "string",        
+                                        // id of the policy description
 
-                 "policy_id":        "string",        // id of the policy description
+                "policy_version": "string",        
+                                        // version identifier for the policy
 
-         "policy_version":    "string",        // version identifier for the policy
+                "gateway_node": boolean,    
+                                        // node is a gateway node            
 
-                 "gateway_node":    boolean,    // node is a gateway node            
+                "open_connect_source": boolean,    
+                                        // node is willing to be a source
 
-                 "open_connect_source":boolean,    // node is willing to be a source
+                "open_connect_dest": boolean,    
+                                        // node is willing to be a destination
 
-                 "open_connect_dest":    boolean,    // node is willing to be a destination
+                "social_community": boolean,    
+                                        // is community is a social community
 
-                 "social_community":    boolean    ,    // is community is a social community
+                "node_policy":                
+                                        // node-specific policies, optional
 
-              "node_policy":                // node-specific policies, optional
+                    {"sync_frequency": integer,        
+                                        // target time between synchronizations
 
-         {
+                    "deleted_data_policy": "string",        
+                                        // policy value
 
-                 "sync_frequency":    integer,        // target time between synchronizations
+                    "TTL": integer,        
+                                        // minimum time to live for resource data 
 
-         "deleted_data_policy":    "string",        // policy value
+                    "accepted_version": ["string"],    
+                                        // list of resource data description document 
 
-         "TTL":            integer,        // minimum time to live for resource data 
+                                        // versions that the node can process
 
-         "accepted_version":    ["string"],    // list of resource data description document 
+                    "accepted_TOS": ["string"],    
+                                        // list of ToS that the node will accept    
 
-                                                        // versions that the node can process
+                    "accepts_anon": boolean,    
+                                        // node takes anonymous submissions
 
-         "accepted_TOS":    ["string"],    // list of ToS that the node will accept    
+                    "accepts_unsigned": boolean,    
+                                        // node takes unsigned submissions
 
-         "accepts_anon":    boolean,    // node takes anonymous submissions
+                    "validates_signature": boolean,    
+                                        // node will validate signatures
 
-                 "accepts_unsigned":    boolean,    // node takes unsigned submissions
+                    "check_trust": boolean,    
+                                        // node will evaluate trust of submitter
 
-                 "validates_signature":    boolean    ,    // node will validate signatures
+                    "max_doc_size": integer        
+                                        // max document size that a node stores
 
-                "check_trust":        boolean,    // node will evaluate trust of submitter
+                    }
 
-                 "max_doc_size":    integer        // max document size that a node stores
+                "filter":                    
+                                        // filter data
 
-          }
+                    {"filter_name": "string",         
+                                        // name of the filter
 
-                 "filter":                    // filter data
+                    "custom": boolean,    
+                                        // custom filter
 
-                 {
+                    "include_exclude": boolean,    
+                                        // accept or reject list
 
-                 "filter_name":         "string",         // name of the filter
+                    "filters":[                
+                                        // array of filter rules
 
-                 "custom":        boolean,    // custom filter
+                        {"filter_key": "string",        
+                                        // REGEX that matches names
 
-                 "include_exclude":    boolean,    // accept or reject list
+                        "filter_value": "string"        
+                                        // REGEX that matches values
 
-                 "filters":                // array of filter rules
+                        }
 
-                 [
+                        ]
 
-                 {"filter_key":        "string",        // REGEX that matches names
-
-                 "filter_value":        "string"        // REGEX that matches values
-
-             }
-
-                 ]
-
-                 }
+                    }
 
                 }
 
 **Network** **Node** **Description**
 
-    // Return the description of a network node
+::
+
+                                        // Return the description of a network node
 
     DEFINE VIEW on 
 
@@ -369,52 +415,54 @@ The service MAY return additional informational values.
 
 **Service** **Description**
 
+::
+
     {
 
-         "doc_type":        "service_description",    
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "access",
+        "service_type": "access",
 
-     "service_name":    "Network Node Description",        
+        "service_name": "Network Node Description",
 
-    "service_description":"Service to retrieve a comprehensive description of a node",        
+        "service_description": "Service to retrieve a comprehensive description of a node",
 
-     "service_version":    "0.23.0",
+        "service_version": "0.23.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
+        "service_auth": 
+                                        // service authentication and authorization descriptions
 
-     {
+            {"service_authz": ["<authvalue>"], 
+                                        // authz values for the service
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-     "service_key":        <T/F>,        // does service use an access key            
-
-     "service_https":    <T/F>        // does service require https
-
-     }
+            "service_https": < T / F > 
+                                        // does service require https
+    
+            }
 
     }
 
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.5l0qus-ugg81l:
 
-**Network** **Node** **Services** **Service**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------
+Network Node Services Service
+-----------------------------
 
 The network node services service is used to return the list of services available at a network node.
 For each service at a node, the service SHALL return all of the key-value pairs listed that have a valid value.
@@ -425,6 +473,8 @@ The service MAY return additional key-value pairs for a service.
 The service SHOULD group and sort the results in some logical form, e.g., by ACTIVE, by TYPE.
 
 **API**
+
+::
 
         GET <node-service-endpoint-URL>/services
 
@@ -440,55 +490,70 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
 
         Results Object:
 
-                {
+                {"timestamp": "string",        
+                                        // time of report, time/date encoding
 
-                 "timestamp":        "string",        // time of report, time/date encoding
+                "active": boolean;    
+                                        // is the network node active
 
-                 "active":        boolean;    // is the network node active
+                "node_id": "string",        
+                                        // ID of the network node
 
-                 "node_id":        "string",        // ID of the network node
+                "node_name": "string",        
+                                        // name of the network node
 
-                 "node_name":        "string",        // name of the network node
+                "services":[                
+                                        // array of service description objects
 
-                 "services":                // array of service description objects
+                    {"active": boolean;    
+                                        // is the service active
 
-                 [
+                    "service_id": "string",        
+                                        // id of the service
 
-                 {"active":        boolean;    // is the service active
+                    "service_type": "string",        
+                                        // fixed vocabulary
 
-                 "service_id":        "string",        // id of the service
+                    "service_name": "string",        
+                                        // name of the service
 
-                 "service_type":    "string",        // fixed vocabulary
+                    "service_description": "string",        
+                                        // description of the service
 
-         "service_name":    "string",        // name of the service
+                    "service_version": "string",        
+                                        // version number of the service description
 
-                 "service_description":    "string",        // description of the service
+                    "service_endpoint": "string",        
+                                        // URL of service
 
-                 "service_version":    "string",        // version number of the service description
+                    "service_auth":            
+                                        // service authentication and authorization descriptions
 
-                 "service_endpoint":    "string",        // URL of service
+                        {"service_authz": ["string"],     
+                                        // authz values for the service
 
-         "service_auth":            // service authentication and authorization descriptions
+                        "service_key": boolean,    
+                                        // does service use an access key                  
+        
+                        "service_https": boolean        
+                                        // does service require https
 
-         {
+                        },
 
-         "service_authz":    ["string"],     // authz values for the service
+                    "service_data": {}        
+                                        // service-specific name-value pairs
 
-         "service_key":    boolean,    // does service use an access key                  "service_https":    boolean        // does service require https
+                    }
 
-         },
-
-                 "service_data":    {}        // service-specific name-value pairs
-
-                 }
-
-                 ]
+                    ]
 
                 }
 
 **Network** **Node** **Services**
 
-    // Return the description of network node services
+::
+
+                                        // Return the description of network node services
 
     DEFINE VIEW on 
 
@@ -504,52 +569,55 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
 
 **Service** **Description**
 
+::
+
     {
+        "doc_type": "service_description",
 
-         "doc_type":        "service_description",    
+        "doc_version": "0.20.0",
 
-         "doc_version":        "0.20.0",
+        "doc_scope": "node",
 
-         "doc_scope":        "node",
+        "active": true,
 
-         "active":        true,
+        "service_id": "<uniqueid>",
 
-         "service_id":        "<uniqueid>",        
+        "service_type": "access",
 
-         "service_type":        "access",
+        "service_name": "Network Node Services",
 
-     "service_name":    "Network Node Services",
+        "service_description": "Service to retrieve the list of services deployed at a node",
 
-    "service_description":"Service to retrieve the list of services deployed at a node",        
+        "service_version": "0.21.0",
 
-     "service_version":    "0.21.0",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_auth": 
+                                        // service authentication and authorization descriptions
 
-     "service_auth":                // service authentication and authorization descriptions
+            {
+            
+            "service_authz": ["<authvalue>"],
+                                        // authz values for the service
 
-     {
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_https": < T / F > 
+                                        // does service require https
 
-     "service_key":        <T/F>,        // does service use an access key            
-
-     "service_https":    <T/F>        // does service require https
-
-     }
+            }
 
     }
 
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.jlubtj-czhato:
 
-**Resource** **Distribution** **Network** **Policy** **Service**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------
+Resource Distribution Network Policy Service
+--------------------------------------------
 
 The resource distribution network policies service is used to return information about the policies that apply to the resource distribution network that the network node is a part of.
 The service SHALL return all of the key-value pairs listed that have a valid value.
@@ -558,6 +626,8 @@ The service MAY return additional policy key-value pairs.
 The service MAY be called at any node in the resource distribution network; all network nodes store an identical copy of the policy data.
 
 **API**
+
+::
 
         GET <node-service-endpoint-URL>/policy
 
@@ -575,31 +645,43 @@ The service MAY be called at any node in the resource distribution network; all 
 
                 {
 
-                 "timestamp":        "string",        // time of report, time/date encoding
+                    "timestamp": "string", 
+                                        // time of report, time/date encoding
 
-                 "active":        boolean;    // is the network node active
+                    "active": boolean; 
+                                        // is the network node active
 
-                 "node_id":        "string",        // ID of the network node
+                    "node_id": "string", 
+                                        // ID of the network node
 
-                 "node_name":        "string",        // name of the network node
+                    "node_name": "string", 
+                                        // name of the network node
 
-                 "network_id":        "string",        // id of the network
+                    "network_id": "string", 
+                                        // id of the network
 
-                 "network_name":     "string",        // name of the network
+                    "network_name": "string", 
+                                        // name of the network
 
-                 "network_description":    "string",        // description of the network
+                    "network_description": "string", 
+                                        // description of the network
 
-                 "policy_id":        "string",        // id of the policy description
+                    "policy_id": "string", 
+                                        // id of the policy description
 
-         "policy_version":    "string",        // version identifier for the policy
+                    "policy_version": "string", 
+                                        // version identifier for the policy
 
-                 "TTL":            integer        // minimum time to live for resource data
+                    "TTL": integer 
+                                        // minimum time to live for resource data
 
                 }
 
 **Resource** **Distribution** **Network** **Policy**
 
-    // Return the description of network policies
+::
+
+                                        // Return the description of network policies
 
     DEFINE VIEW on 
 
@@ -615,52 +697,56 @@ The service MAY be called at any node in the resource distribution network; all 
 
 **Service** **Description**
 
+::
+
     {
 
-         "doc_type":        "service_description",    
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "access",
+        "service_type": "access",
 
-     "service_name":    "Resource Distribution Network Policy",
+        "service_name": "Resource Distribution Network Policy",
 
-    "service_description":    "Service to retrieve network policies from a node",        
+        "service_description": "Service to retrieve network policies from a node",
 
-     "service_version":    "0.21.0",
+        "service_version": "0.21.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
+        "service_auth": 
+                                        // service authentication and authorization descriptions
 
-     {
+            {
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_authz": ["<authvalue>"], 
+                                        // authz values for the service
 
-     "service_key":        <T/F>,        // does service use an access key            
+            "service_key": < T / F > , 
+                                        // does service use an access key            
 
-     "service_https":    <T/F>        // does service require https
+            "service_https": < T / F > 
+                                        // does service require https
 
-     }
+            }
 
     }
 
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-
-"""""""""""""""""""""""""""""""""""""""""
-
 .. _h.e1519o-y653zc:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -681,13 +767,11 @@ The descriptive values (service_name, service_description) MAY be changed from w
 | Future      | TBD      |            | Archived copy location TBD. (V MS:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 .. role:: deprecation
 
