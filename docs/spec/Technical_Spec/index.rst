@@ -5,14 +5,15 @@
 Learning Registry Technical Specification V 0.49.0
 ==================================================
 
-**Draft in Progres**.
-**See the  :ref:`Change Log <h.q7vwu59mjki6>` for links to prior stable versions**.
+**Draft in Progress**.
 
-:changes:`**Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with** ▲.`
+See the  `Change Log`_ for links to prior stable versions.
 
-:deletions:`**Significant deletions are shaded.**`
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:deprecation:`**Features to be deprecated in a future version are shaded and indicated with** ▼.`
+:deletions:`Significant deletions are shaded.`
+
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
 **This document is the whole of the Learning Registry Technical Specification.**
 
