@@ -1,34 +1,25 @@
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.u6sbhsuktqyj:
 
-Distribution Services: **Learning** **Registry** **Technical** **Specification** **V** **DS****:0.**49**.0**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+============================================================================
+Distribution Services: Learning Registry Technical Specification V DS:0.49.0
+============================================================================
 
 Draft in Progress.
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
-This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+This document is part of one or more versions of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
-
-    :ref:`Distribution<h.u6sbhsuktqyj>` :ref:`Services<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`DS<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Resource<h.vb0xt6mhzmg2>` :ref:`Data<h.vb0xt6mhzmg2>` :ref:`Distribution<h.vb0xt6mhzmg2>` :ref:`Service<h.vb0xt6mhzmg2>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the Learning Registry services used to distribute resource documents throughout a distribution network.
 
@@ -52,12 +43,12 @@ The reader should be familiar with other parts of the specification, including, 
 In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>` part describes the network model, the :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>` part describes the data that distribution services process, and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.vb0xt6mhzmg2:
 
+----------------------------------
 Resource Data Distribution Service
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
 
 The resource data distribution service is used to distribute (synchronize or replicate) the resource data from one node to its connected nodes (unidirectional).
 The resource data distribution service SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_, if present at the destination node, to restrict the resource data that is distributed.
@@ -94,7 +85,10 @@ The service provides three distinct functions:
 - A service and API at each destination node that is used to return descriptive information from the destination node to the source node to validate the connection.
   
 
-**API****: ****Data** **Distribution**
+API: Data Distribution
+======================
+
+::
 
         POST <node-service-endpoint-URL>/distribute
 
@@ -126,7 +120,11 @@ The service provides three distinct functions:
 
         500    An error
 
-**Resource** **Distribution****: ****Source** **Node** **Process**
+
+Resource Distribution: Source Node Process
+==========================================
+
+::
 
     // Distribute a resource data description document collection from one node to its connected nodes
 
@@ -228,7 +226,10 @@ A bad connection should never have been accepted; the checks are included to ens
 *NB*: The process does not return errors when a distribution fails, either directly or because the destination node is not available.
 The process SHOULD verify that the destination node is reachable and operational before performing data distribution.
 
-**Resource** **Distribution****: ****Destination** **Node** **Process**
+Resource Distribution: Destination Node Process
+===============================================
+
+::
 
         // Process and filter inbound resource data description documents at a node
 
@@ -248,14 +249,17 @@ The process SHOULD verify that the destination node is reachable and operational
 
                 THEN PERFORM filtering and store only documents that pass the filter
 
-        ▼:deprecation:`UPDATE`:deprecation:` `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` // `:deprecation:`when`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`document`:deprecation:` `:deprecation:`was`:deprecation:` `:deprecation:`stored`:deprecation:` `:deprecation:`at`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`node`
+        ▼:deprecation:`UPDATE node_timestamp // when the document was stored at the node`
 
 *NB*: The process does not return indicators when documents are filtered.
 
 ▼:deprecation:`*NB*`:deprecation:`: `:deprecation:`An`:deprecation:` `:deprecation:`implementation`:deprecation:` `:deprecation:`SHALL`:deprecation:` `:deprecation:`maintain`:deprecation:` `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`manner`:deprecation:` `:deprecation:`that`:deprecation:` `:deprecation:`does`:deprecation:` `:deprecation:`not`:deprecation:` `:deprecation:`trigger`:deprecation:` `:deprecation:`redistibution`:deprecation:` `:deprecation:`of`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`documen`:deprecation:`t`:deprecation:`; `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`is`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`local`:deprecation:` `:deprecation:`node`:deprecation:` `:deprecation:`value`:deprecation:`.
 -- `TO BE replaced by a local value that is not maintained as part of the resource data description document
 
-**API****: ****Destination** **Node** **Information**
+API: Destination Node Information
+=================================
+
+::
 
         GET <node-service-endpoint-URL>/destination
 
@@ -305,7 +309,11 @@ The process SHOULD verify that the destination node is reachable and operational
 
         500    An error
 
-**Resource** **Distribution****: ****Destination** **Node** **Information**
+
+Resource Distribution: Destination Node Information
+===================================================
+
+::
 
     // Return the description of a destination network node
 
@@ -321,41 +329,45 @@ The process SHOULD verify that the destination node is reachable and operational
 
     
 
-**Service** **Description**
+Service Description
+===================
+
+::
 
     {
 
-         "doc_type":        "service_description",    
+        "doc_type": "service_description",
 
-         "doc_version":        "0.20.0",
+        "doc_version": "0.20.0",
 
-         "doc_scope":        "node",
+        "doc_scope": "node",
 
-         "active":        true,
+        "active": true,
 
-         "service_id":        "<uniqueid>",        
+        "service_id": "<uniqueid>",
 
-         "service_type":        "distribute",
+        "service_type": "distribute",
 
-     "service_name":    "Resource Data Distribution",
+        "service_name": "Resource Data Distribution",
 
-        "service_description":    "Service used to distribute resource documents from one node to other nodes",        
+        "service_description": "Service used to distribute resource documents from one node to other nodes",
 
-     "service_version":    "0.23.0",
+        "service_version": "0.23.0",
 
-     "service_endpoint":    "<node-service-endpoint-URL>",
+        "service_endpoint": "<node-service-endpoint-URL>",
 
-     "service_auth":                // service authentication and authorization descriptions
+        "service_auth": 
+                                                // service authentication and authorization descriptions
+        {
 
-     {
+            "service_authz": ["<authvalue>"],
+                                                // authz values for the service
 
-     "service_authz":    ["<authvalue>"],     // authz values for the service
+            "service_key": < T / F > ,
+                                                // does service use an access key   
 
-     "service_key":        <T/F>,        // does service use an access key            
-
-     "service_https":    <T/F>        // does service require https
-
-     }
+            "service_https": < T / F > // does service require https
+        }
 
     }
 
@@ -366,12 +378,12 @@ When the service is deployed at a node, appropriate values for the placeholders 
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
 
-"""""""""""""""""""""""""""""""""""""""""
 
 .. _h.e1519o-y653zc:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -393,12 +405,12 @@ The descriptive values (service_name, service_description) MAY be changed from w
 +-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 .. role:: deprecation
 

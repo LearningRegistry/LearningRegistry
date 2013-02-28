@@ -2,7 +2,7 @@
 .. _h.u6sbhsuktqyj:
 
 ===============================================================================
-Resource Data Data Model: Learning Registry Technical Specification V RM:0.49.0
+Resource Data Data Model: Learning Registry Technical Specification V RM:0.50.1
 ===============================================================================
 
 Draft in Progress.
@@ -20,23 +20,8 @@ These links may link to the most recent version of a part, not to the version of
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
 
+.. toc
 
-
-    - :ref:`Resource Data Data Model: Learning Registry Technical Specification V RM:0.49.0<h.u6sbhsuktqyj>`
-
-        - :ref:`Resource Data Data Models<h.cbvxf-xys34q>`
-
-            - :ref:`Resource Data Description Data Model<h.kdtam7-568cce>`
-
-            - :ref:`Metadata Formats<h.ykraw8-ientp5>`
-
-            - :ref:`Paradata Formats<h.5bpp9l-ncbjqy>`
-
-            - :ref:`Resource Data<h.hphvlw-1cw6xc>`
-
-        - :ref:`Change Log<h.e1519o-y653zc>`
-
-        - :ref:`Working Notes and Placeholder Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It describes the model of resource data that is transported through the network.
 
@@ -94,71 +79,6 @@ The name of such an element SHALL begin with the characters "resource\_".
 Once the data model has been instantiated the value of an immutable element SHALL NOT change.
 Other values MAY be changed only by the owner of the document.
 
-
-JSON Schema
-===========
-Following is Resource Data Description Data Model described using `JSON Schema V3 <http://tools.ietf.org/html/draft-zyp-json-schema-03>`_.
-Instances of the data model describing resources MUST validate against one of the following schemas:
-
-    - file\:lr/schema/v_0_49/inline_resource_data.json : a data model where the resource data is included in the instance inline.
-    - file\:lr/schema/v_0_49/linked_resource_data.json : a data model where the resource data is linked externaly.
-    - file\:lr/schema/v_0_49/deleted_resource_data.json : a data model that indicates that a previously published inline or linked data model instance should be removed from the node.
-    - file\:lr/schema/v_0_49/resource_data.json : a union of the previous schemas
-
-file\:lr/schema/v_0_49/resource_data.json
------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/resource_data.json
-    :language: javascript
-
-
-
-file\:lr/schema/v_0_49/inline_resource_data.json
-------------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/inline_resource_data.json
-    :language: javascript
-
-
-
-file\:lr/schema/v_0_49/abstract_inline_resource_data.json
----------------------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/abstract_inline_resource_data.json
-    :language: javascript
-
-
-file\:lr/schema/v_0_49/deleted_resource_data.json
--------------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/deleted_resource_data.json
-    :language: javascript
-
-
-file\:lr/schema/v_0_49/linked_resource_data.json
-------------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/linked_resource_data.json
-    :language: javascript
-
-
-
-file\:lr/schema/v_0_49/abstract_linked_resource_data.json
----------------------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/abstract_linked_resource_data.json
-    :language: javascript
-
-
-
-file\:lr/schema/v_0_49/abstract_resource_data.json
---------------------------------------------------
-
-.. literalinclude:: ../../../LR/lr/schema/abstract_resource_data.json
-    :language: javascript
-
-
-
 ::
 
     {
@@ -167,8 +87,8 @@ file\:lr/schema/v_0_49/abstract_resource_data.json
                                         // the literal "resource_data"
                                         // required, immutable
 
-        "doc_version": "0.23.0",
-                                        // the literal for the current version -- "0.23.0"
+        "doc_version": "0.49.0",
+                                        // the literal for the current version -- "0.49.0"
                                         // required, immutable
                                         // general elements about the submission
 
@@ -244,15 +164,15 @@ file\:lr/schema/v_0_49/abstract_resource_data.json
                                         // required
                                         // provided by the initial publishing node
                                         // not by a distribution node
+                                        // ▲ Inadvertently removed from previous version of spec.
 
-        :deprecation: `▼
         "node_timestamp": "string",
                                         // timestamp of when received by the current node
                                         // time/date encoding
                                         // required
                                         // provided by the current distribution node
                                         // NOT distributed to other nodes
-                                        // Planned to be deprecated after 20110930`
+                                        // ▲ Removed from deprecation
 
         "create_timestamp": "string",
                                         // timestamp of when first published to the network
@@ -298,7 +218,7 @@ file\:lr/schema/v_0_49/abstract_resource_data.json
         "resource_locator": "string",
                                         // unique locator for the resource described
                                         // SHALL resolve to a single unique resource
-                                        // required
+                                        // ▲ required unless "replaces" is non-empty indicating deletion. 
 
         "keys": ["string"],
                                         // array of hashtag, keyword value list used for filtering
@@ -315,12 +235,12 @@ file\:lr/schema/v_0_49/abstract_resource_data.json
                                         // "inline" -- resource data is in an object that follows
                                         // "linked" -- resource data is at the link provided
                                         // "attached" -- resource data is in an attachment
-                                        // required
+                                        // ▲ required unless "replaces" is non-empty indicating deletion. 
 
         "payload_schema": ["string"],
                                         // array of schema description/keywords
                                         // for the resource data
-                                        // required
+                                        // ▲ required if "replaces" is non-empty
                                         // defined :ref:`metadata schema values<h.ykraw8-ientp5>`
                                         // defined :ref:`paradata schema values<h.5bpp9l-ncbjqy>`
 
@@ -342,16 +262,84 @@ file\:lr/schema/v_0_49/abstract_resource_data.json
                                         // maybe a JSON object, or
                                         // a string encoding XML or some other format, or
                                         // a string encoding binary
-                                        // required if "inline" otherwise ignored
+                                        // ▲ required if "inline" or "replaces" is non-empty indicating deletion, otherwise ignored
+
+
+        "replaces": ["string"],
+                                        // A list of doc_ID that refer to resource data that this resource data should replace
+                                        // optional
+                                        // ▲ new field handilng replacements.
 
         "X_xxx": ? ? ? ? ? 
                                         // placeholder for extensibility, optional
     }
 
 
+JSON Schema
+===========
+Following is Resource Data Description Data Model described using `JSON Schema V3 <http://tools.ietf.org/html/draft-zyp-json-schema-03>`_.
+Instances of the data model describing resources MUST validate against one of the following schemas:
+
+    - file\:lr/schema/v_0_49/inline_resource_data.json : a data model where the resource data is included in the instance inline.
+    - file\:lr/schema/v_0_49/linked_resource_data.json : a data model where the resource data is linked externaly.
+    - file\:lr/schema/v_0_49/deleted_resource_data.json : a data model that indicates that a previously published inline or linked data model instance should be removed from the node.
+    - file\:lr/schema/v_0_49/resource_data.json : a union of the previous schemas
+
+file\:lr/schema/v_0_49/resource_data.json
+-----------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/v_0_49/resource_data.json
+    :language: javascript
 
 
-Timestamp values for update_timestamp, :deprecation:`▼ node_timestamp`, and create_timestamp SHALL be UTC 0.
+
+file\:lr/schema/v_0_49/inline_resource_data.json
+------------------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/v_0_49/inline_resource_data.json
+    :language: javascript
+
+
+
+file\:lr/schema/abstract_inline_resource_data.json
+--------------------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/abstract_inline_resource_data.json
+    :language: javascript
+
+
+file\:lr/schema/v_0_49/deleted_resource_data.json
+-------------------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/v_0_49/deleted_resource_data.json
+    :language: javascript
+
+
+file\:lr/schema/v_0_49/linked_resource_data.json
+------------------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/v_0_49/linked_resource_data.json
+    :language: javascript
+
+
+
+file\:lr/schema/abstract_linked_resource_data.json
+--------------------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/abstract_linked_resource_data.json
+    :language: javascript
+
+
+
+file\:lr/schema/abstract_resource_data.json
+-------------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/abstract_resource_data.json
+    :language: javascript
+
+
+
+Timestamp values for update_timestamp, :changes:`▲ node_timestamp`, and create_timestamp SHALL be UTC 0.
 
 *Open* *Question*: Is there a use case that requires create_timestamp?
 
@@ -508,6 +496,27 @@ Other types of resource data description documents SHALL NOT be defined and SHAL
 Other organizational classifications SHALL NOT be used.
 *NB*: These constraints are meant to restrict placing resource data in multiple different databases.
 
+----------
+Tombstones
+----------
+
+A tombstone is node local document that acts a terminal marker for an RD3.  It SHALL be the only allowed mutability of a RD3. A tombstone MUST NOT be distributed to other nodes.
+
+The data model for a tombstone SHALL adhere to the following `JSON Schema <http://tools.ietf.org/html/draft-zyp-json-schema-03>`_:
+
+
+JSON SCHEMA
+===========
+
+file\:lr/schema/v_0_49/tombstone.json
+-------------------------------------
+
+.. literalinclude:: ../../../LR/lr/schema/v_0_49/tombstone.json
+    :language: javascript
+
+
+*NB*: ALL harvest services SHOULD be updated to exclude tombstones.
+*NB*: Any harvest service MAY be updated to allow explicit request for tombstone by “doc_ID”. It is RECOMMENDED this feature only be available via Basic Harvest and Obtain.
 
 
 .. _h.e1519o-y653zc:
@@ -531,6 +540,8 @@ Change Log
 | 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V RM:0.49.0)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Add page size as service doc setting with flow control.Archived copy location TBD. (V RM:0.50.0)                                                                |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130226 | JK         | Convert to RestructuredText formatting.  Adding model changes Replacement Documents and Tombstones per `Amendment <https://docs.google.com/document/d/1JpwEQ4J6ruQUe502K4XzLnWqvC5L67vjasTTFKQo9e8/edit>`_ (V 0.3).                                                                          |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Future      | TBD      |            | Assertion (relation/sameas) and trust documents.Archived copy location TBD. (V RM:x.xx.x)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+

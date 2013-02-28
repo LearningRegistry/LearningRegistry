@@ -1,7 +1,7 @@
 .. _h.u6sbhsuktqyj:
 
 =======================================================================
-Publish Services: Learning Registry Technical Specification V PS:0.49.0
+Publish Services: Learning Registry Technical Specification V PS:0.50.1
 =======================================================================
 
 Draft in Progress.
@@ -18,23 +18,6 @@ This document is part of one or more versions of the :doc:`Learning <../Technica
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Publish<h.u6sbhsuktqyj>` :ref:`Services<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`PS<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Resource<h.xf8fiul5s5dl>` :ref:`Data<h.xf8fiul5s5dl>` :ref:`Publish<h.xf8fiul5s5dl>` :ref:`Services<h.xf8fiul5s5dl>`
-
-                :ref:`Basic<h.aera9k-4u6l42>` :ref:`Publish<h.aera9k-4u6l42>` :ref:`Service<h.aera9k-4u6l42>`
-
-                :ref:`SWORD<h.jl9f1nnwcev4>` :ref:`Publish<h.jl9f1nnwcev4>` :ref:`Service<h.jl9f1nnwcev4>`
-
-                    :ref:`Retrieve<h.ku7eedtbq15d>` :ref:`Service<h.ku7eedtbq15d>` :ref:`Document<h.ku7eedtbq15d>`
-
-                    :ref:`Create<h.2o7qqzkocz2j>` :ref:`a<h.2o7qqzkocz2j>` :ref:`Resource<h.2o7qqzkocz2j>`
-
-                :ref:`Basic<h.rfe7ga-6sbjly>` :ref:`Delete<h.rfe7ga-6sbjly>` :ref:`Service<h.rfe7ga-6sbjly>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the basic Learning Registry services used to publish (push) resource documents into a distribution network.
 
@@ -65,8 +48,8 @@ Resource Data Publish Services
 
 Publish services are used to push resource data into the network.
 They are used by external publishing edge nodes.
-All resource data publishing services SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ if present to restrict the resource data that is published to the node.
-All resource data publishing services SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ `validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is published to the node.
+All resource data publishing services SHALL `apply filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ if present to restrict the resource data that is published to the node.
+All resource data publishing services SHALL `apply validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is published to the node.
 The validation process MAY also provide local updates to the resource document prior to it being published.
 Any resource data publishing service MAY reject any resource data for any reason:
 
@@ -123,7 +106,7 @@ If the resource data description document does not have an assigned identifier, 
 If the resource data description document has an identifier and a document with the same identifier exists in the resource data description document collection, the new document SHALL be an update, replacing the existing document in total.
 If the resource data description document is being updated, the value of an immutable element SHALL NOT be changed.
 
-The publication process SHALL set values for publish_node, , update_timestamp, ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`, node_timestamp, create_timestamp.
+The publication process SHALL set values for publish_node, , update_timestamp, :changes:`▲ node_timestamp`, create_timestamp.
 All timestamp values SHALL be the identical.
 All timestamp values SHALL be UTC 0.
 
@@ -139,117 +122,117 @@ Do we need more to support trust?
 
 *NB*: The process currently does not handle attachments.
 
-**API**
+API
+===
 
-::
 
-        POST <node-service-endpoint-URL>/publish
+.. http:post:: /publish
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:                 // resource data to be published
+        **Request Object:**
 
-            {"documents": 
+        .. sourcecode:: http
 
-                [                       // array of
-                    {resource_data_description}   
+            {
+                "documents": [ 
+                                        // array of
                                         // resource data description documents
+
+                    {resource_data_description} 
+                                        // resource data to be published
+
                 ]
-                
+
             }
 
-        Results Object:
+        **Results Object:**
 
-        {
+        .. sourcecode:: http
 
-         "OK": boolean,                 // T if successful
+            {
 
-         "error": "string",             // text describing global error
+                "OK": boolean,          
+                                        // T if successful
 
+                "error": "string",      
+                                        // text describing global error
                                         // present only if NOT OK
 
-        "document_results":
+                "document_results": [
+                                        // array of per document results
 
-        [                               // array of per document results
+                    {
 
-         {
+                        "doc_ID": "string",            
+                                        // ID of the document
 
-         "doc_ID": "string",            // ID of the document
+                        "OK": boolean   
+                                        // T if document was published
 
-         "OK": boolean                  // T if document was published
-
-         "error": "string"              // text describing error or filter failure
-
+                        "error": "string"              
+                                        // text describing error or filter failure
                                         // present only if NOT OK
-         }
+                    }
 
-        ]
+                ]
 
-        }
+            }
 
-        Return Codes:
-
-            200
-
-            500            
+        :statuscode 200: no error
+        :statuscode 500: error            
             
-**Basic** **Publish**
+Basic Publish
+=============
 
-::
 
-                                        // Publish each resource data description document in the supplied list
 
-                                        // Perform Validation    
+    // Publish each resource data description document in the supplied list
+
+    // Perform Validation    
 
     VALIDATE the *resource* *data* *description* document does not contain a do_not_distribute key.
 
         IF do_not_distribute key is present
 
-            THEN                        // create the global error object
+            THEN                // create the global error object
 
                                 OK := F
 
-                                error := "cannot publish" 
-                                        // an appropriate error for global condition
-
+                                error := "cannot publish" // an appropriate error for global condition
+                                
                                 EXIT
 
-    VALIDATE the publish request        
-                                        // apply appropriate business rules
+    VALIDATE the publish request // apply appropriate business rules
 
         IF there is an overall error 
 
-            THEN                        
-                                        // create the global error object
+            THEN                // create the global error object
 
                                 OK := F
 
-                                error := "error msg"    
-                                        // an appropriate error for global condition
+                                error := "error msg"  // an appropriate error for global condition
 
                                 EXIT
 
-    OK := T                             // global return status
+    OK := T                     // global return status
 
     FOR EACH *resource* *data* *description* document
 
-        VALIDATE the *resource* *data* *description* document 
-                                        // all syntactical and semantic rules
+        VALIDATE the *resource* *data* *description* document // all syntactical and semantic rules
 
         IF there is an error
 
-            THEN                        
-                                        // create an error object array element object for the individual document    
-
+            THEN                // create an error object array element object for the individual document    
+    
                                 OK := F
-
-                                error := "error msg"    
-                                        // an appropriate error for the document
-
+    
+                                error := "error msg"    // an appropriate error for the document
+    
                                 doc_ID := supplied doc_ID 
-
+    
                                 SKIP
 
         IF the *network* *node* *filter* *description* document exists and contains active filters
@@ -258,145 +241,181 @@ Do we need more to support trust?
 
             IF the *resource* *data* *description* document does NOT pass the filter
 
-                                THEN        // indicate filtering was applied
-
+                                THEN    // indicate filtering was applied
+    
                                         OK := F
-
-                                        error := "rejected by filter" 
-                                        // an appropriate filtering message
-
+    
+                                        error := "rejected by filter" // an appropriate filtering message
+    
                                         doc_ID := supplied doc_ID 
-
+    
                                         SKIP
 
         IF the service applies ToS checks
 
                         AND the *resource* *data* *description* document TOS is unacceptable
 
-                                THEN                // indicate ToS was rejected
-
+                                THEN    // indicate ToS was rejected
+    
                                         OK := F
-
-                                        error := "rejected by ToS" 
-                                        // an appropriate message
-
+    
+                                        error := "rejected by ToS" // an appropriate message
+    
                                         doc_ID := supplied doc_ID 
-
+    
                                         SKIP
 
         IF the service does not accept anonymous submissions
 
                         AND the *resource* *data* *description* document has submitted_type=="anonymous"
 
-                                THEN                
-                                        // indicate submitted type was rejected
-
+                                THEN    // indicate submitted type was rejected
+    
                                         OK := F
-
+    
                                         error := "anon submission rejected" // an appropriate message
-
+    
                                         doc_ID := supplied doc_ID 
-
+    
                                         SKIP
 
-            IF the service validates the submitter
+        IF the service validates the submitter
 
                         AND the *resource* *data* *description* document submitter cannot be verified or trusted
 
-                                THEN    
-                                        // indicate submitter was rejected
-
+                                THEN    // indicate submitter was rejected
+    
                                         OK := F
-
-                                        error := "rejected submitter" 
-                                        // an appropriate message
-
+    
+                                        error := "rejected submitter" // an appropriate message
+    
                                         doc_ID := supplied doc_ID 
-
+    
                                         SKIP
 
-                IF the service requires a signature
+        IF the service requires a signature
 
                         AND the *resource* *data* *description* document signature not present
 
-                                THEN    
-                                        // indicate signature was rejected
-
+                                THEN    // indicate signature was rejected
                                         OK := F
-
-                                    error := "no signature" 
-                                        // an appropriate message
-
+    
+                                        error := "no signature" // an appropriate message
+    
                                         doc_ID := supplied doc_ID 
-
+    
                                         SKIP
 
-                IF the service validates the signature
+        IF the service validates the signature
 
                         AND the *resource* *data* *description* document signature cannot be verified
 
-                                THEN    
-                                        // indicate signature was rejected
-
+                                THEN    // indicate signature was rejected
+    
                                         OK := F
-
-                                        error := "rejected signature" 
-                                        // an appropriate message
-
+    
+                                        error := "rejected signature" // an appropriate message
+    
                                         doc_ID := supplied doc_ID 
-
+    
                                         SKIP
 
-                IF the node limits the size of document that can be stored
+        IF the node limits the size of document that can be stored
 
                         AND the *resource* *data* *description* document is too large
 
-                                THEN    
-                                        // indicate document too large
-
+                                THEN    // indicate document too large
+    
                                         OK := F
-
-                                        error := "too large" 
-                                        // an appropriate message
-
+    
+                                        error := "too large" // an appropriate message
+    
                                         doc_ID := supplied doc_ID
-
+    
                                         SKIP
 
-                IF *resource* *data* *description* document did not have a supplied doc_ID
+        IF *resource* *data* *description* document did not have a supplied doc_ID
 
                         THEN generate a new unique doc_ID
 
-                PUBLISH the *resource* *data* *description* document to the node
+        
+        :changes:`▲ graveyard := []`
+
+        :changes:`If *resource* *data* *description* document has a non-empty "replaces" property`
+
+                        :changes:`THEN            // check that document can be published according to replacement policy`
+
+                            :changes:`FOR EACH *resource* *data* *description* specifed in "replaces" property`
+
+                                :changes:`IF the original *resource data description* document can be replaced`
+
+                                    :changes:`THEN    // indicate tombstone can be created`
+
+                                        :changes:`CREATE *tombstone document* for original *resource data description* document`
+
+                                        :changes:`PUSH  *tombstone document* to graveyard`
+
+                                :changes:`If the replacement *resource data description* document violates *replacement policy*`
+
+                                    :changes:`THEN    // indicate that replacement is invalid and not permitted`
+
+                                        :changes:`OK := F`
+
+                                        :changes:`error := "rejected replacement"  // an appropriate message`
+
+                                        :changes:`doc_ID := supplied doc_ID`
+
+                                        :changes:`SKIP`
+
+
+        PUBLISH the *resource* *data* *description* document to the node
 
                         by the owner of the node 
 
-                     to the node’s resource data description document database
+                        to the node’s resource data description document database
 
-                    SET publish_node, update_timestamp,▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`, create_timestamp
+                        SET publish_node, update_timestamp, :changes:`▲ node_timestamp`, create_timestamp
 
-                IF there is a publishing error
+        IF there is a publishing error
 
-                        THEN                        // create an error object array element object for the individual document    
+                THEN            // create an error object array element object for the individual document    
 
-                                OK := F
+                        OK := F
+    
+                        error := "publish failed" // an appropriate error for the publish failure
+    
+                        doc_ID := supplied doc_ID 
+    
+                        SKIP
 
-                                error := "publish failed" 
-                                        // an appropriate error for the publish failure
+        :changes:`▲ VALIDATE tombstones in graveyard may be saved.`
 
-                                doc_ID := supplied doc_ID 
+                :changes:`IF tombstones are permitted to be saved by *replacement policy*`
 
-                                SKIP
+                    :changes:`THEN`
 
-                                        // create a return object array element object for the individual document
+                        :changes:`FOR EACH tombstone in graveyard`
 
-                OK := T
+                            :changes:`IF *tombstone document* exists for *resource data description document* specified in *tombstone document*:`
 
-                doc_ID                          // supplied or generated doc_ID
+                                :changes:`SKIP`
+
+                            :changes:`ELSE`
+
+                                :changes:`UPDATE original *resource data description document* specified in *tombstone document*
+                                with the *tombstone document*  // this is a replacement operation`
+
+
+        // create a return object array element object for the individual document
+    
+        OK := T
+    
+        doc_ID  // supplied or generated doc_ID
 
     
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -534,63 +553,47 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 
   - <sword:treatment> and <sword:service> elements SHALL be omitted.
 
-**API**
+API
+===
 
-::
+.. http:get:: /swordservice
 
-    GET <node-service-endpoint-url>/swordservice
 
-    HTTP Headers
+    **HTTP Headers**
 
-                X-On-Behalf-Of: [on-behalf-of-user]
+    .. sourcecode:: http
 
-    Results XML
+        X-On-Behalf-Of: [on-behalf-of-user]
 
-        Well formed XML instance document that conforms to the SWORD 1.3 specification.
+    **Results XML**
 
-                        <?xml version="1.0" encoding="utf-8"?>
+    Well formed XML instance document that conforms to the SWORD 1.3 specification.
 
-                        <service xmlns="http://www.w3.org/2007/app"
+    .. sourcecode:: xml
 
-                 xmlns:atom="http://www.w3.org/2005/Atom"
+        <?xml version="1.0" encoding="utf-8"?>
+        <service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sword="http://purl.org/net/sword/">
+          <sword:version>1.3</sword:version>
+          <sword:verbose>true</sword:verbose>
+          <sword:noOp>true</sword:noOp>
+          <workspace>
+            <atom:title>...</atom:title>
+            <collection href="...">
+              <atom:title>...</atom:title>
+              <accept>application/json</accept>
+              <sword:mediation>true</sword:mediation>
+              <dcterms:abstract>...</dcterms:abstract>
+              <sword:collectionPolicy>...</sword:collectionPolicy>
+            </collection>
+          </workspace>
+        </service>
 
-                xmlns:sword="http://purl.org/net/sword/"
 
-                xmlns:dcterms="http://purl.org/dc/terms/">
+SWORD: swordservice
+===================
 
-             <sword:version>1.3</sword:version>
 
-                        <sword:verbose>true</sword:verbose>
-
-                        <sword:noOp>true</sword:noOp>
-
-                         <workspace>
-
-                 <atom:title>...</atom:title>
-
-                 <collection href="..." >
-
-                  <atom:title>...</atom:title>
-
-                  <accept>application/json</accept>
-
-                 <sword:mediation>true</sword:mediation>
-
-                  <dcterms:abstract>...</dcterms:abstract>
-
-                                 <sword:collectionPolicy>...</sword:collectionPolicy>
-
-                 </collection>
-
-              </workspace>
-
-                        </service>
-
-**SWORD****: ****swordservice**
-
-::
-
-                                        // return the service document
+    // return the service document
 
     Build XML results document
 
@@ -598,45 +601,39 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 
     EMIT the required elements
 
+    .. sourcecode:: xml
+
                 <sword:version>1.3</sword:version>
-
                 <sword:verbose>true</sword:verbose>
-
                 <sword:noOp>true</sword:verbose>
 
     EMIT the workspace elements
 
-        <workspace>
+    .. sourcecode:: xml
 
-            <atom:title>community_name or community_id from the *network* *community*                 *description* *data* *model*<atom:title>
+        <workspace>
+            <atom:title>community_name or community_id from the *network community description data model*<atom:title>
 
     IF the [on-behalf-of-user] is permitted to publish to the node
 
         THEN EMIT the collection elements
 
-            <collection
+        .. sourcecode:: xml
 
-                href="URL of the network node">
-
-                     <atom:title>node_name or node_id from the *network* *node* 
-
-                                *description* *data* *model*</atom:title>
-
+                <collection href="URL of the network node">
+                  <atom:title>node_name or node_id from the *network node description data model*</atom:title>
                   <accept>application/json</accept>
-
-                 <sword:mediation>true</sword:mediation>
-
-                  <dcterms:abstract>node_description from the *network* *node*                             *description* *data* *model*</dcterms:abstract>
-
-                                <sword:collectionPolicy>Policy URL</sword:collectionPolicy>
-
-                 </collection>
+                  <sword:mediation>true</sword:mediation>
+                  <dcterms:abstract>node_description from the *network node description data model*</dcterms:abstract>
+                  <sword:collectionPolicy>Policy URL</sword:collectionPolicy>
+                </collection>
 
     Complete XML elements
 
-        </workspace>
+    .. sourcecode:: xml
 
-                </service>
+            </workspace>
+        </service>
 
 .. _h.2o7qqzkocz2j:
 
@@ -646,23 +643,25 @@ Create a Resource
 
     in a future draft of the specification
 
-**API**
+API
+===
 
-::
+.. http:post:: /swordpub
 
-    POST <node-service-endpoint-url>/swordpub
+    **HTTP Headers**
 
-    HTTP Headers
+    **Results XML**
 
-    Results XML
 
-**SWORD****: ****swordpub**
+SWORD: swordpub
+===============
 
 ::
 
     // pseudo code
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -724,8 +723,9 @@ The descriptive values (service_name, service_description) MAY be changed from w
 Basic Delete Service
 --------------------
 
-The basic delete service "deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.
+:deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
+The basic delete service "deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.
 
 Each resource data description document identified in the supplied set is deleted independently.
 In addition to the overall service return indicating status, there SHALL be one returned object per resource data description document, aligned 1:1 to the documents identified in the supplied resource data description document array, indicating deletion of the resource data description document.
@@ -751,125 +751,129 @@ An implementation SHALL indicate any size limits in the service description.
 
 *NB*: The deletion process SHALL be consistent with the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ policy.
 
-**API**
+API
+===
 
-::
 
-        POST <node-service-endpoint-URL>/delete
 
+.. http:POST:: /delete
+
+    :deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
+
+    **Arguments:**
+
+        None
+
+    **Request Object:**
+
+    .. sourcecode:: http
+
+        {
+            "request_IDs":      // list of resource data descriptions to delete
+          
+
+            [                   // array of resource data description document ID
+
+                doc_ID          // required
+     
+            ]
+        
+        }
+
+    **Results Object:**
+
+    .. sourcecode:: http
+
+        {
+            "OK": boolean,              // T if successful
+            
+            "error": "string",          // text describing global error
+                                
+                                        // present only if NOT OK
+
+            "document_results": [       // array of per document results
             
 
-        Arguments:
+                {
+                    "doc_ID": "string", // ID of the document
 
-            None
+                    "OK": boolean,      // T if document was deleted
 
-        Request Object:                 // list of resource data descriptions to delete
-
-                {"request_IDs":
-
-                    [                   // array of
-
-                     doc_ID             // resource data description document ID
-
-                                        // required
-                    ]
-                
-                }
-
-        Results Object:
-
-                {"OK":        boolean,  
-                                        // T if successful
-
-                "error":        "string",            
-                                        // text describing global error
+                    "error": "string"   // text describing deletion error
 
                                         // present only if NOT OK
-
-                "document_results": [                       
-                                        // array of per document results
-
-                 {"doc_ID":    "string",            
-                                        // ID of the document
-
-                 "OK":        boolean,            
-                                        // T if document was deleted
-
-                 "error":        "string"            
-                                        // text describing deletion error
-
-                                        // present only if NOT OK
-                 }
-
-                ]
-
                 }
 
-        Return Codes:
+            ]
 
-            200
+        }
 
-            500
 
-**Basic** **Delete**
+    :statuscode 200: OK
 
-::
+    :statuscode 500: Error
 
-                                        // Obtain the resource data description document for each supplied ID
 
-        FOR EACH *resource* *data* *description* document ID
+Basic Delete
+============
 
-                Put the *resource* *data* *description* document ID in the results object
+    :deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
-                IF the document does not exist
+    // Obtain the resource data description document for each supplied ID
 
-                    THEN 
+    FOR EACH *resource* *data* *description* document ID
 
-                                OK := FALSE
+            Put the *resource* *data* *description* document ID in the results object
 
-                                error := "document doesn’t exist"
+            IF the document does not exist
 
-                                SKIP
+                THEN 
 
-        IF the document has been deleted
+                            OK := FALSE
 
-                    THEN 
+                            error := "document doesn’t exist"
 
-                                OK := FALSE
+                            SKIP
 
-                                error := "document already deleted
+    IF the document has been deleted
 
-                                SKIP    
+                THEN 
 
-                                        // otherwise delete
+                            OK := FALSE
 
-        OK := TRUE
+                            error := "document already deleted
 
-                CASE delete_action
+                            SKIP    
 
-                    ignore:
+    // otherwise delete
 
-                                NO OP
+    OK := TRUE
 
-                    mark: 
+            CASE delete_action
 
-                                set a flag on the document that it is deleted 
-                                        // ACTIVE := FALSE
+                ignore:
 
-                    delete: 
+                            NO OP
 
-                                perform a system-level delete 
-                                        // whatever "delete" means
+                mark: 
 
-                    purge: 
+                            set a flag on the document that it is deleted // ACTIVE := FALSE
 
-                                perform a system-level delete 
-                                        // whatever "delete" means
+                delete: 
 
-                                trigger system level purge 
-                                        // may run at some later time
+                            perform a system-level delete // whatever "delete" means
 
-**Service** **Description**
+                purge: 
+
+                            perform a system-level delete // whatever "delete" means
+
+                            trigger system level purge // may run at some later time
+
+
+Service Description
+===================
+
+:deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
 ::
 
@@ -961,6 +965,8 @@ Change Log
 | 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V PS:0.49.0)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V PS:0.50.0)                                                                                                                       |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130227 | JK         | Un-deprecated node_timestamp. Amended Publishing algorithm to handle replacement documents.                                                                                                                                                                                                  |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Future      | TBD      |            | Logging/tracking emit as paradata to services. Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V PS:x.xx.x)                                                                                                                        |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+

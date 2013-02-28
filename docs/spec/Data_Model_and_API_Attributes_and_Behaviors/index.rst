@@ -1,56 +1,24 @@
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 .. _h.u6sbhsuktqyj:
 
-Data Model and API Attributes and Behaviors: **Learning** **Registry** **Technical** **Specification** **V** **RQ****:0.**49**.0**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+====================================================================================================
+Data Model and API Attributes and Behaviors: Learning Registry Technical Specification V RQ:0.49.0
+====================================================================================================
 
 Draft in Progress.
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 
-:changes:`Shading`:changes:` `:changes:`indicates`:changes:` `:changes:`major`:changes:` `:changes:`changes`:changes:` `:changes:`and`:changes:` `:changes:`additions`:changes:` `:changes:`from`:changes:` `:changes:`the`:changes:` `:changes:`prior`:changes:` `:changes:`version`:changes:` (0.24.0).
-`:changes:`Also`:changes:` `:changes:`indicated`:changes:` `:changes:`with` ▲:changes:`.`
+:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
-:deletions:`Significant`:deletions:` `:deletions:`deletions`:deletions:` `:deletions:`are`:deletions:` `:deletions:`shaded`:deletions:`.`
+:deletions:`Significant deletions are shaded.`
 
-:deprecation:`Features`:deprecation:` `:deprecation:`to`:deprecation:` `:deprecation:`be`:deprecation:` `:deprecation:`deprecated`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`future`:deprecation:` `:deprecation:`version`:deprecation:` `:deprecation:`are`:deprecation:` `:deprecation:`shaded`:deprecation:` `:deprecation:`and`:deprecation:` `:deprecation:`indicated`:deprecation:` `:deprecation:`with`▼:deprecation:`.`
+:deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
-This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+This document is part of one or more versions of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Data<h.u6sbhsuktqyj>` :ref:`Model<h.u6sbhsuktqyj>` :ref:`and<h.u6sbhsuktqyj>` :ref:`API<h.u6sbhsuktqyj>` :ref:`Attributes<h.u6sbhsuktqyj>` :ref:`and<h.u6sbhsuktqyj>` :ref:`Behaviors<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`RQ<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Common<h.i6djle3var4b>` :ref:`Data<h.i6djle3var4b>` :ref:`Model<h.i6djle3var4b>` :ref:`and<h.i6djle3var4b>` :ref:`API<h.i6djle3var4b>` :ref:`Attributes<h.i6djle3var4b>` :ref:`and<h.i6djle3var4b>` :ref:`Behaviors<h.i6djle3var4b>`
-
-            :ref:`Data<h.3h25kjtjey9j>` :ref:`Model<h.3h25kjtjey9j>` :ref:`Attributes<h.3h25kjtjey9j>`
-
-                :ref:`Identifiers<h.3yyq9awq43ia>`
-
-                :ref:`Strings<h.24hd1gg6oeak>` :ref:`and<h.24hd1gg6oeak>` :ref:`Internationalization<h.24hd1gg6oeak>`
-
-                :ref:`Time<h.davnw03urmtp>` :ref:`and<h.davnw03urmtp>` :ref:`Date<h.davnw03urmtp>`
-
-            :ref:`API<h.iser5w-jiok98>` :ref:`Attributes<h.iser5w-jiok98>` :ref:`and<h.iser5w-jiok98>` :ref:`Behaviors<h.iser5w-jiok98>`
-
-                :ref:`Service<h.bjbfxxm61faq>` :ref:`Instantiation<h.bjbfxxm61faq>` :ref:`Validation<h.bjbfxxm61faq>`
-
-                :ref:`Transactional<h.xzwjyolpx52v>` :ref:`Behaviors<h.xzwjyolpx52v>` :ref:`and<h.xzwjyolpx52v>` :ref:`Data<h.xzwjyolpx52v>` :ref:`Consistency<h.xzwjyolpx52v>`
-
-                :ref:`Resource<h.rw8jrb-9tha8>` :ref:`Data<h.rw8jrb-9tha8>` :ref:`Validation<h.rw8jrb-9tha8>` :ref:`and<h.rw8jrb-9tha8>` :ref:`Publication<h.rw8jrb-9tha8>`
-
-                :ref:`Resource<h.seu03yccp8ld>` :ref:`Data<h.seu03yccp8ld>` :ref:`ToS<h.seu03yccp8ld>`:ref:`, <h.seu03yccp8ld>`:ref:`Signatures<h.seu03yccp8ld>` :ref:`and<h.seu03yccp8ld>` :ref:`Trust<h.seu03yccp8ld>` :ref:`Policy<h.seu03yccp8ld>` :ref:`Enforcement<h.seu03yccp8ld>`
-
-                :ref:`Operational<h.aj5me7w75zd3>` :ref:`Policy<h.aj5me7w75zd3>` :ref:`Enforcement<h.aj5me7w75zd3>`
-
-                :ref:`Resource<h.mm60gf-1u077v>` :ref:`Data<h.mm60gf-1u077v>` :ref:`Filtering<h.mm60gf-1u077v>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes common requirements for all APIs and data models.
 
@@ -72,31 +40,31 @@ The reader should be familiar with other parts of the specification, including, 
 In particular, the reader needs to be aware that information from this part of the Technical Specification applies to all services and data models.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.i6djle3var4b:
 
-**Common** **Data** **Model** **and** **API** **Attributes** **and** **Behaviors**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------------
+Common Data Model and API Attributes and Behaviors
+--------------------------------------------------
 
 The definition of several common attributes shared across all data models and APIs, along with common API behaviors are specified here as a single point of specification.
 In case of a discrepancy, the definition here SHALL take precedence over the definition elsewhere in this specification.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.3h25kjtjey9j:
 
-**Data** **Model** **Attributes**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+---------------------
+Data Model Attributes
+---------------------
 
 
-"""""""""""""""""""""""""""""""""""""
 
 .. _h.3yyq9awq43ia:
 
-**Identifiers**
-"""""""""""""""""""""""""""""""""""""
+-----------
+Identifiers
+-----------
 
 Most data models include one or more *identifiers*.
 An identifier SHALL be unique within a defined scope or context.
@@ -116,12 +84,12 @@ Extending the scope to all implementations is an intentional simplification.
 *Open* *Question*: UUID Version 1 (MAC Address) Version 5 (SHA-1 Hash)?
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.24hd1gg6oeak:
 
-**Strings** **and** **Internationalization**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------
+Strings and Internationalization
+--------------------------------
 
 All character strings SHALL support full UTF-8 encoding of Unicode character representation.
 
@@ -129,12 +97,12 @@ All character strings SHALL support full UTF-8 encoding of Unicode character rep
 ECMAScript strings are UTC-16.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.davnw03urmtp:
 
-**Time** **and** **Date**
-"""""""""""""""""""""""""""""""""""""""""""""""
+-------------
+Time and Date
+-------------
 
 The format for all times and dates SHALL conform to ISO 8601-2004. All encoded dates and times SHALL  be UTC 0. All *stored* times SHALL be expressed to at least second precision.
 More precise values MAY be used.
@@ -146,12 +114,13 @@ Unless specified elsewhere, the JSON encoding of a time and date SHALL be a sing
 *NB*: Some data models and APIs MAY place additional restrictions on times and dates, including requiring less precision (e.g., days only) in arguments and results.
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 .. _h.iser5w-jiok98:
 
-**API** **Attributes** **and** **Behaviors**
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------
+API Attributes and Behaviors
+----------------------------
 
 Description here about RESTful APIs, CoolURIs, Context negotiation, application/JSON vs text/plain
 
@@ -170,12 +139,13 @@ GET requests SHALL support an optional jsonp argument.
 If the jsonp argument is present, the API SHALL return the result padded into the function named in the jsonp argument.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 .. _h.bjbfxxm61faq:
 
-**Service** **Instantiation** **Validation**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------
+Service Instantiation Validation
+--------------------------------
 
 A service at a node SHALL verify that a valid *service* *description* *documen*t exists for the service.
 If the service description document does not exist, is invalid, or indicates that the service is not active, the service SHALL return an HTTP status code.
@@ -193,12 +163,12 @@ If the service is not instantiated at a node, the returned HTTP status code SHAL
 One SHOULD NOT exist without the other.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.xzwjyolpx52v:
 
-**Transactional** **Behaviors** **and** **Data** **Consistency**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+--------------------------------------------
+Transactional Behaviors and Data Consistency
+--------------------------------------------
 
 Unless stated in an individual API specification, transactional atomicity SHALL BE document granularity.
 
@@ -209,12 +179,13 @@ Prior to, or during document distribution, documents MAY be inconsistent.
 *NB*: The distribution model assumes the underlying system SHALL produce *eventual* *consistency*.
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.rw8jrb-9tha8:
 
-**Resource** **Data** **Validation** **and** **Publication**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+----------------------------------------
+Resource Data Validation and Publication
+----------------------------------------
 
 All resource data publishing and distribution services SHALL validate all documents before the document is stored at the node.
 
@@ -234,7 +205,11 @@ All resource data publishing and distribution services SHALL validate all docume
 
 - Node-specific fields SHALL be filled in.
 
-**Resource** **Data** **Validation** **and** **Publication**
+Resource Data Validation and Publication
+========================================
+
+
+::
 
     // Validate a *resource* *data* *description* document
 
@@ -320,9 +295,9 @@ All resource data publishing and distribution services SHALL validate all docume
 
                         update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time // granularity of seconds
 
-                ELSE
+        ELSE
 
-                    create_timestamp :=update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time
+                        create_timestamp :=update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time
 
     IF frbr_level not specified
 
@@ -333,12 +308,12 @@ All resource data publishing and distribution services SHALL validate all docume
 *Open* *Question*: Should an update delete the attachments automatically, or should this be an option?
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.seu03yccp8ld:
 
-**Resource** **Data** **ToS****, ****Signatures** **and** **Trust** **Policy** **Enforcement**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------------------------------
+Resource Data ToS, Signatures and Trust Policy Enforcement
+----------------------------------------------------------
 
 All resource data publishing services and resource data distribution services MAY apply ToS, digital signature and submitter identity checks to resource data.
 
@@ -363,7 +338,10 @@ The outcome of those checks, and the actions taken, are governed by node, networ
 *NB*: An implementation MAY check policies in any order.
 It MAY evaluate all policies or do a short-circuit evaluation and stop when any policy violation is found.
 
-**Resource** **Data** **ToS****, ****Signatures** **and** **Trust** **Policy** **Enforcement**
+Resource Data ToS, Signatures and Trust Policy Enforcement
+==========================================================
+
+::
 
     // Check Policies
 
@@ -418,12 +396,12 @@ It MAY evaluate all policies or do a short-circuit evaluation and stop when any 
                 EXIT
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.aj5me7w75zd3:
 
+------------------------------
 Operational Policy Enforcement
-""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------
 
 All resource data publishing services and resource data distribution services MAY enforce operational policies
 
@@ -436,7 +414,10 @@ All resource data publishing services and resource data distribution services MA
 *NB*: An implementation MAY check policies in any order.
 It MAY evaluate all policies or do a short-circuit evaluation and stop when any policy violation is found.
 
-**Operational** **Policy** **Enforcement**
+Operational Policy Enforcement
+==============================
+
+::
 
         // Check Policies
 
@@ -451,12 +432,12 @@ It MAY evaluate all policies or do a short-circuit evaluation and stop when any 
                 EXIT
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.mm60gf-1u077v:
 
-**Resource** **Data** **Filtering**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------
+Resource Data Filtering
+-----------------------
 
 All resource data publishing services and resource data distribution services apply filters to resource data.
 If a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Node <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Filter <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Document <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ is stored at a node, the filter SHALL be applied to a resource data description document before the document is stored at the node.
@@ -475,7 +456,10 @@ Behavior for filtering against linked resource data, attachments or the inline r
 
 *NB*: Resource data filtering is in addition to the prerequisite manditory filtering of any document that contains a do_not_distribute key-value pair.
 
-**Resource** **Data** **Filtering**
+Resource Data Filtering
+=======================
+
+::
 
     // Filter a *resource* *data* *description* document
 
@@ -554,12 +538,12 @@ Behavior for filtering against linked resource data, attachments or the inline r
             ELSE EXIT // don’t store
 
 
-"""""""""""""""""""""""""""""""""""""""""
 
-.. _h.e1519o-y653zc:
+.. _Change Log:
 
-**Change** **Log**
-"""""""""""""""""""""""""""""""""""""""""
+----------
+Change Log
+----------
 
 *NB*: The change log only lists major updates to the specification.
 
@@ -581,12 +565,12 @@ Behavior for filtering against linked resource data, attachments or the inline r
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. _h.tph0s9vmrwxu:
 
-**Working** **Notes** **and** **Placeholder** **Text**
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+----------------------------------
+Working Notes and Placeholder Text
+----------------------------------
 
 - Flow control consistency
 

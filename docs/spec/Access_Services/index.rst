@@ -7,7 +7,7 @@ Access Services: Learning Registry Technical Specification V AS:0.49.0
 
 Draft in Progress.
 
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -19,43 +19,6 @@ This document is part of one or more versions of the :doc:`Learning <../Technica
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Access<h.u6sbhsuktqyj>` :ref:`Services<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`AS<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Resource<h.kbv3x699el4w>` :ref:`Data<h.kbv3x699el4w>` :ref:`Access<h.kbv3x699el4w>` :ref:`Services<h.kbv3x699el4w>`
-
-                :ref:`Basic<h.23ll5s-2p4zua>` :ref:`Obtain<h.23ll5s-2p4zua>` :ref:`Service<h.23ll5s-2p4zua>`
-
-                :ref:`Basic<h.s3sst6-69kzq1>` :ref:`Harvest<h.s3sst6-69kzq1>` :ref:`Service<h.s3sst6-69kzq1>`
-
-                    :ref:`Get<h.v57vz0-u0ge3y>` :ref:`Record<h.v57vz0-u0ge3y>`
-
-                    :ref:`List<h.56c4qr-c1nbmq>` :ref:`Records<h.56c4qr-c1nbmq>`
-
-                    :ref:`List<h.fldcps-ri52yn>` :ref:`Identifiers<h.fldcps-ri52yn>`
-
-                    :ref:`Identify<h.k5h4di-cvleu6>`
-
-                    :ref:`List<h.eokref-1hyu2a>` :ref:`Metadata<h.eokref-1hyu2a>` :ref:`Formats<h.eokref-1hyu2a>`
-
-                    :ref:`List<h.aocxiz-yca3fl>` :ref:`Sets<h.aocxiz-yca3fl>`
-
-                :ref:`OAI<h.art057-hbjxj4>`:ref:`-<h.art057-hbjxj4>`:ref:`PMH<h.art057-hbjxj4>` :ref:`Harvest<h.art057-hbjxj4>` :ref:`Service<h.art057-hbjxj4>`
-
-                    :ref:`Get<h.bto5ylf0qbe8>` :ref:`Record<h.bto5ylf0qbe8>`
-
-                    :ref:`List<h.8u0mmhr8juw2>` :ref:`Records<h.8u0mmhr8juw2>`
-
-                    :ref:`List<h.ig18pu2ue7vp>` :ref:`Identifiers<h.ig18pu2ue7vp>`
-
-                    :ref:`Identify<h.1dvaj9ngizdi>`
-
-                    :ref:`List<h.rmgxadwnkcu>` :ref:`Metadata<h.rmgxadwnkcu>` :ref:`Formats<h.rmgxadwnkcu>`
-
-                    :ref:`List<h.v3mu36o8erz0>` :ref:`Sets<h.v3mu36o8erz0>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the basic Learning Registry services used to access (pull) resource documents from a distribution network.
 
@@ -109,7 +72,7 @@ The results SHALL be aligned 1:1 with the IDs in the request.
 
 If the request ID is not provided, the service MAY return all or a service-determined subset of the resource data description documents.
 The service description SHALL specify how the service implementation responds to an ALL request (returning ALL, none, or a limited subset).
-When returning a subset of the documents, the service SHOULD return the documents with the most recent ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` values.
+When returning a subset of the documents, the service SHOULD return the documents with the most recent ▼:deprecation:`node_timestamp` values.
 
 *NB*: To support buffering, the service MAY return a smaller number of results than it advertises.
 
@@ -174,25 +137,27 @@ An implementation SHALL indicate any size limits in the service description.
 
 *ToDo*: Extend to produce (log) a usage record of the obtain.
 
-**API**
 
-::
+API
+===
 
-        GET <node-service-endpoint-URL>/obtain?request_id=<ID>
+.. http:get::  /obtain?request_id=<ID>
 
-                &by_doc_ID=<T|F>
+    &by_doc_ID=<T|F>
 
-                &by_resource_ID=<T|F>
+    &by_resource_ID=<T|F>
 
-                &ids_only=<T|F>
+    &ids_only=<T|F>
 
-                &resumption_token=<token>
+    &resumption_token=<token>
 
-        POST <node-service-endpoint-URL>/obtain
+       
+.. http:post:: /obtain
 
-    
 
-        Arguments (HTTP GET):
+    **Arguments (HTTP GET):**
+
+    ::
 
         "request_ID": ID,        
                                         // resource data description document ID or
@@ -226,253 +191,256 @@ An implementation SHALL indicate any size limits in the service description.
 
                                         // optional, default FALSE
 
-        *"*resumption_token": "string",       
+        "resumption_token": "string",       
                                         // flow control resumption token
 
                                         // optional; provided as a result on prior calls
 
-        Arguments (HTTP POST):
+    **Arguments (HTTP POST):**
 
             None
 
-        Request Object (HTTP GET):
+    **Request Object (HTTP GET):**
 
             None
 
-        Request Object (HTTP POST):            
+    **Request Object (HTTP POST):**
 
-                {                       
-                                        // list of resource data descriptions to obtain
+    .. sourcecode:: http
 
-                 "by_doc_ID": boolean,    
-                                        // request is for specific document for each ID
+        {                       
+                                    // list of resource data descriptions to obtain
 
-                                        // request_ID is a doc_ID
+             "by_doc_ID": boolean,    
+                                    // request is for specific document for each ID
 
-                                        // optional, default FALSE,
+                                    // request_ID is a doc_ID
 
-                  
+                                    // optional, default FALSE,
 
-                "by_resource_ID": boolean,    
-                                        // request is for a collation of documents 
+              
 
-                                        // for each ID
+            "by_resource_ID": boolean,    
+                                    // request is for a collation of documents 
 
-                                        // optional, default TRUE
+                                    // for each ID
 
-                                        // request_ID is a resource_locator
+                                    // optional, default TRUE
 
-                 "ids_only": boolean,    
-                                        // request is just for IDs, not documents
+                                    // request_ID is a resource_locator
 
-                                        // optional, default FALSE
+             "ids_only": boolean,    
+                                    // request is just for IDs, not documents
 
-                *▲"*resumption_token": "string",        
-                                        // flow control resumption token
+                                    // optional, default FALSE
 
-                                        // optional; provided as a result on prior calls
+            *▲"*resumption_token": "string",        
+                                    // flow control resumption token
 
-                "request_IDs": [request_ID]    
-                                        // array of
+                                    // optional; provided as a result on prior calls
 
-                                        // resource ID or
+            "request_IDs": [request_ID]    
+                                    // array of
 
-                                        // resource data description document ID
+                                    // resource ID or
 
-                                        // optional
+                                    // resource data description document ID
 
-                                        // ignored if ids_only is TRUE
+                                    // optional
 
-                                        // if missing return documents for ALL IDs
+                                    // ignored if ids_only is TRUE
 
-            }
-
-        Results Object:                 
-                                        // list of resource data description documents
-
-        {"documents": [
-
-         {                
-
-                "doc_ID": ID,       
-                                        // document ID
-
-                "document": [
-                        
-                        {resource_data_description}
-                                        // resource data description documents
-                  ]    
-                                        // array
-
-                                        // present only if ID is valid, otherwise NULL
-
-             }    
-
-        ],
-
-                ▲"resumption_token":  "string"        
-                                        // flow control resumption token
-
-                                        // present only if flow control is supported
-
-                                        // present only if these results are paginated
-
-                                        // NULL if this is the last set of paginated results
+                                    // if missing return documents for ALL IDs
 
         }
 
-        Return Codes:
+    **Results Object:**
+        
+    .. sourcecode:: http
+                                                        
 
-            200
+        {
+            "documents": [                              // list of resource data description documents
 
-            500
+                {                
 
-**Basic** **Obtain**
+                    "doc_ID": ID,       
+                                                        // document ID
+
+                    "document": [                       // resource data description documents
+                        
+                        {resource_data_description}     // array
+                                        
+                    ]                                   // present only if ID is valid, otherwise NULL
+
+                }    
+
+        ],
+
+                ▲"resumption_token":  "string"          // flow control resumption token
+
+                                                        // present only if flow control is supported
+
+                                                        // present only if these results are paginated
+
+                                                        // NULL if this is the last set of paginated results
+
+        }
+
+    :statuscode 200:: OK
+
+    :statuscode 500:: ERROR
+
+
+Basic Obtain
+============
 
 ::
 
-                                        // Obtain the resource data description documents for each supplied ID
+    // Obtain the resource data description documents for each supplied ID
 
-        IF by_doc_ID AND by_resource_ID
+    IF by_doc_ID AND by_resource_ID
 
-                THEN
+            THEN
 
-                        error           // only one can be true
+                    error  // only one can be true
 
-                        EXIT
+                    EXIT
 
     ▲IF resumption_token present and NOT flow_control
 
         THEN
 
-            error                       // flow control error
+            error  // flow control error
 
             EXIT
 
     IF resumption_token present AND 
 
-         (resumption_token DOES NOT MATCH saved state for this this client 
+        (resumption_token DOES NOT MATCH saved state for this this client 
 
-                                        // test must recognize that client did not get last resuts and is re-requesting last set
+            // test must recognize that client did not get last resuts and is re-requesting last set
 
-                                        // or client may be requesting next set
+            // or client may be requesting next set
 
             OR
 
- server has lost state)
+        server has lost state)
 
-        THEN
+            THEN
 
-            error                       
-                                        // flow control error
+                error  // flow control error              
+                                            
 
-            EXIT
+                EXIT
 
-        IF by_doc_ID
+    IF by_doc_ID
 
-            IF request_ID not specified 
+        IF request_ID not specified 
 
-                THEN set doc_IDs in request_ID array
+            THEN set doc_IDs in request_ID array
 
-                                        // based on the values in the service description (none, ALL, subset)
+                // based on the values in the service description (none, ALL, subset)
 
-                FOR EACH request_ID 
+        FOR EACH request_ID 
 
-                    ▲IF flow_control AND resumption_token is present
+            ▲IF flow_control AND resumption_token is present
 
-                        THEN SKIP if entry is prior to resumption point
+                THEN SKIP if entry is prior to resumption point
 
-                    IF results object exceeds flow control or results size limits
+            IF results object exceeds flow control or results size limits
 
-                        THEN EXIT LOOP
+                THEN EXIT LOOP
 
-                Put the request_ID in the results object
+        Put the request_ID in the results object
+
+        IF ids_only THEN SKIP
+
+        GET the corresponding *resource* *data* *description* document
+
+                IF Successful 
+
+                 THEN PUT the *resource* *data* *description* document in the results object
+
+                    // all stored key-value pairs or only those defined in the spec
+
+                    // as defined in the service description
+
+                 ELSE PUT NULL in the results object
+
+        ▲IF Loop ended normally
+
+            IF flow_control and resumption token is present
+
+                THEN return NULL resumption_token in results
+
+                ELSE omit resumption_token from results
+
+        IF Loop exited because of flow control or results size limits
+
+            IF flow_control
+
+                THEN return appropriate resumption_token
+
+    IF by_resource_ID
+
+        IF request_ID not specified 
+
+                THEN set unique_resource_locations in request_ID array
+
+                    // based on the values in the service description (none, ALL, subset)
+
+        FOR EACH request_ID 
+
+            ▲IF flow_control AND resumption_token is present
+
+                THEN SKIP if entry is prior to resumption point
+
+            IF results object exceeds flow control or results size limits
+
+                THEN EXIT LOOP
+
+            IF NOT ids_only
+
+                THEN FIND the collation of resource data description documents
+
+                WHERE resource_locator MATCHES supplied request_ID
+
+            IF Successful     
+
+                PUT the request ID in the results object        
 
                 IF ids_only THEN SKIP
 
-                GET the corresponding *resource* *data* *description* document
+                FOR EACH *resource data description* document
 
-                        IF Successful 
+                GET the corresponding *resource data description* document
 
-                         THEN PUT the *resource* *data* *description* document in the results object
+                    PUT the *resource data description* document in the results object
 
-                                        // all stored key-value pairs or only those defined in the spec
+                        // all stored key-value pairs or only those defined in the spec
 
-                                        // as defined in the service description
+                        // as defined in the service description
 
-                         ELSE PUT NULL in the results object
+            ELSE PUT NULL in the results object
 
-                ▲IF Loop ended normally
+        ▲IF Loop ended normally
 
-                    IF flow_control and resumption token is present
+            IF flow_control and resumption token is present
 
-                        THEN return NULL resumption_token in results
+                THEN return NULL resumption_token in results
 
-                        ELSE omit resumption_token from results
+            ELSE omit resumption_token from results
 
-                IF Loop exited because of flow control or results size limits
+        IF Loop exited because of flow control or results size limits
 
-                    IF flow_control
+            IF flow_control
 
-                        THEN return appropriate resumption_token
+                THEN return appropriate resumption_token
 
-        IF by_resource_ID
 
-                IF request_ID not specified 
-
-                        THEN set unique_resource_locations in request_ID array
-
-                                        // based on the values in the service description (none, ALL, subset)
-
-                FOR EACH request_ID 
-
-                    ▲IF flow_control AND resumption_token is present
-
-                        THEN SKIP if entry is prior to resumption point
-
-                    IF results object exceeds flow control or results size limits
-
-                        THEN EXIT LOOP
-
-                    IF NOT ids_only
-
-                                THEN FIND the collation of resource data description documents
-
-                                WHERE resource_locator MATCHES supplied request_ID
-
-                        IF Successful     
-
-                                PUT the request ID in the results object        
-
-                                IF ids_only THEN SKIP
-
-                                FOR EACH *resource* *data* *description* document
-
-                        GET the corresponding *resource* *data* *description* document
-
-                                        PUT the *resource* *data* *description* document in the results object
-
-                                        // all stored key-value pairs or only those defined in the spec
-
-                                        // as defined in the service description
-
-                        ELSE PUT NULL in the results object
-
-                ▲IF Loop ended normally
-
-                    IF flow_control and resumption token is present
-
-                        THEN return NULL resumption_token in results
-
-                        ELSE omit resumption_token from results
-
-                IF Loop exited because of flow control or results size limits
-
-                    IF flow_control
-
-                        THEN return appropriate resumption_token
-
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -651,149 +619,161 @@ The service SHALL return complete resource data description documents.
 
 *ToDo*: Extend to produce (log) a usage record of the harvest.
 
-**API**
+API
+===
 
-::
+.. http:get:: /harvest/getrecord?request_id=<id>
+    
+    &by_doc_ID=<T|F>
 
-        GET <node-service-endpoint-URL>/harvest/getrecord?request_id=<id>
+    &by_resource_ID=<T|F>
 
-                &by_doc_ID=<T|F>
+.. http:post:: /harvest/getrecord
 
-                &by_resource_ID=<T|F>
+    **Arguments (HTTP GET):**
 
-        POST <node-service-endpoint-URL>/harvest/getrecord
+    ::
 
-        Arguments (HTTP GET):
+        "request_ID": ID,        
+                                // resource data description document ID or
 
-                "request_ID": ID,        
-                                        // resource data description document ID or
+                                // resource ID
 
-                                        // resource ID
+                                // required
 
-                                        // required
+        "by_doc_ID": boolean,    
+                                // request is for a single document
 
-                "by_doc_ID": boolean,    
-                                        // request is for a single document
+                                // optional, default FALSE
 
-                                        // optional, default FALSE
+                                // request_ID is a doc_ID
 
-                                        // request_ID is a doc_ID
+        "by_resource_ID": boolean        
+                                // request is for a collation of all documents
 
-                "by_resource_ID": boolean        
-                                        // request is for a collation of all documents
+                                // for the specified resource
 
-                                        // for the specified resource
+                                // optional, default TRUE
 
-                                        // optional, default TRUE
+                                // request_ID is a resource_locator
 
-                                        // request_ID is a resource_locator
+    **Arguments (HTTP POST):**
 
-        Arguments (HTTP POST):
+        None
 
-            None
+    **Request Object (HTTP GET):**
 
-        Request Object (HTTP GET):
+        None
 
-            None
+    **Request Object (HTTP POST):**
 
-        Request Object (HTTP POST):
+    ::
+        {
+            "request_ID": ID,       
+                                    // resource data description document ID or
 
-                {"request_ID": ID,       
-                                        // resource data description document ID or
+                                    // resource ID
 
-                                        // resource ID
+                                    // required
 
-                                        // required
+            "by_doc_ID":        boolean,    
+                                    // request is for a single document
 
-                "by_doc_ID":        boolean,    
-                                        // request is for a single document
+                                    // optional, default FALSE
 
-                                        // optional, default FALSE
+                                    // request_ID is a doc_ID
 
-                                        // request_ID is a doc_ID
+            "by_resource_ID",    boolean       
+                                    // request is for a collation of all documents
 
-                "by_resource_ID",    boolean       
-                                        // request is for a collation of all documents
+                                    // for the specified resource
 
-                                        // for the specified resource
+                                    // optional, default TRUE
 
-                                        // optional, default TRUE
+                                    // request_ID is a resource_locator
 
-                                        // request_ID is a resource_locator
+        }
 
-                }
+    **Results Object:**
 
-        Results Object:
+    ::
 
-                {"OK":            boolean,    
-                                        // T if successful
+        {
+            "OK": boolean,    
+                                    // T if successful
 
-                "error":            "string",        
-                                        // text describing error
+            "error": "string",        
+                                    // text describing error
+                                    // present only if NOT OK
 
-                                        // present only if NOT OK
+            "responseDate": "string",        
+                                    // time of report, time/date encoding
 
-                "responseDate":    "string",        
-                                        // time of report, time/date encoding
+            "request":                
+                                    // the API request
 
-                "request":                
-                                        // the API request
+                {
+                    "verb": "getrecord",    
+                                                        // the literal "getrecord"
 
-                    {"verb": "getrecord",    
-                                        // the literal "getrecord"
 
-                     "identifier": ID,        
-                                        // request ID
+                    "identifier": ID,        
+                                                        // request ID
 
-                     "by_doc_ID": boolean,    
-                                        // request is for a single document
 
-                     "by_resource_ID": boolean,    
-                                        // request is for a collation of documents
+                    "by_doc_ID": boolean,    
+                                                        // request is for a single document
 
-                     "HTTP_request": "string"        
-                                        // the HTTP request as a string
 
-                    },
+                    "by_resource_ID": boolean,    
+                                                        // request is for a collation of documents
 
-                    "getrecord":        // the resource data description documents
 
-                                        // present only if ID is valid, otherwise NULL
+                    "HTTP_request": "string"        
+                                                        // the HTTP request as a string
 
-                        {
 
-                            "record": [                
-                                        // record container
+                },
 
-                            {"header":                
-                                        // header info
+                "getrecord":        // the resource data description documents
+                                    // present only if ID is valid, otherwise NULL
 
-                                {"identifier": ID,        
-                                        // resource data description document ID
+                    {
 
-                                ▼"datestamp": "string", 
-                                        // resource data timestamp date/time
+                        "record": [                
+                                    // record container
 
-                                        // requried, granularity of 1 second
+                            {
+                                "header":                
+                                                            // header info
 
-                                "status": "string"        
-                                        // fixed vocabulary ["active", "deleted"]                                
-                                        // optional, "active" if not present
+                                    {"identifier": ID,        
+                                                            // resource data description document ID
 
-                                },
+                                    ▼"datestamp": "string", 
+                                                            // resource data timestamp date/time
+                                                            // requried, granularity of 1 second
 
-                            "resource_data": {resource_data_description}        
-                                        // resource data description documents
+                                    "status": "string"        
+                                                            // fixed vocabulary ["active", "deleted"]                                
+                                                            // optional, "active" if not present
+
+                                    },
+
+                                "resource_data": {resource_data_description}        
+                                                            // resource data description documents
 
                             }
-                            
-                            ]
+                        
+                        ]
 
-                        }
+                    }
 
-                }
+            }
 
-**Basic** **Harvest****: ****GetRecord**
+
+Basic Harvest: GetRecord
+========================
 
 ::
 
