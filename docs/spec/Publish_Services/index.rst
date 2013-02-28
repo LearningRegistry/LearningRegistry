@@ -126,7 +126,7 @@ API
 ===
 
 
-.. http:post:: <node-service-endpoint-URL>/publish
+.. http:post:: /publish
 
         **Arguments:**
 
@@ -361,7 +361,7 @@ Basic Publish
 
                                         :changes:`OK := F`
 
-                                        :changes:`error := "rejected replacement"`  // an appropriate message
+                                        :changes:`error := "rejected replacement"  // an appropriate message`
 
                                         :changes:`doc_ID := supplied doc_ID`
 
@@ -556,41 +556,44 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
 API
 ===
 
-::
+.. http:get:: /swordservice
 
-    GET <node-service-endpoint-url>/swordservice
 
-    HTTP Headers
+    **HTTP Headers**
 
-                X-On-Behalf-Of: [on-behalf-of-user]
+    .. sourcecode:: http
 
-    Results XML
+        X-On-Behalf-Of: [on-behalf-of-user]
 
-        Well formed XML instance document that conforms to the SWORD 1.3 specification.
+    **Results XML**
 
-                <?xml version="1.0" encoding="utf-8"?>
-                <service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sword="http://purl.org/net/sword/">
-                  <sword:version>1.3</sword:version>
-                  <sword:verbose>true</sword:verbose>
-                  <sword:noOp>true</sword:noOp>
-                  <workspace>
-                    <atom:title>...</atom:title>
-                    <collection href="...">
-                      <atom:title>...</atom:title>
-                      <accept>application/json</accept>
-                      <sword:mediation>true</sword:mediation>
-                      <dcterms:abstract>...</dcterms:abstract>
-                      <sword:collectionPolicy>...</sword:collectionPolicy>
-                    </collection>
-                  </workspace>
-                </service>
+    Well formed XML instance document that conforms to the SWORD 1.3 specification.
+
+    .. sourcecode:: xml
+
+        <?xml version="1.0" encoding="utf-8"?>
+        <service xmlns="http://www.w3.org/2007/app" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sword="http://purl.org/net/sword/">
+          <sword:version>1.3</sword:version>
+          <sword:verbose>true</sword:verbose>
+          <sword:noOp>true</sword:noOp>
+          <workspace>
+            <atom:title>...</atom:title>
+            <collection href="...">
+              <atom:title>...</atom:title>
+              <accept>application/json</accept>
+              <sword:mediation>true</sword:mediation>
+              <dcterms:abstract>...</dcterms:abstract>
+              <sword:collectionPolicy>...</sword:collectionPolicy>
+            </collection>
+          </workspace>
+        </service>
+
 
 SWORD: swordservice
 ===================
 
-::
 
-                                        // return the service document
+    // return the service document
 
     Build XML results document
 
@@ -598,11 +601,15 @@ SWORD: swordservice
 
     EMIT the required elements
 
+    .. sourcecode:: xml
+
                 <sword:version>1.3</sword:version>
                 <sword:verbose>true</sword:verbose>
                 <sword:noOp>true</sword:verbose>
 
     EMIT the workspace elements
+
+    .. sourcecode:: xml
 
         <workspace>
             <atom:title>community_name or community_id from the *network community description data model*<atom:title>
@@ -610,6 +617,8 @@ SWORD: swordservice
     IF the [on-behalf-of-user] is permitted to publish to the node
 
         THEN EMIT the collection elements
+
+        .. sourcecode:: xml
 
                 <collection href="URL of the network node">
                   <atom:title>node_name or node_id from the *network node description data model*</atom:title>
@@ -620,6 +629,8 @@ SWORD: swordservice
                 </collection>
 
     Complete XML elements
+
+    .. sourcecode:: xml
 
             </workspace>
         </service>
@@ -635,13 +646,12 @@ Create a Resource
 API
 ===
 
-::
+.. http:post:: /swordpub
 
-    POST <node-service-endpoint-url>/swordpub
+    **HTTP Headers**
 
-    HTTP Headers
+    **Results XML**
 
-    Results XML
 
 SWORD: swordpub
 ===============
@@ -744,125 +754,126 @@ An implementation SHALL indicate any size limits in the service description.
 API
 ===
 
-::
 
-        POST <node-service-endpoint-URL>/delete
 
+.. http:POST:: /delete
+
+    :deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
+
+    **Arguments:**
+
+        None
+
+    **Request Object:**
+
+    .. sourcecode:: http
+
+        {
+            "request_IDs":      // list of resource data descriptions to delete
+          
+
+            [                   // array of resource data description document ID
+
+                doc_ID          // required
+     
+            ]
+        
+        }
+
+    **Results Object:**
+
+    .. sourcecode:: http
+
+        {
+            "OK": boolean,              // T if successful
+            
+            "error": "string",          // text describing global error
+                                
+                                        // present only if NOT OK
+
+            "document_results": [       // array of per document results
             
 
-        Arguments:
+                {
+                    "doc_ID": "string", // ID of the document
 
-            None
+                    "OK": boolean,      // T if document was deleted
 
-        Request Object:                 // list of resource data descriptions to delete
-
-                {"request_IDs":
-
-                    [                   // array of
-
-                     doc_ID             // resource data description document ID
-
-                                        // required
-                    ]
-                
-                }
-
-        Results Object:
-
-                {"OK":        boolean,  
-                                        // T if successful
-
-                "error":        "string",            
-                                        // text describing global error
+                    "error": "string"   // text describing deletion error
 
                                         // present only if NOT OK
-
-                "document_results": [                       
-                                        // array of per document results
-
-                 {"doc_ID":    "string",            
-                                        // ID of the document
-
-                 "OK":        boolean,            
-                                        // T if document was deleted
-
-                 "error":        "string"            
-                                        // text describing deletion error
-
-                                        // present only if NOT OK
-                 }
-
-                ]
-
                 }
 
-        Return Codes:
+            ]
 
-            200
+        }
 
-            500
+
+    :statuscode 200: OK
+
+    :statuscode 500: Error
+
 
 Basic Delete
 ============
 
-::
+    :deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
-                                        // Obtain the resource data description document for each supplied ID
+    // Obtain the resource data description document for each supplied ID
 
-        FOR EACH *resource* *data* *description* document ID
+    FOR EACH *resource* *data* *description* document ID
 
-                Put the *resource* *data* *description* document ID in the results object
+            Put the *resource* *data* *description* document ID in the results object
 
-                IF the document does not exist
+            IF the document does not exist
 
-                    THEN 
+                THEN 
 
-                                OK := FALSE
+                            OK := FALSE
 
-                                error := "document doesn’t exist"
+                            error := "document doesn’t exist"
 
-                                SKIP
+                            SKIP
 
-        IF the document has been deleted
+    IF the document has been deleted
 
-                    THEN 
+                THEN 
 
-                                OK := FALSE
+                            OK := FALSE
 
-                                error := "document already deleted
+                            error := "document already deleted
 
-                                SKIP    
+                            SKIP    
 
-                                        // otherwise delete
+    // otherwise delete
 
-        OK := TRUE
+    OK := TRUE
 
-                CASE delete_action
+            CASE delete_action
 
-                    ignore:
+                ignore:
 
-                                NO OP
+                            NO OP
 
-                    mark: 
+                mark: 
 
-                                set a flag on the document that it is deleted 
-                                        // ACTIVE := FALSE
+                            set a flag on the document that it is deleted // ACTIVE := FALSE
 
-                    delete: 
+                delete: 
 
-                                perform a system-level delete 
-                                        // whatever "delete" means
+                            perform a system-level delete // whatever "delete" means
 
-                    purge: 
+                purge: 
 
-                                perform a system-level delete 
-                                        // whatever "delete" means
+                            perform a system-level delete // whatever "delete" means
 
-                                trigger system level purge 
-                                        // may run at some later time
+                            trigger system level purge // may run at some later time
+
 
 Service Description
 ===================
+
+:deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
 ::
 
