@@ -88,11 +88,10 @@ The service MAY return additional key-value pairs that indicate status.
 
 A network node SHALL maintain all of the data necessary to return the required key-value pairs.
 
-**API**
+API
+===
 
-::
-
-        GET <node-service-endpoint-URL>/status
+.. http:get:: /status
    
 
         Arguments:
@@ -105,7 +104,10 @@ A network node SHALL maintain all of the data necessary to return the required k
 
         Results Object:
 
-                {"timestamp": "string",              
+        .. sourcecode:: http
+
+            {
+                "timestamp": "string",              
                                         // time of report, time/date encoding
 
                 "active": boolean; 
@@ -164,9 +166,10 @@ A network node SHALL maintain all of the data necessary to return the required k
 
                                         // time/date encoding
 
-                }
+            }
 
-**Network** **Node** **Status**
+Network Node Status
+===================
 
 ::
 
@@ -182,7 +185,8 @@ A network node SHALL maintain all of the data necessary to return the required k
 
     TRANSFORM results to specified CONTENT-TYPE
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -239,11 +243,11 @@ The service SHALL return all of the key-value pairs listed that have a valid val
 An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ for which a value is missing or NULL.
 The service MAY return additional informational values.
 
-**API**
+API
+===
 
-::
 
-        GET <node-service-endpoint-URL>/description
+.. http:get:: /description
    
 
         Arguments:
@@ -255,8 +259,11 @@ The service MAY return additional informational values.
             None
 
         Results Object:
+        
+        .. sourcecode:: http
 
-                {"timestamp": "string",        
+            {
+                "timestamp": "string",        
                                         // time of report, time/date encoding
 
                 "active": boolean;    
@@ -328,7 +335,8 @@ The service MAY return additional informational values.
                 "node_policy":                
                                         // node-specific policies, optional
 
-                    {"sync_frequency": integer,        
+                {   
+                    "sync_frequency": integer,        
                                         // target time between synchronizations
 
                     "deleted_data_policy": "string",        
@@ -360,12 +368,13 @@ The service MAY return additional informational values.
                     "max_doc_size": integer        
                                         // max document size that a node stores
 
-                    }
+                }
 
                 "filter":                    
                                         // filter data
-
-                    {"filter_name": "string",         
+                
+                {   
+                    "filter_name": "string",         
                                         // name of the filter
 
                     "custom": boolean,    
@@ -377,21 +386,21 @@ The service MAY return additional informational values.
                     "filters":[                
                                         // array of filter rules
 
-                        {"filter_key": "string",        
+                    {
+                        "filter_key": "string",        
                                         // REGEX that matches names
 
                         "filter_value": "string"        
                                         // REGEX that matches values
 
-                        }
-
-                        ]
-
-                    }
+                    }]
 
                 }
 
-**Network** **Node** **Description**
+            }
+
+Network Node Description
+========================
 
 ::
 
@@ -413,7 +422,8 @@ The service MAY return additional informational values.
 
     TRANSFORM results to specified CONTENT-TYPE
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -472,13 +482,11 @@ The service MAY return additional key-value pairs for a service.
 
 The service SHOULD group and sort the results in some logical form, e.g., by ACTIVE, by TYPE.
 
-**API**
+API
+===
 
-::
 
-        GET <node-service-endpoint-URL>/services
-
-    
+.. http:post:: /services    
 
         Arguments:
 
@@ -490,7 +498,10 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
 
         Results Object:
 
-                {"timestamp": "string",        
+        .. sourcecode:: http
+        
+            {
+                "timestamp": "string",        
                                         // time of report, time/date encoding
 
                 "active": boolean;    
@@ -505,7 +516,8 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
                 "services":[                
                                         // array of service description objects
 
-                    {"active": boolean;    
+                {   
+                    "active": boolean;    
                                         // is the service active
 
                     "service_id": "string",        
@@ -529,7 +541,8 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
                     "service_auth":            
                                         // service authentication and authorization descriptions
 
-                        {"service_authz": ["string"],     
+                    {
+                        "service_authz": ["string"],     
                                         // authz values for the service
 
                         "service_key": boolean,    
@@ -538,18 +551,17 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
                         "service_https": boolean        
                                         // does service require https
 
-                        },
+                    },
 
                     "service_data": {}        
                                         // service-specific name-value pairs
 
-                    }
+                }]
 
-                    ]
+            }
 
-                }
-
-**Network** **Node** **Services**
+Network Node Services
+=====================
 
 ::
 
@@ -567,7 +579,8 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
 
     TRANSFORM results to specified CONTENT-TYPE
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -625,13 +638,10 @@ An implementation MAY omit the return of any key-value pair that is an optional 
 The service MAY return additional policy key-value pairs.
 The service MAY be called at any node in the resource distribution network; all network nodes store an identical copy of the policy data.
 
-**API**
+API
+===
 
-::
-
-        GET <node-service-endpoint-URL>/policy
-
-    
+.. http:get:: /policy
 
         Arguments:
 
@@ -643,41 +653,44 @@ The service MAY be called at any node in the resource distribution network; all 
 
         Results Object:
 
-                {
+        .. sourcecode:: http
+                
+            {
 
-                    "timestamp": "string", 
+                "timestamp": "string", 
                                         // time of report, time/date encoding
 
-                    "active": boolean; 
+                "active": boolean; 
                                         // is the network node active
 
-                    "node_id": "string", 
+                "node_id": "string", 
                                         // ID of the network node
 
-                    "node_name": "string", 
+                "node_name": "string", 
                                         // name of the network node
 
-                    "network_id": "string", 
+                "network_id": "string", 
                                         // id of the network
 
-                    "network_name": "string", 
+                "network_name": "string", 
                                         // name of the network
 
-                    "network_description": "string", 
+                "network_description": "string", 
                                         // description of the network
 
-                    "policy_id": "string", 
+                "policy_id": "string", 
                                         // id of the policy description
 
-                    "policy_version": "string", 
+                "policy_version": "string", 
                                         // version identifier for the policy
 
-                    "TTL": integer 
+                "TTL": integer 
                                         // minimum time to live for resource data
 
-                }
+            }
 
-**Resource** **Distribution** **Network** **Policy**
+Resource Distribution Network Policy
+====================================
 
 ::
 
@@ -695,7 +708,8 @@ The service MAY be called at any node in the resource distribution network; all 
 
     TRANSFORM results to specified CONTENT-TYPE
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 

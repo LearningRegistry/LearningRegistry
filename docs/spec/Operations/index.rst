@@ -154,7 +154,8 @@ The procedures also include REJECT steps.
 These are general rules designed to check if a document is well formed, that all mandatory fields are present, that values are from constrained vocabularies, that immutable values are not changed on update, etc.
 The procedure exits without changing the state of any database if validation fails (i.e., the procedure is a transaction).
 
-**Establish** **a** **Network** **Node**
+Establish a Network Node
+========================
 
 ::
 
@@ -211,7 +212,8 @@ The procedure exits without changing the state of any database if validation fai
 
                 REJECT if the *network* *node* *service* *description* document is not valid
 
-**Establish** **a** **Resource** **Distribution** **Network**
+Establish a Resource Distribution Network
+=========================================
 
 ::
 
@@ -262,7 +264,8 @@ The procedure exits without changing the state of any database if validation fai
 
                 REJECT if a *resource* *distribution* *network* *policy* document exists
 
-**Establish** **a** **Network** **Community**
+Establish a Network Community
+=============================
 
 ::
 
@@ -305,7 +308,8 @@ The procedure exits without changing the state of any database if validation fai
 
                 REJECT if a *network* *community* *description* document exists
 
-**Add** **a** **Network** **Node** **to** **a** **Resource** **Distribution** **Network**
+Add a Network Node to a Resource Distribution Network
+=====================================================
 
 ::
 
@@ -338,7 +342,8 @@ The procedure exits without changing the state of any database if validation fai
 
                                         // may proceed asynchronously
 
-**Adding** **Connections** **within** **a** **Resource** **Distribution** **Network**
+Adding Connections within a Resource Distribution Network
+=========================================================
 
 ::
 
@@ -386,7 +391,8 @@ The procedure exits without changing the state of any database if validation fai
 
         REJECT if the same source -> destination active connection exists
 
-**Connect** **Networks** **within** **a** **Community**
+Connect Networks within a Community
+===================================
 
 ::
 
@@ -441,7 +447,8 @@ The procedure exits without changing the state of any database if validation fai
 
         REJECT if the same source -> destination active connection exists
 
-**Connect** **Communities**
+Connect Communities
+===================
 
 ::
 
@@ -516,7 +523,8 @@ Deleting a document would require network-level garbage collection to determine 
 
 If updating the description of a network node, its services or connectivity, the description of a the distribution network or the network community causes the descriptions to violate the requirements for the `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_ `Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_, the node SHALL NOT be considered to be a part of the corresponding distribution network and network community and SHALL NOT participate in any network or resource operations.
 
-**Change** **Network** **Node** **Description**
+Change Network Node Description
+===============================
 
 ::
 
@@ -534,7 +542,8 @@ If updating the description of a network node, its services or connectivity, the
 
                                         // node may have only one network node description
 
-**Delete** **a** **Network** **Node**
+Delete a Network Node
+=====================
 
 ::
 
@@ -578,7 +587,8 @@ If updating the description of a network node, its services or connectivity, the
 
         PERFORM the Delete Node Network Connection process
 
-**Change** **Node** **Service** **Description**
+Change Node Service Description
+===============================
 
 ::
 
@@ -594,7 +604,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *service* *description* document is not an update
 
-**Add** **Node** **Service**
+Add Node Service
+================
 
 ::
 
@@ -610,7 +621,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *service* *description* document is not an addition
 
-**Delete** **Node** **Service**
+Delete Node Service
+===================
 
 ::
 
@@ -628,7 +640,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *service* *description* document is not an update
 
-**Change** **Node** **Network** **Connectivity**
+Change Node Network Connectivity
+================================
 
 ::
 
@@ -648,7 +661,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *connectivity* *description* document is not an update
 
-**Delete** **Node** **Network** **Connectivity**
+Delete Node Network Connectivity
+================================
 
 ::
 
@@ -668,7 +682,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *connectivity* *description* document is not an update
 
-**Change** **Node** **Filters**
+Change Node Filters
+===================
 
 ::
 
@@ -684,7 +699,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *filter* *description* document is not an update
 
-**Delete** **Node** **Filters**
+Delete Node Filters
+===================
 
 ::
 
@@ -702,7 +718,8 @@ If updating the description of a network node, its services or connectivity, the
 
         REJECT if the *network* *node* *filter* *description* document is not an update
 
-**Change** **Resource** **Distribution** **Network** **Description**
+Change Resource Distribution Network Description
+================================================
 
 ::
 
@@ -728,7 +745,8 @@ If updating the description of a network node, its services or connectivity, the
 
                                         // may proceed asynchronously
 
-**Delete** **Resource** **Distribution** **Network** **Description**
+Delete Resource Distribution Network Description
+================================================
 
 ::
 
@@ -756,7 +774,8 @@ If updating the description of a network node, its services or connectivity, the
 
                                         // may proceed asynchronously
 
-**Change** **Resource** **Distribution** **Network** **Policy**
+Change ResourceDistribution Network Policy
+==========================================
 
 ::
 
@@ -782,7 +801,8 @@ If updating the description of a network node, its services or connectivity, the
 
                                         // may proceed asynchronously
 
-**Delete** **Resource** **Distribution** **Network** **Policy**
+Delete Resource Distribution Network Policy
+===========================================
 
 ::
 
@@ -810,7 +830,8 @@ If updating the description of a network node, its services or connectivity, the
 
                                         // may proceed asynchronously
 
-**Change** **Network** **Community** **Description**
+Change Network Community Description
+====================================
 
 ::
 
@@ -840,7 +861,8 @@ If updating the description of a network node, its services or connectivity, the
 
                                         // may proceed asynchronously
 
-**Delete** **Network** **Community** **Description**
+Delete Network Community Description
+====================================
 
 ::
 

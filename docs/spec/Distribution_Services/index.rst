@@ -88,11 +88,8 @@ The service provides three distinct functions:
 API: Data Distribution
 ======================
 
-::
 
-        POST <node-service-endpoint-URL>/distribute
-
-    
+.. http:post:: /distribute
 
         Arguments:
 
@@ -104,22 +101,20 @@ API: Data Distribution
 
         Results Object:                    // results summary and errors
 
-        {
-
-         "OK":        boolean,        // T if successful
-
-         "error":        "string"            // text describing error
-
-        }
-
+        .. sourcecode:: http
         
+            {
 
-    Return Codes:
+                "OK":        boolean,        // T if successful
 
-        200    Successful
+                "error":        "string"            // text describing error
 
-        500    An error
+            }            
+        
+        Return Codes:
 
+        :statuscode 200: no error
+        :statuscode 500: error
 
 Resource Distribution: Source Node Process
 ==========================================
@@ -259,11 +254,8 @@ Resource Distribution: Destination Node Process
 API: Destination Node Information
 =================================
 
-::
 
-        GET <node-service-endpoint-URL>/destination
-
-    
+.. http:get:: /destination
 
         Arguments:
 
@@ -275,39 +267,40 @@ API: Destination Node Information
 
         Results Object:                    // results summary and errors
 
-        {
+        .. sourcecode:: http
+        
+            {
 
-         "OK":        boolean,        // T if successful
+                "OK":        boolean,        // T if successful
 
-         "error":        "string",            // text describing error
+                "error":        "string",            // text describing error
 
-         "target_node_info":            // target distribution node data
+                "target_node_info":            // target distribution node data
 
-         {
+                {
 
-                 "active":        boolean,    // is the destination network node active
+                    "active":        boolean,    // is the destination network node active
 
-                 "node_id":        "string",        // ID of the destination network node
+                    "node_id":        "string",        // ID of the destination network node
 
-                 "network_id":        "string",        // id of the network of the destination
+                    "network_id":        "string",        // id of the network of the destination
 
-                 "community_id":    "string",     // id of the community of the destination
+                    "community_id":    "string",     // id of the community of the destination
 
-                 "gateway_node":    boolean,    // destination node is a gateway node
+                    "gateway_node":    boolean,    // destination node is a gateway node
 
-                 "social_community":    boolean        // is community a social community
+                    "social_community":    boolean        // is community a social community
 
                 }
 
-        }
+            }
 
         
 
-    Return Codes:
+            Return Codes:
 
-        200    Successful
-
-        500    An error
+                :statuscode 200: no error
+                :statuscode 500: error 
 
 
 Resource Distribution: Destination Node Information
