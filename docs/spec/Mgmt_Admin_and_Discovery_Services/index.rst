@@ -94,15 +94,15 @@ API
 .. http:get:: /status
    
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:    
+        **Request Object:**    
 
             None
 
-        Results Object:
+        **Results Object:**
 
         .. sourcecode:: http
 
@@ -250,15 +250,15 @@ API
 .. http:get:: /description
    
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:    
+        **Request Object:**    
 
             None
 
-        Results Object:
+        **Results Object:**
         
         .. sourcecode:: http
 
@@ -488,15 +488,15 @@ API
 
 .. http:post:: /services    
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:    
+        **Request Object:**    
 
             None
 
-        Results Object:
+        **Results Object:**
 
         .. sourcecode:: http
         
@@ -643,15 +643,15 @@ API
 
 .. http:get:: /policy
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:    
+        **Request Object:**    
 
             None
 
-        Results Object:
+        **Results Object:**
 
         .. sourcecode:: http
                 

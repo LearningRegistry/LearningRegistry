@@ -91,15 +91,15 @@ API: Data Distribution
 
 .. http:post:: /distribute
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:
+        **Request Object:**
 
             None
 
-        Results Object:                    // results summary and errors
+        **Results Object:**                    // results summary and errors
 
         .. sourcecode:: http
         
@@ -111,7 +111,7 @@ API: Data Distribution
 
             }            
         
-        Return Codes:
+        **Return Codes:**
 
         :statuscode 200: no error
         :statuscode 500: error
@@ -257,15 +257,15 @@ API: Destination Node Information
 
 .. http:get:: /destination
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:
+        **Request Object:**
 
             None
 
-        Results Object:                    // results summary and errors
+        **Results Object:**                    // results summary and errors
 
         .. sourcecode:: http
         
@@ -297,7 +297,7 @@ API: Destination Node Information
 
         
 
-            Return Codes:
+            **Return Codes:**
 
                 :statuscode 200: no error
                 :statuscode 500: error 
