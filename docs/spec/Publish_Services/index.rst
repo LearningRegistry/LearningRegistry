@@ -42,9 +42,9 @@ In particular, the reader needs to be aware that specific criteria for services 
 
 .. _h.xf8fiul5s5dl:
 
-------------------------------
+""""""""""""""""""""""""""""""
 Resource Data Publish Services
-------------------------------
+""""""""""""""""""""""""""""""
 
 Publish services are used to push resource data into the network.
 They are used by external publishing edge nodes.
@@ -197,13 +197,11 @@ Basic Publish
 
         IF do_not_distribute key is present
 
-            THEN                
-                                        // create the global error object
+            THEN // create the global error object
 
                 OK := F
 
-                error := "cannot publish" 
-                                        // an appropriate error for global condition
+                error := "cannot publish"  // an appropriate error for global condition
                                 
                 EXIT
 
@@ -212,13 +210,11 @@ Basic Publish
 
         IF there is an overall error 
 
-            THEN                
-                                        // create the global error object
+            THEN // create the global error object
 
                 OK := F
 
-                error := "error msg"  
-                                        // an appropriate error for global condition
+                error := "error msg"    // an appropriate error for global condition
 
                 EXIT
 
@@ -249,13 +245,11 @@ Basic Publish
 
             IF the *resource* *data* *description* document does NOT pass the filter
 
-                THEN    
-                                        // indicate filtering was applied
+                THEN     // indicate filtering was applied
     
                     OK := F
     
-                    error := "rejected by filter" 
-                                        // an appropriate filtering message
+                    error := "rejected by filter"  // an appropriate filtering message
     
                     doc_ID := supplied doc_ID 
     
@@ -280,13 +274,11 @@ Basic Publish
 
             AND the *resource* *data* *description* document has submitted_type=="anonymous"
 
-                THEN    
-                                        // indicate submitted type was rejected
+                THEN     // indicate submitted type was rejected
     
                     OK := F
     
-                    error := "anon submission rejected" 
-                                        // an appropriate message
+                    error := "anon submission rejected"  // an appropriate message
     
                     doc_ID := supplied doc_ID 
     
@@ -296,13 +288,11 @@ Basic Publish
 
             AND the *resource* *data* *description* document submitter cannot be verified or trusted
 
-                THEN    
-                                        // indicate submitter was rejected
+                THEN // indicate submitter was rejected
     
                     OK := F
     
-                    error := "rejected submitter" 
-                                        // an appropriate message
+                    error := "rejected submitter"  // an appropriate message
     
                     doc_ID := supplied doc_ID 
     
@@ -312,12 +302,10 @@ Basic Publish
 
             AND the *resource* *data* *description* document signature not present
 
-                THEN    
-                                        // indicate signature was rejected
+                THEN // indicate signature was rejected
                     OK := F
     
-                    error := "no signature" 
-                                        // an appropriate message
+                    error := "no signature" // an appropriate message
     
                     doc_ID := supplied doc_ID 
     
@@ -332,8 +320,7 @@ Basic Publish
     
                     OK := F
     
-                    error := "rejected signature" 
-                                        // an appropriate message
+                    error := "rejected signature"  // an appropriate message
     
                     doc_ID := supplied doc_ID 
     
@@ -343,13 +330,11 @@ Basic Publish
 
             AND the *resource* *data* *description* document is too large
 
-                THEN    
-                                        // indicate document too large
+                THEN     // indicate document too large
     
                     OK := F
     
-                    error := "too large" 
-                                        // an appropriate message
+                    error := "too large"  // an appropriate message
     
                     doc_ID := supplied doc_ID
     
@@ -539,9 +524,9 @@ The Service Description document SHALL apply to the entire API.
 
 .. _h.ku7eedtbq15d:
 
--------------------------
+
 Retrieve Service Document
--------------------------
+=========================
 
 The SWORD Service Document endpoint SHALL return an XML SWORD Service Document with the following settings:
 
@@ -577,7 +562,7 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
   - <sword:treatment> and <sword:service> elements SHALL be omitted.
 
 API
-===
+---
 
 .. http:get:: /swordservice
 
@@ -613,7 +598,7 @@ API
 
 
 SWORD: swordservice
-===================
+-------------------
 
                                         // return the service document
 
@@ -659,14 +644,14 @@ SWORD: swordservice
 
 .. _h.2o7qqzkocz2j:
 
------------------
+
 Create a Resource
------------------
+=================
 
     in a future draft of the specification
 
 API
-===
+---
 
 .. http:post:: /swordpub
 
@@ -676,14 +661,14 @@ API
 
 
 SWORD: swordpub
-===============
+---------------
 
 ::
 
     // pseudo code
 
 Service Description
-===================
+-------------------
 
 ::
 

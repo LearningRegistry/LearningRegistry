@@ -824,9 +824,8 @@ Delete Network Community Description
 
 .. _h.tcjl0w4wifiy:
 
------------------
 Network Discovery
------------------
+=================
 
 Finding all the nodes in a network or community is a non core service.
 One approach is to use replication and distribution to build a complete list of all network links at each node (an alternative is to traverse the network and build the link structure).
@@ -914,9 +913,8 @@ Service provisioning (publish, access, distribution, broker) SHALL be determined
 
 .. _h.a9luwl-3jrses:
 
--------------------------
 Resource Data Persistence
--------------------------
+=========================
 
 A node SHALL persist resource data stored at a node for at least as many days as specified by the TTL (time to live) in the resource distribution network policy description.
 A node MAY “delete” documents that have been stored longer than the network’s TTL.

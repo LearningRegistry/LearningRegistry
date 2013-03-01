@@ -86,7 +86,6 @@ If a resource data description document is to be signed and validated, the follo
 
 .. _h.2eu5kpj7khu7:
 
---------------------------------------------
 Signing a Resource Data Description Document
 --------------------------------------------
 
@@ -152,7 +151,6 @@ The signing process SHALL be the same; the elements of the data model used in th
 
 .. _h.16mk2ptzlcqz:
 
-----------------------------------------------------------------
 Validation the Signature of a Resource Data Description Document
 ----------------------------------------------------------------
 
@@ -195,7 +193,6 @@ Full details of how services implement these controls is not specified.
 
 .. _h.8by9tsdoelc1:
 
---------------
 Authentication
 --------------
 
@@ -226,7 +223,6 @@ A deployment of the Learning Registry SHALL specify how to provision authenticat
 
 .. _h.250yt6n6562w:
 
--------------
 Authorization
 -------------
 
@@ -245,7 +241,6 @@ A deployment of the Learning Registry SHALL specify how to provision access keys
 
 .. _h.j7dqds4zprd9:
 
--------------------------------
 Network Communications Security
 -------------------------------
 
@@ -260,7 +255,6 @@ A deployment of the Learning Registry SHALL specify how to provision secure comm
 
 .. _h.tpp2lj40losm:
 
--------------
 Network Ports
 -------------
 

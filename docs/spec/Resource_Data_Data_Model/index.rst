@@ -69,9 +69,9 @@ Additional constraints on attributes values are detailed in `Data <https://docs.
 
 .. _h.kdtam7-568cce:
 
-------------------------------------
+
 Resource Data Description Data Model
-------------------------------------
+""""""""""""""""""""""""""""""""""""
 
 The data model describing resources, metadata, paradata, etc., that is distributed by the resource distribution network.
 The data model MAY be extended with additional optional, mutable elements that describe a resource and have a character string value space.
@@ -414,9 +414,8 @@ The format and encoding are based on the defined payload_schema and payload_sche
 
 .. _h.ykraw8-ientp5:
 
-----------------
 Metadata Formats
-----------------
+""""""""""""""""
 
 The metadata in a resource data description MAY be defined using any metadata standard.
 Metadata documents SHALL include the reference to the defining standard or schema.
@@ -448,9 +447,9 @@ JSON encodings of metadata schemata (primarily for inline resource data) will be
 
 .. _h.5bpp9l-ncbjqy:
 
-----------------
+
 Paradata Formats
-----------------
+""""""""""""""""
 
 The paradata in a resource data description MAY be defined using any paradata standard.
 Paradata documents SHALL include the reference to the defining standard or schema.
@@ -478,9 +477,9 @@ JSON encodings of paradata schemata (primarily for inline resource data) will be
 
 .. _h.hphvlw-1cw6xc:
 
--------------
+
 Resource Data
--------------
+"""""""""""""
 
 The resource data SHALL be maintained in a set of documents stored at each node in the network.
 
@@ -496,9 +495,9 @@ Other types of resource data description documents SHALL NOT be defined and SHAL
 Other organizational classifications SHALL NOT be used.
 *NB*: These constraints are meant to restrict placing resource data in multiple different databases.
 
-----------
+
 Tombstones
-----------
+""""""""""
 
 A tombstone is node local document that acts a terminal marker for an RD3.  It SHALL be the only allowed mutability of a RD3. A tombstone MUST NOT be distributed to other nodes.
 

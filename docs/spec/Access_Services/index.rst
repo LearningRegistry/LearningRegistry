@@ -43,9 +43,9 @@ In particular, the reader needs to be aware that specific criteria for services 
 
 .. _h.kbv3x699el4w:
 
------------------------------
+"""""""""""""""""""""""""""""
 Resource Data Access Services
------------------------------
+"""""""""""""""""""""""""""""
 
 Access services are used to pull resource data from the network.
 They are used by external access edge nodes to obtain one or more resource data description documents for “off network” processing.
@@ -57,9 +57,9 @@ A future version of the specification MAY define additional resource data docume
 
 .. _h.23ll5s-2p4zua:
 
---------------------
+~~~~~~~~~~~~~~~~~~~~
 Basic Obtain Service
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 The basic obtain service pulls an instance of a resource data description document (or a set of documents) directly from a node on a resource distribution network.
 It is the most basic, direct mechanism to access resource data.
@@ -114,22 +114,22 @@ If the service cannot return the next portion of the results, it SHALL return a 
 
 ▲To support integrity of results sets, if the set of documents stored at the node changes in a way such that the sequence of calls will not return all the requested results, e.g., documents are added between calls to the service, the service SHALL return a flow control error.
 
-*▲**NB*: To support communication error recovery, the client MAY repeatedly call the service using the same resumption token.
+*▲NB*: To support communication error recovery, the client MAY repeatedly call the service using the same resumption token.
 
 *NB*: The format of the resumption token is not specified; the service MAY use any format or encoding needed to support flow control.
 
 *NB*: There are no restrictions on number of requested documents or in the total size of the HTTP message or response.
 An implementation SHALL indicate any size limits in the service description.
 
-*NB**: *The default is that IDs are for resources, not documents.
+*NB*: The default is that IDs are for resources, not documents.
 
 *NB*: The default is to return full resource data description documents, not just IDs.
 
-*▲**NB*: By default, flow control is not supported.
+*▲NB*: By default, flow control is not supported.
 
 *NB*: The request of *by* *document* or *by* *resource* applies to the entire list of request IDs.
 
-*NB**: *The mechanism of matching a supplied request ID to a resource locator is not specified.
+*NB*: The mechanism of matching a supplied request ID to a resource locator is not specified.
 
 *NB*: The process currently does not handle attachments.
 
@@ -138,8 +138,9 @@ An implementation SHALL indicate any size limits in the service description.
 *ToDo*: Extend to produce (log) a usage record of the obtain.
 
 
+---
 API
-===
+---
 
 .. http:get::  /obtain?request_id=<ID>
 
@@ -292,8 +293,9 @@ API
     :statuscode 500:: ERROR
 
 
+------------
 Basic Obtain
-============
+------------
 
 
 
@@ -438,8 +440,9 @@ Basic Obtain
                 THEN return appropriate resumption_token
 
 
+-------------------
 Service Description
-===================
+-------------------
 
 .. sourcecode:: javascript
 
@@ -527,9 +530,9 @@ The descriptive values (service_name, service_description) MAY be changed from w
 
 .. _h.s3sst6-69kzq1:
 
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 Basic Harvest Service
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 The basic harvest service can be used by an external agent to connect to a node to harvest (pull) the resource data description documents held by the node.
 The service is patterned after the OAI-PMH specification.
@@ -546,7 +549,7 @@ The internal JSON storage of a resource data description document MAY include ad
 The service MAY return all stored key-value pairs, or only the key-value pairs defined in this specification for the resource data description document.
 The service document SHALL indicate if the returned documents are limited to the specification-defined key-value pairs only or if all stored key-value pairs are returned.
 
-*OAI**-**PMH* *Extension*: IDs MAY be:
+*OAI-PMH* *Extension*: IDs MAY be:
 
 - the document ID for a resource data description document.
   The service SHALL return the single resource data description document that matches the ID.
@@ -557,7 +560,7 @@ The service document SHALL indicate if the returned documents are limited to the
 Mapping of Learning Registry Basic Harvest to OAI-PMH Concepts
 
 +---------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Native** **OAI****\-****PMH** **Concept**                               | **Learning** **Regisry** **Harvest** **API** **Concept**                                                                                          |
+| **Native OAI\-PMH Concept**                                               | **Learning Regisry Harvest API Concept**                                                                                                          |
 +---------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | Repository (harvest API end point)                                        | Node Resource Data Description Document Database                                                                                                  |
 +---------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -1754,9 +1757,9 @@ The descriptive values (service_name, service_description) MAY be changed from w
 
 .. _h.art057-hbjxj4:
 
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 OAI-PMH Harvest Service
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The OAI-PMH harvest services can be used by an external agent to connect to a node to harvest (pull) the resource data (e.g., the metadata or paradata) contained in the resource data description documents stored at the node.
 The service defines how to harvest a variety of metadata formats (DC, LOM), paradata formats, etc., along with full resource data description documents stored at the node.
@@ -1765,7 +1768,7 @@ Set-based harvesting is not currently supported.
 Flow control is not currently supported.
 
 
-*OAI**-**PMH* *Extension*: IDs MAY be:
+*OAI-PMH* *Extension*: IDs MAY be:
 
 - the document ID for a resource data description document.
   The service SHALL return the single resource data description document that matches the ID.
@@ -1778,8 +1781,7 @@ The core functionality is present in basic harvest service.
 A transformation would be applied to the results to convert them from JSON to XML.
 
 To support extensions, the OAI-PMH XSD has been extended.
-A copy of the schema is currently available at: `http <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_://`www <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_.`learningregistry <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_.`org <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_/`documents <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_/`downloads <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_/`OAI <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_-`PMH <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_-`LR <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_.`xsd <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregistry.org%2Fdocuments%2Fdownloads%2FOAI-PMH-LR.xsd&sa=D&sntz=1&usg=AFQjCNEly8-adKyMHzsoj7abs6R8KKQgKA>`_
-
+A copy of the schema is currently available at: http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd
 This schema:
 
 - adds the ID arguments for GetRecord
@@ -1796,7 +1798,7 @@ The service description for the OAI-PMH harvest service includes a schema locati
 Mapping Learning Registry OAI-PMH Harvest to OAI-PMH Concepts
 
 +---------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Native** **OAI****\-****PMH** **Concept**                               | **Learning** **Registry** **Harvest** **API** **Concept**                                                                                         |
+| **Native OAI\-PMH Concept**                                               | **Learning Registry Harvest API Concept**                                                                                                         |
 +---------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 | Repository (harvest API end point)                                        | Node Resource Data Description Document Database                                                                                                  |
 +---------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -1840,7 +1842,7 @@ The granularity of the timestamp SHALL be stored in the service description docu
 
 *NB*: As specified in OAI-PMH, the granularity in response data SHALL be seconds.
 
-*OAI**-**PMH* *Extension*: If the requested dissemination format in metadataPrefix matches the JSON metadataPrefix in the servcie description (e.g., "LR_JSON_0.10.0"), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
+*OAI-PMH* *Extension*: If the requested dissemination format in metadataPrefix matches the JSON metadataPrefix in the servcie description (e.g., "LR_JSON_0.10.0"), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
 
 
 The internal JSON storage of a resource data description document MAY include additional key-value pairs defined in this specification.
@@ -1855,7 +1857,7 @@ Get Record
 
 The Get Record verb returns resource data (e.g., the metadata or paradata) that matches the requested dissemination format for the specified resource data description document ID or resource ID.
 
-*OAI**-**PMH* *Extension*: If the request ID is a resource data description document ID, the service SHALL return the metadata dissemination for the single resource data description document that matches the ID.
+*OAI-PMH* *Extension*: If the request ID is a resource data description document ID, the service SHALL return the metadata dissemination for the single resource data description document that matches the ID.
 If the request ID is a unique resource identifier, e.g., the resource locator, the service SHALL return the metadata disseminations for all resource data description documents for the specified resource.
 
 The Get Record verb SHALL support the return any resource_data that matches the requested dissemination format that is associated with the requested resource data document, i.e., any payload where the payload_schema matches the requested dissemination format.
@@ -1866,7 +1868,7 @@ The Get Record verb SHALL support the return of resource_data independent of whe
 
 If the requested metadata dissemination is not available for the requested ID, the service SHALL return a cannotDisseminateFormat error.
 
-*OAI**-**PMH* *Extension*: If the requested dissemination format in metadataPrefix matches the JSON metadataPrefix in the servcie description (e.g., "LR_JSON_0.10.0"), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
+*OAI-PMH* *Extension*: If the requested dissemination format in metadataPrefix matches the JSON metadataPrefix in the servcie description (e.g., "LR_JSON_0.10.0"), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
 This behavior is NOT specified in the pseudo code below.
 
 *ToDo*: Extend to produce (log) a usage record of the harvest.
@@ -2155,7 +2157,7 @@ Since not all resource data description documents support all formats, the servi
 The resulting error code of cannotDisseminateFormat does not occur.
 If no records match the requested metadata dissemination format, the error code SHALL be noRecordsMatch.
 
-*OAI**-**PMH* *Extension*: If the requested dissemination format in metadataPrefix matches the JSON metadataPrefix in the servcie description (e.g., "LR_JSON_0.10.0"), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
+*OAI-PMH* *Extension*: If the requested dissemination format in metadataPrefix matches the JSON metadataPrefix in the servcie description (e.g., "LR_JSON_0.10.0"), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
 This behavior is NOT specified in the pseudo code below.
 
 *NB*: List records does not support access by resource locator.
@@ -2706,7 +2708,7 @@ OAI-PMH: Identify
 
                 *network* *node* *description*</deletedRecord>
 
-            <granularity>granularity from the *OAI**-**PMH* *Harvest* *service* *description*</granularity>
+            <granularity>granularity from the *OAI-PMH* *Harvest* *service* *description*</granularity>
 
             <adminEmail>node_admin_identity from the *network* *node* *description*</adminEmail>
 
@@ -2734,7 +2736,7 @@ The service does not define how to determine the value for <metadataNameSpace>.
 If an identifier is provided, the metadata formats SHALL be returned only for the identified resource data description documents.
 If an identifier is *not* provided, the metadata formats SHALL be returned for *all* resource data description documents.
 
-*OAI**-**PMH* *Extension*: If the request ID is a resource data description document ID, the service SHALL return the metadata formats for the single resource data description document that matches the ID.
+*OAI-PMH* *Extension*: If the request ID is a resource data description document ID, the service SHALL return the metadata formats for the single resource data description document that matches the ID.
 If the request ID is a unique resource identifier, e.g., the resource locator, the service SHALL return the metadata format for all resource data description documents for the specified resource.
 
 Only unique dissemination formats SHALL be included in the list of formats.
@@ -2752,7 +2754,7 @@ The service SHOULD NOT return values that do not satisfy the OAI-PMH requirement
 
 The service SHALL include the Learning Registry JSON resource data description document format 
 
-metadataPrefix specified in the metadataformats structure in the service description:changes:` `(e.g., "LR_JSON_0.10.0") in the results list of formats.
+metadataPrefix specified in the metadataformats structure in the service description (e.g., "LR_JSON_0.10.0") in the results list of formats.
 
 API
 ===

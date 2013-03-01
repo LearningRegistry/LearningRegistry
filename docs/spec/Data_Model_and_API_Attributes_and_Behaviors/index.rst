@@ -43,9 +43,9 @@ In particular, the reader needs to be aware that information from this part of t
 
 .. _h.i6djle3var4b:
 
---------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""""""""""""
 Common Data Model and API Attributes and Behaviors
---------------------------------------------------
+""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The definition of several common attributes shared across all data models and APIs, along with common API behaviors are specified here as a single point of specification.
 In case of a discrepancy, the definition here SHALL take precedence over the definition elsewhere in this specification.
@@ -54,9 +54,9 @@ In case of a discrepancy, the definition here SHALL take precedence over the def
 
 .. _h.3h25kjtjey9j:
 
----------------------
+'''''''''''''''''''''
 Data Model Attributes
----------------------
+'''''''''''''''''''''
 
 
 
@@ -118,9 +118,9 @@ Unless specified elsewhere, the JSON encoding of a time and date SHALL be a sing
 
 .. _h.iser5w-jiok98:
 
-----------------------------
+''''''''''''''''''''''''''''
 API Attributes and Behaviors
-----------------------------
+''''''''''''''''''''''''''''
 
 Description here about RESTful APIs, CoolURIs, Context negotiation, application/JSON vs text/plain
 

@@ -6,7 +6,7 @@ Resource Distribution Network Model: Learning Registry Technical Specification V
 ==========================================================================================
 
 Draft in Progress.
-See the :ref:`Change Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -17,36 +17,6 @@ See the :ref:`Change Log<h.e1519o-y653zc>` for links to prior stable versions.
 This document is part of one or more versions of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
-
-    :ref:`Resource Distribution Network Model :  Learning Registry Technical Specification V NM :0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Resource Distribution Network Model<h.v9pspv7cuh5h>`
-
-            :ref:`Network Nodes and Node Services<h.vpp8gzlkb4ag>`
-
-            :ref:`Network Topology<h.7a6j0fur21i3>`
-
-            :ref:`Network Data Models<h.2hcwpd1wq9oo>`
-
-                :ref:`Network Node Description Data Model<h.18vbt1hxuutv>`
-
-                :ref:`Network Node Service Description Data Model<h.z0spjmvlcbb9>`
-
-                :ref:`Network Node Connectivity Description Data Model<h.1cq79ogiyvxn>`
-
-                :ref:`Network Node Filter Description Data Model<h.1cq79ogiyvxn>`
-
-                :ref:`Resource Distribution Network Description Data Model<h.425s9yjzhp5f>`
-
-                :ref:`Resource Distribution Network Policy Data Model<h.5txlehgykaso>`
-
-                :ref:`Network Community Description Data Model<h.uthscj877bjr>`
-
-            :ref:`Network Description<h.ugg6hzrtv6ho>`
-
-        :ref:`Change Log<h.e1519o-y653zc>`
-
-        :ref:`Working Notes and Placeholder Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It describes the model of resource data that is transported through the network.
 
@@ -85,9 +55,9 @@ This two-tiered model of networks and communities supports security requirements
 
 .. _h.vpp8gzlkb4ag:
 
--------------------------------
+
 Network Nodes and Node Services
--------------------------------
+===============================
 
 A **node** is a server process with network connectivity to either other nodes or to edge services.
 Nodes process **resource** **data** (e.g., network messages about resources, metadata, paradata, etc.).
@@ -97,25 +67,25 @@ Only the owner of a node description MAY change the description.
 Certain attributes of the node description are immutable.
 *NB*: These are security constraints.
 
-A node MAY provide five (5) different classes of services (`Services <https://docs.google.com/a/learningregistry.org/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit?hl=en_US#heading=h.d08onhltt4u1>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit?hl=en_US#heading=h.d08onhltt4u1>`_ `APIs <https://docs.google.com/a/learningregistry.org/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit?hl=en_US#heading=h.d08onhltt4u1>`_ and `Resource <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ `Models <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ are described in their respective parts of the specification:
+A node MAY provide five (5) different classes of services (`Services and APIs and Resource Data Data Models <https://docs.google.com/a/learningregistry.org/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit?hl=en_US#heading=h.cbvxf-xys34q>`_ are described in their respective parts of the specification:
 
-- **Publish** **Services**: `Resource <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Publish <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_  are used by external agents to push (publish) resource data from the external agent into the distribution network.
+- **Publish** **Services**: `Resource Data Publish Services <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_  are used by external agents to push (publish) resource data from the external agent into the distribution network.
   The data model for publication data is specified below.
   A node that provides publish services MAY support different publishing APIs, but all SHALL use the publication data model.
   
 
-- **Access** **Services**: `Resource <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Access <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ are used by external agents to discover, access and obtain (pull) resource data from the distribution network.
+- **Access** **Services**: `Resource Data Access Services <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ are used by external agents to discover, access and obtain (pull) resource data from the distribution network.
   A node that provides access services MAY support different access APIs.
   
 
-- **Distribution** **Services**: The `Resource <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ is used to transfer, replicate and synchronize resource data from node X to node Y. X is the source node for distribution, Y is the destination node.
+- **Distribution** **Services**: The `Resource Data Distribution Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ is used to transfer, replicate and synchronize resource data from node X to node Y. X is the source node for distribution, Y is the destination node.
   To support security requirements, distribution is directed from X to Y; independent paired services [X→Y + Y→X] are used for bi-directional synchronization.
   
 
-- **Broker** **Services**: `Broker <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_ operate at a node to augment, transform or process resource data held at that node to produce new or updated resource data for access or distribution.
+- **Broker** **Services**: `Broker Services <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_ operate at a node to augment, transform or process resource data held at that node to produce new or updated resource data for access or distribution.
   A node that provides broker services MAY support different broker processes.
 
-- **Administrative** **Services**: `Administrative <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ are used to query a node to obtain its status or to trigger node administrative actions.
+- **Administrative** **Services**: `Administrative Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ are used to query a node to obtain its status or to trigger node administrative actions.
   
 
 *NB*: There are no requirements to provision any service at a node.
@@ -126,15 +96,14 @@ This specification permits non operational or non accessible networks.
 
 .. _h.7a6j0fur21i3:
 
-----------------
 Network Topology
-----------------
+================
 
 A **resource** **distribution** **network** is a group of one or more connected nodes, with each node providing node services.
 All nodes in a resource distribution network operate under the same policies.
 Multiple resource distribution networks MAY be established.
 
-A resource distribution network SHALL be described using the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_. Only the owner of a network description MAY change the description.
+A resource distribution network SHALL be described using the `Resource Distribution Network Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.v9pspv7cuh5h>`_. Only the owner of a network description MAY change the description.
 Certain attributes of the resource distribution network description are immutable.
 *NB*: These are security constraints.
 
@@ -170,7 +139,7 @@ A resource network SHALL be a member of only one community.
 Gateway nodes provide the connectivity between resources networks within a network community and MAY provide connectivity between networks in different communities.
 *NB*: A gateway node that provides an intra-community network gateway is undifferentiated from one that provides an inter-community network gateway.
 
-A network community SHALL be described using the `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.uthscj877bjr>`_ `Community <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.uthscj877bjr>`_ `Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.uthscj877bjr>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.uthscj877bjr>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.uthscj877bjr>`_. Only the owner of a network community description MAY change the description.
+A network community SHALL be described using the `Network Community Description Data Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.uthscj877bjr>`_. Only the owner of a network community description MAY change the description.
 Certain attributes of the network community description are immutable.
 *NB*: These are security constraints.
 
@@ -216,9 +185,8 @@ Resource distribution network A also connects to network C and network C connect
 
 .. _h.2hcwpd1wq9oo:
 
--------------------
 Network Data Models
--------------------
+===================
 
 The description of a network is maintained in a set of documents that includes:
 
@@ -261,7 +229,6 @@ Additional constraints on attributes values are detailed in `Data Model Attribut
 
 .. _h.18vbt1hxuutv:
 
------------------------------------
 Network Node Description Data Model
 -----------------------------------
 
@@ -339,7 +306,7 @@ Other values MAY be changed only by the owner of the node document.
                                                                   // optional
         "deleted_data_policy": "string",
                                                                   // fixed vocabulary ["no", "persistent", "transient"]
-                                                                  // see `Resource <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_
+                                                                  // see `Resource Data Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_
 
         "TTL": integer,
                                                                   // minimum time to live for resource data in the node
@@ -379,7 +346,7 @@ Other values MAY be changed only by the owner of the node document.
       },
 
       "node_key": "string",
-      // node public key, optional
+                                                                  // node public key, optional
       "X_xxx": ? ? ? ? ? // placeholder for extensibility, optional
     }
 
@@ -427,7 +394,6 @@ A node MUST explicitly state the policies it enforces.
 
 .. _h.z0spjmvlcbb9:
 
--------------------------------------------
 Network Node Service Description Data Model
 -------------------------------------------
 
@@ -530,7 +496,6 @@ The descriptive values (service_name, service_description) MAY be changed from w
 
 .. _h.1cq79ogiyvxn:
 
-------------------------------------------------
 Network Node Connectivity Description Data Model
 ------------------------------------------------
 
@@ -593,7 +558,6 @@ It is present to enable `building <https://docs.google.com/a/learningregistry.or
 *Working* *Assumption*: It is assumed that a vocabulary to describe additional types of connections is not needed.
 
 
-------------------------------------------
 Network Node Filter Description Data Model
 ------------------------------------------
 
@@ -669,7 +633,6 @@ Other values MAY be changed only by the owner of the node document.
 
 .. _h.425s9yjzhp5f:
 
-----------------------------------------------------
 Resource Distribution Network Description Data Model
 ----------------------------------------------------
 
@@ -732,7 +695,6 @@ A deployment MAY specify that the identity be used to look up the network’s pu
 
 .. _h.5txlehgykaso:
 
------------------------------------------------
 Resource Distribution Network Policy Data Model
 -----------------------------------------------
 
@@ -794,7 +756,6 @@ Other values MAY be changed only by the owner of the network *description* docum
 
 .. _h.uthscj877bjr:
 
-----------------------------------------
 Network Community Description Data Model
 ----------------------------------------
 
@@ -861,9 +822,8 @@ A deployment MAY specify that the identity be used to look up the community’s 
 
 .. _h.ugg6hzrtv6ho:
 
--------------------
 Network Description
--------------------
+===================
 
 A valid, consistent network SHALL be described through a set of documents stored at each node in the network.
 

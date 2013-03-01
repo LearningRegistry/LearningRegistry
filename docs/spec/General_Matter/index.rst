@@ -210,9 +210,9 @@ The Learning Registry Technical Specification is split into several parts:
 
 .. _h.9vpjmlmi28mv:
 
------------------
+
 Design Principles
------------------
+=================
 
 The learning registry design and technical specification is based on several key principles:
 
