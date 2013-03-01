@@ -72,7 +72,7 @@ The results SHALL be aligned 1:1 with the IDs in the request.
 
 If the request ID is not provided, the service MAY return all or a service-determined subset of the resource data description documents.
 The service description SHALL specify how the service implementation responds to an ALL request (returning ALL, none, or a limited subset).
-When returning a subset of the documents, the service SHOULD return the documents with the most recent ▼:deprecation:`node_timestamp` values.
+When returning a subset of the documents, the service SHOULD return the documents with the most recent ▲:changes:`node_timestamp` values.
 
 *NB*: To support buffering, the service MAY return a smaller number of results than it advertises.
 
@@ -157,7 +157,7 @@ API
 
     **Arguments (HTTP GET):**
 
-    ::
+    .. sourcecode:: javascript
 
         "request_ID": ID,        
                                         // resource data description document ID or
@@ -206,7 +206,7 @@ API
 
     **Request Object (HTTP POST):**
 
-    .. sourcecode:: http
+    .. sourcecode:: javascript
 
         {                       
                                     // list of resource data descriptions to obtain
@@ -229,13 +229,13 @@ API
 
                                     // request_ID is a resource_locator
 
-             "ids_only": boolean,    
+            "ids_only": boolean,    
                                     // request is just for IDs, not documents
 
                                     // optional, default FALSE
 
-            *▲"*resumption_token": "string",        
-                                    // flow control resumption token
+            "resumption_token": "string",        
+                                    // ▲ flow control resumption token
 
                                     // optional; provided as a result on prior calls
 
@@ -256,7 +256,7 @@ API
 
     **Results Object:**
         
-    .. sourcecode:: http
+    .. sourcecode:: javascript
                                                         
 
         {
@@ -275,9 +275,9 @@ API
 
                 }    
 
-        ],
+            ],
 
-                ▲"resumption_token":  "string"          // flow control resumption token
+            "resumption_token":  "string"               // ▲ flow control resumption token
 
                                                         // present only if flow control is supported
 
@@ -295,7 +295,7 @@ API
 Basic Obtain
 ============
 
-::
+
 
     // Obtain the resource data description documents for each supplied ID
 
@@ -319,7 +319,7 @@ Basic Obtain
 
         (resumption_token DOES NOT MATCH saved state for this this client 
 
-            // test must recognize that client did not get last resuts and is re-requesting last set
+            // test must recognize that client did not get last results and is re-requesting last set
 
             // or client may be requesting next set
 
@@ -331,7 +331,6 @@ Basic Obtain
 
                 error  // flow control error              
                                             
-
                 EXIT
 
     IF by_doc_ID
@@ -442,7 +441,7 @@ Basic Obtain
 Service Description
 ===================
 
-::
+.. sourcecode:: javascript
 
     {
 
@@ -511,8 +510,8 @@ Service Description
 
                                             // optional, default F
 
-            ▲"flow_control": boolean 
-                                            // T if the implementation supports flow control
+            "flow_control": boolean 
+                                            // ▲ T if the implementation supports flow control
 
                                             // F if flow control is not supported
 
@@ -615,7 +614,7 @@ The service SHALL return complete resource data description documents.
 
 *NB*: The process currently does not handle attachments.
 
-*NB**: *The default is that IDs are for resources, not documents.
+*NB*: The default is that IDs are for resources, not documents.
 
 *ToDo*: Extend to produce (log) a usage record of the harvest.
 
@@ -632,7 +631,7 @@ API
 
     **Arguments (HTTP GET):**
 
-    ::
+    .. sourcecode:: javascript
 
         "request_ID": ID,        
                                 // resource data description document ID or
@@ -667,7 +666,8 @@ API
 
     **Request Object (HTTP POST):**
 
-    ::
+    .. sourcecode:: javascript
+
         {
             "request_ID": ID,       
                                     // resource data description document ID or
@@ -696,7 +696,7 @@ API
 
     **Results Object:**
 
-    ::
+    .. sourcecode:: javascript
 
         {
             "OK": boolean,    
@@ -750,7 +750,7 @@ API
                                     {"identifier": ID,        
                                                             // resource data description document ID
 
-                                    ▼"datestamp": "string", 
+                                    ▲"datestamp": "string", 
                                                             // resource data timestamp date/time
                                                             // requried, granularity of 1 second
 
@@ -775,101 +775,98 @@ API
 Basic Harvest: GetRecord
 ========================
 
-::
 
-                                        // Return the resource data description documents for the supplied ID
+    // Return the resource data description documents for the supplied ID
 
     Build results object
 
-                responseDate := time of report         
-                                        // time/date encoding
+        responseDate := time of report      // time/date encoding
 
-                request :=                
-                                        // the API request
+        request :=                          // the API request
 
-                 {"verb": "getrecord",    
-                                        // the literal "getrecord"
+         {"verb": "getrecord",              // the literal "getrecord"
 
-                 "identifier": ID,        
-                                        // request ID
+         "identifier": ID,                  // request ID
 
-                 "by_doc_ID": boolean,     
-                                        // request value
+         "by_doc_ID": boolean,              // request value
 
-                 "by_resource_ID": boolean,    
-                                        // request value
+         "by_resource_ID": boolean,         // request value
 
-                 "HTTP_request": "string"        
-                                        // the HTTP request as a string
+         "HTTP_request": "string"           // the HTTP request as a string
 
-                 }
+         }
 
-                IF request_ID not supplied 
-                                        // return error
+        IF request_ID not supplied  // return error
 
-                     THEN     OK := FALSE
+            THEN    
 
-                          error := “badArgument"
+                OK := FALSE
 
-                          EXIT
+                error := “badArgument"
 
-                IF by_doc_ID AND by_resource_ID
+                EXIT
 
-                        THEN    OK := FALSE
+        IF by_doc_ID AND by_resource_ID
 
-                                error := "badArgument"
-                                        // only one can be true
+            THEN    
 
-                                EXIT
+                OK := FALSE
 
-                IF by_resource_ID 
-                                        // get the list of documents otherwise it’s just the requested ID
+                error := "badArgument" // only one can be true
 
-                    THEN     FIND the collation of resource data description document IDs
+                EXIT
 
-                                WHERE resource_locator MATCHES request <identifier>
+        IF by_resource_ID  // get the list of documents otherwise it’s just the requested ID
 
-                FOR EACH resource data description document ID
+            THEN     
 
-        GET the corresponding *resource* *data* *description* document
+                FIND the collation of resource data description document IDs
 
-                IF successful
+                WHERE resource_locator MATCHES request <identifier>
 
-                     THEN 
-                                        // return resource data
 
-                                        // header
 
-                                ▼datestamp := node_timestamp from the *resource* *data* *description*
+        FOR EACH resource data description document ID
 
-                                identifier := resource data description document ID
+        GET the corresponding *resource data description* document
 
-                                IF delete_data_policy <> "no"
+        IF successful
 
-                                    AND the *resource* *data* *description* document has been deleted
+             THEN
 
-                                    THEN status := "deleted"
+                // return resource data
 
-                                        // resource data
+                // header
 
-                                PUT the *resource* *data* *description* document in the results object
+                ▲datestamp := node_timestamp from the *resource* *data* *description*
 
-                                        // all stored key-value pairs or only those defined in the spec
+                identifier := resource data description document ID
 
-                                        // as defined in the service description
+                IF delete_data_policy <> "no"
 
-                        OK := TRUE
+                    AND the *resource* *data* *description* document has been deleted
 
-                     ELSE               
-                                        // not found error
+                    THEN status := "deleted"
 
-                                PUT NULL in the results object
+                // resource data
 
-                        OK := FALSE
+                PUT the *resource* *data* *description* document in the results object
 
-                        error := "idDoesNotExist"
+                    // all stored key-value pairs or only those defined in the spec
 
-        TRANSFORM results to specified CONTENT-TYPE
+                    // as defined in the service description
+
+                OK := TRUE
+
+             ELSE // not found error
+
+                PUT NULL in the results object
+
+                OK := FALSE
+
+                error := "idDoesNotExist"
+
+    TRANSFORM results to specified CONTENT-TYPE
 
 .. _h.56c4qr-c1nbmq:
 
@@ -890,15 +887,16 @@ Documents may only be accessed by document ID.
 
 *ToDo*: Extend to produce (log) a usage record of the harvest.
 
-**API**
+API
+===
 
-::
+.. http:get:: /harvest/listrecords?from=<date>&until=<date>
 
-        GET <node-service-endpoint-URL>/harvest/listrecords?from=<date>&until=<date>
+.. http:post:: /harvest/listrecords
 
-        POST <node-service-endpoint-URL>/harvest/listrecords
+        **Arguments (HTTP GET):**
 
-        Arguments (HTTP GET):
+        .. sourcecode:: javascript
 
             "from": "string",            
                                         // start of harvest time/date range
@@ -914,40 +912,45 @@ Documents may only be accessed by document ID.
 
                                         // latest resource data timestamp if not present
 
-        Arguments (HTTP POST):
+        **Arguments (HTTP POST):**
 
             None
 
-        Request Object (HTTP GET):
+        **Request Object (HTTP GET):**
 
             None
 
-        Request Object (HTTP POST):
+        **Request Object (HTTP POST):**
 
-            {"from": "string",           
+        .. sourcecode:: javascript
+
+            {
+
+                "from": "string",           
                                         // start of harvest time/date range
 
                                         // optional, time/date
 
                                         // earliest resource data timestamp if not present
 
-            "until": "string"                        
+                "until": "string"                        
                                         // end of harvest time/date range
 
                                         // optional, time/date
 
                                         // latest resource data timestamp if not present
-
             }
 
-        Results Object:
+        **Results Object:**
 
-                {"OK": boolean,    
+        .. sourcecode:: javascript
+
+            {
+                "OK": boolean,    
                                         // T if successful
 
                 "error": "string",        
                                         // text describing error
-
                                         // present only if NOT OK
 
                 "responseDate": "string",        
@@ -955,21 +958,20 @@ Documents may only be accessed by document ID.
 
                 "request":              // the API request
 
-                    {"verb": "listrecords",    
-                                        // the literal "listrecords"
+                    {
+                        "verb": "listrecords",    
+                                                // the literal "listrecords"
 
-                    "from": "string",        
-                                        // specified start of harvest time/date range
+                        "from": "string",        
+                                                // specified start of harvest time/date range
+                                                // time/date
 
-                                        // time/date
+                        "until": "string".
+                                                // specified end of harvest time/date range
+                                                // time/date
 
-                    "until": "string".
-                                        // specified end of harvest time/date range
-
-                                        // time/date
-
-                    "HTTP_request": "string"        
-                                        // the HTTP request as a string
+                        "HTTP_request": "string"        
+                                                // the HTTP request as a string
 
                     },
 
@@ -978,23 +980,21 @@ Documents may only be accessed by document ID.
 
                     {"record":                
                                         // the resource data description document
-
                                         // present only if ID is valid, otherwise NULL
 
                         {"header":
 
-                            {"identifier": ID,        
-                                        // resource data description document ID
+                            {
+                                "identifier": ID,        
+                                                    // resource data description document ID
 
-                            ▼"datestamp": "string" 
-                                        // resource data timestamp, date/time
+                                "datestamp": "string" 
+                                                    // ▲ resource data timestamp, date/time
+                                                    // required granularity of 1 second
 
-                                        // required granularity of 1 second
-
-                            "status": "string"        
-                                        // fixed vocabulary ["active", "deleted"]                                
-                                        
-                                        // optional, "active" if not present
+                                "status": "string"        
+                                                    // fixed vocabulary ["active", "deleted"]                                
+                                                    // optional, "active" if not present
 
                             },
 
@@ -1007,108 +1007,105 @@ Documents may only be accessed by document ID.
 
                     }      
 
-                    ]
+                ]
 
-                }
+            }
 
-**Basic** **Harvest****: ****ListRecords**
 
-::
+Basic Harvest: ListRecords
+==========================
 
-                                        // Return the resource data description documents for the specified time range
+    // Return the resource data description documents for the specified time range
 
-        Build results object
+    Build results object
 
-                responseDate := time of report         
-                                        // time/date encoding
+        responseDate := time of report          // time/date encoding
 
-                request :=                
-                                        // the API request
+        request :=                              // the API request
 
-                {"verb": "listrecords",    
-                                        // the literal "listrecords"
+        {
+            "verb": "listrecords",              // the literal "listrecords"
 
-                "from": "string",        
-                                        // specified start of harvest time/date range
+            "from": "string",                   // specified start of harvest time/date range
 
-                "until": "string",        
-                                        // specified end of harvest time/date range
+            "until": "string",                  // specified end of harvest time/date range
 
-                "HTTP_request": "string"        
-                                        // the HTTP request as a string
+            "HTTP_request": "string"            // the HTTP request as a string
 
-                }
+        }
 
-                IF from > until 
-                                        // return error
+        IF from > until  // return error
 
-                     THEN     OK := FALSE
+            THEN
 
-                          error := "badArgument"
+                OK := FALSE
 
-                          EXIT
+                error := "badArgument"
 
-                IF granularity of from time <> granularity of until time 
-                                        // return error
+                EXIT
 
-                     THEN     OK := FALSE
+        IF granularity of from time <> granularity of until time  // return error
 
-                          error := "badArgument"
+            THEN     
 
-                          EXIT
+                OK := FALSE
 
-                IF granularity of from time < service granularity 
+                error := "badArgument"
 
-                                        // request is for seconds, service instance only supports days (not seconds)
+                EXIT
 
-                     THEN     OK := FALSE
+        IF granularity of from time < service granularity  // request is for seconds, service instance only supports days (not seconds)
 
-                          error := "badArgument"
+            THEN
 
-                          EXIT
+                OK := FALSE
 
-                IF from not specified THEN from := earliest timestamp
+                error := "badArgument"
 
-                IF until not specified THEN until := latest timestamp
+                EXIT
 
-            FOR EACH *resource* *data* *description* document
+        IF from not specified THEN from := earliest timestamp
 
-                        IF from <= ▼node_timestamp from the *resource* *data* *description* document
+        IF until not specified THEN until := latest timestamp
 
-                            <= until 
-                                        // timestamp inclusive in [from:until] range
+        FOR EACH *resource* *data* *description* document
 
-                     THEN
+            IF from <= ▲node_timestamp from the *resource* *data* *description* document
 
-                                        // return header for resource data
+                    <= until  // timestamp inclusive in [from:until] range
 
-                                ▼datestamp := node_timestamp from the resource* *data* *description*
+            THEN
 
-                                identifier := resource data description document ID
+                // return header for resource data
 
-                                IF the delete_data_policy <> "no"
+                ▲datestamp := node_timestamp from the resource* *data* *description*
 
-                                    AND the r*esource* *data* *description* document has been deleted
+                
+                identifier := resource data description document ID
 
-                                    THEN status := "deleted"
+                IF the delete_data_policy <> "no"
 
-                                        // return the resource data
+                    AND the r*esource* *data* *description* document has been deleted
 
-                                PUT the r*esource* *data* *description* document in the results object
+                    THEN status := "deleted"
+
+                // return the resource data
+
+                PUT the r*esource* *data* *description* document in the results object
 
         IF listrecords array is empty
 
             THEN
 
-                        OK := FALSE
+                OK := FALSE
 
-                        error := "noRecordsMatch"
+                error := "noRecordsMatch"
 
-                    ELSE
+            ELSE
 
-                        OK := TRUE
+                OK := TRUE
 
-        TRANSFORM results to specified CONTENT-TYPE
+    TRANSFORM results to specified CONTENT-TYPE
 
 .. _h.fldcps-ri52yn:
 
@@ -1128,105 +1125,108 @@ Data elements are renamed to map to the the OAI-PMH specification.
 *NB*: There is currently no mechanism to return the collection of ids of resources where a new resource data description document has been added to the collation of documents for a resource within the specified time range.
 Documents may only be accessed by document ID.
 
-**API**
+API
+===
 
-::
+.. http:GET:: /harvest/listidentifiers?from=<date>&until=<date>
 
-        GET <node-service-endpoint-URL>/harvest/listidentifiers?from=<date>&until=<date>
+.. http:POST:: /harvest/listidentifiers
 
-        POST <node-service-endpoint-URL>/harvest/listidentifiers
+    **Arguments (HTTP GET):**
 
-        Arguments (HTTP GET):
+    .. :sourcecode:: javascript
 
+        "from": "string",            
+                                    // start of harvest time/date range
+
+                                    // optional, time/date
+
+                                    // earliest resource data timestamp if not present
+
+        "until": "string"            
+                                    // end of harvest time/date range
+
+                                    // optional, time/date
+
+                                    // latest resource data timestamp if not present
+
+    **Arguments (HTTP POST):**
+
+        None
+
+    **Request Object (HTTP GET):**
+
+        None
+
+    **Request Object (HTTP POST):**
+
+    .. :sourcecode:: javascript
+
+        {
             "from": "string",            
-                                        // start of harvest time/date range
-
-                                        // optional, time/date
-
-                                        // earliest resource data timestamp if not present
+                                    // start of harvest time/date range
+                                    // optional, time/date
+                                    // earliest resource data timestamp if not present
 
             "until": "string"            
-                                        // end of harvest time/date range
+                                    // end of harvest time/date range
+                                    // optional, time/date
+                                    // latest resource data timestamp if not present
 
-                                        // optional, time/date
+        }
 
-                                        // latest resource data timestamp if not present
+    **Results Object:**
 
-        Arguments (HTTP POST):
+    .. :sourcecode:: javascript
 
-            None
-
-        Request Object (HTTP GET):
-
-            None
-
-        Request Object (HTTP POST):
-
-            {"from": "string",            
-                                        // start of harvest time/date range
-
-                                        // optional, time/date
-
-                                        // earliest resource data timestamp if not present
-
-            "until": "string"            
-                                        // end of harvest time/date range
-
-                                        // optional, time/date
-
-                                        // latest resource data timestamp if not present
-
-            }
-
-        Results Object:
-
-            {"OK": boolean,    
-                                        // T if successful
+        {
+            "OK": boolean,    
+                                    // T if successful
 
             "error": "string",        
-                                        // text describing error
-
-                                        // present only if NOT OK
+                                    // text describing error
+                                    // present only if NOT OK
 
             "responseDate": "string",        
-                                        // time of report, time/date encoding
+                                    // time of report, time/date encoding
 
             "request":                
-                                        // the API request
+                                    // the API request
 
-                {"verb": "listidentifiers",    
-                                        // the literal "listidentifiers"
+            {
+                "verb": "listidentifiers",    
+                                    // the literal "listidentifiers"
 
                 "from": "string",       
-                                        // specified start of harvest time/date range
-
-                                        // time/date
+                                    // specified start of harvest time/date range
+                                    // time/date
 
                 "until": "string".
-                                        // specified end of harvest time/date range
-
-                                        // time/date
+                                    // specified end of harvest time/date range
+                                    // time/date
 
                 "HTTP_request": "string"        
-                                        // the HTTP request as a string
+                                    // the HTTP request as a string
 
-                },
+            },
 
             "listidentifiers":[                
-                                        // array of headers
+                                    // array of headers
 
-                {"header":
+                {
+                    "header":
 
-                    {"identifier": ID,        
-                                        // resource data description document ID
+                    {
+                        "identifier": ID,        
+                                    // resource data description document ID
 
-                    ▼"datestamp": "string",        
-                                        // resource data timestamp, date/time
-                                        // requried, granularity of 1 second
+                        "datestamp": "string",        
+                                    // ▲ resource data timestamp, date/time
+                                    // requried, granularity of 1 second
 
-                    "status": "string"        
-                                        // fixed vocabulary ["active", "deleted"]                                
-                                        // optional, "active" if not present
+                        "status": "string"        
+                                    // fixed vocabulary ["active", "deleted"]                                
+                                    // optional, "active" if not present
 
                     }
 
@@ -1234,104 +1234,102 @@ Documents may only be accessed by document ID.
 
             ]
 
-            }
+        }
 
-**Basic** **Harvest****: ****ListIdentifiers**
 
-::
+Basic Harvest: ListIdentifiers
+==============================
 
-                                        // Return the resource data description document headers for the specified time range
+    // Return the resource data description document headers for the specified time range
 
-        Build results object
+    Build results object
 
-                responseDate := time of report         
-                                        // time/date encoding
+        responseDate := time of report      // time/date encoding
 
-                request :=                
-                                        // the API request
+        request :=                          // the API request
 
-                {"verb": "listidentifiers",    
-                                        // the literal "listidentifiers"
+        {
+            "verb": "listidentifiers",      // the literal "listidentifiers"
 
-                "from": "string",        
-                                        // specified start of harvest time/date range
+            "from": "string",               // specified start of harvest time/date range
 
-                "until": "string",        
-                                        // specified end of harvest time/date range
+            "until": "string",              // specified end of harvest time/date range
 
-                 "HTTP_request": "string"        
-                                        // the HTTP request as a string
+            "HTTP_request": "string"        // the HTTP request as a string
 
-                }
+        }
 
-                IF from > until 
-                                        // return error
+        IF from > until // return error
 
-                     THEN     OK := FALSE
+            THEN     
+                
+                OK := FALSE
 
-                          error := "badArgument"
+                error := "badArgument"
 
-                          EXIT
+                EXIT
 
-                IF granularity of from time <> granularity of until time 
-                                        // return error
+        IF granularity of from time <> granularity of until time // return error
 
-                     THEN     OK := FALSE
+            THEN     
 
-                          error := "badArgument"
+                OK := FALSE
 
-                          EXIT
+                error := "badArgument"
 
-                IF granularity of from time < service granularity 
+                EXIT
 
-                                        // request is for seconds, service instance only supports days (not seconds)
+        IF granularity of from time < service granularity 
 
-                     THEN     OK := FALSE
+            // request is for seconds, service instance only supports days (not seconds)
 
-                          error := "badArgument"
+            THEN     
 
-                          EXIT
+                OK := FALSE
 
-                IF from not specified THEN from := earliest timestamp
+                error := "badArgument"
 
-                IF until not specified THEN unti := latest timestamp
+                EXIT
 
-            FOR EACH *resource* *data* *description* document
+        IF from not specified THEN from := earliest timestamp
 
-                        IF from <= node_ timestamp from the r*esource* *data* *description* document
+        IF until not specified THEN unti := latest timestamp
 
-                            <= until 
-                                        // timestamp inclusive in [from:until] range
+        FOR EACH *resource* *data* *description* document
 
-                     THEN 
+            IF from <= node_timestamp from the *resource data description* document
 
-                                        // return header for resource data
+                    <= until // timestamp inclusive in [from:until] range
 
-                                ▼datestamp := node_timestamp fromt the *resource* *data* *description*
+            THEN // return header for resource data
 
-                                identifier := resource data description document ID
+                ▲datestamp := node_timestamp fromt the *resource data description*
 
-                                IF the delete_data_policy <> "no"
+                identifier := resource data description document ID
 
-                                    AND the r*esource* *data* *description* document has been deleted
+                IF the delete_data_policy <> "no"
 
-                                    THEN status := "deleted"
+                    AND the *resource data description* document has been deleted
+
+                    THEN status := "deleted"
 
         IF listidentifiers array is empty
 
             THEN
 
-                        OK := FALSE
+                OK := FALSE
 
-                        error := "noRecordsMatch"
+                error := "noRecordsMatch"
 
-                    ELSE
+            ELSE
 
-                        OK := TRUE
+            OK := TRUE
 
-        TRANSFORM results to specified CONTENT-TYPE
+    TRANSFORM results to specified CONTENT-TYPE
+
 
 .. _h.k5h4di-cvleu6:
+
 --------
 Identify
 --------
@@ -1343,131 +1341,129 @@ The service MAY return additional key-value pairs that describe the harvest serv
 
 A network node SHALL maintain all of the data necessary to return the required key-value pairs.
 
-**API**
+API
+===
 
-::
+.. http:GET:: /harvest/identify
 
-        GET <node-service-endpoint-URL>/harvest/identify
-
-        POST <node-service-endpoint-URL>/harvest/identify
+.. http:POST:: /harvest/identify
            
 
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:    
+        **Request Object:**
 
             None
 
-        Results Object:
+        **Results Object:**
 
-            {"OK": boolean,    
+        .. :sourcecode:: javascript
+
+            {
+                "OK": boolean,    
                                         // T if successful
 
-            "error": "string",       
+                "error": "string",       
                                         // text describing error
 
                                         // present only if NOT OK
 
-            "responseDate": "string",        
+                "responseDate": "string",        
                                         // time of report, time/date encoding
 
-            "request":                
+                "request":  {              
                                         // the API request
-
-                {"verb": "identify",    
+                
+                    "verb": "identify",    
                                         // the literal "identify"
 
-                "HTTP_request": "string"         
+                    "HTTP_request": "string"         
                                         // the HTTP request as a string
 
                 },
 
-            "identify":
-
-                {"node_id": "string",        
+                "identify": {
+                    "node_id": "string",        
                                         // ID of the network node
 
-                "repositoryName": "string",        
+                    "repositoryName": "string",        
                                         // name of the network node
 
-                "baseURL": "string",        
+                    "baseURL": "string",        
                                         // URL of the network node
 
-                "protocolVersion": "2.0",        
+                    "protocolVersion": "2.0",        
                                         // the literal "2.0"
 
-                "service_version": "string",        
+                    "service_version": "string",        
                                         // version of the Harvest service API
 
-                "earliestDatestamp": "string",        
+                    "earliestDatestamp": "string",        
                                         // time/date encoding
 
-                "deletedRecord": "string",        
+                    "deletedRecord": "string",        
                                         // node delete policy
 
-                "granularity": "string",        
+                    "granularity": "string",        
                                         // granularity from the service policy
 
-                "adminEmail": "string"        
+                    "adminEmail": "string"        
                                         // node admin URL
 
                 }
 
             }
 
-**Basic** **Harvest****: ****Identify**
 
-::
+Basic Harvest: Identify
+=======================
 
-                                        // Return the description of the harvest service
+
+    // Return the description of the harvest service
 
     Build results object
 
         OK := TRUE
 
-                responseDate := time of report 
-                                        // time/date encoding
+        responseDate := time of report  // time/date encoding
 
-                request := 
-                                        // the API request
+        request :=                      // the API request
 
-                {"verb": "identify",    
-                                        // the literal "identify"
+        {
+            "verb": "identify",         // the literal "identify"
 
-                "HTTP_request": "string"         
-                                        // the HTTP request as a string
+            "HTTP_request": "string"    // the HTTP request as a string
 
-                }
+        }
 
-                node_id := node_id from the *network* *node* *description*
+        node_id := node_id from the *network node description*
 
-                repositoryName := node_name from the *network* *node* *description*
+        repositoryName := node_name from the *network node description*
 
-                baseURL := <node-service-endpoint-URL> 
-                                        // URL of the network node
+        baseURL := <node-service-endpoint-URL>  // URL of the network node
 
-                protocolVersion := "2.0" 
-                                        // the OAI-PMH version
+        protocolVersion := "2.0"  // the OAI-PMH version
 
-                service_version := service_version from the *Harvest* *service* *description* 
+        service_version := service_version from the *Harvest* *service* *description* 
 
-                earliestDatestamp := timestamp 
+        earliestDatestamp := timestamp 
 
-                                        // the oldest guaranteed publish/update or delete timestamp
+            // the oldest guaranteed publish/update or delete timestamp
 
-                                        // time/date encoding with service-specified granularity
+            // time/date encoding with service-specified granularity
 
-                deletedRecord := deleted_data_policy from the node_policy from the
+        deletedRecord := deleted_data_policy from the node_policy from the
 
-                         *network* *node* *description*
+            *network node description*
 
-                granularity := granularity from the *Harvest* *service* *description* 
+        granularity := granularity from the *Harvest service description* 
 
-                adminEmail := node_admin_identity from the *network* *node* *description*
+        adminEmail := node_admin_identity from the *network node description*
 
         TRANSFORM results to specified CONTENT-TYPE
+
 
 .. _h.eokref-1hyu2a:
 
@@ -1484,94 +1480,95 @@ The service SHALL NOT return additional key-value pairs.
 The services does not support the retrieval of the metadata format for an individual resource data description document.
 Including a ID in the request SHOULD produce an error.
 
-**API**
+API
+===
 
-::
+.. :http:GET:: /harvest/listmetadataformats
 
-        GET <node-service-endpoint-URL>/harvest/listmetadataformats
+.. :http:POST:: /harvest/listmetadataformats
+   
 
-        POST <node-service-endpoint-URL>/harvest/listmetadataformats
-
-            
-
-        Arguments:
+        **Arguments:**
 
             None
 
-        Request Object:    
+        **Request Object:**    
 
             None
 
-        Results Object:
+        **Results Object:**
 
-            {"OK": boolean,    
-                                        // T if successful
+        .. :sourcode:: javascript
 
-            "error": "string",        
-                                        // text describing error
+            {
+                "OK": boolean,    
+                                            // T if successful
 
-                                        // present only if NOT OK
+                "error": "string",        
+                                            // text describing error
 
-            "responseDate": "string",        
-                                        // time of report, time/date encoding
+                                            // present only if NOT OK
 
-            "request":                  // the API request
+                "responseDate": "string",        
+                                            // time of report, time/date encoding
 
-                {"verb": "listmetadataformats",    
-                                        // the literal "listmetadataformats"
+                "request": {                // the API request
 
-                "HTTP_request": "string"         
-                                        // the HTTP request as a string 
+                    "verb": "listmetadataformats",    
+                                            // the literal "listmetadataformats"
+
+                    "HTTP_request": "string"         
+                                            // the HTTP request as a string 
 
                 },
 
-            "listmetadataformats":[            
-                                        // array of supported metadata formats
+                "listmetadataformats":[            
+                                            // array of supported metadata formats
 
-                {"metadataformat":
+                    {
+                        "metadataformat":
 
-                    {"metadataPrefix": "string"        
-                                        // metadata format name/prefix
+                        {
+                            "metadataPrefix": "string"        
+                                            // metadata format name/prefix
+                                            // other elements will go here
 
-                                        // other elements will go here
+                        }
 
                     }
-
-                }
 
                 ]
 
             }
 
-**Basic** **Harvest****: ****List** **Metadata** **Formats**
 
-::
+Basic Harvest: List Metadata Formats
+====================================
 
-                                        // Return the description of the metadata formats supported for harvest
+
+    // Return the description of the metadata formats supported for harvest
 
     Build results object
 
         OK := TRUE
 
-                responseDate := time of report 
-                                        // time/date encoding
+        responseDate := time of report  // time/date encoding
 
-                request := 
-                                        // the API request
+        request :=  // the API request
 
-                {"verb": "listmetadataformats",   
-                                        // the literal "listmetadataformats"
+            {
+                "verb": "listmetadataformats",      // the literal "listmetadataformats"
 
-                 "HTTP_request": "string"            
-                                        // the HTTP request as a string
+                "HTTP_request": "string"            // the HTTP request as a string
 
-                }
+            }
 
-                metadataFormat := metadataformat structure from the *Harvest* *service* *description* 
+        metadataFormat := metadataformat structure from the *Harvest* *service* *description* 
 
-                                        // the key-value pair [{"metadataPrefix": "LR_JSON_0.10.0"}]
+            // the key-value pair [{"metadataPrefix": "LR_JSON_0.10.0"}]
 
         TRANSFORM results to specified CONTENT-TYPE
+
 
 .. _h.aocxiz-yca3fl:
 
@@ -2096,7 +2093,7 @@ OAI-PMH: GetRecord
 
         <identifier>resource data description document doc_ID</identifier>
 
-        <datastamp>▼node_timestamp from the r*esource* *data* *description*</datestamp>
+                <datastamp>▲node_timestamp from the r*esource* *data* *description*</datestamp>
 
         </header>
 
@@ -2314,7 +2311,7 @@ OAI-PMH: ListRecords
 
     FOR EACH *resource* *data* *description* document
 
-        IF from <= ▼node_timestamp from the *resource* *data* *description* document
+        IF from <= ▲node_timestamp from the *resource* *data* *description* document
 
             <= until 
                                         // timestamp inclusive in [from:until] range
@@ -2347,7 +2344,7 @@ OAI-PMH: ListRecords
 
             <identifier>resource data description document ID</identifier>
 
-            <datastamp>▼node_timestamp from the *resource* *data* *description*</datestamp>
+                <datastamp>▲node_timestamp from the *resource* *data* *description*</datestamp>
 
             </header>
 
@@ -2558,7 +2555,7 @@ OAI-PMH: ListIdentifiers
 
         FOR EACH *resource* *data* *description* document
 
-                IF from <= ▼node_timestamp from the *resource* *data* *description* document
+                IF from <= ▲node_timestamp from the *resource* *data* *description* document
 
                         <= until 
                                         // timestamp inclusive in [from:until] range
@@ -2591,7 +2588,7 @@ OAI-PMH: ListIdentifiers
 
                 <identifier>resource data description document ID</identifier>
 
-                <datastamp>▼node_timestamp from the *resource* *data* *description*</datestamp>
+                <datastamp>▲node_timestamp from the *resource* *data* *description*</datestamp>
 
                 </header>
 
