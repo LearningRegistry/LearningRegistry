@@ -211,19 +211,19 @@ Resource Data Validation and Publication
 
 ::
 
-    // Validate a *resource* *data* *description* document
+                                        // Validate a *resource* *data* *description* document
 
-    // is the submission well formed
+                                        // is the submission well formed
 
     IF any required element is missing
 
         THEN
 
-                        REJECT the document
+            REJECT the document
 
-                        EXIT    
+            EXIT    
 
-    // changes in mutable fields are only allowed in an update
+                                        // changes in mutable fields are only allowed in an update
 
     IF submission is an update
 
@@ -231,61 +231,61 @@ Resource Data Validation and Publication
 
             THEN
 
-                                REJECT the document
+                REJECT the document
 
-                                EXIT
+                EXIT
 
-    // does the payload match the declaration
+                                        // does the payload match the declaration
 
     IF payload_placement = "linked" and no payload_locator provided
 
         THEN
 
-                        REJECT the document
+            REJECT the document
 
-                        EXIT
+            EXIT
 
     IF payload_placement = "inline" and no resource_document in the submission 
 
         THEN
 
-                        REJECT the document
+            REJECT the document
 
-                        EXIT
+            EXIT
 
     IF payload_placement = "attached" and no attachment
 
         THEN
 
-                        REJECT the document
+            REJECT the document
 
-                        EXIT
+            EXIT
 
-    // payload must match the schema and validate
+                                        // payload must match the schema and validate
 
     IF payload_schema does not correspond to resource_data_type
 
         THEN
 
-                        REJECT the document
+            REJECT the document
 
-                        EXIT
+            EXIT
 
     VALIDATE the payload
 
-    // updates invalidate existing attachments
+                                        // updates invalidate existing attachments
 
     IF submission is an update
 
         THEN delete any attachments
 
-    // Generate the ID if required
+                                        // Generate the ID if required
 
-        IF doc_ID isn’t provided
+    IF doc_ID isn’t provided
 
         THEN generate a doc_ID
 
-    // Set local node data
+                                        // Set local node data
 
     publish_node := node_id
 
@@ -293,11 +293,11 @@ Resource Data Validation and Publication
 
         THEN 
 
-                        update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time // granularity of seconds
+            update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time // granularity of seconds
 
         ELSE
 
-                        create_timestamp :=update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time
+            create_timestamp :=update_timestamp := ▼:deprecation:`node`:deprecation:`_`:deprecation:`timestamp` := current time
 
     IF frbr_level not specified
 
@@ -343,57 +343,57 @@ Resource Data ToS, Signatures and Trust Policy Enforcement
 
 ::
 
-    // Check Policies
+                                        // Check Policies
 
-        IF the service applies ToS checks
+    IF the service applies ToS checks
 
-                AND the *resource* *data* *description* document TOS is unacceptable
+        AND the *resource* *data* *description* document TOS is unacceptable
 
-            THEN // indicate ToS was rejected
+        THEN // indicate ToS was rejected
 
-                REJECT the document
+            REJECT the document
 
-                EXIT
+            EXIT
 
     IF the service does not accept anonymous submissions
 
-                AND the *resource* *data* *description* document has submitter_type=="anonymous"
+        AND the *resource* *data* *description* document has submitter_type=="anonymous"
 
-            THEN // indicate submitter type was rejected
+        THEN // indicate submitter type was rejected
 
-                        REJECT the document
+            REJECT the document
 
-                EXIT
+            EXIT
 
-        IF the service validates the submitter or submitter trust
+    IF the service validates the submitter or submitter trust
 
-                AND the *resource* *data* *description* document submitter cannot be verified or trusted
+        AND the *resource* *data* *description* document submitter cannot be verified or trusted
 
-                THEN // indicate submitter was rejected
+        THEN // indicate submitter was rejected
 
-                        REJECT the document
+            REJECT the document
 
-                EXIT
+            EXIT
 
-        IF the service requires a signature
+    IF the service requires a signature
 
-                AND the *resource* *data* *description* document signature not present
+        AND the *resource* *data* *description* document signature not present
 
-                THEN // indicate signature was rejected
+        THEN // indicate signature was rejected
 
-                        REJECT the document
+            REJECT the document
 
-                EXIT
+            EXIT
 
-        IF the service validates the signature
+    IF the service validates the signature
 
-                AND the *resource* *data* *description* document signature cannot be verified
+        AND the *resource* *data* *description* document signature cannot be verified
 
-                THEN // indicate signature was rejected
+        THEN // indicate signature was rejected
 
-                        REJECT the document
+            REJECT the document
 
-                EXIT
+            EXIT
 
 
 
@@ -419,17 +419,18 @@ Operational Policy Enforcement
 
 ::
 
-        // Check Policies
+                                        // Check Policies
 
-        IF the service applies ToS checks
+    IF the service applies ToS checks
 
-                AND the *resource* *data* *description* document TOS is unacceptable
+        AND the *resource* *data* *description* document TOS is unacceptable
 
-            THEN // indicate ToS was rejected
+        THEN 
+                                        // indicate ToS was rejected
 
-                REJECT the document
+            REJECT the document
 
-                EXIT
+            EXIT
 
 
 
@@ -461,9 +462,9 @@ Resource Data Filtering
 
 ::
 
-    // Filter a *resource* *data* *description* document
+                                        // Filter a *resource* *data* *description* document
 
-    // No filter test
+                                        // No filter test
 
     IF the *network* *node* *filter* *description* document does NOT exist
 
@@ -471,7 +472,7 @@ Resource Data Filtering
 
             EXIT
 
-    // Filter not active test
+                                        // Filter not active test
 
     IF NOT active in the *network* *node* *filter* *description* document
 
@@ -479,7 +480,7 @@ Resource Data Filtering
 
             EXIT
 
-    // Use custom filter if defined
+                                        // Use custom filter if defined
 
     IF custom_filter in the the *network* *node* *filter* *description* document
 
@@ -487,13 +488,13 @@ Resource Data Filtering
 
             IF the code returns true 
 
-                                THEN store the *resource* *data* *description* document
+                THEN store the *resource* *data* *description* document
 
-                        EXIT
+                    EXIT
 
-    // Expression-based filtering
+                                        // Expression-based filtering
 
-    // Does the filter match the document
+                                        // Does the filter match the document
 
     match := F
 
@@ -517,11 +518,11 @@ Resource Data Filtering
 
                         SKIP ALL
 
-    // Store or reject
+                                        // Store or reject
 
     IF include_exclude 
 
-                IF match // matches what to include
+        IF match // matches what to include
 
             THEN store the *resource* *data* *description* document
 
@@ -536,7 +537,6 @@ Resource Data Filtering
                 EXIT
 
             ELSE EXIT // don’t store
-
 
 
 .. _Change Log:

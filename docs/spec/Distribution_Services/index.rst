@@ -121,91 +121,91 @@ Resource Distribution: Source Node Process
 
 ::
 
-    // Distribute a resource data description document collection from one node to its connected nodes
+                                        // Distribute a resource data description document collection from one node to its connected nodes
 
     VALIDATE resource_document_database.doc_type = "resource_data"
 
-    // only distributing resource data
+                                        // only distributing resource data
 
-        GET the *network* *node* *description* document for the source node to obtain
+    GET the *network* *node* *description* document for the source node to obtain
 
-            source.network_id
+        source.network_id
 
-            source.community_id
+        source.community_id
 
-            source.gateway_node
+        source.gateway_node
 
-        GET the *network* *community* *description* document for the source node to obtain
+    GET the *network* *community* *description* document for the source node to obtain
 
-            source.social_community
+        source.social_community
 
-        GET the *network* *node* *connectivity* documents for the source node
+    GET the *network* *node* *connectivity* documents for the source node
 
         IF > 1 connectivity document with active = T AND gateway_connection = T
 
             THEN ABORT 
 
-                        // only one active gateway is allowed, faulty network description
+                                        // only one active gateway is allowed, faulty network description
 
         FOR EACH node connectivity document
 
             GET the *network* *node* *description* document for the destination node
 
-                        (via the destination_node_url) to obtain
+                (via the destination_node_url) to obtain
 
-                            destination.network_id
+                destination.network_id
 
-                            destination.community_id
+                destination.community_id
 
-                            destination.gateway_node
+                destination.gateway_node
 
-                        GET the *network* *community* *description* document for the destination node
+            GET the *network* *community* *description* document for the destination node
 
-                        to obtain
+                to obtain
 
-                    destination.social_community
+                destination.social_community
 
-                        IF source.community_id <> destination.community_id
+            IF source.community_id <> destination.community_id
 
-                         AND ((NOT source,social_community) 
+                AND ((NOT source,social_community) 
 
-                                OR (NOT destination.social_community))
+                    OR (NOT destination.social_community))
 
-                            THEN SKIP
+                    THEN SKIP
 
-                        // cannot distribute across non social communities
+                                        // cannot distribute across non social communities
 
-                        IF (NOT gateway_connection) AND
+            IF (NOT gateway_connection) AND
 
-                         source.network_id <> destination.network_id
+                source.network_id <> destination.network_id
 
-                            THEN SKIP
+                    THEN SKIP
 
-                        // cannot distribute across networks (or communities) unless gateway
+                                        // cannot distribute across networks (or communities) unless gateway
 
-                        IF gateway_connection AND
+            IF gateway_connection AND
 
-                         source.network_id = destination.network_id
+                source.network_id = destination.network_id
 
-                            THEN SKIP
+                    THEN SKIP
 
-                        // gateway must only distribute across different networks
+                                        // gateway must only distribute across different networks
 
-                        IF gateway_connection
+            IF gateway_connection
 
-                         AND    ((NOT source.gateway_node)
+                AND    ((NOT source.gateway_node)
 
-                            (OR (NOT destination.gateway_node))
+                    (OR (NOT destination.gateway_node))
 
-                            THEN SKIP
+                    THEN SKIP
 
-                        // gateways can only distribute to gateways
+                                        // gateways can only distribute to gateways
 
-                        COMMIT all outstanding resource data description database operations
+            COMMIT all outstanding resource data description database operations
 
-                        PERFORM distribution service between source and destination nodes
+            PERFORM distribution service between source and destination nodes
 
-                        // this is the distribution primitive
+                                        // this is the distribution primitive
 
 *NB*: There may be a better way to do the validations via map-reduce.
 
@@ -228,21 +228,21 @@ Resource Distribution: Destination Node Process
 
         // Process and filter inbound resource data description documents at a node
 
-         REJECT the *resource* *data* *description* document if it contains a do_not_distribute key.
+        REJECT the *resource* *data* *description* document if it contains a do_not_distribute key.
 
         VALIDATE the *resource* *data* *description* document
 
-            // skip storing all documents that do not validate
+                                        // skip storing all documents that do not validate
 
         REJECT the *resource* *data* *description* document if the submitter cannot be verified
 
         REJECT the *resource* *data* *description* document if the submitter_TOS is unacceptable to the node
 
-         REJECT the *resource* *data* *description* document if it too large
+        REJECT the *resource* *data* *description* document if it too large
 
         IF the *network* *node* *filter* *description* document exists and contains active filters
 
-                THEN PERFORM filtering and store only documents that pass the filter
+            THEN PERFORM filtering and store only documents that pass the filter
 
         ▼:deprecation:`UPDATE node_timestamp // when the document was stored at the node`
 
@@ -318,7 +318,7 @@ Resource Distribution: Destination Node Information
 
     QUERY
 
-        RETURN Results document
+    RETURN Results document
 
     
 

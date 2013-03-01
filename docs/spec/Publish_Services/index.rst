@@ -197,43 +197,51 @@ Basic Publish
 
         IF do_not_distribute key is present
 
-            THEN                // create the global error object
+            THEN                
+                                        // create the global error object
 
-                                OK := F
+                OK := F
 
-                                error := "cannot publish" // an appropriate error for global condition
+                error := "cannot publish" 
+                                        // an appropriate error for global condition
                                 
-                                EXIT
+                EXIT
 
-    VALIDATE the publish request // apply appropriate business rules
+    VALIDATE the publish request 
+                                        // apply appropriate business rules
 
         IF there is an overall error 
 
-            THEN                // create the global error object
+            THEN                
+                                        // create the global error object
 
-                                OK := F
+                OK := F
 
-                                error := "error msg"  // an appropriate error for global condition
+                error := "error msg"  
+                                        // an appropriate error for global condition
 
-                                EXIT
+                EXIT
 
-    OK := T                     // global return status
+    OK := T                     
+                                        // global return status
 
     FOR EACH *resource* *data* *description* document
 
-        VALIDATE the *resource* *data* *description* document // all syntactical and semantic rules
+        VALIDATE the *resource* *data* *description* document 
+                                        // all syntactical and semantic rules
 
         IF there is an error
 
-            THEN                // create an error object array element object for the individual document    
+            THEN                
+                                        // create an error object array element object for the individual document    
     
-                                OK := F
+                OK := F
     
-                                error := "error msg"    // an appropriate error for the document
+                error := "error msg"    // an appropriate error for the document
     
-                                doc_ID := supplied doc_ID 
+                doc_ID := supplied doc_ID 
     
-                                SKIP
+                SKIP
 
         IF the *network* *node* *filter* *description* document exists and contains active filters
 
@@ -241,176 +249,191 @@ Basic Publish
 
             IF the *resource* *data* *description* document does NOT pass the filter
 
-                                THEN    // indicate filtering was applied
+                THEN    
+                                        // indicate filtering was applied
     
-                                        OK := F
+                    OK := F
     
-                                        error := "rejected by filter" // an appropriate filtering message
+                    error := "rejected by filter" 
+                                        // an appropriate filtering message
     
-                                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                                        SKIP
+                    SKIP
 
         IF the service applies ToS checks
 
-                        AND the *resource* *data* *description* document TOS is unacceptable
+            AND the *resource* *data* *description* document TOS is unacceptable
 
-                                THEN    // indicate ToS was rejected
+                THEN    
+                                        // indicate ToS was rejected
     
-                                        OK := F
+                    OK := F
     
-                                        error := "rejected by ToS" // an appropriate message
+                    error := "rejected by ToS" // an appropriate message
     
-                                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                                        SKIP
+                    SKIP
 
         IF the service does not accept anonymous submissions
 
-                        AND the *resource* *data* *description* document has submitted_type=="anonymous"
+            AND the *resource* *data* *description* document has submitted_type=="anonymous"
 
-                                THEN    // indicate submitted type was rejected
+                THEN    
+                                        // indicate submitted type was rejected
     
-                                        OK := F
+                    OK := F
     
-                                        error := "anon submission rejected" // an appropriate message
+                    error := "anon submission rejected" 
+                                        // an appropriate message
     
-                                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                                        SKIP
+                    SKIP
 
         IF the service validates the submitter
 
-                        AND the *resource* *data* *description* document submitter cannot be verified or trusted
+            AND the *resource* *data* *description* document submitter cannot be verified or trusted
 
-                                THEN    // indicate submitter was rejected
+                THEN    
+                                        // indicate submitter was rejected
     
-                                        OK := F
+                    OK := F
     
-                                        error := "rejected submitter" // an appropriate message
+                    error := "rejected submitter" 
+                                        // an appropriate message
     
-                                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                                        SKIP
+                    SKIP
 
         IF the service requires a signature
 
-                        AND the *resource* *data* *description* document signature not present
+            AND the *resource* *data* *description* document signature not present
 
-                                THEN    // indicate signature was rejected
-                                        OK := F
+                THEN    
+                                        // indicate signature was rejected
+                    OK := F
     
-                                        error := "no signature" // an appropriate message
+                    error := "no signature" 
+                                        // an appropriate message
     
-                                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                                        SKIP
+                    SKIP
 
         IF the service validates the signature
 
-                        AND the *resource* *data* *description* document signature cannot be verified
+            AND the *resource* *data* *description* document signature cannot be verified
 
-                                THEN    // indicate signature was rejected
+                THEN    
+                                        // indicate signature was rejected
     
-                                        OK := F
+                    OK := F
     
-                                        error := "rejected signature" // an appropriate message
+                    error := "rejected signature" 
+                                        // an appropriate message
     
-                                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                                        SKIP
+                    SKIP
 
         IF the node limits the size of document that can be stored
 
-                        AND the *resource* *data* *description* document is too large
+            AND the *resource* *data* *description* document is too large
 
-                                THEN    // indicate document too large
+                THEN    
+                                        // indicate document too large
     
-                                        OK := F
+                    OK := F
     
-                                        error := "too large" // an appropriate message
+                    error := "too large" 
+                                        // an appropriate message
     
-                                        doc_ID := supplied doc_ID
+                    doc_ID := supplied doc_ID
     
-                                        SKIP
+                    SKIP
 
         IF *resource* *data* *description* document did not have a supplied doc_ID
 
-                        THEN generate a new unique doc_ID
+            THEN generate a new unique doc_ID
 
         
         :changes:`▲ graveyard := []`
 
-        :changes:`If *resource* *data* *description* document has a non-empty "replaces" property`
+        IF *resource* *data* *description* document has a non-empty "replaces" property
 
-                        :changes:`THEN            // check that document can be published according to replacement policy`
+            THEN          
+                                        // check that document can be published according to replacement policy
 
-                            :changes:`FOR EACH *resource* *data* *description* specifed in "replaces" property`
+                FOR EACH *resource* *data* *description* specifed in "replaces" property
 
-                                :changes:`IF the original *resource data description* document can be replaced`
+                    IF the original *resource data description* document can be replaced
 
-                                    :changes:`THEN    // indicate tombstone can be created`
+                        THEN    
+                                        // indicate tombstone can be created`
 
-                                        :changes:`CREATE *tombstone document* for original *resource data description* document`
+                            CREATE *tombstone document* for original *resource data description* document
 
-                                        :changes:`PUSH  *tombstone document* to graveyard`
+                            PUSH  *tombstone document* to graveyard
 
-                                :changes:`If the replacement *resource data description* document violates *replacement policy*`
+                        IF the replacement *resource data description* document violates *replacement policy*
 
-                                    :changes:`THEN    // indicate that replacement is invalid and not permitted`
+                            THEN    
+                                        // indicate that replacement is invalid and not permitted
 
-                                        :changes:`OK := F`
+                                OK := F
 
-                                        :changes:`error := "rejected replacement"  // an appropriate message`
+                                error := "rejected replacement"  
+                                        // an appropriate message
 
-                                        :changes:`doc_ID := supplied doc_ID`
+                                doc_ID := supplied doc_ID
 
-                                        :changes:`SKIP`
+                                SKIP
 
 
-        PUBLISH the *resource* *data* *description* document to the node
+        PUBLISH the *resource* *data* *description* document to the node by the owner of the node to the node’s resource data description document database
 
-                        by the owner of the node 
-
-                        to the node’s resource data description document database
-
-                        SET publish_node, update_timestamp, :changes:`▲ node_timestamp`, create_timestamp
+            SET publish_node, update_timestamp, :changes:`▲ node_timestamp`, create_timestamp
 
         IF there is a publishing error
 
-                THEN            // create an error object array element object for the individual document    
+                THEN            
+                                        // create an error object array element object for the individual document    
 
-                        OK := F
+                    OK := F
     
-                        error := "publish failed" // an appropriate error for the publish failure
+                    error := "publish failed" 
+                                        // an appropriate error for the publish failure
     
-                        doc_ID := supplied doc_ID 
+                    doc_ID := supplied doc_ID 
     
-                        SKIP
+                    SKIP
 
         :changes:`▲ VALIDATE tombstones in graveyard may be saved.`
 
-                :changes:`IF tombstones are permitted to be saved by *replacement policy*`
+            IF tombstones are permitted to be saved by *replacement policy*
 
-                    :changes:`THEN`
+                THEN
 
-                        :changes:`FOR EACH tombstone in graveyard`
+                    FOR EACH tombstone in graveyard
 
-                            :changes:`IF *tombstone document* exists for *resource data description document* specified in *tombstone document*:`
+                        IF *tombstone document* exists for *resource data description document* specified in *tombstone document*:
 
-                                :changes:`SKIP`
+                            SKIP
 
-                            :changes:`ELSE`
+                        ELSE
 
-                                :changes:`UPDATE original *resource data description document* specified in *tombstone document*
-                                with the *tombstone document*  // this is a replacement operation`
+                            UPDATE original *resource data description document* specified in *tombstone document* with the *tombstone document*  
+                                        // this is a replacement operation
 
-
-        // create a return object array element object for the individual document
+                                        // create a return object array element object for the individual document
     
         OK := T
     
-        doc_ID  // supplied or generated doc_ID
+        doc_ID  
+                                        // supplied or generated doc_ID
 
     
 
@@ -592,8 +615,7 @@ API
 SWORD: swordservice
 ===================
 
-
-    // return the service document
+                                        // return the service document
 
     Build XML results document
 
@@ -819,55 +841,59 @@ Basic Delete
 
     :deprecation:`▼ The Basic Delete Service is deprecated 20130226. Use of a resource data description document with a "replaces" property to delete and replace existing resource data description documents.`
 
-    // Obtain the resource data description document for each supplied ID
+                                        // Obtain the resource data description document for each supplied ID
 
     FOR EACH *resource* *data* *description* document ID
 
-            Put the *resource* *data* *description* document ID in the results object
+        Put the *resource* *data* *description* document ID in the results object
 
-            IF the document does not exist
+        IF the document does not exist
 
-                THEN 
+            THEN 
 
-                            OK := FALSE
+                OK := FALSE
 
-                            error := "document doesn’t exist"
+                error := "document doesn’t exist"
 
-                            SKIP
+                SKIP
 
-    IF the document has been deleted
+        IF the document has been deleted
 
-                THEN 
+            THEN 
 
-                            OK := FALSE
+                OK := FALSE
 
-                            error := "document already deleted
+                error := "document already deleted
 
-                            SKIP    
+                SKIP    
 
-    // otherwise delete
+                                        // otherwise delete
 
-    OK := TRUE
+        OK := TRUE
 
-            CASE delete_action
+        CASE delete_action
 
                 ignore:
 
-                            NO OP
+                    NO OP
 
                 mark: 
 
-                            set a flag on the document that it is deleted // ACTIVE := FALSE
+                    set a flag on the document that it is deleted 
+                                        // ACTIVE := FALSE
 
                 delete: 
 
-                            perform a system-level delete // whatever "delete" means
+                    perform a system-level delete 
+                                        // whatever "delete" means
 
                 purge: 
 
-                            perform a system-level delete // whatever "delete" means
+                    perform a system-level delete 
+                                        // whatever "delete" means
 
-                            trigger system level purge // may run at some later time
+                    trigger system level purge 
+                                        // may run at some later time
 
 
 Service Description

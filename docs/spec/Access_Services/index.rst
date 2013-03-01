@@ -1583,51 +1583,54 @@ The List Sets verb returns the list of sets used to organize resource data descr
 Support for sets is not defined in this version of the specification.
 The API SHALL return a standard error indicating that sets are not available.
 
-**API**
+API
+===
 
-::
 
-        GET <node-service-endpoint-URL>/harvest/listsets
+.. http:get:: /harvest/listsets
 
-        POST <node-service-endpoint-URL>/harvest/listsets
+.. http:post:: /harvest/listsets
+          
+        **Arguments:**
 
+            None
+
+        **Request Object:**    
+
+            None
+
+        **Results Object:**
+
+            .. sourcecode:: http
             
-
-        Arguments:
-
-            None
-
-        Request Object:    
-
-            None
-
-        Results Object:
-
-            {"OK": boolean,        
+                {
+                    "OK": boolean,        
                                         // T if successful
 
-            "error": "string",            
+                    "error": "string",            
                                         // text describing error
 
                                         // present only if NOT OK
 
-            "responseDate": "string",        
+                    "responseDate": "string",        
                                         // time of report, time/date encoding
 
-            "request":                
+                    "request":                
                                         // the API request
 
-                {"verb": "listsets",    
+                    {
+                        "verb": "listsets",    
                                         // the literal "listsets"
 
-                "HTTP_request": "string"         
+                        "HTTP_request": "string"         
                                         // the HTTP request as a string
+
+                    }
 
                 }
 
-            }
-
-**Basic** **Harvest****: ****List** **Sets**
+Basic Harvest: List Sets
+========================
 
 ::
 
@@ -1655,7 +1658,8 @@ The API SHALL return a standard error indicating that sets are not available.
 
         TRANSFORM results to specified CONTENT-TYPE
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
@@ -1870,23 +1874,13 @@ This behavior is NOT specified in the pseudo code below.
 
 *ToDo*: Extend to produce (log) a usage record of the harvest.
 
-**API**
+API
+===
 
-::
 
-        GET<node-service-endpoint-URL>/OAI-PMH?verb=GetRecord
+.. http:get:: /OAI-PMH?verb=GetRecord
 
-                &identifier=<ID>
-
-                &metadataPrefix=<resourcedataformat>
-
-                &by_doc_ID=<T|F>
-
-                &by_resource_ID=<T|F>
-
-        POST <node-service-endpoint-URL>/OAI-PMH
-
-        Post Payload: verb=GetRecord
+            .. sourcecode:: http
 
                 &identifier=<ID>
 
@@ -1896,16 +1890,32 @@ This behavior is NOT specified in the pseudo code below.
 
                 &by_resource_ID=<T|F>
 
-    Request Key-Value Pairs (as per OAI-PMH Specification, with Learning Registry extensions)
+.. http:post:: /OAI-PMH
 
-        verb = GetRecord        
+            .. sourcecode:: http
+
+                Post Payload: verb=GetRecord
+
+                    &identifier=<ID>
+
+                    &metadataPrefix=<resourcedataformat>
+
+                    &by_doc_ID=<T|F>
+
+                    &by_resource_ID=<T|F>
+
+    **Request Key-Value Pairs (as per OAI-PMH Specification, with Learning Registry extensions)**
+
+            .. sourcecode:: http
+            
+                verb = GetRecord        
                                         // literal "GetRecord", required
 
-        identifier = <string>           // resource data description document ID
+                identifier = <string>           // resource data description document ID
 
                                         // required
 
-        metadataPrefix = <string>        
+                metadataPrefix = <string>        
                                         // requested metadata dissemination format
 
                                         // required
@@ -1930,7 +1940,7 @@ This behavior is NOT specified in the pseudo code below.
 
                                         // OAI-PMH extension
 
-    Results XML
+    **Results XML**
 
         Well formed XML instance document that validates according to the Learning Registry 
 
@@ -1938,121 +1948,179 @@ This behavior is NOT specified in the pseudo code below.
 
         Contains:
 
-            <responseDate />            
+            .. sourcecode:: xml
+        
+                <responseDate />            
                                         // required XML element
 
-            <request />                 
+                <request />                 
                                         // required XML element
 
                                         // includes extensions
 
-            <error />            
+                <error />            
                                         // XML element if errors
 
-            <GetRecord />            
+                <GetRecord />            
                                         // XML element with results if no errors
 
     
 
-**OAI****-****PMH****: ****GetRecord**
+OAI-PMH: GetRecord
+==================
 
 ::
 
                                         // Return the resource data from the resource data description document for the ID in the request
 
-        Build XML results document
+    Build XML results document
 
-        EMIT OAI-PMH namespace declarations
+    EMIT OAI-PMH namespace declarations
 
     EMIT the required + extension elements
 
-                <responseDate>time of report<responseDate>
+        <responseDate>time of report<responseDate>
 
-                <request 
+        <request 
 
-                    verb="GetRecord"            
+            verb="GetRecord"            
                                         // the literal "GetRecord"
 
-                    identifier=<ID>                
+                   
+            identifier=<ID>                
                                         // request ID
 
-                    metadataPrefix=<metadataformat>    
+            metadataPrefix=<metadataformat>    
                                         // requested metadata format
 
-                    by_doc_ID=<boolean>            
+            by_doc_ID=<boolean>            
                                         // by document request flag
 
-                    by_resource_ID=<boolean>        
+            by_resource_ID=<boolean>        
                                         // by resource request flag
 
-                    >
+            >
 
-                    HTTP_request                
+            HTTP_request                
                                         // the HTTP request as a string
 
-                </request>
+        </request>
 
-        IF identifier not supplied 
+    IF identifier not supplied 
                                         // return error element
 
-                <error code="badArgument" />
+        <error code="badArgument" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF metadataPrefix not supplied 
+    IF metadataPrefix not supplied 
                                         // return error element
 
-                <error code="badArgument" />
+        <error code="badArgument" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF by_doc_ID AND by_resource_ID
+    IF by_doc_ID AND by_resource_ID
 
-                <error code="badArgument" /> 
+        <error code="badArgument" /> 
                                         // only one can be true
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
                                         // Does the document exist
 
-        IF by_doc_ID AND
+    IF by_doc_ID AND
 
-                no *resource* *data* *description* document with doc_ID = <identifier>
+        no *resource* *data* *description* document with doc_ID = <identifier>
 
-                THEN     <error code="idDoesNotExist" />
+        THEN     <error code="idDoesNotExist" />
 
-                        Complete XML
+            Complete XML
 
-                        EXIT
+            EXIT
 
-        IF by_resource_ID AND no *resource* *data* *description* document with resource_locator = <identifier>
+    IF by_resource_ID AND no *resource* *data* *description* document with resource_locator = <identifier>
 
-                THEN    <error code="idDoesNotExist" />
+        THEN    <error code="idDoesNotExist" />
 
-                        Complete XML
+            Complete XML
 
-                        EXIT
+            EXIT
 
-        IF by_resource_ID 
+    IF by_resource_ID 
                                         // get the list of documents otherwise it’s just the requested ID
 
-                THEN     FIND the collation of resource data description documents IDs as <identifier>
+        THEN FIND the collation of resource data description documents IDs as <identifier>
 
-                        WHERE resource_locator MATCHES request <identifier>
+            WHERE resource_locator MATCHES request <identifier>
 
-        FOR EACH resource data description document IDs
+    FOR EACH resource data description document IDs
 
                                         // Is there an acceptable metadata format
 
-        IF payload_schema <> <resourcedataformat> OR
+    IF payload_schema <> <resourcedataformat> OR
 
-                NOT *Same**_**As* *or* *Translatable* (payload_schema, <resourcedataformat>)
+        NOT *Same**_**As* *or* *Translatable* (payload_schema, <resourcedataformat>)
+
+        <error code="cannotDisseminateFormat" />
+
+        Complete XML
+
+        EXIT
+
+    Build <GetRecord>
+
+    <GetRecord>
+
+    Build <record>
+
+    <record>
+
+        EMIT <header>
+
+       <header
+
+            IF delete_data_policy <> "no"
+
+            AND the r*esource* *data* *description* document has been deleted
+
+            THEN status ="deleted"
+
+            >
+
+        <identifier>resource data description document doc_ID</identifier>
+
+        <datastamp>▼node_timestamp from the r*esource* *data* *description*</datestamp>
+
+        </header>
+
+        EMIT <metadata>
+
+        <metadata>
+
+            CASE 
+
+                payload_placement = "inline"
+
+                    EMIT resource data in XML
+
+                payload_placement = "attachment"
+
+                    EMIT attached document in XML
+
+                payload_placement = "linked"
+
+                    Get resource data from payload_schema_locator
+
+                    EMIT document in XML
+
+            IF EMIT fails
 
                 <error code="cannotDisseminateFormat" />
 
@@ -2060,65 +2128,11 @@ This behavior is NOT specified in the pseudo code below.
 
                 EXIT
 
-        Build <GetRecord>
+        </metadata>
 
-        <GetRecord>
+    </record>
 
-        Build <record>
-
-        <record>
-
-                EMIT <header>
-
-                <header
-
-                        IF delete_data_policy <> "no"
-
-                        AND the r*esource* *data* *description* document has been deleted
-
-                        THEN status ="deleted"
-
-                        >
-
-                <identifier>resource data description document doc_ID</identifier>
-
-                <datastamp>▼node_timestamp from the r*esource* *data* *description*</datestamp>
-
-                </header>
-
-                EMIT <metadata>
-
-                <metadata>
-
-                    CASE 
-
-                                payload_placement = "inline"
-
-                            EMIT resource data in XML
-
-                        payload_placement = "attachment"
-
-                            EMIT attached document in XML
-
-                        payload_placement = "linked"
-
-                            Get resource data from payload_schema_locator
-
-                            EMIT document in XML
-
-                    IF EMIT     fails
-
-                                <error code="cannotDisseminateFormat" />
-
-                        Complete XML
-
-                        EXIT
-
-                </metadata>
-
-        </record>
-
-        </GetRecord>
+    </GetRecord>
 
 .. _h.8u0mmhr8juw2:
 
@@ -2152,21 +2166,13 @@ Documents may only be accessed by document ID.
 
 *ToDo*: Extend to produce (log) a usage record of the harvest.
 
-**API**
+API
+===
 
-::
 
-        GET<node-service-endpoint-URL>/OAI-PMH?verb=ListRecords
+.. http:get:: /OAI-PMH?verb=ListRecords
 
-                &from=<date>
-
-                &until=<date>
-
-                &metadataPrefix=<resourcedataformat>
-
-        POST <node-service-endpoint-URL>/OAI-PMH
-
-        Post Payload: verb=ListRecords
+            .. sourcecode:: http
 
                 &from=<date>
 
@@ -2174,31 +2180,45 @@ Documents may only be accessed by document ID.
 
                 &metadataPrefix=<resourcedataformat>
 
-    Request Key-Value Pairs (as per OAI-PMH Specification, with Learning Registry extensions)
+.. http:post:: /OAI-PMH
 
-        verb = ListRecords        
+            .. sourcecode:: http
+            
+                Post Payload: verb=ListRecords
+
+                    &from=<date>
+
+                    &until=<date>
+
+                    &metadataPrefix=<resourcedataformat>
+
+    **Request Key-Value Pairs (as per OAI-PMH Specification, with Learning Registry extensions)**
+
+        .. sourcecode:: http
+        
+            verb = ListRecords        
                                         // literal "ListRecords", required
 
-        from =<date>        
+            from =<date>        
                                         // start of harvest time/date range
 
                                         // optional, time/date
 
                                         // earliest resource data timestamp if not present
 
-        until =<date>        
+            until =<date>        
                                         // end of harvest time/date range
 
                                         // optional, time/date
 
                                         // latest resource data timestamp if not present
 
-        metadataPrefix = <string>        
+            metadataPrefix = <string>        
                                         // requested metadata dissemination format
 
                                         // required
 
-    Results XML
+    **Results XML**
 
         Well formed XML instance document that validates according to the Learning Registry 
 
@@ -2206,173 +2226,176 @@ Documents may only be accessed by document ID.
 
         Contains:
 
-            <responseDate />            
+            .. sourcecode:: xml
+        
+                <responseDate />            
                                         // required XML element
 
-            <request />            
+                <request />            
                                         // required XML element
 
-            <error />            
+                <error />            
                                         // XML element if errors
 
-            <ListRecords />           
+                <ListRecords />           
                                         // XML element with results if no errors
 
-**OAI****-****PMH****: ****ListRecords**
+OAI-PMH: ListRecords
+====================
 
 ::
 
                                         // Return the resource data description documents for the specified time range
 
-        Build XML results document
+    Build XML results document
 
-        EMIT OAI-PMH namespace declarations
+    EMIT OAI-PMH namespace declarations
 
-        EMIT the required elements
+    EMIT the required elements
 
-                <responseDate>time of report<responseDate>
+        <responseDate>time of report<responseDate>
 
-                <request 
+        <request 
 
-                    verb="ListRecords"             
+            verb="ListRecords"             
                                         // the literal "ListRecords"
 
-                    metadataPrefix=<metadataformat>    
+            metadataPrefix=<metadataformat>    
                                         // requested metadata format
 
-                    from=<date>                
+            from=<date>                
                                         // start of harvest time/date range
 
-                    until=<date>                
+            until=<date>                
                                         // end of harvest time/date range
 
-                    >
+            >
 
-                    HTTP_request                
+            HTTP_request                
                                         // the HTTP request as a string
 
-                </request>
+        </request>
 
-        IF from > until 
+    IF from > until 
                                         // return error
 
-                <error code="badArgument" />
+        <error code="badArgument" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF granularity of from time <> granularity of until time 
+    IF granularity of from time <> granularity of until time 
                                         // return error
 
-                <error code="badArgument" />
+        <error code="badArgument" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF granularity of from time < service granularity
+    IF granularity of from time < service granularity
 
                                         // request is for seconds, service instance only supports days (not seconds)
 
-                <error code="badArgument" />
+        <error code="badArgument" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF from not specified THEN from := earliest timestamp
+    IF from not specified THEN from := earliest timestamp
 
-        IF until not specified THEN until := latest timestamp
+    IF until not specified THEN until := latest timestamp
 
-        Build <ListRecords>
+    Build <ListRecords>
 
-        <ListRecords>
+    <ListRecords>
 
-        FOR EACH *resource* *data* *description* document
+    FOR EACH *resource* *data* *description* document
 
-                IF from <= ▼node_timestamp from the *resource* *data* *description* document
+        IF from <= ▼node_timestamp from the *resource* *data* *description* document
 
-                        <= until 
+            <= until 
                                         // timestamp inclusive in [from:until] range
 
-                THEN
+        THEN
 
-                IF payload_schema <> <resourcedataformat> OR
+        IF payload_schema <> <resourcedataformat> OR
 
-                        NOT *Same**_**As* *or* *Translatable* (payload_schema, <resourcedataformat>)
+            NOT *Same**_**As* *or* *Translatable* (payload_schema, <resourcedataformat>)
 
-                    NEXT LOOP
+            NEXT LOOP
 
-                THEN
+        THEN
 
-                Build a <record>
+            Build a <record>
 
-                <record>
+            <record>
 
-                EMIT <header>
+            EMIT <header>
 
-                <header
+            <header
 
-                        IF delete_data_policy <> "no"
+                IF delete_data_policy <> "no"
 
-                        AND the r*esource* *data* *description* document has been deleted
+                    AND the r*esource* *data* *description* document has been deleted
 
                         THEN status ="deleted"
 
-                        >
+                >
 
-                <identifier>resource data description document ID</identifier>
+            <identifier>resource data description document ID</identifier>
 
-                <datastamp>▼node_timestamp from the *resource* *data* *description*</datestamp>
+            <datastamp>▼node_timestamp from the *resource* *data* *description*</datestamp>
 
-                </header>
+            </header>
 
-                EMIT <metadata>
+            EMIT <metadata>
 
-                <metadata>
+            <metadata>
 
-                    CASE 
+                CASE 
 
-                                payload_placement = "inline"
+                    payload_placement = "inline"
 
-                            EMIT resource data in XML
+                        EMIT resource data in XML
 
-                        payload_placement = "attachment"
+                    payload_placement = "attachment"
 
-                            EMIT attached document in XML
+                        EMIT attached document in XML
 
-                        payload_placement = "linked"
+                    payload_placement = "linked"
 
-                            Get resource data from payload_schema_locator
+                        Get resource data from payload_schema_locator
 
-                            EMIT document in XML
+                        EMIT document in XML
 
-                    IF EMIT     fails
+                IF EMIT fails
 
-                                <error code="cannotDisseminateFormat" />
+                    <error code="cannotDisseminateFormat" />
 
-                        Complete XML
+                    Complete XML
 
-                        EXIT
+                    EXIT
 
-                </metadata>
+            </metadata>
 
         </record>
 
         </ListRecords>
 
-    IF <ListRecords> is empty
+        IF <ListRecords> is empty
 
         THEN
 
-        DELETE <ListRecords> element
+            DELETE <ListRecords> element
 
-                <error code="noRecordsMatch" />
+            <error code="noRecordsMatch" />
 
-                Complete XML
+            Complete XML
 
-                EXIT
+            EXIT
 
 .. _h.ig18pu2ue7vp:
 
@@ -2389,71 +2412,80 @@ The API is functionally equivalent to the List Records API, only header informat
 *NB*: There is currently no mechanism to return the collection of ids of resources where a new resource data description document has been added to the collation of documents for a resource within the specified time range.
 Documents may only be accessed by document ID.
 
-**API**
+API
+===
 
-::
 
-        GET<node-service-endpoint-URL>/OAI-PMH?verb=ListIdentifiers
+.. http:get:: /OAI-PMH?verb=ListIdentifiers
 
+            .. sourcecode:: http
+            
                 &from=<date>
 
                 &until=<date>
 
                 &metadataPrefix=<resourcedataformat>
 
-        POST <node-service-endpoint-URL>/OAI-PMH
+.. http:post:: /OAI-PMH
 
-        Post Payload: verb=ListIdentifiers
+            .. sourcecode:: http
+                
+                Post Payload: verb=ListIdentifiers
 
-                &from=<date>
+                    &from=<date>
 
-                &until=<date>
+                    &until=<date>
+    
+                    &metadataPrefix=<resourcedataformat>
 
-                &metadataPrefix=<resourcedataformat>
+    **Request Key-Value Pairs (as per OAI-PMH Specification)**
 
-    Request Key-Value Pairs (as per OAI-PMH Specification)
-
-        verb = ListIdentifiers        
+        .. sourcecode:: http
+        
+            verb = ListIdentifiers        
                                         // literal "ListIdentifiers", required
 
-        from =<date>        
+            from =<date>        
                                         // start of harvest time/date range
 
                                         // optional, time/date
 
                                         // earliest resource data timestamp if not present
 
-        until =<date>        
+            until =<date>        
                                         // end of harvest time/date range
 
                                         // optional, time/date
 
                                         // latest resource data timestamp if not present
 
-        metadataPrefix = <string>        
+            metadataPrefix = <string>        
                                         // requested metadata dissemination format
 
                                         // required
 
-    Results XML
+    **Results XML**
 
         Well formed XML instance document that validates according to the OAI-PMH XML XSD
 
         Contains:
 
-            <responseDate />         
+            .. sourcecode:: xml
+        
+                <responseDate />         
                                         // required XML element
 
-            <request />            
+                <request />            
                                         // required XML element
 
-            <error />            
+                <error />            
                                         // XML element if errors
 
-            <ListIdentifiers />        
+                <ListIdentifiers />        
                                         // XML element with results if no errors
 
-**OAI****-****PMH****: ****ListIdentifiers**
+OAI-PMH: ListIdentifiers
+========================
 
 ::
 
@@ -2465,28 +2497,28 @@ Documents may only be accessed by document ID.
 
         EMIT the required elements
 
-                <responseDate>time of report<responseDate>
+            <responseDate>time of report<responseDate>
 
-                <request 
+            <request 
 
-                    verb="ListIdentifiers"            
+                verb="ListIdentifiers"            
                                         // the literal "ListIdentifiers"
 
-                        metadataPrefix=<metadataformat>    
+                metadataPrefix=<metadataformat>    
                                         // requested metadata format
 
-                        from=<date>                
+                from=<date>                
                                         // start of harvest time/date range
 
-                        until=<date>               
+                until=<date>               
                                         // end of harvest time/date range
 
-                        >
+                >
 
-                        HTTP_request                
+                HTTP_request                
                                         // the HTTP request as a string
 
-                </request>
+            </request>
 
         IF from > until 
                                         // return error
@@ -2535,7 +2567,7 @@ Documents may only be accessed by document ID.
 
                 IF payload_schema <> <resourcedataformat> OR
 
-                        NOT *Same**_**As* *or* *Translatable* (payload_schema, <resourcedataformat>)
+                    NOT *Same**_**As* *or* *Translatable* (payload_schema, <resourcedataformat>)
 
                     NEXT LOOP
 
@@ -2549,13 +2581,13 @@ Documents may only be accessed by document ID.
 
                 <header
 
-                        IF delete_data_policy <> "no"
+                    IF delete_data_policy <> "no"
 
-                        AND the *resource* *data* *description* document has been deleted
+                    AND the *resource* *data* *description* document has been deleted
 
-                        THEN status ="deleted"
+                    THEN status ="deleted"
 
-                        >
+                    >
 
                 <identifier>resource data description document ID</identifier>
 
@@ -2573,11 +2605,11 @@ Documents may only be accessed by document ID.
 
         DELETE <ListRecords> element
 
-                <error code="noRecordsMatch" />
+        <error code="noRecordsMatch" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
 .. _h.1dvaj9ngizdi:
 
@@ -2591,40 +2623,47 @@ The service MAY return additional XML elements that describe the harvest service
 
 A network node SHALL maintain all of the data necessary to return the required elements.
 
-**API**
+API
+===
 
-::
 
-        GET<node-service-endpoint-URL>/OAI-PMH?verb=Identify
+.. http:get:: /OAI-PMH?verb=Identify
 
-        POST <node-service-endpoint-URL>/OAI-PMH
+.. http:post:: /OAI-PMH
 
-        Post Payload: verb=Identify
+        .. sourcecode:: http
+        
+            Post Payload: verb=Identify
 
-    Request Key-Value Pairs (as per OAI-PMH Specification)
+    **Request Key-Value Pairs (as per OAI-PMH Specification)**
 
-        verb = Identify        
+        .. sourcecode:: http
+        
+            verb = Identify        
                                         // literal "Identify", required
 
-    Results XML
+    **Results XML**
 
         Well formed XML instance document that validates according to the OAI-PMH XML XSD
 
         Contains:
 
-            <responseDate />         
+            .. sourcecode:: xml
+        
+                <responseDate />         
                                         // required XML element
 
-            <request />            
+                <request />            
                                         // required XML element
 
-            <error />            
+                <error />            
                                         // XML element if errors
 
-            <Identify/>            
+                <Identify/>            
                                         // XML element with results if no errors
 
-**OAI****-****PMH****: ****Identify**
+OAI-PMH: Identify
+=================
 
 ::
 
@@ -2636,19 +2675,19 @@ A network node SHALL maintain all of the data necessary to return the required e
 
         EMIT the required elements
 
-                <responseDate>time of report<responseDate>
+            <responseDate>time of report<responseDate>
 
-                <request 
+            <request 
 
-                    verb="Identify"            
+                verb="Identify"            
                                         // the literal "Identify"
 
-                    >
+                >
 
-                    HTTP_request            
+                HTTP_request            
                                         // the HTTP request as a string
 
-                </request>
+            </request>
 
         Build <Identify>
 
@@ -2656,21 +2695,23 @@ A network node SHALL maintain all of the data necessary to return the required e
 
         <Identitfy>
 
-                <repositoryName>node_name from the *network* *node* *description*</repositoryName>
+            <repositoryName>node_name from the *network* *node* *description*</repositoryName>
 
-                <baseURL>URL of the network node</baseURL>
+            <baseURL>URL of the network node</baseURL>
 
-                <protocolVersion>2.0</protocolVersion>
+            <protocolVersion>2.0</protocolVersion>
 
-                <earliestDatestamp>the oldest guaranteed publish/update or delete                     timestamp</earliestDatestamp>
+            <earliestDatestamp>the oldest guaranteed publish/update or delete 
+                
+                timestamp</earliestDatestamp>
 
-                <deletedRecord>deleted_data_policy from the node_policy from the
+            <deletedRecord>deleted_data_policy from the node_policy from the
 
-                        *network* *node* *description*</deletedRecord>
+                *network* *node* *description*</deletedRecord>
 
-                <granularity>granularity from the *OAI**-**PMH* *Harvest* *service* *description*</granularity>
+            <granularity>granularity from the *OAI**-**PMH* *Harvest* *service* *description*</granularity>
 
-                <adminEmail>node_admin_identity from the *network* *node* *description*</adminEmail>
+            <adminEmail>node_admin_identity from the *network* *node* *description*</adminEmail>
 
         </Identify>
 
@@ -2716,21 +2757,13 @@ The service SHALL include the Learning Registry JSON resource data description d
 
 metadataPrefix specified in the metadataformats structure in the service description:changes:` `(e.g., "LR_JSON_0.10.0") in the results list of formats.
 
-**API**
+API
+===
 
-::
 
-        GET<node-service-endpoint-URL>/OAI-PMH?verb=ListMetadataFormats
+.. http:get:: /OAI-PMH?verb=ListMetadataFormats
 
-                &identifier=<id>
-
-                &by_doc_ID=<T|F>
-
-                &by_resource_ID=<T|F>
-
-        POST <node-service-endpoint-URL>/OAI-PMH
-
-        Post Payload: verb=ListMetadataFormats
+            .. sourcecode:: http
 
                 &identifier=<id>
 
@@ -2738,24 +2771,38 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                 &by_resource_ID=<T|F>
 
-    Request Key-Value Pairs (as per OAI-PMH Specification,with Learning Registry extensions)
+.. http:post:: /OAI-PMH
 
-        verb = ListMetadataFormats    
+        .. sourcecode:: http
+        
+            Post Payload: verb=ListMetadataFormats
+
+                &identifier=<id>
+
+                &by_doc_ID=<T|F>
+
+                &by_resource_ID=<T|F>
+
+    **Request Key-Value Pairs (as per OAI-PMH Specification,with Learning Registry extensions)**
+
+        .. sourcecode:: http
+    
+            verb = ListMetadataFormats    
                                         // literal "ListMetadataFormats", required
 
-        identifier = <string>        
+            identifier = <string>        
                                         // resource data description document ID
 
                                         // optional
 
-        by_doc_ID = boolean        
+            by_doc_ID = boolean        
                                         // request is for a single document
 
                                         // optional, default FALSE
 
                                         // OAI-PMH extension
 
-        by_resource_ID = boolean,    
+            by_resource_ID = boolean,    
                                         // request is for a collation of all documents
 
                                         // for the specified resource
@@ -2764,7 +2811,7 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                                         // OAI-PMH extension
 
-    Results XML
+    **Results XML**
 
         Well formed XML instance document that validates according to the Learning Registry 
 
@@ -2772,21 +2819,24 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
         Contains:
 
-            <responseDate />         
+            .. sourcecode:: xml
+            
+                <responseDate />         
                                         // required XML element
 
-            <request />            
+                <request />            
                                         // required XML element
 
                                         // includes extensions
 
-            <error />            
+                <error />            
                                         // XML element if errors
 
-            <ListMetadataFormats />    
+                <ListMetadataFormats />    
                                         // XML element with results if no errors
 
-**OAI****-****PMH****: ****List** **Metadata** **Formats**
+OAI-PMH: List Metadata Formats
+==============================
 
 ::
 
@@ -2796,17 +2846,17 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
         IF identifier is provided
 
-                        THEN 
+            THEN 
 
-                        IF by_doc_ID
+            IF by_doc_ID
 
-                                THEN use the resource data description document where doc_ID = <identifier>
+                THEN use the resource data description document where doc_ID = <identifier>
 
-                        IF by_resource_ID
+            IF by_resource_ID
 
-                                THEN use all resource data description documents where                 resource_locator = <identifier>
+                THEN use all resource data description documents where                 resource_locator = <identifier>
 
-                        ELSE use all resource data description documents
+            ELSE use all resource data description documents
 
         View includes: payload_schema, payload_schema_locator
 
@@ -2824,79 +2874,79 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
                                         // Return the description of the metadata formats supported for harvest
 
-        Build XML results document
+    Build XML results document
 
-        EMIT OAI-PMH namespace declarations
+    EMIT OAI-PMH namespace declarations
 
-            EMIT the required elements
+        EMIT the required elements
 
-                <responseDate>time of report<responseDate>
+        <responseDate>time of report<responseDate>
 
-                <request
+        <request
 
-                    verb="ListMetadataFormats"         
+            verb="ListMetadataFormats"         
                                         // the literal "ListMetadataFormats"
 
-                    identifier=<ID>                
+            identifier=<ID>                
                                         // request ID
 
-                    by_doc_ID=<boolean>            
+            by_doc_ID=<boolean>            
                                         // by document request flag
 
-                    by_resource_ID=<boolean>        
+            by_resource_ID=<boolean>        
                                         // by resource request flag
 
-                    >
+            >
 
-                    HTTP_request                
+            HTTP_request                
                                         // the HTTP request as a string
 
-                </request>
+        </request>
 
-        IF by_doc_ID AND by_resource_ID
+    IF by_doc_ID AND by_resource_ID
 
-                <error code="badArgument" />             
+        <error code="badArgument" />             
                                         // only one can be true
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF <identifier> provided AND 
+    IF <identifier> provided AND 
 
-                by_doc_ID AND
+        by_doc_ID AND
 
-                no *resource* *data* *description* document with doc_ID = <identifier>
+        no *resource* *data* *description* document with doc_ID = <identifier>
 
-                <error code="idDoesNotExist" />
+        <error code="idDoesNotExist" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF <identifier> provided AND 
+    IF <identifier> provided AND 
 
-                by_resoruce_ID AND
+        by_resoruce_ID AND
 
-                no *resource* *data* *description* document with resource_locator = <identifier>
+        no *resource* *data* *description* document with resource_locator = <identifier>
 
-                <error code="idDoesNotExist" />
+        <error code="idDoesNotExist" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
-        IF <identifier> provided AND Results View is empty
+    IF <identifier> provided AND Results View is empty
 
-                <error code="noMetadaFormats" />
+        <error code="noMetadaFormats" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
     Build <ListMetadataFormats>
 
-        <ListMetadataFormats>
+    <ListMetadataFormats>
 
     FOR EACH element in Results View
 
@@ -2908,7 +2958,7 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
             <metadataNamespace>optionally determine the value for the                             namespace<metadataNamespace>
 
-                </metadataFormat>
+        </metadataFormat>
 
                                         // Add Learning Registry Native JSON format
 
@@ -2916,13 +2966,13 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
             <metadataPrefix>metadataformat structure from the 
 
-                        *Harvest* *service* *description*</metadataPrefix>
+            *Harvest* *service* *description*</metadataPrefix>
 
                                         // the value LR_JSON_0.10.0
 
-                </metadataFormat>
+        </metadataFormat>
 
-        <ListMetadataFormats>
+    <ListMetadataFormats>
 
     IF <ListMetadataFormats> is empty
 
@@ -2930,11 +2980,11 @@ metadataPrefix specified in the metadataformats structure in the service descrip
 
         DELETE <ListMetadataFormats> element
 
-                <error code="noMetadaFormats" />
+        <error code="noMetadaFormats" />
 
-                Complete XML
+        Complete XML
 
-                EXIT
+        EXIT
 
 .. _h.v3mu36o8erz0:
 
@@ -2946,26 +2996,32 @@ The List Sets verb returns the list of sets used to organize resource data descr
 Support for sets is not defined in this version of the specification.
 The API SHALL return a standard error indicating that sets are not available.
 
-**API**
+API
+===
 
-::
 
-        GET<node-service-endpoint-URL>/OAI-PMH?verb=ListSets
+.. http:get:: /OAI-PMH?verb=ListSets
 
-        POST <node-service-endpoint-URL>/OAI-PMH
+.. http:post:: /OAI-PMH
+
+    .. sourcecode:: http
 
         Post Payload: verb=ListSets
 
-    Request Key-Value Pairs (as per OAI-PMH Specification)
+    **Request Key-Value Pairs (as per OAI-PMH Specification)**
 
+        .. sourcecode:: http
+    
         verb = ListSets        
                                         // literal "ListSets", required
 
-    Results XML
+    **Results XML**
 
         Well formed XML instance document that validates according to the OAI-PMH XML XSD
 
-        Contains:
+        **Contains:**
+        
+        .. sourcecode:: xml
 
             <responseDate />         
                                         // required XML element
@@ -2979,7 +3035,8 @@ The API SHALL return a standard error indicating that sets are not available.
             <ListSets/>            
                                         // XML element with results if no errors
 
-**OAI****-****PMH****: ****List** **Sets**
+OAI-PMH: List Sets
+==================
 
 ::
 
@@ -2991,25 +3048,26 @@ The API SHALL return a standard error indicating that sets are not available.
 
         EMIT the required elements
 
-                <responseDate>time of report<responseDate>
+            <responseDate>time of report<responseDate>
 
-                <request 
+            <request 
 
-                    verb="ListSets"             
+                verb="ListSets"             
                                         // the literal "ListSets"
 
-                    >
+                >
 
-                    HTTP_request            
+                HTTP_request            
                                         // the HTTP request as a string
 
-                </request>
+            </request>
 
                                         // No Set Support
 
         <error code="noSetHierarchy" />
 
-**Service** **Description**
+Service Description
+===================
 
 ::
 
