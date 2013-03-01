@@ -91,41 +91,40 @@ API: Data Distribution
 
 .. http:post:: /distribute
 
-        **Arguments:**
+    **Arguments:**
 
-            None
+        None
 
-        **Request Object:**
+    **Request Object:**
 
-            None
+        None
 
-        **Results Object:**                    // results summary and errors
+    **Results Object:**                    // results summary and errors
 
-        .. sourcecode:: http
-        
-            {
+    .. sourcecode:: javascript
+    
+        {
 
-                "OK":        boolean,        // T if successful
+            "OK":        boolean,          // T if successful
 
-                "error":        "string"            // text describing error
+            "error":        "string"       // text describing error
 
-            }            
-        
-        **Return Codes:**
+        }            
 
-        :statuscode 200: no error
-        :statuscode 500: error
+    :statuscode 200: no error
+    :statuscode 500: error
+
 
 Resource Distribution: Source Node Process
 ==========================================
 
-::
 
-                                        // Distribute a resource data description document collection from one node to its connected nodes
+
+    // Distribute a resource data description document collection from one node to its connected nodes
 
     VALIDATE resource_document_database.doc_type = "resource_data"
 
-                                        // only distributing resource data
+    // only distributing resource data
 
     GET the *network* *node* *description* document for the source node to obtain
 
@@ -224,7 +223,7 @@ The process SHOULD verify that the destination node is reachable and operational
 Resource Distribution: Destination Node Process
 ===============================================
 
-::
+
 
         // Process and filter inbound resource data description documents at a node
 
@@ -246,9 +245,11 @@ Resource Distribution: Destination Node Process
 
         ▼:deprecation:`UPDATE node_timestamp // when the document was stored at the node`
 
+
+
 *NB*: The process does not return indicators when documents are filtered.
 
-▼:deprecation:`*NB*`:deprecation:`: `:deprecation:`An`:deprecation:` `:deprecation:`implementation`:deprecation:` `:deprecation:`SHALL`:deprecation:` `:deprecation:`maintain`:deprecation:` `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`in`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`manner`:deprecation:` `:deprecation:`that`:deprecation:` `:deprecation:`does`:deprecation:` `:deprecation:`not`:deprecation:` `:deprecation:`trigger`:deprecation:` `:deprecation:`redistibution`:deprecation:` `:deprecation:`of`:deprecation:` `:deprecation:`the`:deprecation:` `:deprecation:`documen`:deprecation:`t`:deprecation:`; `:deprecation:`node`:deprecation:`_`:deprecation:`timestamp`:deprecation:` `:deprecation:`is`:deprecation:` `:deprecation:`a`:deprecation:` `:deprecation:`local`:deprecation:` `:deprecation:`node`:deprecation:` `:deprecation:`value`:deprecation:`.
+▼:deprecation:`*NB*: An implementation SHALL maintain node_timestamp in a manner that does not trigger redistibution of the document; node_timestamp is a local node value`.
 -- `TO BE replaced by a local value that is not maintained as part of the resource data description document
 
 API: Destination Node Information
@@ -257,64 +258,61 @@ API: Destination Node Information
 
 .. http:get:: /destination
 
-        **Arguments:**
+    **Arguments:**
 
-            None
+        None
 
-        **Request Object:**
+    **Request Object:**
 
-            None
+        None
 
-        **Results Object:**                    // results summary and errors
+    **Results Object:**                    
 
-        .. sourcecode:: http
-        
+    .. sourcecode:: javascript
+    
+        {                                   // results summary and errors
+
+            "OK":        boolean,           // T if successful
+
+            "error":        "string",       // text describing error
+
+            "target_node_info":             // target distribution node data
+
             {
 
-                "OK":        boolean,        // T if successful
+                "active":        boolean,       // is the destination network node active
 
-                "error":        "string",            // text describing error
+                "node_id":        "string",     // ID of the destination network node
 
-                "target_node_info":            // target distribution node data
+                "network_id":        "string",  // id of the network of the destination
 
-                {
+                "community_id":    "string",    // id of the community of the destination
 
-                    "active":        boolean,    // is the destination network node active
+                "gateway_node":    boolean,     // destination node is a gateway node
 
-                    "node_id":        "string",        // ID of the destination network node
-
-                    "network_id":        "string",        // id of the network of the destination
-
-                    "community_id":    "string",     // id of the community of the destination
-
-                    "gateway_node":    boolean,    // destination node is a gateway node
-
-                    "social_community":    boolean        // is community a social community
-
-                }
+                "social_community":    boolean  // is community a social community
 
             }
 
-        
+        }
 
-            **Return Codes:**
 
-                :statuscode 200: no error
-                :statuscode 500: error 
+
+    :statuscode 200: no error
+    :statuscode 500: error 
 
 
 Resource Distribution: Destination Node Information
 ===================================================
 
-::
 
     // Return the description of a destination network node
 
     DEFINE VIEW on
 
-                *network* *node* *description* document containing the required output fields
+        *network* *node* *description* document containing the required output fields
 
-                + *network* *community* *description* document containing the required output fields
+        + *network* *community* *description* document containing the required output fields
 
     QUERY
 
