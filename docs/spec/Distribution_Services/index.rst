@@ -1,7 +1,7 @@
 
 
 
-.. _h.u6sbhsuktqyj:
+
 
 ============================================================================
 Distribution Services: Learning Registry Technical Specification V DS:0.49.0
@@ -51,9 +51,9 @@ Resource Data Distribution Service
 ----------------------------------
 
 The resource data distribution service is used to distribute (synchronize or replicate) the resource data from one node to its connected nodes (unidirectional).
-The resource data distribution service SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ `filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_, if present at the destination node, to restrict the resource data that is distributed.
-The resource data distribution service SHALL `apply <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ `validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is stored at the destination node.
-A destination node MAY reject any resource data description document based on the node’s `p <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.seu03yccp8ld>`_`olicies <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.seu03yccp8ld>`_: from an unverified or untrusted submitter, that is not signed or where the signature cannot be verified, that does not contain an accepted ToS, etc.
+The resource data distribution service SHALL `apply filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_, if present at the destination node, to restrict the resource data that is distributed.
+The resource data distribution service SHALL `apply validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is stored at the destination node.
+A destination node MAY reject any resource data description document based on the node’s `policies <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.seu03yccp8ld>`_: from an unverified or untrusted submitter, that is not signed or where the signature cannot be verified, that does not contain an accepted ToS, etc.
 The destination node MAY reject any document that is larger than the node can store.
 The destination node SHALL reject any document with a "do_not_distribute" key-value pair; this verification SHALL be performed before any other verification and SHALL short circuit all other verification.
 
@@ -250,7 +250,7 @@ Resource Distribution: Destination Node Process
 *NB*: The process does not return indicators when documents are filtered.
 
 ▼:deprecation:`*NB*: An implementation SHALL maintain node_timestamp in a manner that does not trigger redistibution of the document; node_timestamp is a local node value`.
--- `TO BE replaced by a local value that is not maintained as part of the resource data description document
+-- TO BE replaced by a local value that is not maintained as part of the resource data description document
 
 API: Destination Node Information
 =================================

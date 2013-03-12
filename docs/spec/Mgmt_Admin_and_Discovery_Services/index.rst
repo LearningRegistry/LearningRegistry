@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 ========================================================================================================
 Management, Administrative and Discovery Services: Learning Registry Technical Specification V MS:0.49.0
@@ -19,21 +19,6 @@ This document is part of one or more versions of the :doc:`Learning <../Technica
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Management<h.u6sbhsuktqyj>`:ref:`, <h.u6sbhsuktqyj>`:ref:`Administrative<h.u6sbhsuktqyj>` :ref:`and<h.u6sbhsuktqyj>` :ref:`Discovery<h.u6sbhsuktqyj>` :ref:`Services<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`MS<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Administrative<h.kuf0re8u58qs>` :ref:`Services<h.kuf0re8u58qs>`
-
-                :ref:`Network<h.x3qh8x-kqmikf>` :ref:`Node<h.x3qh8x-kqmikf>` :ref:`Status<h.x3qh8x-kqmikf>` :ref:`Service<h.x3qh8x-kqmikf>`
-
-                :ref:`Network<h.ixbka3-k9h0vx>` :ref:`Node<h.ixbka3-k9h0vx>` :ref:`Description<h.ixbka3-k9h0vx>` :ref:`Service<h.ixbka3-k9h0vx>`
-
-                :ref:`Network<h.5l0qus-ugg81l>` :ref:`Node<h.5l0qus-ugg81l>` :ref:`Services<h.5l0qus-ugg81l>` :ref:`Service<h.5l0qus-ugg81l>`
-
-                :ref:`Resource<h.jlubtj-czhato>` :ref:`Distribution<h.jlubtj-czhato>` :ref:`Network<h.jlubtj-czhato>` :ref:`Policy<h.jlubtj-czhato>` :ref:`Service<h.jlubtj-czhato>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes the basic Learning Registry services used to manage, administer and perform discovery in a distribution network.
 

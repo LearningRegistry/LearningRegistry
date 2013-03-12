@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 ===============================================================================
 Resource Data Data Model: Learning Registry Technical Specification V RM:0.50.1

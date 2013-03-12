@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 =========================================================================
 General Matter: Learning Registry Technical Specification - V GM:0.50.0

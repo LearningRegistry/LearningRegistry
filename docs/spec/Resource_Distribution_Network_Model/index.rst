@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 ==========================================================================================
 Resource Distribution Network Model: Learning Registry Technical Specification V NM:0.5x.0

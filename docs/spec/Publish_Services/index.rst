@@ -1,4 +1,4 @@
-.. _h.u6sbhsuktqyj:
+
 
 =======================================================================
 Publish Services: Learning Registry Technical Specification V PS:0.50.1
@@ -514,7 +514,7 @@ The service end points for the protocol operations are:
 +---------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
 | Deleting a Resource                         | Currently not supported. May be added in a later version of the specification                                                   |
 +---------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
-| Retrieving a Resource                       | Not supported \-\- provided via the :ref:`Atom<h.1qn5t6\-ubytij>` :ref:`Pub<h.1qn5t6\-ubytij>` :ref:`Service<h.1qn5t6\-ubytij>` |
+| Retrieving a Resource                       | Not supported \-\- provided via the Atom Pub Service                                                                            |
 +---------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
 
 *Open* *Question*: Should SWORD just publish the raw metadata or paradata document and let the service create the JSON?

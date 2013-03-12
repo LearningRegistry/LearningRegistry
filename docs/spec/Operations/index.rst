@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 ===================================================================================
 Learning Registry Operations: Learning Registry Technical Specification V OP:0.49.0
@@ -7,7 +7,7 @@ Learning Registry Operations: Learning Registry Technical Specification V OP:0.4
 
 Draft in Progress.
 
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -15,52 +15,28 @@ See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to 
 
 :deprecation:`Features to be deprecated in a future version are shaded and indicated with ▼.`
 
-This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
+This document is part of one or more versions of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
-    :ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Operations<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`OP<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Operations<h.mkv6i5cksheq>`
-
-            :ref:`Networks<h.brri0fmvece8>` :ref:`and<h.brri0fmvece8>` :ref:`Communities<h.brri0fmvece8>`
-
-                :ref:`Building<h.rawjykojy7ox>` :ref:`the<h.rawjykojy7ox>` :ref:`Network<h.rawjykojy7ox>` :ref:`Description<h.rawjykojy7ox>`
-
-                :ref:`Maintaining<h.kffq2k69jiwa>` :ref:`Networks<h.kffq2k69jiwa>` :ref:`and<h.kffq2k69jiwa>` :ref:`Communities<h.kffq2k69jiwa>`
-
-                :ref:`Network<h.tcjl0w4wifiy>` :ref:`Discovery<h.tcjl0w4wifiy>`
-
-            :ref:`Network<h.3udx6s-e0sz0s>` :ref:`Design<h.3udx6s-e0sz0s>`
-
-            :ref:`Resource<h.gqn64jl41k4j>` :ref:`Data<h.gqn64jl41k4j>` :ref:`Publication<h.gqn64jl41k4j>`:ref:`, <h.gqn64jl41k4j>`:ref:`Distribution<h.gqn64jl41k4j>` :ref:`and<h.gqn64jl41k4j>` :ref:`Access<h.gqn64jl41k4j>`
-
-                :ref:`Resource<h.a9luwl-3jrses>` :ref:`Data<h.a9luwl-3jrses>` :ref:`Persistence<h.a9luwl-3jrses>`
-
-            :ref:`Network<h.u18wsr3gn1zm>` :ref:`Administration<h.u18wsr3gn1zm>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
-
-This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes how to setup and operate a distribution network and community.
+This document is part of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It describes how to setup and operate a distribution network and community.
 
 This document is not standalone.
 The reader should be familiar with other parts of the specification, including, but not limited to:
 
-- :doc:`General <../General_Matter/index>` :doc:`Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References
+- :doc:`General Matter <../General_Matter/index>`, including Licenses, Notation, Versioning, Glossary, References
 
-- :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>`
+- :doc:`Resource Distribution Network Model <../Resource_Distribution_Network_Model/index>`
 
-- :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>`
+- :doc:`Resource Data Data Models <../Resource_Data_Data_Model/index>`
 
-- :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>`
+- :doc:`Identity, Trust, Authentication, Security <../Identity_Trust_Auth_and_Security/index>`
 
-- :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>`
+- :doc:`Data Model and API Attributes and Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>`
 
-- :doc:`Services <../Services_and_APIs/index>` including :doc:`Distribution <../Distribution_Services/index>`, :doc:`Publish <../Publish_Services/index>`, :doc:`Access <../Access_Services/index>`, :doc:`Broker <../Broker_Services/index>`, :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
+- :doc:`Services <../Services_and_APIs/index>` including :doc:`Distribution <../Distribution_Services/index>`, :doc:`Publish <../Publish_Services/index>`, :doc:`Access <../Access_Services/index>`, :doc:`Broker <../Broker_Services/index>`, :doc:`Management / Administration / Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
 
-In particular, the reader needs to be aware of the details of the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>`.
+In particular, the reader needs to be aware of the details of the :doc:`Resource Distribution Network Model <../Resource_Distribution_Network_Model/index>`.
 
 .. _h.mkv6i5cksheq:
 
@@ -147,7 +123,7 @@ In particular, adding a new node to a network does not load resource data into t
 
 *NB*: The procedure does not state what services need to be provisioned at a node.
 Any organization can provision their own nodes, determine what services to offer (under what access constraints) and add the node to the network and community.
-To participate in resource distribution, each source and target resource data distribution node SHALL provision the appropriate source or destination process of the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_.
+To participate in resource distribution, each source and target resource data distribution node SHALL provision the appropriate source or destination process of the `Resource Data Distribution Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_.
 
 The procedures include VALIDATE steps which are explicit semantic rules that need to be enforced, generally involving values in different documents.
 The procedures also include REJECT steps.
@@ -495,7 +471,7 @@ By definition, elements of the network model SHALL NOT be deleted; they are tran
 *NB**:* The data models contain forward links to other models.
 Deleting a document would require network-level garbage collection to determine when all links to a document have been deleted.
 
-If updating the description of a network node, its services or connectivity, the description of a the distribution network or the network community causes the descriptions to violate the requirements for the `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_ `Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_, the node SHALL NOT be considered to be a part of the corresponding distribution network and network community and SHALL NOT participate in any network or resource operations.
+If updating the description of a network node, its services or connectivity, the description of a the distribution network or the network community causes the descriptions to violate the requirements for the `Network Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_, the node SHALL NOT be considered to be a part of the corresponding distribution network and network community and SHALL NOT participate in any network or resource operations.
 
 Change Network Node Description
 ===============================
@@ -869,7 +845,7 @@ Resource Data Publication, Distribution and Access
 
 Once a resource distribution network has been established, external agents use the publish services at network nodes to publish or update resource data to nodes in the resource distribution network.
 Network nodes SHALL store the valid, published resource data in their resource data description documents database.
-Publication MAY be performed via any of the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Publish <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_, value-added services or via tools and applications that are built upon these services.
+Publication MAY be performed via any of the `Resource Data Publish Services <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_, value-added services or via tools and applications that are built upon these services.
 Other mechanisms to publish resource data (e.g., direct access to the underlying data stores) SHALL NOT be supported.
 
 
@@ -895,11 +871,11 @@ Filters are optional.
 Distribution SHALL add or update any node-specific data.
 
 Resource distribution network nodes distribute their data to other nodes.
-If a network node provides the resource data distribution service, it SHALL periodically launch the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Distribution <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ service to distribute resource data from the node to its connected nodes.
+If a network node provides the resource data distribution service, it SHALL periodically launch the `Resource Data Distribution Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ service to distribute resource data from the node to its connected nodes.
 Any node that wants to establish a connection with another node, i.e., wants to be the target of distribution, SHALL support the necessary services that allow the source node to distribute data to it.
 
 Resource data is available for access by external agents through the access services at network nodes.
-Access MAY be provided via any of the supplied `Resource <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Access <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_, value-added services or via tools and applications that are built using these services.
+Access MAY be provided via any of the supplied `Resource Data Access Services <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_, value-added services or via tools and applications that are built using these services.
 Other mechanisms to access resource data (e.g., direct access to the underlying data stores) SHALL NOT be supported.
 
 Access SHALL satisfy trust and identity conditions.
@@ -907,7 +883,7 @@ When available via distribution, the same resource data may be accessed from one
 
 There is no requirement to block access to resource data that is tagged as non distributatble.
 
-Resource distribution network nodes MAY provide `Broker <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_. Operation of a broker service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
+Resource distribution network nodes MAY provide `Broker Services <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_. Operation of a broker service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
 Service provisioning (publish, access, distribution, broker) SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
@@ -952,7 +928,7 @@ What is the model for deletion versus TTL and access to deletion status for harv
 Network Administration
 ----------------------
 
-Resource distribution network nodes MAY provide `Administrative <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_ `Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_. Operation of an administrative service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
+Resource distribution network nodes MAY provide `Administrative Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_. Operation of an administrative service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
 Provisioning of administrative services SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
@@ -969,12 +945,12 @@ Change Log
 
 *NB*: Updates and edits may not results in a version update.
 
-*NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
+*NB*: See the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>` for prior change history not listed below.
 
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0)                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V OP:0.49.0)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+

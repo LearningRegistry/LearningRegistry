@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 ====================================================================================================
 Data Model and API Attributes and Behaviors: Learning Registry Technical Specification V RQ:0.49.0
@@ -147,7 +147,7 @@ If the jsonp argument is present, the API SHALL return the result padded into th
 Service Instantiation Validation
 --------------------------------
 
-A service at a node SHALL verify that a valid *service* *description* *documen*t exists for the service.
+A service at a node SHALL verify that a valid *service description document* exists for the service.
 If the service description document does not exist, is invalid, or indicates that the service is not active, the service SHALL return an HTTP status code.
 
 If the service description document does not exist, the status code SHALL be 501 and the response SHALL include the statement: "Service not implemented".
@@ -176,7 +176,7 @@ Unless stated in an individual API specification, transactional atomicity SHALL 
 Requirements for consistency of documents across multiple nodes apply only when the nodes are consistent.
 Prior to, or during document distribution, documents MAY be inconsistent.
 
-*NB*: The distribution model assumes the underlying system SHALL produce *eventual* *consistency*.
+*NB*: The distribution model assumes the underlying system SHALL produce *eventual consistency*.
 
 
 

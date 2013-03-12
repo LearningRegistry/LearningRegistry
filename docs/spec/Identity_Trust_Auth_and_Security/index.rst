@@ -1,5 +1,5 @@
 
-.. _h.u6sbhsuktqyj:
+
 
 =========================================================================================
 Identity, Trust, Auth and Security: Learning Registry Technical Specification V IT:0.49.0
@@ -18,32 +18,6 @@ See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to 
 This document is part of one or more versions of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It may contain links to other parts of the Specification.
 These links may link to the most recent version of a part, not to the version of the part that corresponds to this version of this part.
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
-
-    :ref:`Identity<h.u6sbhsuktqyj>`:ref:`, <h.u6sbhsuktqyj>`:ref:`Trust<h.u6sbhsuktqyj>`:ref:`, <h.u6sbhsuktqyj>`:ref:`Auth<h.u6sbhsuktqyj>` :ref:`and<h.u6sbhsuktqyj>` :ref:`Security<h.u6sbhsuktqyj>`:ref:`: <h.u6sbhsuktqyj>`:ref:`Learning<h.u6sbhsuktqyj>` :ref:`Registry<h.u6sbhsuktqyj>` :ref:`Technical<h.u6sbhsuktqyj>` :ref:`Specification<h.u6sbhsuktqyj>` :ref:`V<h.u6sbhsuktqyj>` :ref:`IT<h.u6sbhsuktqyj>`:ref:`:0.49.0<h.u6sbhsuktqyj>`
-
-        :ref:`Identity<h.xpzctzivy2zq>` :ref:`and<h.xpzctzivy2zq>` :ref:`Digital<h.xpzctzivy2zq>` :ref:`Signatures<h.xpzctzivy2zq>`
-
-            :ref:`Signing<h.2eu5kpj7khu7>` :ref:`a<h.2eu5kpj7khu7>` :ref:`Resource<h.2eu5kpj7khu7>` :ref:`Data<h.2eu5kpj7khu7>` :ref:`Description<h.2eu5kpj7khu7>` :ref:`Document<h.2eu5kpj7khu7>`
-
-            :ref:`Validating<h.16mk2ptzlcqz>` :ref:`the<h.16mk2ptzlcqz>` :ref:`Signature<h.16mk2ptzlcqz>` :ref:`of<h.16mk2ptzlcqz>` :ref:`a<h.16mk2ptzlcqz>` :ref:`Resource<h.16mk2ptzlcqz>` :ref:`Data<h.16mk2ptzlcqz>` :ref:`Description<h.16mk2ptzlcqz>` :ref:`Document<h.16mk2ptzlcqz>`
-
-        :ref:`Authorization<h.slxcka4lp7dt>` :ref:`and<h.slxcka4lp7dt>` :ref:`Authentication<h.slxcka4lp7dt>`
-
-            :ref:`Authentication<h.8by9tsdoelc1>`
-
-            :ref:`Authorization<h.250yt6n6562w>`
-
-            :ref:`Network<h.j7dqds4zprd9>` :ref:`Communications<h.j7dqds4zprd9>` :ref:`Security<h.j7dqds4zprd9>`
-
-            :ref:`Network<h.tpp2lj40losm>` :ref:`Ports<h.tpp2lj40losm>`
-
-        :ref:`Trust<h.txcvxb4el8ko>`
-
-        :ref:`Security<h.gpi214-wi3pd9>` :ref:`and<h.gpi214-wi3pd9>` :ref:`Information<h.gpi214-wi3pd9>` :ref:`Assurance<h.gpi214-wi3pd9>`
-
-        :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>`
-
-        :ref:`Working<h.tph0s9vmrwxu>` :ref:`Notes<h.tph0s9vmrwxu>` :ref:`and<h.tph0s9vmrwxu>` :ref:`Placeholder<h.tph0s9vmrwxu>` :ref:`Text<h.tph0s9vmrwxu>`
 
 This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes a collection of issues related to identity, digital signature, authorization, authentication, trust, security and information assurance.
 
