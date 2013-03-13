@@ -7,7 +7,7 @@ Resource Data Data Model: Learning Registry Technical Specification V RM:0.50.1
 
 Draft in Progress.
 
-See the :ref:`Change Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -44,7 +44,7 @@ In particular, the reader needs to be aware that specific criteria for the Netwo
 
 
 
-.. _h.cbvxf-xys34q:
+.. _Resource Data Data Models:
 
 -------------------------
 Resource Data Data Models
@@ -63,11 +63,11 @@ The data model description specifies the literal value for this element for all 
 All data models have a named attribute that is a “version” element (doc_version).
 The data model description specifies the literal value for this element for all document instances.
 
-Additional constraints on attributes values are detailed in `Data <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_ `Attributes <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.3h25kjtjey9j>`_.
+Additional constraints on attributes values are detailed in :ref:`Data <Data Model Attributes>` :ref:`Model <Data Model Attributes>` :ref:`Attributes <Data Model Attributes>`.
 
 
 
-.. _h.kdtam7-568cce:
+
 
 
 Resource Data Description Data Model
@@ -356,7 +356,7 @@ If missing, it SHALL be provided by a publishing service when the document is fi
 
 *NB*: Separating the key owner from the submitter enables 3rd party signing of submissions.
 
-*NB*: The signing mechanism is described under `Identity <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `and <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `Digital <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_ `Signatures <https://docs.google.com/a/learningregistry.org/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit?hl=en_US#heading=h.xpzctzivy2zq>`_.
+*NB*: The signing mechanism is described under :ref:`Identity <Identity and Digital Signatures>` :ref:`and <Identity and Digital Signatures>` :ref:`Digital <Identity and Digital Signatures>` :ref:`Signatures <Identity and Digital Signatures>`.
 
 *NB*: Providing the signing method enables different signing algorithms.
 
@@ -412,7 +412,7 @@ The format and encoding are based on the defined payload_schema and payload_sche
 
 
 
-.. _h.ykraw8-ientp5:
+
 
 Metadata Formats
 """"""""""""""""
@@ -445,7 +445,7 @@ JSON encodings of metadata schemata (primarily for inline resource data) will be
 
 
 
-.. _h.5bpp9l-ncbjqy:
+
 
 
 Paradata Formats
@@ -475,7 +475,7 @@ JSON encodings of paradata schemata (primarily for inline resource data) will be
 
 
 
-.. _h.hphvlw-1cw6xc:
+
 
 
 Resource Data
@@ -483,7 +483,7 @@ Resource Data
 
 The resource data SHALL be maintained in a set of documents stored at each node in the network.
 
-- Each node MAY store one or more instances of the :ref:`resource<h.kdtam7-568cce>` :ref:`data<h.kdtam7-568cce>` :ref:`description<h.kdtam7-568cce>` :ref:`documents<h.kdtam7-568cce>`.
+- Each node MAY store one or more instances of the `resource data description documents <Resource Data Description Data Model>`_.
   All document instances stored at a node SHALL be unique.
   A document MAY be replicated at many nodes.
 
@@ -518,7 +518,7 @@ file\:lr/schema/v_0_49/tombstone.json
 *NB*: Any harvest service MAY be updated to allow explicit request for tombstone by “doc_ID”. It is RECOMMENDED this feature only be available via Basic Harvest and Obtain.
 
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -547,7 +547,7 @@ Change Log
 
 
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

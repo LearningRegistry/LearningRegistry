@@ -41,7 +41,7 @@ In particular, the reader needs to be aware that information from this part of t
 
 
 
-.. _h.i6djle3var4b:
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""
 Common Data Model and API Attributes and Behaviors
@@ -52,7 +52,7 @@ In case of a discrepancy, the definition here SHALL take precedence over the def
 
 
 
-.. _h.3h25kjtjey9j:
+.. _Data Model Attributes:
 
 '''''''''''''''''''''
 Data Model Attributes
@@ -60,7 +60,7 @@ Data Model Attributes
 
 
 
-.. _h.3yyq9awq43ia:
+
 
 -----------
 Identifiers
@@ -85,7 +85,7 @@ Extending the scope to all implementations is an intentional simplification.
 
 
 
-.. _h.24hd1gg6oeak:
+
 
 --------------------------------
 Strings and Internationalization
@@ -98,7 +98,7 @@ ECMAScript strings are UTC-16.
 
 
 
-.. _h.davnw03urmtp:
+
 
 -------------
 Time and Date
@@ -116,7 +116,7 @@ Unless specified elsewhere, the JSON encoding of a time and date SHALL be a sing
 
 
 
-.. _h.iser5w-jiok98:
+
 
 ''''''''''''''''''''''''''''
 API Attributes and Behaviors
@@ -141,7 +141,7 @@ If the jsonp argument is present, the API SHALL return the result padded into th
 
 
 
-.. _h.bjbfxxm61faq:
+
 
 --------------------------------
 Service Instantiation Validation
@@ -164,7 +164,7 @@ One SHOULD NOT exist without the other.
 
 
 
-.. _h.xzwjyolpx52v:
+
 
 --------------------------------------------
 Transactional Behaviors and Data Consistency
@@ -180,7 +180,7 @@ Prior to, or during document distribution, documents MAY be inconsistent.
 
 
 
-.. _h.rw8jrb-9tha8:
+.. _Resource Data Validation and Publication:
 
 
 ----------------------------------------
@@ -309,7 +309,7 @@ Resource Data Validation and Publication
 
 
 
-.. _h.seu03yccp8ld:
+.. _Resource Data ToS, Signatures and Trust Policy Enforcement:
 
 ----------------------------------------------------------
 Resource Data ToS, Signatures and Trust Policy Enforcement
@@ -397,7 +397,7 @@ Resource Data ToS, Signatures and Trust Policy Enforcement
 
 
 
-.. _h.aj5me7w75zd3:
+
 
 ------------------------------
 Operational Policy Enforcement
@@ -434,14 +434,14 @@ Operational Policy Enforcement
 
 
 
-.. _h.mm60gf-1u077v:
+.. _Resource Data Filtering:
 
 -----------------------
 Resource Data Filtering
 -----------------------
 
 All resource data publishing services and resource data distribution services apply filters to resource data.
-If a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Node <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Filter <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ `Document <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.1cq79ogiyvxn>`_ is stored at a node, the filter SHALL be applied to a resource data description document before the document is stored at the node.
+If a :ref:`Network Node Filter Document <Network Node Description Data Model>` is stored at a node, the filter SHALL be applied to a resource data description document before the document is stored at the node.
 
 Either a custom filter or expression-based filters MAY be defined.
 If there is a custom filter (expressed in custom code at the node), expression-based filters SHALL be ignored.
@@ -566,7 +566,7 @@ Change Log
 
 
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

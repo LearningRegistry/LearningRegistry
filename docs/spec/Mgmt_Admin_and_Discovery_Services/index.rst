@@ -7,7 +7,7 @@ Management, Administrative and Discovery Services: Learning Registry Technical S
 
 Draft in Progress.
 
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -41,7 +41,7 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>` part describes the network model and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
-.. _h.kuf0re8u58qs:
+.. _Administrative Services:
 
 """""""""""""""""""""""
 Administrative Services
@@ -61,7 +61,8 @@ All administrative services SHALL support HTTP content negotiation.
 All administrative services SHALL support return of CONTENT-TYPE: text/plain.
 All administrative services SHOULD support return of text/html, text/xml, application/rdf+xml.
 
-.. _h.x3qh8x-kqmikf:
+
+.. _Network Node Status Service:
 
 ---------------------------
 Network Node Status Service
@@ -217,7 +218,8 @@ Service Description
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.ixbka3-k9h0vx:
+
+.. _Network Node Description Service:
 
 --------------------------------
 Network Node Description Service
@@ -225,7 +227,7 @@ Network Node Description Service
 
 The network node description service is used to return descriptive information about a network node, the resource distribution network that it is a part of and the network community that it is a part of.
 The service SHALL return all of the key-value pairs listed that have a valid value.
-An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ for which a value is missing or NULL.
+An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a :ref:`Network Data Model <Network Data Models>` for which a value is missing or NULL.
 The service MAY return additional informational values.
 
 API
@@ -453,7 +455,8 @@ Service Description
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.5l0qus-ugg81l:
+
+.. _Network Node Services Service:
 
 -----------------------------
 Network Node Services Service
@@ -461,7 +464,7 @@ Network Node Services Service
 
 The network node services service is used to return the list of services available at a network node.
 For each service at a node, the service SHALL return all of the key-value pairs listed that have a valid value.
-An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ for which a value is missing or NULL.
+An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a :ref:`Network Data Model <Network Data Models>` for which a value is missing or NULL.
 The service MAY return additional key-value pairs for a service.
 
 
@@ -611,7 +614,8 @@ Service Description
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.jlubtj-czhato:
+
+.. _Resource Distribution Network Policy Service:
 
 --------------------------------------------
 Resource Distribution Network Policy Service
@@ -619,7 +623,7 @@ Resource Distribution Network Policy Service
 
 The resource distribution network policies service is used to return information about the policies that apply to the resource distribution network that the network node is a part of.
 The service SHALL return all of the key-value pairs listed that have a valid value.
-An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.2hcwpd1wq9oo>`_ for which a value is missing or NULL.
+An implementation MAY omit the return of any key-value pair that is an optional key-value pair in a :ref:`Network Data Model <Network Data Models>` for which a value is missing or NULL.
 The service MAY return additional policy key-value pairs.
 The service MAY be called at any node in the resource distribution network; all network nodes store an identical copy of the policy data.
 
@@ -741,7 +745,7 @@ Service Description
 When the service is deployed at a node, appropriate values for the placeholders (service_id, service_endpoint, service_auth) SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -766,7 +770,7 @@ Change Log
 | Future      | TBD      |            | Archived copy location TBD. (V MS:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

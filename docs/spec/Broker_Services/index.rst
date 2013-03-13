@@ -7,7 +7,7 @@ Broker Services: Learning Registry Technical Specification V BS:0.50.0
 
 Draft in Progress.
 
-See the :ref:`Change Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -40,7 +40,7 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that specific criteria for the services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>` part describes the data that broker services process, and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
-.. _h.i6ioshmsfczo:
+.. _Broker Services:
 
 ---------------
 Broker Services
@@ -50,7 +50,7 @@ Broker services operate at a network node to process, transform, augment, amplif
 No broker services are currently defined.
 Broker services may be defined in future drafts or versions of the specification.
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -73,7 +73,7 @@ Change Log
 | Future      | TBD      |            | Archived copy location TBD. (V BS:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

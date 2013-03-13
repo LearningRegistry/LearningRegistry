@@ -25,7 +25,7 @@ Readers of the other parts of the Learning Registry Technical Specification shou
 
 
 
-.. _h.t8dv95qkagu4:
+
 
 --------------------------
 Learning Registry Overview
@@ -48,7 +48,7 @@ The Learning Registry provides *social* *networking* *for* *metadata* (trusted s
 
 
 
-.. _h.bflimlt80rpq:
+
 
 ---------------------
 Specification License
@@ -69,7 +69,7 @@ Later versions may apply.`
 
 
 
-.. _h.cu2ipktikrsa:
+
 
 --------
 Notation
@@ -77,7 +77,7 @@ Notation
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the Learning Registry Technical Specification are to be interpreted as described in `RFC <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Fhtml%2Frfc2119&sa=D&sntz=1&usg=AFQjCNEifotriMBsHSbNZlbtV_IVSzvraQ>`_` 2119 <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Fhtml%2Frfc2119&sa=D&sntz=1&usg=AFQjCNEifotriMBsHSbNZlbtV_IVSzvraQ>`_.
 
-The vocabulary of terms used in describing the Learning Registry and in the Learning Registry Technical Specification are listed in the :ref:`Glossary<h.8n9oub9badbo>`.
+The vocabulary of terms used in describing the Learning Registry and in the Learning Registry Technical Specification are listed in the `Glossary`_.
 Specific terms are set in **bold** when introduced in context.
 
 Data models are described in a JSON-like notation.
@@ -88,7 +88,7 @@ A future version of the specification may describe the data models and their imp
 
 
 
-.. _h.whmj37vjr0jk:
+
 
 -----------
 Conformance
@@ -108,7 +108,7 @@ It MAY NOT relax any constraint.
 
 
 
-.. _h.lisx85v54wl:
+
 
 ------------------------
 Specification Versioning
@@ -182,7 +182,7 @@ Version numbers of different components may be updated independently and version
 
 
 
-.. _h.o12ejzxfggen:
+
 
 --------------------------------
 Technical Specification Overview
@@ -208,7 +208,7 @@ The Learning Registry Technical Specification is split into several parts:
 
 
 
-.. _h.9vpjmlmi28mv:
+
 
 
 Design Principles
@@ -246,7 +246,7 @@ The learning registry design and technical specification is based on several key
 
 
 
-.. _h.8n9oub9badbo:
+
 
 --------
 Glossary
@@ -333,7 +333,7 @@ Additional terms may be provided in a future draft or version of the specificati
 
 
 
-.. _h.76rvgj-gh9lot:
+
 
 ----------
 References
@@ -385,7 +385,7 @@ Additional references may be provided in a future draft or version of the specif
 
 
 
-.. _h.vqkk28dmgzlf:
+
 
 ----------
 Change Log
@@ -410,7 +410,7 @@ Change Log
 
 
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

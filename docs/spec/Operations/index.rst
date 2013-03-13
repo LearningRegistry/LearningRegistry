@@ -38,7 +38,7 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware of the details of the :doc:`Resource Distribution Network Model <../Resource_Distribution_Network_Model/index>`.
 
-.. _h.mkv6i5cksheq:
+
 
 ----------
 Operations
@@ -46,13 +46,13 @@ Operations
 
 This section outlines one approach of how to use the specified network model, data models and APIs to set up and operate a Learning Registry network community.
 
-.. _h.brri0fmvece8:
+
 
 ------------------------
 Networks and Communities
 ------------------------
 
-.. _h.rawjykojy7ox:
+
 
 --------------------------------
 Building the Network Description
@@ -123,7 +123,7 @@ In particular, adding a new node to a network does not load resource data into t
 
 *NB*: The procedure does not state what services need to be provisioned at a node.
 Any organization can provision their own nodes, determine what services to offer (under what access constraints) and add the node to the network and community.
-To participate in resource distribution, each source and target resource data distribution node SHALL provision the appropriate source or destination process of the `Resource Data Distribution Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_.
+To participate in resource distribution, each source and target resource data distribution node SHALL provision the appropriate source or destination process of the :ref:`Resource Data Distribution Service <Resource Data Distribution Service>`.
 
 The procedures include VALIDATE steps which are explicit semantic rules that need to be enforced, generally involving values in different documents.
 The procedures also include REJECT steps.
@@ -460,7 +460,7 @@ Connect Communities
 
     REJECT if the same source -> destination active connection exists
 
-.. _h.kffq2k69jiwa:
+
 
 ------------------------------------
 Maintaining Networks and Communities
@@ -471,7 +471,7 @@ By definition, elements of the network model SHALL NOT be deleted; they are tran
 *NB**:* The data models contain forward links to other models.
 Deleting a document would require network-level garbage collection to determine when all links to a document have been deleted.
 
-If updating the description of a network node, its services or connectivity, the description of a the distribution network or the network community causes the descriptions to violate the requirements for the `Network Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.ugg6hzrtv6ho>`_, the node SHALL NOT be considered to be a part of the corresponding distribution network and network community and SHALL NOT participate in any network or resource operations.
+If updating the description of a network node, its services or connectivity, the description of a the distribution network or the network community causes the descriptions to violate the requirements for the :ref:`Network Description <Network Description>`, the node SHALL NOT be considered to be a part of the corresponding distribution network and network community and SHALL NOT participate in any network or resource operations.
 
 Change Network Node Description
 ===============================
@@ -798,7 +798,8 @@ Delete Network Community Description
 
                                         // may proceed asynchronously
 
-.. _h.tcjl0w4wifiy:
+
+.. _Network Discovery:
 
 Network Discovery
 =================
@@ -818,7 +819,7 @@ The tables of networks or communities with only inbound connectivity will includ
 *NB*: This process only builds the network link table at a point in time.
 It does not provide real-time connectivity status.
 
-.. _h.3udx6s-e0sz0s:
+
 
 --------------
 Network Design
@@ -837,7 +838,7 @@ The illustration shows an example of such a gateway structure.
 
 |picture_0|
 
-.. _h.gqn64jl41k4j:
+
 
 --------------------------------------------------
 Resource Data Publication, Distribution and Access
@@ -845,7 +846,7 @@ Resource Data Publication, Distribution and Access
 
 Once a resource distribution network has been established, external agents use the publish services at network nodes to publish or update resource data to nodes in the resource distribution network.
 Network nodes SHALL store the valid, published resource data in their resource data description documents database.
-Publication MAY be performed via any of the `Resource Data Publish Services <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.xf8fiul5s5dl>`_, value-added services or via tools and applications that are built upon these services.
+Publication MAY be performed via any of the :ref:`Resource Data Publish Services <Resource Data Publish Services>`, value-added services or via tools and applications that are built upon these services.
 Other mechanisms to publish resource data (e.g., direct access to the underlying data stores) SHALL NOT be supported.
 
 
@@ -871,11 +872,11 @@ Filters are optional.
 Distribution SHALL add or update any node-specific data.
 
 Resource distribution network nodes distribute their data to other nodes.
-If a network node provides the resource data distribution service, it SHALL periodically launch the `Resource Data Distribution Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_ service to distribute resource data from the node to its connected nodes.
+If a network node provides the resource data distribution service, it SHALL periodically launch the :ref:`Resource Data Distribution Service <Resource Data Distribution Service>` service to distribute resource data from the node to its connected nodes.
 Any node that wants to establish a connection with another node, i.e., wants to be the target of distribution, SHALL support the necessary services that allow the source node to distribute data to it.
 
 Resource data is available for access by external agents through the access services at network nodes.
-Access MAY be provided via any of the supplied `Resource Data Access Services <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.kbv3x699el4w>`_, value-added services or via tools and applications that are built using these services.
+Access MAY be provided via any of the supplied :ref:`Resource Data Access Services <Resource Data Access Services>`, value-added services or via tools and applications that are built using these services.
 Other mechanisms to access resource data (e.g., direct access to the underlying data stores) SHALL NOT be supported.
 
 Access SHALL satisfy trust and identity conditions.
@@ -883,11 +884,12 @@ When available via distribution, the same resource data may be accessed from one
 
 There is no requirement to block access to resource data that is tagged as non distributatble.
 
-Resource distribution network nodes MAY provide `Broker Services <https://docs.google.com/a/learningregistry.org/document/d/1-dasdKJ_gDW-YEi4S7-g8ODGOp5To9xfXR-qbZVwt-Q/edit?hl=en_US#heading=h.i6ioshmsfczo>`_. Operation of a broker service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
+Resource distribution network nodes MAY provide :ref:`Broker Services <Broker Services>`. Operation of a broker service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
 Service provisioning (publish, access, distribution, broker) SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
-.. _h.a9luwl-3jrses:
+
+.. _Resource Data Persistence:
 
 Resource Data Persistence
 =========================
@@ -922,19 +924,19 @@ Tracking of deletions MAY be independent of the actual TTL and the actual deleti
 This MAY invalidate the required information about the tracking and persistence of deletions.
 What is the model for deletion versus TTL and access to deletion status for harvest?
 
-.. _h.u18wsr3gn1zm:
+
 
 ----------------------
 Network Administration
 ----------------------
 
-Resource distribution network nodes MAY provide `Administrative Services <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.kuf0re8u58qs>`_. Operation of an administrative service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
+Resource distribution network nodes MAY provide :ref:`Administrative Services <Administrative Services>`. Operation of an administrative service SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
 Provisioning of administrative services SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
 *Open* *Question*: Do we need a mechanism to control access to network data models beyond authentication controls?
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -959,7 +961,7 @@ Change Log
 | Future      | TBD      |            | Archived copy location TBD. (V OP:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

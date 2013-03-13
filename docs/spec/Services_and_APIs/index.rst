@@ -48,7 +48,7 @@ Different types of services are detailed independently.
 
 - :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
 
-.. _h.d08onhltt4u1:
+
 
 -----------------
 Services and APIs
@@ -64,33 +64,33 @@ A node MAY provide additional services not specified herein.
 
 - :doc:`Distribution <../Distribution_Services/index>`
 
-  - `Resource Data Distribution Service <https://docs.google.com/a/learningregistry.org/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit?hl=en_US#heading=h.vb0xt6mhzmg2>`_
+  - :ref:`Resource Data Distribution Service <Resource Data Distribution Service>`
 
 - :doc:`Publish <../Publish_Services/index>`
 
-  - `Basic Publish Service <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.aera9k-4u6l42>`_
+  - :ref:`Basic Publish Service`
 
-  - `Basic Delete Service <https://docs.google.com/a/learningregistry.org/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit?hl=en_US#heading=h.rfe7ga-6sbjly>`_
+  - :ref:`Basic Delete Service`
 
 - :doc:`Access <../Access_Services/index>`
 
-  - `Basic Obtain Service <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.23ll5s-2p4zua>`_
+  - :ref:`Basic Obtain Service`
 
-  - `Basic Harvest Service <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.s3sst6-69kzq1>`_
+  - :ref:`Basic Harvest Service`
 
-  - `OAI-PMH Harvest Service <https://docs.google.com/a/learningregistry.org/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit?hl=en_US#heading=h.art057-hbjxj4>`_
+  - :ref:`OAI-PMH Harvest Service`
 
 - :doc:`Broker <../Broker_Services/index>` -- none currently defined
 
 - :doc:`Management <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Administration <../Mgmt_Admin_and_Discovery_Services/index>`/:doc:`Discovery <../Mgmt_Admin_and_Discovery_Services/index>`
 
-  - `Network Node Status Service <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.x3qh8x-kqmikf>`_
+  - :ref:`Network Node Status Service`
 
-  - `Network Node Description Service <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.ixbka3-k9h0vx>`_
+  - :ref:`Network Node Description Service`
 
-  - `Network Node Services Service <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.5l0qus-ugg81l>`_
+  - :ref:`Network Node Services Service`
 
-  - `Resource Distribution Network Policy Service <https://docs.google.com/a/learningregistry.org/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit?hl=en_US#heading=h.jlubtj-czhato>`_
+  - :ref:`Resource Distribution Network Policy Service`
 
 *NB*: There is no mechanism to reserve names for APIs, tag them as authoritative (i.e., they are defined in this specification), etc.
 A future version of the specification MAY extend the service definition to include tags (e.g., authoritative, experimental, third-party) and other validation or conformance information.
@@ -98,7 +98,7 @@ A future version of the specification MAY extend the service definition to inclu
 Services and APIs are RESTful and bound to a particular node in the resource distribution network.
 Service descriptions include the API call (HTTP binding), the API arguments, the message payload (using the JSON-like notation), the service results (using JSON-like notation), error codes, an informative pseudo code description of a *possible* implementation, and the network node service description data.
 
-The `Network Node Service Description Data Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ provides a machine and human readable description of the service; an instance of the description document is stored at the node that provides the service.
+The :ref:`Network Node Service Description Data Model <Network Node Service Description Data Model>` provides a machine and human readable description of the service; an instance of the description document is stored at the node that provides the service.
 
 Additional constraints on API attributes, HTTP bindings (headers, HTTP errors), error processing and behaviors are  described in the :doc:`Data Model and API Attributes and Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part of the specification.
 
@@ -107,7 +107,7 @@ An implementation SHALL NOT assume the provision of any service at any node, i.e
 
 ▲Except as noted, services SHALL be fully independent; the implementation and provisioning of a service at a node SHALL NOT assume that any other service is deployed at the node.
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -120,17 +120,17 @@ Change Log
 
 *NB*: See the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>` for prior change history not listed below.
 
-+-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                                                                                                                      |
-+-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (`V <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ 0.24.0) |
-+-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.0      | 20110927 | DR         | Editorial updates to create stand alone version. Clarify non dependence of service deployment.Archived copy location TBD. (V SA 0.50.0)                                                                                                                                                                                                                                                         |
-+-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Future      | TBD      |            | Archived copy location TBD. (V SA:x.xx.x)                                                                                                                                                                                                                                                                                                                                                       |
-+-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                            |
++-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_                                            |
++-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | 20110927 | DR         | Editorial updates to create stand alone version. Clarify non dependence of service deployment.Archived copy location TBD. (V SA 0.50.0)                                                                                               |
++-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | Archived copy location TBD. (V SA:x.xx.x)                                                                                                                                                                                             |
++-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

@@ -6,7 +6,7 @@ Publish Services: Learning Registry Technical Specification V PS:0.50.1
 
 Draft in Progress.
 
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -40,7 +40,7 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Model <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`API <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Attributes <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`and <../Data_Model_and_API_Attributes_and_Behaviors/index>` :doc:`Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource <../Resource_Distribution_Network_Model/index>` :doc:`Distribution <../Resource_Distribution_Network_Model/index>` :doc:`Network <../Resource_Distribution_Network_Model/index>` :doc:`Model <../Resource_Distribution_Network_Model/index>` part describes the network model, the :doc:`Resource <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Data <../Resource_Data_Data_Model/index>` :doc:`Models <../Resource_Data_Data_Model/index>` part describes the model of published data and the :doc:`Identity <../Identity_Trust_Auth_and_Security/index>`, :doc:`Trust <../Identity_Trust_Auth_and_Security/index>`, :doc:`Authentication <../Identity_Trust_Auth_and_Security/index>`, :doc:`Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
-.. _h.xf8fiul5s5dl:
+.. _Resource Data Publish Services:
 
 """"""""""""""""""""""""""""""
 Resource Data Publish Services
@@ -48,8 +48,8 @@ Resource Data Publish Services
 
 Publish services are used to push resource data into the network.
 They are used by external publishing edge nodes.
-All resource data publishing services SHALL `apply filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_ if present to restrict the resource data that is published to the node.
-All resource data publishing services SHALL `apply validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is published to the node.
+All resource data publishing services SHALL :ref:`apply filters <Resource Data Filtering>` if present to restrict the resource data that is published to the node.
+All resource data publishing services SHALL :ref:`apply validation <Resource Data Validation and Publication>` to restrict the resource data that is published to the node.
 The validation process MAY also provide local updates to the resource document prior to it being published.
 Any resource data publishing service MAY reject any resource data for any reason:
 
@@ -77,7 +77,8 @@ A node MAY advertise acceptable ToS in the node description document, but this M
 
 Future drafts or versions of this specification MAY define additional resource data publish services.
 
-.. _h.aera9k-4u6l42:
+
+.. _Basic Publish Service:
 
 ---------------------
 Basic Publish Service
@@ -483,7 +484,7 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.jl9f1nnwcev4:
+
 
 ---------------------
 SWORD Publish Service
@@ -522,7 +523,7 @@ The service end points for the protocol operations are:
 Each of the protocol operations are specified separately.
 The Service Description document SHALL apply to the entire API.
 
-.. _h.ku7eedtbq15d:
+
 
 
 Retrieve Service Document
@@ -642,7 +643,7 @@ SWORD: swordservice
             </workspace>
         </service>
 
-.. _h.2o7qqzkocz2j:
+
 
 
 Create a Resource
@@ -724,7 +725,8 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.rfe7ga-6sbjly:
+
+.. _Basic Delete Service:
 
 --------------------
 Basic Delete Service
@@ -756,7 +758,7 @@ An implementation SHALL indicate any size limits in the service description.
 
 *NB*: A mechanism to delete all resource data description documents associated with a single resource identifier (resource locator) is not provided since these resource data description documents may have different owners.
 
-*NB*: The deletion process SHALL be consistent with the `Resource <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ `Persistence <https://docs.google.com/a/learningregistry.org/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit?hl=en_US#heading=h.a9luwl-3jrses>`_ policy.
+*NB*: The deletion process SHALL be consistent with the :ref:`Resource <Resource Data Persistence>` :ref:`Data <Resource Data Persistence>` :ref:`Persistence <Resource Data Persistence>` policy.
 
 API
 ===
@@ -955,7 +957,7 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -982,7 +984,7 @@ Change Log
 | Future      | TBD      |            | Logging/tracking emit as paradata to services. Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V PS:x.xx.x)                                                                                                                        |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

@@ -41,7 +41,7 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that specific criteria for services and APIs are presented in the :doc:`Data Model and API Attributes and Behaviors <../Data_Model_and_API_Attributes_and_Behaviors/index>` part, the :doc:`Resource Distribution Network Model <../Resource_Distribution_Network_Model/index>` part describes the network model, the :doc:`Resource Data Data Models <../Resource_Data_Data_Model/index>` part describes the model of published data and the :doc:`Identity, Trust, Authentication, Security <../Identity_Trust_Auth_and_Security/index>` part describes security requirements.
 
-.. _h.kbv3x699el4w:
+.. _Resource Data Access Services:
 
 """""""""""""""""""""""""""""
 Resource Data Access Services
@@ -55,7 +55,8 @@ Future drafts or versions of this specification MAY define additional resource d
 *NB*: The services do not currently define a specific process to find or maintain all resource data description documents in a collation for a specific resource locator, i.e., for a unique resource identifier.
 A future version of the specification MAY define additional resource data document types that maintain collation descriptions.
 
-.. _h.23ll5s-2p4zua:
+
+.. _Basic Obtain Service:
 
 ~~~~~~~~~~~~~~~~~~~~
 Basic Obtain Service
@@ -528,7 +529,8 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.s3sst6-69kzq1:
+
+.. _Basic Harvest Service:
 
 ~~~~~~~~~~~~~~~~~~~~~
 Basic Harvest Service
@@ -602,7 +604,7 @@ The granularity of the timestamp SHALL be stored in the service description docu
 
 *NB*: All times are UTC 0.
 
-.. _h.v57vz0-u0ge3y:
+
 
 ----------
 Get Record
@@ -871,7 +873,7 @@ Basic Harvest: GetRecord
 
     TRANSFORM results to specified CONTENT-TYPE
 
-.. _h.56c4qr-c1nbmq:
+
 
 ------------
 List Records
@@ -1112,7 +1114,7 @@ Basic Harvest: ListRecords
 
     TRANSFORM results to specified CONTENT-TYPE
 
-.. _h.fldcps-ri52yn:
+
 
 ----------------
 List Identifiers
@@ -1333,7 +1335,7 @@ Basic Harvest: ListIdentifiers
     TRANSFORM results to specified CONTENT-TYPE
 
 
-.. _h.k5h4di-cvleu6:
+
 
 --------
 Identify
@@ -1470,7 +1472,7 @@ Basic Harvest: Identify
         TRANSFORM results to specified CONTENT-TYPE
 
 
-.. _h.eokref-1hyu2a:
+
 
 ---------------------
 List Metadata Formats
@@ -1576,7 +1578,7 @@ Basic Harvest: List Metadata Formats
         TRANSFORM results to specified CONTENT-TYPE
 
 
-.. _h.aocxiz-yca3fl:
+
 
 ---------
 List Sets
@@ -1754,7 +1756,8 @@ When the service is deployed at a node, appropriate values for the placeholders 
 Appropriate values for the service_data elements SHALL be provided.
 The descriptive values (service_name, service_description) MAY be changed from what is specified herein.
 
-.. _h.art057-hbjxj4:
+
+.. _OAI-PMH Harvest Service:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 OAI-PMH Harvest Service
@@ -1848,7 +1851,7 @@ The internal JSON storage of a resource data description document MAY include ad
 The service MAY return all stored key-value pairs, or only the key-value pairs defined in this specification for the resource data description document.
 The service document SHALL indicate if the returned documents are limited to the specification-defined key-value pairs only or if all stored key-value pairs are returned.
 
-.. _h.bto5ylf0qbe8:
+
 
 ----------
 Get Record
@@ -2126,7 +2129,7 @@ OAI-PMH: GetRecord
     </GetRecord>
 
 
-.. _h.8u0mmhr8juw2:
+
 
 ------------
 List Records
@@ -2373,7 +2376,7 @@ OAI-PMH: ListRecords
         EXIT
 
 
-.. _h.ig18pu2ue7vp:
+
 
 ----------------
 List Identifiers
@@ -2583,7 +2586,7 @@ OAI-PMH: ListIdentifiers
         EXIT
 
 
-.. _h.1dvaj9ngizdi:
+
 
 --------
 Identify
@@ -2686,7 +2689,7 @@ OAI-PMH: Identify
         </Identify>
 
 
-.. _h.rmgxadwnkcu:
+
 
 ---------------------
 List Metadata Formats
@@ -2949,7 +2952,7 @@ OAI-PMH: List Metadata Formats
 
         EXIT
 
-.. _h.v3mu36o8erz0:
+
 
 ---------
 List Sets
@@ -3101,7 +3104,7 @@ The descriptive values (service_name, service_description) MAY be changed from w
 There is no guarantee of persistence of this copy of the XSD.
 A deployed service instance SHOULD use an existing copy of the XSD or maintain a private copy of the XSD according to the node’s data persistence policies.
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -3126,7 +3129,7 @@ Change Log
 | Future      | TBD      |            | ToS attribution output to OAI. Harvest flow control. Flow control to OAI. Logging/tracking emit as paradata to services. Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD .(V AS:x.xx.x)                                              |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

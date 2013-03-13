@@ -7,7 +7,7 @@ Identity, Trust, Auth and Security: Learning Registry Technical Specification V 
 
 Draft in Progress.
 
-See the :ref:`Change<h.e1519o-y653zc>` :ref:`Log<h.e1519o-y653zc>` for links to prior stable versions.
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -38,7 +38,8 @@ The reader should be familiar with other parts of the specification, including, 
 
 In particular, the reader needs to be aware that information from this part of the Technical Specification applies to all services.
 
-.. _h.xpzctzivy2zq:
+
+.. _Identity and Digital Signatures:
 
 -------------------------------
 Identity and Digital Signatures
@@ -58,7 +59,7 @@ Digital signing and validation of resource data description documents is an OPTI
 A deployment of the Learning Registry MAY require documents be signed and validated.
 If a resource data description document is to be signed and validated, the following procedures SHALL be used to sign the document and verify the signature.
 
-.. _h.2eu5kpj7khu7:
+
 
 Signing a Resource Data Description Document
 --------------------------------------------
@@ -123,7 +124,7 @@ A deployment of the Learning Registry that requires digital signatures SHALL ind
 A future version of the specification MAY require that other documents be signed.
 The signing process SHALL be the same; the elements of the data model used in the signature vary by document type.
 
-.. _h.16mk2ptzlcqz:
+
 
 Validation the Signature of a Resource Data Description Document
 ----------------------------------------------------------------
@@ -154,7 +155,7 @@ To validate the signature:
 
 Additional information on identity may be provided in a future version or draft of the specification.
 
-.. _h.slxcka4lp7dt:
+
 
 --------------------------------
 Authorization and Authentication
@@ -162,10 +163,10 @@ Authorization and Authentication
 
 Each service deployment at a node MAY specify authorization and authentication access controls and secure communications.
 These three types of controls are defined independently.
-Values for the controls are specified in the instance of the `Network <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ `Node <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ `Service <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ `Description <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ `Data <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ `Model <https://docs.google.com/a/learningregistry.org/document/d/1msnZC6RU9N72Omau0F4FNBO5YCU6hZrG1kKRs_z42Mc/edit?hl=en_US#heading=h.z0spjmvlcbb9>`_ for the service.
+Values for the controls are specified in the instance of the :ref:`Network Node Service Description Data Model <Network Node Service Description Data Model>` for the service.
 Full details of how services implement these controls is not specified.
 
-.. _h.8by9tsdoelc1:
+
 
 Authentication
 --------------
@@ -195,7 +196,7 @@ The following authentication methods MAY be supported:
 Storage, processing and distribution of authentication credentials and establishing and provisioning OAUTH or SSH connections is out of scope for this specification.
 A deployment of the Learning Registry SHALL specify how to provision authentication.
 
-.. _h.250yt6n6562w:
+
 
 Authorization
 -------------
@@ -213,7 +214,7 @@ What solution: Custom HTTP Header element, parameters, ...?
 Storage, processing and distribution of access keys is out of scope for this specification.
 A deployment of the Learning Registry SHALL specify how to provision access keys.
 
-.. _h.j7dqds4zprd9:
+
 
 Network Communications Security
 -------------------------------
@@ -227,7 +228,7 @@ A service that requires a network security specifies that the value of the servi
 Provisioning of HTTPS connections between clients and services is out of scope for this specification.
 A deployment of the Learning Registry SHALL specify how to provision secure communications.
 
-.. _h.tpp2lj40losm:
+
 
 Network Ports
 -------------
@@ -237,7 +238,7 @@ The service_endpoint element of a service description and the source_node_url an
 
 Additional information on authorization and authentication may be provided in a future version or draft of the specification.
 
-.. _h.txcvxb4el8ko:
+
 
 -----
 Trust
@@ -245,7 +246,7 @@ Trust
 
 The section on security and information assurance will be provided in a future version or draft of the specification.
 
-.. _h.gpi214-wi3pd9:
+
 
 ----------------------------------
 Security and Information Assurance
@@ -257,7 +258,7 @@ The section on security and information assurance will be provided in a future v
 All services SHOULD maintain a secure log of all service actions.
 Details of logging requirements will be provided in a future version or draft of the specification.
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -282,7 +283,7 @@ Change Log
 | Future      | TBD      |            | Archived copy location TBD. (V IT:x.xx.x)                                                                                                                                                                                                                                                                                                                                                       |
 +-------------+----------+------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text

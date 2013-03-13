@@ -44,16 +44,16 @@ In particular, the reader needs to be aware that specific criteria for services 
 
 
 
-.. _h.vb0xt6mhzmg2:
+.. _Resource Data Distribution Service:
 
 ----------------------------------
 Resource Data Distribution Service
 ----------------------------------
 
 The resource data distribution service is used to distribute (synchronize or replicate) the resource data from one node to its connected nodes (unidirectional).
-The resource data distribution service SHALL `apply filters <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.tph0s9vmrwxu>`_, if present at the destination node, to restrict the resource data that is distributed.
-The resource data distribution service SHALL `apply validation <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.rw8jrb-9tha8>`_ to restrict the resource data that is stored at the destination node.
-A destination node MAY reject any resource data description document based on the node’s `policies <https://docs.google.com/a/learningregistry.org/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit?hl=en_US#heading=h.seu03yccp8ld>`_: from an unverified or untrusted submitter, that is not signed or where the signature cannot be verified, that does not contain an accepted ToS, etc.
+The resource data distribution service SHALL :ref:`apply filters <Resource Data Filtering>`, if present at the destination node, to restrict the resource data that is distributed.
+The resource data distribution service SHALL :ref:`apply validation <Resource Data Validation and Publication>` to restrict the resource data that is stored at the destination node.
+A destination node MAY reject any resource data description document based on the node’s :ref:`policies <Resource Data ToS, Signatures and Trust Policy Enforcement>`: from an unverified or untrusted submitter, that is not signed or where the signature cannot be verified, that does not contain an accepted ToS, etc.
 The destination node MAY reject any document that is larger than the node can store.
 The destination node SHALL reject any document with a "do_not_distribute" key-value pair; this verification SHALL be performed before any other verification and SHALL short circuit all other verification.
 
@@ -370,7 +370,7 @@ The descriptive values (service_name, service_description) MAY be changed from w
 
 
 
-.. _h.e1519o-y653zc:
+
 
 ----------
 Change Log
@@ -397,7 +397,7 @@ Change Log
 
 
 
-.. _h.tph0s9vmrwxu:
+
 
 ----------------------------------
 Working Notes and Placeholder Text
