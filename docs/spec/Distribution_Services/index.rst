@@ -244,14 +244,14 @@ Resource Distribution: Destination Node Process
 
             THEN PERFORM filtering and store only documents that pass the filter
 
-        :deprecation:`▼ UPDATE node_timestamp // when the document was stored at the node`
+        `▲ UPDATE node_timestamp // when the document was stored at the node`:changes:
 
 
 
 *NB*: The process does not return indicators when documents are filtered.
 
-:deprecation:`▼ *NB*: An implementation SHALL maintain node_timestamp in a manner that does not trigger redistibution of the document; node_timestamp is a local node value`.
--- TO BE replaced by a local value that is not maintained as part of the resource data description document
+`▲ *NB*: An implementation SHALL maintain node_timestamp in a manner that does not trigger redistibution of the document; node_timestamp is a local node value`.:changes:
+`-- TO BE replaced by a local value that is not maintained as part of the resource data description document`:deletions:
 
 API: Destination Node Information
 =================================
@@ -396,6 +396,7 @@ Change Log
 | Future      | TBD      |            | Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V DS:x.xx.x)                                                                           |
 +-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.1      | 20130312 | JK         | This document extracted from Google Doc and converted to RestructuredText. `Archived copy (V DS:0.49.0) <https://docs.google.com/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit>`_ |
+|             |          |            | node_timestamp removed from deprecation.                                                                                                                                                         |
 +-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

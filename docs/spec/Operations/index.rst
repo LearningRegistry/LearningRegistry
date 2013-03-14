@@ -913,7 +913,7 @@ A node MAY “delete” documents that have been stored longer than the network�
 If the node supports harvest, the node SHALL maintain a value for earliestDatestamp.
 This value is the oldest publish, update or delete time for a resource data description document that can be accessed at the node via harvest.
 The timestamp SHALL be precise to the nearest second.
-The value is based on the time the resource data description documents are published at the node (▼node_timestamp).
+The value is based on the time the resource data description documents are published at the node `(▲node_timestamp).`:changed:
 
 Access to information about the deletion of resource data is governed by a node-specific policy, deleted_data_policy:
 
@@ -973,6 +973,7 @@ Change Log
 | Future      | TBD      |            | Archived copy location TBD. (V OP:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.1      | 20130312 | JK         | This document extracted from original Google Doc and converted to RestructuredText. `Archived copy (V OP:0.50.0) <https://docs.google.com/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit>`_                                                                                    |
+|             |          |            | node_timestamp removed from deprecation.                                                                                                                                                                                                                                                     |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

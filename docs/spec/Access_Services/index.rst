@@ -1304,7 +1304,7 @@ Basic Harvest: ListIdentifiers
 
         FOR EACH *resource* *data* *description* document
 
-            IF from <= node_timestamp from the *resource data description* document
+            IF from <= `▲node_timestamp`:changes: from the *resource data description* document
 
                     <= until // timestamp inclusive in [from:until] range
 
