@@ -245,8 +245,11 @@ texinfo_documents = [
 
 rst_prolog = '''
 .. role:: deprecation
+    :class: deprecation
 
 .. role:: deletions
+    :class: deletions
 
 .. role:: changes
+    :class: changes
 '''
