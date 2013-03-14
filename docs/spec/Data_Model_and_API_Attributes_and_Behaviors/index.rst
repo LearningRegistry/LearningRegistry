@@ -2,12 +2,12 @@
 
 
 ====================================================================================================
-Data Model and API Attributes and Behaviors: Learning Registry Technical Specification V RQ:0.49.0
+Data Model and API Attributes and Behaviors: Learning Registry Technical Specification V RQ:0.50.1
 ====================================================================================================
 
-Draft in Progress.
-See the `Change Log`_ for links to prior stable versions.
+.. include:: ../stability.txt
 
+See the `Change Log`_ for links to prior stable versions.
 
 :changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
 
@@ -20,7 +20,7 @@ These links may link to the most recent version of a part, not to the version of
 Go to the appropriate version of the Specification that links to this version of this part, and follow the links there to the referenced part to find the version of the part that corresponds to this version of this part.
 
 
-This document is part of the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>`. It describes common requirements for all APIs and data models.
+This document is part of the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>`. It describes common requirements for all APIs and data models.
 
 This document is not standalone.
 The reader should be familiar with other parts of the specification, including, but not limited to:
@@ -550,20 +550,21 @@ Change Log
 
 *NB*: Updates and edits may not results in a version update.
 
-*NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
+*NB*: See the :doc:`Learning Registry Technical Specification <../Technical_Spec/index>` for prior change history not listed below.
 
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V RQ:0.49.0)                                                                                                                                                                                                    |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Archived copy location TBD. (V RQ:0.50.0)                                                                                                                                                                                                |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Future      | TBD      |            | RESTful APIsArchived copy location TBD. (V RQ:x.xx.x)                                                                                                                                                                                                                                        |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                     |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_     |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V RQ:0.49.0)                                                                                                      |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Archived copy location TBD. (V RQ:0.50.0)                                                                                                  |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | RESTful APIsArchived copy location TBD. (V RQ:x.xx.x)                                                                                                                                          |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130312 | JK         | Coverted specification source to RestructuredText. `Archived Copy (V RQ:0.49.0) <https://docs.google.com/document/d/1p-6XFb_eBlVYiGb9fZYtcQ4Z363rjysgS2PiZLXzAyY/edit>`_                       |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 

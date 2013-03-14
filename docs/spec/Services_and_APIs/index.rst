@@ -2,10 +2,10 @@
 
 
 ========================================================================
-Services and APIs: Learning Registry Technical Specification V SA:0.50.0
+Services and APIs: Learning Registry Technical Specification V SA:0.50.1
 ========================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
 
 See the `Change Log`_ for links to prior stable versions.
 
@@ -128,6 +128,8 @@ Change Log
 | 0.50.0      | 20110927 | DR         | Editorial updates to create stand alone version. Clarify non dependence of service deployment.Archived copy location TBD. (V SA 0.50.0)                                                                                               |
 +-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Future      | TBD      |            | Archived copy location TBD. (V SA:x.xx.x)                                                                                                                                                                                             |
++-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130312 | JK         | This document extracted from Google Doc and converted to RestructuredText. `Archive copy (V SA:0.50.0) <https://docs.google.com/document/d/1RGRnuaQ9YFsWLExPnrQRGEgZT5fx000nGGo-PKeFLrY/edit>`_                                       |
 +-------------+----------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

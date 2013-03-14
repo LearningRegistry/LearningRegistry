@@ -2,10 +2,10 @@
 
 
 ======================================================================
-Access Services: Learning Registry Technical Specification V AS:0.49.0
+Access Services: Learning Registry Technical Specification V AS:0.50.1
 ======================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
 
 See the `Change Log`_ for links to prior stable versions.
 
@@ -73,7 +73,7 @@ The results SHALL be aligned 1:1 with the IDs in the request.
 
 If the request ID is not provided, the service MAY return all or a service-determined subset of the resource data description documents.
 The service description SHALL specify how the service implementation responds to an ALL request (returning ALL, none, or a limited subset).
-When returning a subset of the documents, the service SHOULD return the documents with the most recent ▲:changes:`node_timestamp` values.
+When returning a subset of the documents, the service SHOULD return the documents with the most recent :changes:`▲node_timestamp` values.
 
 *NB*: To support buffering, the service MAY return a smaller number of results than it advertises.
 
@@ -93,29 +93,29 @@ The internal storage of a resource data description document MAY include additio
 The service MAY return all stored key-value pairs, or only the key-value pairs defined in this specification for the resource data description document.
 The service document SHALL indicate if the returned documents are limited to the specification-defined key-value pairs only or if all stored key-value pairs are returned.
 
-▲The service description SHALL specify if the service implementation supports flow control, i.e., pagination of results--one page of results is returned at a time.
+`▲The service description SHALL specify if the service implementation supports flow control, i.e., pagination of results--one page of results is returned at a time.
 If flow control is supported, the service MAY return partial results set when called.
 If the results returned is not the complete set of requested documents or IDs, the service SHALL return a resumption token.
 The service SHALL determine how large of a set to return per call.
-NB: The service MAY determine the size of results set on a per call basis.
+NB: The service MAY determine the size of results set on a per call basis.`:changes:
 
-▲In response to the next call to the service from the same client that includes the resumption token, the service MAY return another portion of the results set, including a new resumption token if the response is still not the complete set of results.
+`▲In response to the next call to the service from the same client that includes the resumption token, the service MAY return another portion of the results set, including a new resumption token if the response is still not the complete set of results.
 When the results set is complete, the service SHALL return a resumption token with a value of NULL.
-The service SHALL NOT return a resumption token if it does not support flow control or if the entire results set is returned on the first call.
+The service SHALL NOT return a resumption token if it does not support flow control or if the entire results set is returned on the first call.`:changes:
 
-▲When flow control is supported, the *next* request MAY include the resumption token.
+`▲When flow control is supported, the *next* request MAY include the resumption token.
 If the request includes a resumption token, the service SHOULD attempt to return the next portion of the results.
 When the client begins making requests with a resumption token, only the most recent token MAY be used in the call.
 Any client call without a resumption token invalidates the current resumption token.
-Including a resumption token on the first call SHALL return a flow control error.
+Including a resumption token on the first call SHALL return a flow control error.`:changes:
 
 
-▲The service SHALL determine how long to maintain state to support flow control and how many clients it can support simultaneously.
-If the service cannot return the next portion of the results, it SHALL return a flow control error.
+`▲The service SHALL determine how long to maintain state to support flow control and how many clients it can support simultaneously.
+If the service cannot return the next portion of the results, it SHALL return a flow control error.`:changes:
 
-▲To support integrity of results sets, if the set of documents stored at the node changes in a way such that the sequence of calls will not return all the requested results, e.g., documents are added between calls to the service, the service SHALL return a flow control error.
+`▲To support integrity of results sets, if the set of documents stored at the node changes in a way such that the sequence of calls will not return all the requested results, e.g., documents are added between calls to the service, the service SHALL return a flow control error.`:changes:
 
-*▲NB*: To support communication error recovery, the client MAY repeatedly call the service using the same resumption token.
+`*▲NB*: To support communication error recovery, the client MAY repeatedly call the service using the same resumption token.`:changes:
 
 *NB*: The format of the resumption token is not specified; the service MAY use any format or encoding needed to support flow control.
 
@@ -126,7 +126,7 @@ An implementation SHALL indicate any size limits in the service description.
 
 *NB*: The default is to return full resource data description documents, not just IDs.
 
-*▲NB*: By default, flow control is not supported.
+`*▲NB*: By default, flow control is not supported.`:changes:
 
 *NB*: The request of *by* *document* or *by* *resource* applies to the entire list of request IDs.
 
@@ -310,31 +310,31 @@ Basic Obtain
 
                     EXIT
 
-    ▲IF resumption_token present and NOT flow_control
+    `▲IF resumption_token present and NOT flow_control`:changes:
 
-        THEN
+        `THEN`:changes:
 
-            error  // flow control error
+            `error  // flow control error`:changes:
 
-            EXIT
+            `EXIT`:changes:
 
-    IF resumption_token present AND 
+    `IF resumption_token present AND`:changes:
 
-        (resumption_token DOES NOT MATCH saved state for this this client 
+        `(resumption_token DOES NOT MATCH saved state for this this client`:changes:
 
-            // test must recognize that client did not get last results and is re-requesting last set
+            `// test must recognize that client did not get last results and is re-requesting last set`:changes:
 
-            // or client may be requesting next set
+            `// or client may be requesting next set`:changes:
 
-            OR
+            `OR`:changes:
 
-        server has lost state)
+        `server has lost state)`:changes:
 
-            THEN
+            `THEN`:changes:
 
-                error  // flow control error              
+                `error  // flow control error`:changes:            
                                             
-                EXIT
+                `EXIT`:changes:
 
     IF by_doc_ID
 
@@ -346,13 +346,13 @@ Basic Obtain
 
         FOR EACH request_ID 
 
-            ▲IF flow_control AND resumption_token is present
+            `▲IF flow_control AND resumption_token is present`:changes:
 
-                THEN SKIP if entry is prior to resumption point
+                `THEN SKIP if entry is prior to resumption point`:changes:
 
-            IF results object exceeds flow control or results size limits
+            `IF results object exceeds flow control or results size limits`:changes:
 
-                THEN EXIT LOOP
+                `THEN EXIT LOOP`:changes:
 
         Put the request_ID in the results object
 
@@ -370,19 +370,19 @@ Basic Obtain
 
                  ELSE PUT NULL in the results object
 
-        ▲IF Loop ended normally
+        `▲IF Loop ended normally`:changes:
 
-            IF flow_control and resumption token is present
+            `IF flow_control and resumption token is present`:changes:
 
-                THEN return NULL resumption_token in results
+                `THEN return NULL resumption_token in results`:changes:
 
-                ELSE omit resumption_token from results
+                `ELSE omit resumption_token from results`:changes:
 
-        IF Loop exited because of flow control or results size limits
+        `IF Loop exited because of flow control or results size limits`:changes:
 
-            IF flow_control
+            `IF flow_control`:changes:
 
-                THEN return appropriate resumption_token
+                `THEN return appropriate resumption_token`:changes:
 
     IF by_resource_ID
 
@@ -394,13 +394,13 @@ Basic Obtain
 
         FOR EACH request_ID 
 
-            ▲IF flow_control AND resumption_token is present
+            `▲IF flow_control AND resumption_token is present`:changes:
 
-                THEN SKIP if entry is prior to resumption point
+                `THEN SKIP if entry is prior to resumption point`:changes:
 
-            IF results object exceeds flow control or results size limits
+            `IF results object exceeds flow control or results size limits`:changes:
 
-                THEN EXIT LOOP
+                `THEN EXIT LOOP`:changes:
 
             IF NOT ids_only
 
@@ -426,19 +426,19 @@ Basic Obtain
 
             ELSE PUT NULL in the results object
 
-        ▲IF Loop ended normally
+        `▲IF Loop ended normally`:changes:
 
-            IF flow_control and resumption token is present
+            `IF flow_control and resumption token is present`:changes:
 
-                THEN return NULL resumption_token in results
+                `THEN return NULL resumption_token in results`:changes:
 
-            ELSE omit resumption_token from results
+            `ELSE omit resumption_token from results`:changes:
 
-        IF Loop exited because of flow control or results size limits
+        `IF Loop exited because of flow control or results size limits`:changes:
 
-            IF flow_control
+            `IF flow_control`:changes:
 
-                THEN return appropriate resumption_token
+                `THEN return appropriate resumption_token`:changes:
 
 
 -------------------
@@ -755,8 +755,8 @@ API
                                     {"identifier": ID,        
                                                             // resource data description document ID
 
-                                    ▲"datestamp": "string", 
-                                                            // resource data timestamp date/time
+                                    "datestamp": "string", 
+                                                            // ▲ resource data timestamp date/time
                                                             // requried, granularity of 1 second
 
                                     "status": "string"        
@@ -843,7 +843,7 @@ Basic Harvest: GetRecord
 
                 // header
 
-                ▲datestamp := node_timestamp from the *resource* *data* *description*
+                `▲datestamp := node_timestamp from the *resource* *data* *description*`:changes:
 
                 identifier := resource data description document ID
 
@@ -1077,7 +1077,7 @@ Basic Harvest: ListRecords
 
         FOR EACH *resource* *data* *description* document
 
-            IF from <= ▲node_timestamp from the *resource* *data* *description* document
+            IF from <= `▲node_timestamp`:changes: from the *resource* *data* *description* document
 
                     <= until  // timestamp inclusive in [from:until] range
 
@@ -1085,7 +1085,7 @@ Basic Harvest: ListRecords
 
                 // return header for resource data
 
-                ▲datestamp := node_timestamp from the resource* *data* *description*
+                `▲datestamp := node_timestamp from the resource* *data* *description*`:changes:
 
                 
                 identifier := resource data description document ID
@@ -1310,7 +1310,7 @@ Basic Harvest: ListIdentifiers
 
             THEN // return header for resource data
 
-                ▲datestamp := node_timestamp fromt the *resource data description*
+                `▲datestamp := node_timestamp fromt the *resource data description*`:changes:
 
                 identifier := resource data description document ID
 
@@ -2090,7 +2090,7 @@ OAI-PMH: GetRecord
 
         <identifier>resource data description document doc_ID</identifier>
 
-                <datastamp>▲node_timestamp from the *resource data description* </datestamp>
+                <datastamp> `▲node_timestamp`:changes: from the *resource data description* </datestamp>
 
         </header>
 
@@ -2293,7 +2293,7 @@ OAI-PMH: ListRecords
 
     FOR EACH *resource data description* document
 
-        IF from <= ▲node_timestamp from the *resource data description* document
+        IF from <= `▲node_timestamp`:changes: from the *resource data description* document
 
                 <= until // timestamp inclusive in [from:until] range
 
@@ -2325,7 +2325,7 @@ OAI-PMH: ListRecords
 
             <identifier>resource data description document ID</identifier>
 
-            <datastamp>▲node_timestamp from the *resource data description* </datestamp>
+            <datastamp> `▲node_timestamp`:changes: from the *resource data description* </datestamp>
 
             </header>
 
@@ -2533,7 +2533,7 @@ OAI-PMH: ListIdentifiers
 
     FOR EACH *resource data description* document
 
-            IF from <= ▲node_timestamp from the *resource data description* document
+            IF from <= `▲node_timestamp`:changes: from the *resource data description* document
 
                     <= until // timestamp inclusive in [from:until] range
 
@@ -2565,7 +2565,7 @@ OAI-PMH: ListIdentifiers
 
             <identifier>resource data description document ID</identifier>
 
-            <datastamp>▲node_timestamp from the *resource data description* </datestamp>
+            <datastamp> `▲node_timestamp`:changes: from the *resource data description* </datestamp>
 
             </header>
 
@@ -3120,7 +3120,7 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit>`_ (V 0.24.0)                                                                                                            |
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit>`_                                                                                                            |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V AS:0.49.0)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -3128,7 +3128,9 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Future      | TBD      |            | ToS attribution output to OAI. Harvest flow control. Flow control to OAI. Logging/tracking emit as paradata to services. Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD .(V AS:x.xx.x)                                              |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
+| 0.50.1      | 20130312 | JK         | This document extracted from Google Doc and converted to RestructuredText. `Archived copy (V AS:0.49.0) <https://docs.google.com/document/d/1RRR7ZUjZRYgIyoIXPLsAZKluahqY7_Q7Gb00PHGHw8A/edit>`_                                                                                             |
+|             |          |            | node_timestamp removed from deprecation.                                                                                                                                                                                                                                                     |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 ----------------------------------

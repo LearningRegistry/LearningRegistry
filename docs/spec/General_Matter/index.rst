@@ -2,10 +2,11 @@
 
 
 =========================================================================
-General Matter: Learning Registry Technical Specification - V GM:0.50.0
+General Matter: Learning Registry Technical Specification - V GM:0.50.1
 =========================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
+
 See the `Change Log`_ for links to prior stable versions.
 
 
@@ -31,7 +32,7 @@ Readers of the other parts of the Learning Registry Technical Specification shou
 Learning Registry Overview
 --------------------------
 
-The Learning Registry [`http <http://www.google.com/url?q=http%3A%2F%2Flearningregistry.org%2F&sa=D&sntz=1&usg=AFQjCNH0Q7yFYPqAD-Zg9qiJ8rq8DVYYKg>`_://`learningregistry <http://www.google.com/url?q=http%3A%2F%2Flearningregistry.org%2F&sa=D&sntz=1&usg=AFQjCNH0Q7yFYPqAD-Zg9qiJ8rq8DVYYKg>`_.`org <http://www.google.com/url?q=http%3A%2F%2Flearningregistry.org%2F&sa=D&sntz=1&usg=AFQjCNH0Q7yFYPqAD-Zg9qiJ8rq8DVYYKg>`_/] aims to make “learning resources easier to **find**, easier to **access** and easier to **integrate** into learning environments *wherever* they are stored -- around the country and the world.” It defines a learning resource distribution network model and a set of open APIs and open interoperability standards to provide three fundamental, enabling capabilities:
+The Learning Registry [http://learningregistry.org/] aims to make “learning resources easier to **find**, easier to **access** and easier to **integrate** into learning environments *wherever* they are stored -- around the country and the world.” It defines a learning resource distribution network model and a set of open APIs and open interoperability standards to provide three fundamental, enabling capabilities:
 
 1. a lightweight mechanism to publish (push) learning resources (or metadata or paradata describing the resources) into a learning resource distribution network, independent of format or data type (e.g., resource, metadata or paradata);
 
@@ -58,7 +59,7 @@ Specification License
 The intent is that the final specification will be released under the Open Web Foundation Agreement (OWFa 0.9).
 Later versions may apply.`
 
-▲:changes:`The Learning Registry Technical Specification is being developed under the Open Web Foundation Contributor License Agreement 1.0 - Patent and Copyright (CLA 1.0)..
+:changes:`▲The Learning Registry Technical Specification is being developed under the Open Web Foundation Contributor License Agreement 1.0 - Patent and Copyright (CLA 1.0)..
 The intent is that the final specification will be released under the Open Web Foundation Final Specification Agreement (OWFa 1.0).
 Later versions may apply.`
 
@@ -75,7 +76,7 @@ Later versions may apply.`
 Notation
 --------
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the Learning Registry Technical Specification are to be interpreted as described in `RFC <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Fhtml%2Frfc2119&sa=D&sntz=1&usg=AFQjCNEifotriMBsHSbNZlbtV_IVSzvraQ>`_` 2119 <http://www.google.com/url?q=http%3A%2F%2Ftools.ietf.org%2Fhtml%2Frfc2119&sa=D&sntz=1&usg=AFQjCNEifotriMBsHSbNZlbtV_IVSzvraQ>`_.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the Learning Registry Technical Specification are to be interpreted as described in `RFC 2119 <http://tools.ietf.org/html/rfc2119>`_.
 
 The vocabulary of terms used in describing the Learning Registry and in the Learning Registry Technical Specification are listed in the `Glossary`_.
 Specific terms are set in **bold** when introduced in context.
@@ -114,7 +115,7 @@ It MAY NOT relax any constraint.
 Specification Versioning
 ------------------------
 
-▲:changes:`The following section is new in this version of the part.
+:changes:`▲The following section is new in this version of the part.
 The remainder is not highlighted.`
 
 Different components of the Learning Registry Technical Specification and any implementation are versioned.
@@ -199,9 +200,9 @@ The Learning Registry Technical Specification is split into several parts:
 - **Services** **and** **APIs**: The APIs used to publish and consume data and those used to operate the network.
   The APIs are designed to abstract the logical behaviors of the Learning Registry from any particular implementation tools.
 
-- ▲:changes:`**General** **Requirements**: Common behaviors and attributes that apply to all data models and behaviors.`
+- :changes:`▲ **General Requirements:** Common behaviors and attributes that apply to all data models and behaviors.`
 
-- ▲:changes:`**Identity** **and** **Trust****:** Models of trust, authentication, authorization, identity and security.
+- :changes:`▲ **Identity and Trust:** Models of trust, authentication, authorization, identity and security.
   These models are applied to all data models and operations.`
 
 - **Operations**: Operational procedures that apply to any implementation.
@@ -235,14 +236,14 @@ The learning registry design and technical specification is based on several key
 
 - **Document** **Oriented**: The design is targeted at a document-oriented system for implementation using document-oriented databases.
 
-- **RESTful**: APIs are RESTful, and use `CoolURIs <http://www.google.com/url?q=http%3A%2F%2Fwww.w3.org%2FTR%2Fcooluris%2F&sa=D&sntz=1&usg=AFQjCNFF57WOpfu4EyZdRMGJKnodAVjexg>`_ to return different data representations.
+- **RESTful**: APIs are RESTful, and use `CoolURIs <http://www.w3.org/TR/cooluris/>`_ to return different data representations.
 
 - **Scalable**: The design needs to seamlessly scale and perform at scale.
 
-- **Extensible** **and** **Enabling**: The design is meant to enable new capabilities.
+- **Extensible and Enabling**: The design is meant to enable new capabilities.
   Unless explicitly restricted (usually to satisfy security requirements) anything in the design is extensible.
 
-- **Web**** 2.0 ****Friendly**: The design is based on current, widely implemented Web 2.0 technologies.
+- **Web 2.0 Friendly**: The design is based on current, widely implemented Web 2.0 technologies.
 
 
 
@@ -398,15 +399,17 @@ Change Log
 
 *NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
 
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.0      | 20110926 | DR         | Editorial updates to create stand alone version. Changed license from OWA CLA 0.9 to OWA CLA 1.0. Added section on versioning. Archived copy location TBD. (V GM:0.50.0)                                                                                                                     |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Future      | TBD      |            | XXXArchived copy location TBD. (V GM:x.xx.x)                                                                                                                                                                                                                                                 |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                            |
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_                            |
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | 20110926 | DR         | Editorial updates to create stand alone version. Changed license from OWA CLA 0.9 to OWA CLA 1.0. Added section on versioning. Archived copy location TBD. (V GM:0.50.0)                                              |
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | XXXArchived copy location TBD. (V GM:x.xx.x)                                                                                                                                                                          |
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130312 | JK         | Converted spec source format to RestructuredText. `Archive copy (V GM:0.50.0) <https://docs.google.com/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit>`_                                                |
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 

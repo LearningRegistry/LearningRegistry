@@ -2,10 +2,10 @@
 
 
 ===================================================================================
-Learning Registry Operations: Learning Registry Technical Specification V OP:0.49.0
+Learning Registry Operations: Learning Registry Technical Specification V OP:0.50.1
 ===================================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
 
 See the `Change Log`_ for links to prior stable versions.
 
@@ -85,7 +85,7 @@ Resource data is stored in another database that is replicated throughout the co
 
 Except for a optional local node storage used to maintain private state that is not replicated, other document databases SHALL NOT be defined for the purpose of holding node-specific, network-specific or community-specific information.
 
-*Open* *Issue*:  As defined, gateways permit networks that allow documents to be replicated **into** the network from another network, but do not permit documents to be replicated **out** of the network (unless there is a corresponding bi-directional link).
+*Open Issue*:  As defined, gateways permit networks that allow documents to be replicated **into** the network from another network, but do not permit documents to be replicated **out** of the network (unless there is a corresponding bi-directional link).
 With such a topology, community-specific information cannot reach all nodes if it is published to a node within a network with no outbound flow; the information will not reach other networks.
 Possible solutions:
 
@@ -107,13 +107,13 @@ Possible solutions:
 *NB*: The procedures described below are currently incomplete and do not implement any of these solutions.
 They call for “network wide” (meaning network restricted) or “community wide” distribution.
 
-*Open* *Question*: How to establish a security model so that only an authorized user may update a description at any node.
+*Open Question*: How to establish a security model so that only an authorized user may update a description at any node.
 Is it necessary to sign the descriptions or to store a public key in a description?
 
-*Open* *Question*: How to constrain the network so that if someone finds a connection, they cannot exploit it.
+*Open Question*: How to constrain the network so that if someone finds a connection, they cannot exploit it.
 
 The network model MAY be instantiated in a set of procedures.
-The procedures assume the *resource* *distribution* *network* *description* document, *resource* *distribution* *network* *policy* document and *network* *community* *description* document are published before the network is expanded from the base node.
+The procedures assume the *resource distribution network description* document, *resource distribution network policy* document and *network community description* document are published before the network is expanded from the base node.
 If network expansion is done prior to these documents being created, appropriate *Distribution* processes SHALL be triggered after the documents are published to distribute them to all nodes in the network or community.
 
 
@@ -133,177 +133,163 @@ The procedure exits without changing the state of any database if validation fai
 Establish a Network Node
 ========================
 
-::
+    // Create one new node
 
-                                        // Create one new node
+    FIND a source for the node software, e.g., the Learning Registry `GitHub <http://www.google.com/url?q=https%3A%2F%2Fgithub.com%2FLearningRegistry%2FLearningRegistry&sa=D&sntz=1&usg=AFQjCNHAIkwLpeW5nAGVfizrLcIwxe21wg>`_
 
-        FIND a source for the node software, e.g., the Learning Registry `GitHub <http://www.google.com/url?q=https%3A%2F%2Fgithub.com%2FLearningRegistry%2FLearningRegistry&sa=D&sntz=1&usg=AFQjCNHAIkwLpeW5nAGVfizrLcIwxe21wg>`_
+        // out of band process
 
-                                        // out of band process
+    INSTALL the node software on a hardware node // physical or virtual
 
-        INSTALL the node software on a hardware node 
-                                        // physical or virtual
+    CONFIGURE the node software 
 
-        CONFIGURE the node software 
+    CREATE an identity for the node owner 
 
-        CREATE an identity for the node owner 
+        // used to own node documents, proxy for document owner
 
-                                        // used to own node documents, proxy for document owner
+    CREATE a *network node description* document for the node
 
-        CREATE a *network* *node* *description* document for the node
+    PUBLISH the *network node description* document to the new node by the node owner to the node’s *node document* database
 
-        PUBLISH the *network* *node* *description* document to the new node by the node owner to the node’s *node* *document* database
+        REJECT if the *network node description* document is not valid
 
-            REJECT if the *network* *node* *description* document is not valid
+        REJECT if a *network node description* document exists
 
-            REJECT if a *network* *node* *description* document exists
+    IF the node filters published or distributed data
 
-        IF the node filters published or distributed data
+        CREATE a *network node filter description* document for the node
 
-            CREATE a *network* *node* *filter* *description* document for the node
+        PUBLISH the *network node filter description* document to the new node by the node owner to the node’s *node document* database
 
-            PUBLISH the *network* *node* *filter* *description* document to the new node by the node owner to the node’s *node* *document* database
+            REJECT if the *network node filter description* document is not valid
 
-                REJECT if the *network* *node* *filter* *description* document is not valid
+            REJECT if a *network node filter description* document exists
 
-                REJECT if a *network* *node* *filter* *description* document exists
+    FOR EACH service that the node provides:
 
-        FOR EACH service that the node provides:
+        CREATE a *network node service description* document for the service
 
-            CREATE a *network* *node* *service* *description* document for the service
+        PUBLISH the *network node services description* document to the node by the node owner to the node’s *node document* database
 
-            PUBLISH the *network* *node* *services* *description* document to the node by the node owner to the node’s *node* *document* database
+        REJECT if the *network node service description* document is not valid
 
-            REJECT if the *network* *node* *service* *description* document is not valid
+
 
 Establish a Resource Distribution Network
 =========================================
 
-::
+    // Create a base, one-node network with a network description
 
-                                        // Create a base, one-node network with a network description
+    PREREQUISITE: one active node // denoted the base node 
 
-    PREREQUISITE: one active node 
-                                        // denoted the base node 
-
-                                        // via the *Establish* *a* *Node* process
+        // via the *Establish a Node* process
 
     CREATE an identity for the network owner 
 
-    CREATE a *resource* *distribution* *network* *description* document
+    CREATE a *resource distribution network description* document
 
-    PUBLISH the *resource* *distribution* *network* *description* document to the first node 
+    PUBLISH the *resource distribution network description* document to the first node 
 
-                by the owner of the *resource* *distribution* *network* *description* document
+        by the owner of the *resource distribution network description* document
 
-                to the node’s *network* *document* database
+        to the node’s *network document* database
 
-        VALIDATE 
-                                        // same network
+        VALIDATE // same network
 
-            network_id in the *network* *node* *description* document = network_id in the *resource* *distribution* *network* *description* document
+            network_id in the *network node description* document = network_id in the *resource distribution network description* document
 
-        REJECT if the *resource* *distribution* *network* *description* document is not valid
+        REJECT if the *resource distribution network description* document is not valid
 
-        REJECT if a *resource* *distribution* *network* *description* document exists
+        REJECT if a *resource distribution network description* document exists
 
-    CREATE a *resource* *distribution* *network* *policy* document
+    CREATE a *resource distribution network policy* document
 
-    PUBLISH the *resource* *distribution* *network* *policy* document to the base node by the owner of the *resource* *distribution* *network* *policy* document to the node’s *network* *document* database
+    PUBLISH the *resource distribution network policy* document to the base node by the owner of the *resource distribution network policy* document to the node’s *network document* database
 
-        VALIDATE 
-                                        // same network
+        VALIDATE // same network
 
-            network_id in the *network* *node* *description* document =
+            network_id in the *network node description* document = network_id in the *resource distribution network policy* document
 
-            network_id in the *resource* *distribution* *network* *policy* document
+        REJECT if the *resource distribution network policy* document is not valid
 
-        REJECT if the *resource* *distribution* *network* *policy* document is not valid
+        REJECT if a *resource distribution network policy* document exists
 
-        REJECT if a *resource* *distribution* *network* *policy* document exists
+
 
 Establish a Network Community
 =============================
 
-::
+    // Create a base, one-network community with a network description
 
-                                        // Create a base, one-network community with a network description
+    PREREQUISITE: one active node // denoted the base node 
 
-    PREREQUISITE: one active node 
-                                        // denoted the base node 
-
-                                        // via the *Establish* *a* *Network* *Node* process
+        // via the *Establish a Network Node* process
 
     PREREQUISITE: one active network
 
-                                        // via the *Establish* *a* *Resource* *Distribution* *Network* process
+        // via the *Establish a Resource Distribution Network* process
 
     CREATE an identity for the network community owner
 
-    CREATE a *network* *community* *description* document
+    CREATE a *network community description* document
 
-    PUBLISH the *network* *community* *description* document to the base node by the owner of the network community to the node’s *network* *community* *document* database
+    PUBLISH the *network community description* document to the base node by the owner of the network community to the node’s *network community document* database
 
-        VALIDATE 
-                                        // same community in network and community descriptions
+        VALIDATE // same community in network and community descriptions
 
-            community_id in the *resource* *distribution* *network* *description* document =
+            community_id in the *resource distribution network description* document =
 
-            community_id in the *network* *community* *description* document
+            community_id in the *network community description* document
 
-        VALIDATE 
-                                        // same community in node and community descriptions
+        VALIDATE // same community in node and community descriptions
 
-            community_id in the *network* *node* *description* document =
+            community_id in the *network node description* document =
 
-            community_id in the *network* *community* *description* document
+            community_id in the *network community description* document
 
-        REJECT if the *network* *community* *description* document is not valid
+        REJECT if the *network community description* document is not valid
 
-        REJECT if a *network* *community* *description* document exists
+        REJECT if a *network community description* document exists
+
+
 
 Add a Network Node to a Resource Distribution Network
 =====================================================
 
-::
+    // Add a node to an existing network
 
-                                        // Add a node to an existing network
+    // NB: Nothing in this process loads resource data into the node
 
-                                        // NB: Nothing in this process loads resource data into the node
+    PREREQUISITE: an established active network // one or more active nodes
 
-    PREREQUISITE: an established active network 
-                                        // one or more active nodes
+    PERFORM the *Establish a Network Node* process to create a node // denoted the new node
 
-    PERFORM the *Establish* *a* *Network* *Node* process to create a node 
-                                        // denoted the new node
+    FIND another active node in the network to connect to // denoted the existing node
 
-    FIND another active node in the network to connect to 
-                                        // denoted the existing node
+        // discovery and agreement to connect is out of band
 
-                                        // discovery and agreement to connect is out of band
-
-    PERFORM the *Adding* *Connections* *within* *a* *Resource* *Distribution* *Network* process
+    PERFORM the *Adding Connections within a Resource Distribution Network* process
 
         source node is the existing node
 
         destination node is the new node
 
-    PERFORM the *Distribution* process to replicate the *network* *document* database 
+    PERFORM the *Distribution* process to replicate the *network document* database 
 
-                from the source node to the destination node
+        from the source node to the destination node
 
-                                        // propagates network description and policy to only the new node
+        // propagates network description and policy to only the new node
 
-                                        // may proceed asynchronously
+        // may proceed asynchronously
+
+
 
 Adding Connections within a Resource Distribution Network
 =========================================================
 
-::
+    // Add connectivity between two existing nodes in a network
 
-                                        // Add connectivity between two existing nodes in a network
-
-                                        // A source node connects to a destination node
+    // A source node connects to a destination node
 
     PREREQUISITE: an established network with two or more nodes
 
@@ -311,23 +297,17 @@ Adding Connections within a Resource Distribution Network
 
     PREREQUISITE: the active destination node is known (connected node)
 
-                                        // discovery and agreement to connect is out of band
+        // discovery and agreement to connect is out of band
 
-    VALIDATE 
-                                        // same network
+    VALIDATE // same network
 
-        network_id in the source node’s *network* *node* *description* document =
+        network_id in the source node’s *network node description* document = network_id in the destination node’s *network node description* document
 
-        network_id in the destination node’s *network* *node* *description* document
+    VALIDATE // same community
 
-    VALIDATE 
-                                        // same community
+        community_id in the source node’s *network node description* document = community_id in the destination node’s *network node description* document
 
-        community_id in the source node’s *network* *node* *description* document =
-
-        community_id in the destination node’s *network* *node* *description* document
-
-    CREATE a *network* *node* *connectivity* *description* document with
+    CREATE a *network node connectivity description* document with
 
         source_node_url := source node URL
 
@@ -335,24 +315,24 @@ Adding Connections within a Resource Distribution Network
 
         gateway_connection := F
 
-    PUBLISH the *network* *node* *connectivity* *description* document
+    PUBLISH the *network node connectivity description* document
 
         by the source node owner
 
-                to the source node’s *node* *document* database
+        to the source node’s *node document* database
 
-    REJECT if the *network* *node* *connectivity* *description* document is not VALID
+    REJECT if the *network node connectivity description* document is not VALID
 
     REJECT if the same source -> destination active connection exists
+
+
 
 Connect Networks within a Community
 ===================================
 
-::
+    // Add a gateway connection between two networks
 
-                                        // Add a gateway connection between two networks
-
-                                        // NB: Nothing in this process distributes resource data across the gateway
+    // NB: Nothing in this process distributes resource data across the gateway
 
     PREREQUISITE: two established networks
 
@@ -360,30 +340,23 @@ Connect Networks within a Community
 
     PREREQUISITE: the active destination node is known (connected node)
 
-                                        // discovery and agreement to connect is out of band
+        // discovery and agreement to connect is out of band
 
-    VALIDATE 
-                                        // different network
+    VALIDATE // different network
 
-        network_id in the source node’s *network* *node* *description* document <>
+        network_id in the source node’s *network node description* document <> network_id in the destination node’s *network node description* document
 
-        network_id in the destination node’s *network* *node* *description* document
+    VALIDATE // same community
 
-    VALIDATE 
-                                        // same community
+        community_id in the source node’s *network node description* document = community_id in the destination node’s *network node description* document
 
-        community_id in the source node’s *network* *node* *description* document =
+    VALIDATE // no gateway
 
-        community_id in the destination node’s *network* *node* *description* document
-
-    VALIDATE 
-                                        // no gateway
-
-        FOR EACH source node’s *network* *node* *connectivity* *description* document
+        FOR EACH source node’s *network node connectivity description* document
 
             NOT gateway_connection
 
-    CREATE a *network* *node* *connectivity* *description* document with
+    CREATE a *network node connectivity description* document with
 
         source_node_url := source node URL
 
@@ -391,20 +364,20 @@ Connect Networks within a Community
 
         gateway_connection := T
 
-    PUBLISH the *network* *node* *connectivity* *description* document by the source node owner to the source node’s *node* *document* database
+    PUBLISH the *network node connectivity description* document by the source node owner to the source node’s *node document* database
 
-    REJECT if the *network* *node* *connectivity* *description* document is not VALID
+    REJECT if the *network node connectivity description* document is not VALID
 
     REJECT if the same source -> destination active connection exists
+
+
 
 Connect Communities
 ===================
 
-::
+    // Add a gateway connection between two communities
 
-                                        // Add a gateway connection between two communities
-
-                                        // NB: Nothing in this process distributes resource data across the gateway
+    // NB: Nothing in this process distributes resource data across the gateway
 
     PREREQUISITE: two communities networks
 
@@ -412,37 +385,29 @@ Connect Communities
 
     PREREQUISITE: the active destination node is known (connected node)
 
-                                        // discovery and agreement to connect is out of band
+        // discovery and agreement to connect is out of band
 
-    VALIDATE 
-                                        // social communities
+    VALIDATE // social communities
 
-        social_community T in the source node’s *network* *community* *description* document
+        social_community T in the source node’s *network community description* document
 
-        social_community T in the destination node’s *network* *community* *description* document
+        social_community T in the destination node’s *network community description* document
 
-    VALIDATE
-                                        // different network
+    VALIDATE // different network
 
-        network_id in the source node’s *network* *node* *description* document <>
+        network_id in the source node’s *network node description* document <> network_id in the destination node’s *network node description* document
 
-        network_id in the destination node’s *network* *node* *description* document
+    VALIDATE / different community
 
-    VALIDATE 
-                                        // different community
+        community_id in the source node’s *network node description* document <> community_id in the destination node’s *network node description* document
 
-        community_id in the source node’s *network* *node* *description* document <>
+    VALIDATE // no gateway
 
-        community_id in the destination node’s *network* *node* *description* document
-
-    VALIDATE 
-                                        // no gateway
-
-        FOR EACH source node’s *network* *node* *connectivity* *description* document
+        FOR EACH source node’s *network node connectivity description* document
 
             NOT gateway_connection
 
-    CREATE a *network* *node* *connectivity* *description* document with
+    CREATE a *network node connectivity description* document with
 
         source_node_url := source node URL
 
@@ -450,13 +415,13 @@ Connect Communities
 
         gateway_connection := T
 
-    PUBLISH the *network* *node* *connectivity* *description* document
+    PUBLISH the *network node connectivity description* document
 
         by the source node owner
 
-                to the source node’s *node* *document* database
+        to the source node’s *node document* database
 
-    REJECT if the *network* *node* *connectivity* *description* document is not VALID
+    REJECT if the *network node connectivity description* document is not VALID
 
     REJECT if the same source -> destination active connection exists
 
@@ -473,330 +438,377 @@ Deleting a document would require network-level garbage collection to determine 
 
 If updating the description of a network node, its services or connectivity, the description of a the distribution network or the network community causes the descriptions to violate the requirements for the :ref:`Network Description <Network Description>`, the node SHALL NOT be considered to be a part of the corresponding distribution network and network community and SHALL NOT participate in any network or resource operations.
 
+
+
 Change Network Node Description
 ===============================
 
-::
+    // update the description of any node
 
-                                        // update the description of any node
+    PUBLISH the updated *network node description* document to the node 
 
-        PUBLISH the updated *network* *node* *description* document to the node by the node owner to the node’s *node* *document* database
+        by the node owner 
 
-                REJECT if the *network* *node* *description* document is not valid
+        to the node’s *node document* database
 
-                REJECT if the *network* *node* *description* document is not an update
+        REJECT if the *network node description* document is not valid
 
-                                        // node may have only one network node description
+        REJECT if the *network node description* document is not an update
+
+        // node may have only one network node description
+
+
 
 Delete a Network Node
 =====================
 
-::
+    // remove a node from a network
 
-                                        // remove a node from a network
+    // but the node remains, inaccessible
 
-                                        // but the node remains, inaccessible
+    // first sync the documents so that others have them
 
-                                        // first sync the documents so that others have them
-
-                                        // sync before delete is an operational policy choice; could be modeled in policy
+    // sync before delete is an operational policy choice; could be modeled in policy
 
     COMMIT all outstanding resource data description database operations
 
     PERFORM the Distribute Resource process 
 
-    FOR EACH *resource* *data* *description* document
+    FOR EACH *resource data description* document
 
-        delete the document from the node’s *resource* *data* *description* *document* *database*
+        delete the document from the node’s *resource data description document database*
 
-                                        // this is an explicit delete
+        // this is an explicit delete
 
-    PUBLISH the updated *network* *node* *description* document to the node by the node owner
+    PUBLISH the updated *network node description* document to the node by the node owner
 
         ACTIVE = F
 
-        to the node’s *node* *document* database
+        to the node’s *node document* database
 
-        REJECT if the *network* *node* *description* document is not valid
+        REJECT if the *network node description* document is not valid
 
-        REJECT if the *network* *node* *description* document is not an update
+        REJECT if the *network node description* document is not an update
 
-                                        // node may have only one network node description
+         // node may have only one network node description
 
-    FOR EACH *network* *node* *services* *description* document
+    FOR EACH *network node services description* document
 
         PERFORM the Delete Node Service process
 
-    FOR EACH *network* *node* *connectivity* *description* document
+    FOR EACH *network node connectivity description* document
 
         PERFORM the Delete Node Network Connection process
+
+
 
 Change Node Service Description
 ===============================
 
-::
+    // update the description of a service at any node
 
-                                        // update the description of a service at any node
+    PUBLISH the updated *network node services description* document to the node 
 
-        PUBLISH the updated *network* *node* *services* *description* document to the node by the node owner to the node’s *node* *document* database
+        by the node owner 
 
-        REJECT if the *network* *node* *service* *description* document is not valid
+        to the node’s *node document* database
 
-        REJECT if the *network* *node* *service* *description* document is not an update
+    REJECT if the *network node service description* document is not valid
+
+    REJECT if the *network node service description* document is not an update
+
+
 
 Add Node Service
 ================
 
-::
+    // add a service to any node
 
-                                        // add a service to any node
+    PUBLISH the new *network node services description* document to the node 
 
-        PUBLISH the new *network* *node* *services* *description* document to the node by the node owner to the node’s *node* *document* database
+        by the node owner 
 
-        REJECT if the *network* *node* *service* *description* document is not valid
+        to the node’s *node document* database
 
-        REJECT if the *network* *node* *service* *description* document is not an addition
+    REJECT if the *network node service description* document is not valid
+
+    REJECT if the *network node service description* document is not an addition
+
+
 
 Delete Node Service
 ===================
 
-::
+    // delete a service from any node
 
-                                        // delete a service from any node
+    PUBLISH the updated *network node services description* document to the node
 
-        PUBLISH the updated *network* *node* *services* *description* document to the node
+        ACTIVE = F
 
-            ACTIVE = F
+        by the node owner
 
-            by the node owner
+        to the node’s *node document* database
 
-            to the node’s *node* *document* database
+    REJECT if the *network node service description* document is not valid
 
-        REJECT if the *network* *node* *service* *description* document is not valid
+    REJECT if the *network node service description* document is not an update
 
-        REJECT if the *network* *node* *service* *description* document is not an update
+
 
 Change Node Network Connectivity
 ================================
 
-::
 
-                                        // change the connectivity description of a connection from a node
 
-                                        // unless there are mutable extension data elements, the process is a NO-OP
+    // change the connectivity description of a connection from a node
 
-                                        // all other data elements are immutable
+    // unless there are mutable extension data elements, the process is a NO-OP
 
-    PUBLISH the updated *network* *node* *connectivity* *description* document by the source node owner to the source node’s *node* *document* database
+    // all other data elements are immutable
 
-    REJECT if the *network* *node* *connectivity* *description* document is not valid
+    PUBLISH the updated *network node connectivity description* document 
 
-    REJECT if the *network* *node* *connectivity* *description* document is not an update
+        by the source node owner 
+
+        to the source node’s *node document* database
+
+    REJECT if the *network node connectivity description* document is not valid
+
+    REJECT if the *network node connectivity description* document is not an update
+
+
 
 Delete Node Network Connectivity
 ================================
 
-::
+    // remove the connection from a node to another node
 
-                                        // remove the connection from a node to another node
+    // applies to intra-network or inter-network or inter-community
 
-                                        // applies to intra-network or inter-network or inter-community
-
-    PUBLISH the updated *network* *node* *connectivity* *description* document
+    PUBLISH the updated *network node connectivity description* document
 
         ACTIVE = F
 
         by the source node owner
 
-        to the source node’s *node* *document* database
+        to the source node’s *node document* database
 
-    REJECT if the *network* *node* *connectivity* *description* document is not valid
+    REJECT if the *network node connectivity description* document is not valid
 
-    REJECT if the *network* *node* *connectivity* *description* document is not an update
+    REJECT if the *network node connectivity description* document is not an update
+
+
 
 Change Node Filters
 ===================
 
-::
+    // change the filters at a node
 
-                                        // change the filters at a node
+    PUBLISH the updated *network node filter description* document 
 
-    PUBLISH the updated *network* *node* *filter* *description* document by the source node owner to the source node’s *node* *document* database
+        by the source node owner 
 
-    REJECT if the *network* *node* *filter* *description* document is not valid
+        to the source node’s *node document* database
 
-    REJECT if the *network* *node* *filter* *description* document is not an update
+    REJECT if the *network node filter description* document is not valid
+
+    REJECT if the *network node filter description* document is not an update
+
+
 
 Delete Node Filters
 ===================
 
-::
+    // delete ALL filters at a node
 
-                                        // delete ALL filters at a node
-
-    PUBLISH the updated *network* *node* *filter* *description* document
+    PUBLISH the updated *network node filter description* document
 
         ACTIVE = F
 
         by the source node owner
 
-        to the source node’s *node* *document* database
+        to the source node’s *node document* database
 
-    REJECT if the *network* *node* *filter* *description* document is not valid
+    REJECT if the *network node filter description* document is not valid
 
-    REJECT if the *network* *node* *filter* *description* document is not an update
+    REJECT if the *network node filter description* document is not an update
+
+
 
 Change Resource Distribution Network Description
 ================================================
 
-::
+    // change the resource distribution network description
 
-                                        // change the resource distribution network description
+    // applied at some node
 
-                                        // applied at some node
+    PUBLISH the updated *resource distribution network description* document 
 
-    PUBLISH the updated *resource* *distribution* *network* *description* document by the *resource* *distribution* *network* *description* document owner to the node’s *network* *document* database
+        by the *resource distribution network description* document owner 
 
-    REJECT if the *resource* *distribution* *network* *description* document is not valid
+        to the node’s *network document* database
 
-    REJECT if the *resource* *distribution* *network* *description* document is not an update
+    REJECT if the *resource distribution network description* document is not valid
 
-    PERFORM a network-wide *Distribution* process to replicate the *network* *document* database to the other nodes in the network
+    REJECT if the *resource distribution network description* document is not an update
 
-                                        // propagates resource distribution network description to all nodes in the network
+    PERFORM a network-wide *Distribution* process to replicate the *network document* database 
 
-                                        // may proceed asynchronously
+        to the other nodes in the network
+
+        // propagates resource distribution network description to all nodes in the network
+
+        // may proceed asynchronously
+
+
 
 Delete Resource Distribution Network Description
 ================================================
 
-::
+    // delete the resource distribution network description
 
-                                        // delete the resource distribution network description
+    // applied at some node
 
-                                        // applied at some node
-
-    PUBLISH the updated *resource* *distribution* *network* *description* document
+    PUBLISH the updated *resource distribution network description* document
 
         ACTIVE = F
 
-        by the *resource* *distribution* *network* *description* document owner
+        by the *resource distribution network description* document owner
 
-        to the node’s *network* *document* database
+        to the node’s *network document* database
 
-    REJECT if the *resource* *distribution* *network* *description* document is not valid
+    REJECT if the *resource distribution network description* document is not valid
 
-    REJECT if the *resource* *distribution* *network* *description* document is not an update
+    REJECT if the *resource distribution network description* document is not an update
 
-    PERFORM a network-wide *Distribution* process to replicate the *network* *document* database to the other nodes in the network
+    PERFORM a network-wide *Distribution* process to replicate the *network document* database 
 
-                                        // propagates resource distribution network description to all nodes in the network
+        to the other nodes in the network
 
-                                        // may proceed asynchronously
+        // propagates resource distribution network description to all nodes in the network
 
-Change ResourceDistribution Network Policy
-==========================================
+        // may proceed asynchronously
 
-::
 
-                                        // change the resource distribution network policy
 
-                                        // applied at some node
+Change Resource Distribution Network Policy
+===========================================
 
-    PUBLISH the updated *resource* *distribution* *network* *policy* document by the *resource* *distribution* *network* *policy* document owner to the node’s *network* *document* database
+    // change the resource distribution network policy
 
-    REJECT if the *resource* *distribution* *network* *policy* document is not valid
+    // applied at some node
 
-    REJECT if the *resource* *distribution* *network* *policy* document is not an update
+    PUBLISH the updated *resource distribution network policy* document 
 
-    PERFORM a network-wide *Distribution* process to replicate the *network* *document* database to the other nodes in the network
+        by the *resource distribution network policy* document owner 
 
-                                        // propagates resource distribution network policy to all nodes in the network
+        to the node’s *network document* database
 
-                                        // may proceed asynchronously
+    REJECT if the *resource distribution network policy* document is not valid
+
+    REJECT if the *resource distribution network policy* document is not an update
+
+    PERFORM a network-wide *Distribution* process to replicate the *network document* database 
+
+        to the other nodes in the network
+
+        // propagates resource distribution network policy to all nodes in the network
+
+        // may proceed asynchronously
+
+
 
 Delete Resource Distribution Network Policy
 ===========================================
 
-::
+    // delete the resource distribution network policy
 
-                                        // delete the resource distribution network policy
+    // applied at some node
 
-                                        // applied at some node
-
-    PUBLISH the updated *resource* *distribution* *network* *policy* document
+    PUBLISH the updated *resource distribution network policy* document
 
         ACTIVE = F
 
-        by the *resource* *distribution* *network* *policy* document owner
+        by the *resource distribution network policy* document owner
 
-        to the node’s *network* *document* database
+        to the node’s *network document* database
 
-    REJECT if the *resource* *distribution* *network* *policy* document is not valid
+    REJECT if the *resource distribution network policy* document is not valid
 
-    REJECT if the *resource* *distribution* *network* *policy* document is not an update
+    REJECT if the *resource distribution network policy* document is not an update
 
-    PERFORM a network-wide *Distribution* process to replicate the *network* *document* database to the other nodes in the network
+    PERFORM a network-wide *Distribution* process to replicate the *network document* database 
 
-                                        // propagates resource distribution network policy to all nodes in the network
+        to the other nodes in the network
 
-                                        // may proceed asynchronously
+        // propagates resource distribution network policy to all nodes in the network
+
+        // may proceed asynchronously
+
+
 
 Change Network Community Description
 ====================================
 
-::
+    // change the network community description
 
-                                        // change the network community description
+    // applied at some node in some network in the community
 
-                                        // applied at some node in some network in the community
+    // node must have connectivity to reach all other networks
 
-                                        // node must have connectivity to reach all other networks
+    // otherwise apply to multiple nodes
 
-                                        // otherwise apply to multiple nodes
+    PUBLISH the updated *network community description* document 
 
-    PUBLISH the updated *network* *community* *description* document by the *network* *community* *description* document owner to the node’s *network* *community* *document* database
+        by the *network community description* document owner 
 
-    REJECT if the *network* *community* *description* document is not valid
+        to the node’s *network community document* database
 
-    REJECT if the *network* *community* *description* document is not an update
+    REJECT if the *network community description* document is not valid
 
-    PERFORM a community-wide *Distribution* process to replicate the  *community* *document* database to the other nodes in the community
+    REJECT if the *network community description* document is not an update
 
-                                        // propagates community description to all nodes in the community
+    PERFORM a community-wide *Distribution* process to replicate the *community document* database 
 
-                                        // may proceed asynchronously
+        to the other nodes in the community
+
+        // propagates community description to all nodes in the community
+
+        // may proceed asynchronously
+
+
 
 Delete Network Community Description
 ====================================
 
-::
+    // delete the network community description
 
-                                        // delete the network community description
+    // applied at some node in some network in the community
 
-                                        // applied at some node in some network in the community
+    // node must have connectivity to reach all other networks
 
-                                        // node must have connectivity to reach all other networks
+    // otherwise apply to multiple nodes
 
-                                        // otherwise apply to multiple nodes
-
-    PUBLISH the updated *network* *community* *description* document
+    PUBLISH the updated *network community description* document
 
         ACTIVE = F
 
-        by the *network* *community* *description* document owner
+        by the *network community description* document owner
 
-        to the node’s *network* *community* *document* database
+        to the node’s *network community document* database
 
-    REJECT if the *network* *community* *description* document is not valid
+    REJECT if the *network community description* document is not valid
 
-    REJECT if the *network* *community* *description* document is not an update
+    REJECT if the *network community description* document is not an update
 
-    PERFORM a community-wide *Distribution* process to replicate the *community* *document* database to the other nodes in the community
+    PERFORM a community-wide *Distribution* process to replicate the *community document* database 
 
-                                        // propagates community description to all nodes in the communities
+        to the other nodes in the community
 
-                                        // may proceed asynchronously
+        // propagates community description to all nodes in the communities
+
+        // may proceed asynchronously
+
 
 
 .. _Network Discovery:
@@ -918,9 +930,9 @@ Access to information about the deletion of resource data is governed by a node-
 What it means to “delete” a document is not specified, e.g., it is removed or just marked as deleted.
 Tracking of deletions MAY be independent of the actual TTL and the actual deletion of the resource data.
 
-*Open* *Question*: Should the data persistence policies be network, not node, specific.
+*Open Question*: Should the data persistence policies be network, not node, specific.
 
-*Open* *Issue*: Using pure replication, when one node deletes a document, the delete will propagate.
+*Open Issue*: Using pure replication, when one node deletes a document, the delete will propagate.
 This MAY invalidate the required information about the tracking and persistence of deletions.
 What is the model for deletion versus TTL and access to deletion status for harvest?
 
@@ -934,7 +946,7 @@ Resource distribution network nodes MAY provide :ref:`Administrative Services <A
 
 Provisioning of administrative services SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
-*Open* *Question*: Do we need a mechanism to control access to network data models beyond authentication controls?
+*Open Question*: Do we need a mechanism to control access to network data models beyond authentication controls?
 
 
 
@@ -952,7 +964,7 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0)                                                                                                    |
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V OP:0.49.0)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -960,7 +972,8 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Future      | TBD      |            | Archived copy location TBD. (V OP:x.xx.x)                                                                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
+| 0.50.1      | 20130312 | JK         | This document extracted from original Google Doc and converted to RestructuredText. `Archived copy (V OP:0.50.0) <https://docs.google.com/document/d/1NxS_QSxuTemFOi0uduUDvX69m8_AwHPUM2HmnI-tyuc/edit>`_                                                                                    |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 ----------------------------------

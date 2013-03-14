@@ -4,10 +4,11 @@
 
 
 ============================================================================
-Distribution Services: Learning Registry Technical Specification V DS:0.49.0
+Distribution Services: Learning Registry Technical Specification V DS:0.50.1
 ============================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
+
 See the `Change Log`_ for links to prior stable versions.
 
 
@@ -243,13 +244,13 @@ Resource Distribution: Destination Node Process
 
             THEN PERFORM filtering and store only documents that pass the filter
 
-        ▼:deprecation:`UPDATE node_timestamp // when the document was stored at the node`
+        :deprecation:`▼ UPDATE node_timestamp // when the document was stored at the node`
 
 
 
 *NB*: The process does not return indicators when documents are filtered.
 
-▼:deprecation:`*NB*: An implementation SHALL maintain node_timestamp in a manner that does not trigger redistibution of the document; node_timestamp is a local node value`.
+:deprecation:`▼ *NB*: An implementation SHALL maintain node_timestamp in a manner that does not trigger redistibution of the document; node_timestamp is a local node value`.
 -- TO BE replaced by a local value that is not maintained as part of the resource data description document
 
 API: Destination Node Information
@@ -383,18 +384,19 @@ Change Log
 
 *NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
 
-+-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Version** | **Date** | **Author** | **Change**                                                                                                                                                             |
-+-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.Archived copy (V 0.24.0)                                                                                 |
-+-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V DS:0.49.0)                                                                              |
-+-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V DS:0.50.0) |
-+-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Future      | TBD      |            | Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V DS:x.xx.x)                                                 |
-+-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                       |
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.Archived copy (V 0.24.0)                                                                                                           |
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V DS:0.49.0)                                                                                                        |
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V DS:0.50.0)                           |
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V DS:x.xx.x)                                                                           |
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130312 | JK         | This document extracted from Google Doc and converted to RestructuredText. `Archived copy (V DS:0.49.0) <https://docs.google.com/document/d/1HW_JJBiWxNHoA5L1TuZrjWeK-DaFF0FTeMZBNIL5MqI/edit>`_ |
++-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 

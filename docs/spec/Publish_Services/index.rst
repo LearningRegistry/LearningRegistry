@@ -4,7 +4,7 @@
 Publish Services: Learning Registry Technical Specification V PS:0.50.1
 =======================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
 
 See the `Change Log`_ for links to prior stable versions.
 
@@ -348,35 +348,31 @@ Basic Publish
         
         :changes:`▲ graveyard := []`
 
-        IF *resource* *data* *description* document has a non-empty "replaces" property
+        `IF *resource* *data* *description* document has a non-empty "replaces" property`:changes:
 
-            THEN          
-                                        // check that document can be published according to replacement policy
+            `THEN // check that document can be published according to replacement policy`:changes:
 
-                FOR EACH *resource* *data* *description* specifed in "replaces" property
+                `FOR EACH *resource* *data* *description* specifed in "replaces" property`:changes:
 
-                    IF the original *resource data description* document can be replaced
+                    `IF the original *resource data description* document can be replaced`:changes:
 
-                        THEN    
-                                        // indicate tombstone can be created`
+                        `THEN // indicate tombstone can be created`:changes:
 
-                            CREATE *tombstone document* for original *resource data description* document
+                            `CREATE *tombstone document* for original *resource data description* document`:changes:
 
-                            PUSH  *tombstone document* to graveyard
+                            `PUSH  *tombstone document* to graveyard`:changes:
 
-                        IF the replacement *resource data description* document violates *replacement policy*
+                        `IF the replacement *resource data description* document violates *replacement policy*`:changes:
 
-                            THEN    
-                                        // indicate that replacement is invalid and not permitted
+                            `THEN // indicate that replacement is invalid and not permitted`:changes:
 
-                                OK := F
+                                `OK := F`:changes:
 
-                                error := "rejected replacement"  
-                                        // an appropriate message
+                                `error := "rejected replacement" // an appropriate message`:changes:
 
-                                doc_ID := supplied doc_ID
+                                `doc_ID := supplied doc_ID`:changes:
 
-                                SKIP
+                                `SKIP`:changes:
 
 
         PUBLISH the *resource* *data* *description* document to the node by the owner of the node to the node’s resource data description document database
@@ -558,7 +554,7 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
     If the node_description is missing, the element SHALL be omitted.
 
   - <sword:collectionPolicy> element MAY be present.
-    The value is determined by the policies of the node, network or community (e.g., for the public Learning Registry community, the policy is the terms of service for the community, `http <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregisrty.org%2Ftos%2F&sa=D&sntz=1&usg=AFQjCNG3rD84JmiZzviK-iAYdu4QE0NbrQ>`_://`www <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregisrty.org%2Ftos%2F&sa=D&sntz=1&usg=AFQjCNG3rD84JmiZzviK-iAYdu4QE0NbrQ>`_.`learningregisrty <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregisrty.org%2Ftos%2F&sa=D&sntz=1&usg=AFQjCNG3rD84JmiZzviK-iAYdu4QE0NbrQ>`_.`org <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregisrty.org%2Ftos%2F&sa=D&sntz=1&usg=AFQjCNG3rD84JmiZzviK-iAYdu4QE0NbrQ>`_/`tos <http://www.google.com/url?q=http%3A%2F%2Fwww.learningregisrty.org%2Ftos%2F&sa=D&sntz=1&usg=AFQjCNG3rD84JmiZzviK-iAYdu4QE0NbrQ>`_/)
+    The value is determined by the policies of the node, network or community (e.g., for the public Learning Registry community, the policy is the terms of service for the community, `http://www.learningregistry.org/tos/ <http://www.learningregistry.org/tos/>`_ )
 
   - <sword:treatment> and <sword:service> elements SHALL be omitted.
 
@@ -973,15 +969,15 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_                                                                                                   |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V PS:0.49.0)                                                                                                                                                                                                    |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V PS:0.50.0)                                                                                                                       |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.1      | 20130227 | JK         | Un-deprecated node_timestamp. Amended Publishing algorithm to handle replacement documents.                                                                                                                                                                                                  |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Future      | TBD      |            | Logging/tracking emit as paradata to services. Deprecate node_timestamp. Details of attachments on publish, obtain, harvest.Archived copy location TBD. (V PS:x.xx.x)                                                                                                                        |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130227 | JK         | Un-deprecated node_timestamp. Amended Publishing algorithm to handle replacement documents.  `Archive copy (V PS:0.49.0) <https://docs.google.com/document/d/1kgTyRk1kIM3QvfU2JB1C9ARMuL7fCqsba7mOLQ3IKlw/edit>`_                                                                            |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

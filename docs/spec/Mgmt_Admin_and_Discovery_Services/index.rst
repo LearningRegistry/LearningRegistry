@@ -2,10 +2,10 @@
 
 
 ========================================================================================================
-Management, Administrative and Discovery Services: Learning Registry Technical Specification V MS:0.49.0
+Management, Administrative and Discovery Services: Learning Registry Technical Specification V MS:0.50.1
 ========================================================================================================
 
-Draft in Progress.
+.. include:: ../stability.txt
 
 See the `Change Log`_ for links to prior stable versions.
 
@@ -55,7 +55,7 @@ Future drafts or versions of this specification MAY define additional service qu
 *NB*: Provisioning administrative services is optional.
 They SHOULD NOT be relied on for resource distribution network operations.
 
-*Open* *Question*: Do we need to have separate services to return node filters (now part of the general node description) or node connectivity (currently not retrievable).
+*Open Question*: Do we need to have separate services to return node filters (now part of the general node description) or node connectivity (currently not retrievable).
 
 All administrative services SHALL support HTTP content negotiation.
 All administrative services SHALL support return of CONTENT-TYPE: text/plain.
@@ -157,15 +157,13 @@ API
 Network Node Status
 ===================
 
-::
-
-                                        // Return the operational status of a network node
+    // Return the operational status of a network node
 
     DEFINE VIEW on 
 
-                *network* *node* *description* document containing the required fields 
+                *network node description* document containing the required fields 
 
-                + *network* *node* *operationa*l data containing the required fields
+                + *network node operational* data containing the required fields
 
     QUERY
 
@@ -389,21 +387,19 @@ API
 Network Node Description
 ========================
 
-::
-
-                                        // Return the description of a network node
+    // Return the description of a network node
 
     DEFINE VIEW on 
 
-                *network* *node* *description* document containing the required output fields 
+                *network node description* document containing the required output fields 
 
-                + *resource* *distribution* *network* *description* document containing the required output fields
+                + *resource distribution network description* document containing the required output fields
 
-                + *resource* *distribution* *network* *policy* document containing the required output fields
+                + *resource distribution network policy* document containing the required output fields
 
-                + *network* *community* *description* document containing the required output fields
+                + *network community description* document containing the required output fields
 
-                + *network* *node* *filter* *description* document containing the required output fields
+                + *network node filter description* document containing the required output fields
 
     QUERY
 
@@ -551,15 +547,13 @@ API
 Network Node Services
 =====================
 
-::
-
-                                        // Return the description of network node services
+    // Return the description of network node services
 
     DEFINE VIEW on 
 
-                *network* *node* *description* document containing the required output fields 
+                *network node description* document containing the required output fields 
 
-                + ALL *network* *node* *service* *description* documents containing the required output fields
+                + ALL *network node service description* documents containing the required output fields
 
                 GROUPED and ORDERED on service attributes.
 
@@ -681,17 +675,15 @@ API
 Resource Distribution Network Policy
 ====================================
 
-::
-
-                                        // Return the description of network policies
+    // Return the description of network policies
 
     DEFINE VIEW on 
 
-                *network* *node* *description* document containing the required output fields 
+                *network node description* document containing the required output fields 
 
-                + *resource* *distribution* *network* *description* document containing the required output fields
+                + *resource distribution network description* document containing the required output fields
 
-                + *resource* *distribution* *network* *policy* document containing the required output fields
+                + *resource distribution network policy* document containing the required output fields
 
     QUERY
 
@@ -758,18 +750,19 @@ Change Log
 
 *NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
 
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                                                                                                   |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document.`Archived <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ `copy <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_ (V 0.24.0) |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V MS:0.49.0)                                                                                                                                                                                                    |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V MS:0.50.0)                                                                                                                       |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Future      | TBD      |            | Archived copy location TBD. (V MS:x.xx.x)                                                                                                                                                                                                                                                    |
-+-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                 |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_                 |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.49.0      | 20110927 | DR         | Editorial updates to create stand alone version.Archived copy location TBD. (V MS:0.49.0)                                                                                                                  |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.0      | TBD      | DR         | Renumber all document models and service documents. Added node policy to control storage of attachments (default is stored). Archived copy location TBD. (V MS:0.50.0)                                     |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | Archived copy location TBD. (V MS:x.xx.x)                                                                                                                                                                  |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130312 | JK         | This document extracted from original Google Doc and converted to RestructuredText. `Archived copy (V MS:0.49.0) <https://docs.google.com/document/d/1lATgircOBUOmsoFwia8su2o--TZ88AG4GOmn5NQ6jAc/edit>`_  |
++-------------+----------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 ----------------------------------
