@@ -913,7 +913,7 @@ A node MAY “delete” documents that have been stored longer than the network�
 If the node supports harvest, the node SHALL maintain a value for earliestDatestamp.
 This value is the oldest publish, update or delete time for a resource data description document that can be accessed at the node via harvest.
 The timestamp SHALL be precise to the nearest second.
-The value is based on the time the resource data description documents are published at the node `(▲node_timestamp).`:changed:
+The value is based on the time the resource data description documents are published at the node `(▲node_timestamp).`:changes:
 
 Access to information about the deletion of resource data is governed by a node-specific policy, deleted_data_policy:
 
