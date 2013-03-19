@@ -161,68 +161,70 @@ You can read the full description of the envelope in the
 document.
 
 
-{
+.. sourcecode:: javascript
 
-"TOS": {
+ {
 
-"submission\_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+    "TOS": {
 
-},
+      "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
 
-"active": true,
+    },
 
-"doc\_type": "resource\_data",
+    "active": true,
 
-"doc\_version": "0.23.0",
+    "doc_type": "resource_data",
 
-"identity": {
+    "doc_version": "0.23.0",
 
-"curator": "",
+    "identity": {
 
-"owner": "",
+      "curator": "",
 
-"submitter": "your name or organization here",
+      "owner": "",
 
-"signer": "your name or org, if you're signing the document",
+      "submitter": "your name or organization here",
 
-"submitter\_type": "agent"
+      "signer": "your name or org, if you're signing the document",
 
-},
+      "submitter_type": "agent"
 
-"keys": [
+    },
 
-"science",
+    "keys": [
 
-"Newton",
+      "science",
 
-"apple",
+      "Newton",
 
-"what\_ever\_you\_want"
+      "apple",
 
-],
+      "what_ever_you_want"
 
-"payload\_placement": "inline",
+    ],
 
-"payload\_schema": [
+    "payload_placement": "inline",
 
-"hashtags",
+    "payload_schema": [
 
-"describing",
+      "hashtags",
 
-"resource\_locator",
+      "describing",
 
-"format"
+      "resource_locator",
 
-],
+      "format"
 
-"resource\_data": "Put\_anything\_like\_metadata,
-xml\_or\_whatever\_here",
+    ],
 
-"resource\_data\_type": "metadata",
+    "resource_data": "Put anything like metadata,
+    xml or whatever here",
 
-"resource\_locator": "URI\_of\_resource"
+    "resource_data_type": "metadata",
 
-}
+    "resource_locator": "URI_of_resource"
+
+    }
 
 You're now ready to sign this document with LRSignature.
 
@@ -470,43 +472,47 @@ curl -o test.science.json
 You should get results resembling those below. These results have been
 separated into multiple lines of text for readability purposes.
 
-{
+.. sourcecode:: javascript
 
-"replyStart":"2011-09-15 21:10:37.522239",
+  {
 
-"keyCount":1,
+    "replyStart":"2011-09-15 21:10:37.522239",
 
-"documents":[{"doc\_ID": "761e70f774634030914fa45617fc8815"}],
+    "keyCount":1,
 
-"resultCount":1,
+    "documents":[{"doc_ID": "761e70f774634030914fa45617fc8815"}],
 
-"replyEnd":"2011-09-15 21:10:37.908154"
+    "resultCount":1,
 
-}
+    "replyEnd":"2011-09-15 21:10:37.908154"
+
+  }
 
 In the case of multiple documents being found the results will resemble:
 
-{
+.. sourcecode:: javascript
 
-"replyStart":"2011-09-15 20:24:14.207687",
+  {
 
-"keyCount":1,
+    "replyStart":"2011-09-15 20:24:14.207687",
 
-"documents":[
+    "keyCount":1,
 
-{"doc\_ID": "761e70f774634030914fa45617fc8815", ...etc.},
+    "documents":[
 
-{"doc\_ID": "85924442d9ab431b93732440940a3636", ...etc.},
+      {"doc_ID": "761e70f774634030914fa45617fc8815", ...etc.},
 
-{"doc\_ID": "62c2ee17dbcd4899b373cd4cf63ae669", ...etc.}
+      {"doc_ID": "85924442d9ab431b93732440940a3636", ...etc.},
 
-],
+      {"doc_ID": "62c2ee17dbcd4899b373cd4cf63ae669", ...etc.}
 
-"resultCount":3,
+    ],
 
-"replyEnd":"2011-09-15 20:24:15.170966"
+    "resultCount":3,
 
-}
+    "replyEnd":"2011-09-15 20:24:15.170966"
+
+  }
 
 When ids\_only is set to true, Slice returns a JSON document which
 includes an array of document ID's matching your parameters. The default
