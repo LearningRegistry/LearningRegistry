@@ -10,11 +10,6 @@ Additional technical information about the Learning Registry may be
 found in the
 `Quick Reference Guide <https://docs.google.com/document/d/1Bq_69wnnQJ56O6jyLK2C_fcp-Ovb7MYxXUXD0Rl1Mag/edit?hl=en_US&authkey=CK7k5r8F>`_
 
-**Contents**
-
-.. toctree::
-   :maxdepth: 2
-
 -----
 Setup
 -----
