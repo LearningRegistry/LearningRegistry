@@ -35,18 +35,22 @@ node. Presently, the Slice service handles the following parameters:
 -  **Tags**: Matching any of a document's keys, schema type, or resource
    data type.
 
-Any combination of the above three parameters may be passed to the Slice
+
+Any combination of either Date Range and Identity or Date Range or Tags may be passed to the Slice
 services and are effectively ANDed together. That is, if a date range,
-identity, and tag are passed to Slice, resultant documents will have
-been published: within that date range; by a submitter, curator, owner
-or signer of that identity; and has a key, schema type, or resource data
+and tag are passed to Slice, resultant documents will have
+been published: within that date range and has a key, schema type, or resource data
 type matching that tag. Furthermore, multiple tags may be specified,
 with the results being that the tags are ORed together. That is, if both
 “mathematics” and “metadata” are specified in the list of tags,
 documents will be returned that have either or both of those terms.
 Thus, results have:
 
-date AND identity AND (tag1 OR tag2 OR tag3 ...)
+date AND identity
+
+OR
+
+date AND (tag1 OR tag2 OR tag3 ...)
 
 Date range is specified with a start date (“from”) and end date
 (“until”). Those dates and all dates in between are OR’d together as
@@ -71,9 +75,6 @@ date AND identity
 
 date AND tags
 
-identity AND tags
-
-date AND identity AND tags
 
 Future implementations will allow for multiple identities and for tags
 to be ANDed.
@@ -106,9 +107,11 @@ API
 
 GET <nodeURL>/slice? start\_date=<date>
 
-&identity=<identity>
-
 &any\_tags=tag1,tag2,tag3...
+
+GET <nodeURL>/slice? start\_date=<date>
+
+&identity=<identity>
 
 Arguments (HTTP GET):
 
