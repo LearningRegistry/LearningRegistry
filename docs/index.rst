@@ -15,6 +15,9 @@ Contents:
 
    Node Installation <install/index>
 
+   Getting Started <start/index>
+
+   Slicing <slicing/index>
 
 
 Indices and tables
