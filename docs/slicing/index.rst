@@ -1,8 +1,8 @@
 ============================================
-**Learning Registry - Slicing**
+Learning Registry - Slicing
 ============================================
 
-**Document Version:1.0**
+**Document Version: 1.0**
 
 **Last Edited: September 14 , 2011**
 
@@ -10,13 +10,15 @@ Prepared by:
 
 John Brecht, SRI International (john.brecht@sri.com)
 
-.. figure:: Slicing_html_m428f3ee9.jpg
+
+.. figure:: images/cc-by-nc-sa.jpg
    :align: center
-   :alt:
+   :alt: Creative Commons Attribution NonCommercial ShareAlike 3.0 Unported License
+
 
 Copyright 2011 - SRI International
 
-`This work is licensed under the Creative Commons Attribution NonCommercial ShareAlike 3.0 Unported License. <http://creativecommons.org/licenses/by-nc-sa/3.0/>`_
+This work is licensed under the `Creative Commons Attribution NonCommercial ShareAlike 3.0 Unported License. <http://creativecommons.org/licenses/by-nc-sa/3.0/>`_
 
 ------------
 Introduction
@@ -46,18 +48,17 @@ with the results being that the tags are ORed together. That is, if both
 documents will be returned that have either or both of those terms.
 Thus, results have:
 
-date AND identity
+    date AND identity
 
 OR
 
-date AND (tag1 OR tag2 OR tag3 ...)
+    date AND (tag1 OR tag2 OR tag3 ...)
 
 Date range is specified with a start date (“from”) and end date
 (“until”). Those dates and all dates in between are OR’d together as
 follows:
 
-(from OR date2 OR date3 OR … until) AND identity AND (tag1 OR tag2 OR
-tag3 ...)
+    (from OR date2 OR date3 OR ... until) AND identity AND (tag1 OR tag2 OR tag3 ...)
 
 If one specific date is wanted, then only start date (“from”) is
 specified.
@@ -65,18 +66,18 @@ specified.
 Again, any combination of the three parameters may be passed, so users
 may Slice for:
 
-date
+    date
 
-identity
+    identity
 
-tags
+    tags
 
-date AND identity
+    date AND identity
 
-date AND tags
+    date AND tags
 
 
-Future implementations will allow for multiple identities and for tags
+Future implementations MAY allow for multiple identities and for tags
 to be ANDed.
 
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -105,127 +106,103 @@ prompts to specify the values.)
 API
 -------
 
-GET <nodeURL>/slice? start\_date=<date>
+.. http:get:: /slice
 
-&any\_tags=tag1,tag2,tag3...
+    :query from: *(date)* date of publication to learning registry in the form: YYYY-MM-DD, optional
 
-GET <nodeURL>/slice? start\_date=<date>
+    :query until: *(date)* date of publication to learning registry in the form: YYYY-MM-DD, optional
 
-&identity=<identity>
+    :query identity: *(string)* the name of a person or organization that is the submitter, author, owner, or curator Case-insensitive, but full string match only, optional
 
-Arguments (HTTP GET):
+    :query any_tags: *(list of string)* list of tags, matched against keys, payload\_schema, or resource\_data\_type. Case-insensitive, but full string match only, optional
 
-“from”: date, // date of publication to learning registry in the
+    :query ids_only: *(boolean)* whether to return only a list of IDs or a list of full documents, optional, default is false
 
-// form: YYYY-MM-DD
+    :query resumption_token: *(string)* a token received from a previous query that instructs the node to return the next page of results for that query, optional
 
-// optional
 
-“until”: date, // date of publication to learning registry in the
+    **Example Usage**
 
-// form: YYYY-MM-DD
+    .. sourcecode:: http
 
-// optional
+        http://<nodeUrl>/slice?start_date=<date>&any_tags=<tag1>,<tag2>,<tag3>...
 
-“identity”: string, // the name of a person or organization that
+        http://<nodeUrl/slice?start_date=<date>&identity=<identity>
 
-// is the submitter, author, owner, or curator
 
-// Case-insensitive, but full string match only
+    **Response Object:**
 
-// optional
+    .. sourcecode:: http
 
-// request\_ID is a doc\_ID
+        {
+            “documents”: [                  // array of resource data description documents
+                
+                {
+                
+                    “doc\_ID”: “string”,    // ID of the document
 
-“any\_tags”: list of string // list of tags, matched against keys,
+                    "resource\_data\_description": {resource data description document} //complete document
 
-// payload\_schema, or resource\_data\_type // Case-insensitive, but
-full string match only
+                }
 
-// optional
+            ],
 
-“ids\_only”: boolean //whether to return only a list of IDs or a list of
-full
+            "resumption\_token": "string",  // the token used to resume the next page of
 
-//documents
+                                            // results when flow control is used
 
-//optional, default is false
+            "resultCount": “integer”        // the total number of results for this set of
 
-“resumption\_token”: string //a token received from a previous query
-that
+                                            // query parameters, regardless of flow control
 
-//instructs the node to return the next page of
+        }
 
-//results for that query
+    OR, if ``ids_only`` is true:
 
-Results Object:
+    .. sourcecode:: http
 
-{“documents”:
+        {
+            “documents”: [                  // array of document IDs
+                
+                {
+                
+                    “doc\_ID”: “string”,    // ID of the document
+                
+                }
 
-[ // array of resource data description documents
+            ]
 
-“doc\_ID”: “string”, // ID of the document
-
-"resource\_data\_description":
-
-{resource data description document} //complete document
-
-],
-
-"resumption\_token": "string", //the token used to resume the next page
-of
-
-//results when flow control is used
-
-"resultCount": “integer” //the total number of results for this set of
-
-//query parameters, regardless of flow control
-
-}
-
-OR, if ids\_only is true:
-
-{“documents”:
-
-[ // array of document IDs
-
-“doc\_ID”: “string”, // ID of the document
-
-]}
+        }
 
 -------------------------
 Usage Examples
 -------------------------
 
-http://l<node>/slice?any\_tags=Arithmetic
+``http://<nodeUrl>/slice?any_tags=Arithmetic``
 
-Returns - documents containing “Arithmetic” as a key word
+    Returns - documents containing “Arithmetic” as a key word
 
-http://<node>/slice?any\_tags=paradata&identity=CTE%20Online&full\_docs=true
+``http://<nodeUrl>/slice?any_tags=paradata&identity=CTE%20Online&full_docs=true``
 
-Returns - paradata documents submitted/owned/curated/signed by CTE
-Online, including full docs instead of just IDs
+    Returns - paradata documents submitted/owned/curated/signed by CTE Online, including full docs instead of just IDs
 
-http://<node>/slice?from=2011-06-10
+``http://<nodeUrl>/slice?from=2011-06-10``
 
-Returns - all Resource Data Descriptions submitted on June 10th, 2011
+    Returns - all Resource Data Descriptions submitted on June 10th, 2011
 
-http://<node>/slice?any\_tags=paradata&identity=CTE%20Online&from=2011-06-10&full\_docs=true
+``http://<nodeUrl>/slice?any_tags=paradata&identity=CTE%20Online&from=2011-06-10&full\_docs=true``
 
-Returns - full docs of paradata submitted by CTE Online on Jue 10th,
-2011
+    Returns - full docs of paradata submitted by CTE Online on June 10th, 2011
 
-http://<node>/slice?any\_tags=french,spanish,german
+``http://<nodeUrl>/slice?any_tags=french,spanish,german``
 
-Returns - IDs of docs containing either ‘french’, ‘spanish’, or ‘german’
-keywords.
+    Returns - IDs of docs containing either ‘french’, ‘spanish’, or ‘german’ keywords.
 
-http://<node>/slice?any\_tags=french,spanish,german&resumption\_token=eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJrZXlzIjogWyJtYXRoZW1hdGljcyJdLCAib2Zmc2V0IjogMTAwfQ.Zj05MgBHDJFrivmHjawnrV3EiFej\_jllHOIEdiMnOoo
+``http://<nodeUrl>/slice?any_tags=french,spanish,german&resumption_token=eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJrZXlzIjogWyJtYXRoZW1hdGljcyJdLCAib2Zmc2V0IjogMTAwfQ.Zj05MgBHDJFrivmHjawnrV3EiFej_jllHOIEdiMnOoo``
 
-Returns - The next page of results for the above query, where the token
-specified came as part of the result object for a previous query
+    Returns - The next page of results for the above query, where the token specified came as part of the result object for a previous query
 
-http://<node>/slice?from=2011-05-27&until=2011-06-14&any\_tags=arithmetic
+``http://<nodeUrl>/slice?from=2011-05-27&until=2011-06-14&any_tags=arithmetic``
 
-Returns - IDs of docs containing the keyword ‘arithmetic’ and were
-received by the Learning Registry between May 27th and June 14th 2011.
+    Returns - IDs of docs containing the keyword ‘arithmetic’ and were received by the Learning Registry between May 27th and June 14th 2011.
+
