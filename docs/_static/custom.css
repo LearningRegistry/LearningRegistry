@@ -1,0 +1,12 @@
+
+.changes {
+    background-color: #d9ead3;
+}
+
+.deletions {
+    background-color: #cc0000;
+}
+
+.deprecation {
+    background-color: #ffe599;
+}
