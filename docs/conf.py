@@ -95,7 +95,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 
 if on_rtd:
-  html_theme = 'default'
+  html_theme = 'sphinxdoc'
 else:
   html_theme = 'sphinxdoc'
 
@@ -173,7 +173,7 @@ html_static_path = ['_static']
 htmlhelp_basename = 'LearningRegistrydoc'
 
 if on_rtd:
-  html_style = "rtfd-main.css"
+  html_style = "main.css"
 else:
   html_style = "main.css"
 
