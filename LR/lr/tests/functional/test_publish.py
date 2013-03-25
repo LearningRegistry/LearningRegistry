@@ -1,6 +1,7 @@
 from lr.tests import *
 from lr.model import ResourceDataModel
 from lr.util import decorators
+from lr.util.testdata import getTestDataForReplacement
 from lr.lib.schema_helper import TombstoneValidator, ResourceDataModelValidator
 from lr.lib.signing import reloadGPGConfig
 from time import sleep
@@ -166,6 +167,50 @@ class TestReplacementDocsController(TestController):
                 "name": "mrbasicauth",
                 "password": "ABC_123"
         }
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    @make_gpg_keys(1)
+    def test_publish_replacement_with_delete(self, **kw):
+        '''test_publish_replacement_with_delete: publishes 3 documents, doc 1 ordinary, doc 2 is a replacment, doc 3 is a delete replacment.'''
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        docs = getTestDataForReplacement(3, True)
+
+        assert len(docs) == 3, "Not enough test data."
+
+        key = kw["pgp_keys"][0]
+        signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        replacements = []
+
+        for rd3 in docs:
+
+            signed_rd3 = signer.sign(rd3)
+            replacements.append(signed_rd3)
+
+            data = { "documents": [signed_rd3] }
+            result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+            assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+            for index, docResults in enumerate(result['document_results']):
+
+                assert(docResults['OK'] == True), "Document did not publish for doc_ID: {0}".format(data['documents'][index]['doc_ID'])
+                assert('doc_ID' in docResults), "Expected doc_ID: {0} in result.".format(data['documents'][index]['doc_ID'])  
+                assert(docResults['doc_ID'] == replacements[-1]["doc_ID"]), "Expected doc_id: {0}, got {1}".format(replacements[-1]["doc_ID"], docResults['doc_ID'])          
+                published_document = db[docResults['doc_ID']]
+                assert published_document['digital_signature']['key_owner'] == replacements[-1]['digital_signature']['key_owner'], "key_owner doesn't match"
+                assert published_document['digital_signature']['signature'] == replacements[-1]['digital_signature']['signature'], "signature doesn't match"
+
+                if "replaces" in published_document:
+                    for repl_doc_id in published_document["replaces"]:
+                        repl_doc = db[repl_doc_id]
+
+                        TombstoneValidator.validate_model(repl_doc)
+
+                        assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
+
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     @make_gpg_keys(1)

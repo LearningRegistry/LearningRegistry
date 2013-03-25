@@ -38,6 +38,23 @@
         "valid": true
 
     }, {
+        "description": "missing payload_schema",
+        "data": {
+            "replaces": ["someid"],
+            "payload_placement": "none"
+        },
+        "rm_data": ["payload_schema"],
+        "valid": true
+
+    }, {
+        "description": "none as payload_placement",
+        "data": {
+            "replaces": ["someid"],
+            "payload_placement": "none"
+        },
+        "valid": true
+
+    }, {
         "description": "missing resource_locator and replaces",
         "data": {},
         "rm_data": ["resource_locator"],
