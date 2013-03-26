@@ -25,7 +25,13 @@ function(doc) {
 				emit(["by_doc_ID",doc.doc_ID], null);
 			}
 			if (doc.resource_locator) {
-				emit(["by_resource_locator",doc.resource_locator], null);
+				if (Object.prototype.toString.call( doc.resource_locator ) === '[object Array]') {
+		            for (i=0; i<doc.resource_locator.length; i++) {
+		                emit(["by_resource_locator",doc.resource_locator[i]],  null);  
+		            }
+		        } else {
+		            emit(["by_resource_locator",doc.resource_locator], null);  
+		        }
 			}
 		}
 	}

@@ -153,7 +153,7 @@
         },
         "resource_locator": {
             "description": "unique locator for the resource described",
-            "type": "string",
+            "type": ["string","array"],
             "required": false
         },
         "keys": {
@@ -177,12 +177,12 @@
             "items": {
                 "type": "string"
             },
-            "required": true
+            "required": false
         },
         "payload_placement": {
-            "description": "\"inline\" -- resource data is in an object that follows; \"linked\" -- resource data is at the link provided; \"attached\" -- resource data is in an attachment",
+            "description": "\"inline\" -- resource data is in an object that follows; \"linked\" -- resource data is at the link provided; \"attached\" -- resource data is in an attachment; \"none\": no resource data follows, signaling deletion",
             "type": "string",
-            "enum": ["inline", "linked", "attached"],
+            "enum": ["inline", "linked", "attached", "none"],
             "required": false
         },
         "payload_schema_locator": {

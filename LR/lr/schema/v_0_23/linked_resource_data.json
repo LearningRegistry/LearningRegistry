@@ -23,6 +23,7 @@
         "weight": {},
         "digital_signature": {},
         "resource_locator": {
+            "type": "string",
             "required": true
         },
         "keys": {},
