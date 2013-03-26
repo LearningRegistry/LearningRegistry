@@ -23,6 +23,9 @@ from pylons.controllers.util import abort, redirect
 from lr.lib.base import BaseController, render
 from  lr.model import ResourceDataModel, LRNode
 from  lr.lib import ModelParser, SpecValidationException, helpers as  h, signing, oauth, bauth
+from lr.lib.replacement_helper import ResourceDataReplacement
+from lr.lib.schema_helper import ResourceDataModelValidator
+
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +50,8 @@ def _service_doc(recache=False):
         return __service_doc
     return get_service_doc
 
+
+
 class PublishController(BaseController):
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
@@ -56,6 +61,8 @@ class PublishController(BaseController):
     __OK = "OK"
     __DOCUMENT_RESULTS =  'document_results'
     __DOCUMENTS = 'documents'
+
+    repl_helper = ResourceDataReplacement()
     
 
     @oauth.authorize("oauth-sign", _service_doc(True), roles=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
@@ -107,9 +114,9 @@ class PublishController(BaseController):
             key = f['filter_key']
             resourceValue = None
             
-            for k in resourceData._specData.keys():
+            for k in resourceData.keys():
                 if re.search(key, k) is not None:
-                    resourceValue = str(resourceData.__getattr__(k))
+                    resourceValue = str(resourceData[k])
                     break
                     
             if  resourceValue is None:
@@ -139,27 +146,26 @@ class PublishController(BaseController):
              
         return [False, None]
         
-    def _publish(self, envelopData):
-        if isinstance(envelopData,unicode):
-            envelopeData = json.loads(envelopData)
+    def _publish(self, resourceData):
+        if isinstance(resourceData,unicode):
+            resourceData = json.loads(resourceData)
             
         result={self.__OK: True}
 
         try:
             # Set the envelop data timestaps.
-            timeStamp = h. nowToISO8601Zformat()
-            for stamp in ResourceDataModel._TIME_STAMPS:
-                    envelopData[stamp] = timeStamp
-                    
-            resourceData = ResourceDataModel(envelopData)
+            resourceData = ResourceDataModelValidator.set_timestamps(resourceData)
+
             #Check if the envelop get filtered out
             isFilteredOut, reason = self._isResourceDataFilteredOut(resourceData)
             if isFilteredOut:
                 result[self.__ERROR] = reason
             else:
-                resourceData.publishing_node = LRNode.nodeDescription.node_id
-                resourceData.save()
-                result[resourceData._DOC_ID] = resourceData.doc_ID 
+                resourceData["publishing_node"] = LRNode.nodeDescription.node_id
+                result = self.repl_helper.handle(resourceData)
+                # ResourceDataModelValidator.save(resourceData)
+                result[ResourceDataModelValidator.DOC_ID] = resourceData[ResourceDataModelValidator.DOC_ID]
+
                  
         except SpecValidationException as ex:
             log.exception(ex)

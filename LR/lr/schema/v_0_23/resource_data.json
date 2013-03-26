@@ -1,0 +1,14 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "resource_data",
+    "description": "Resource Data version 0.23.0",
+    "type": [
+        {
+            "$ref": "file:lr/schema/v_0_23/inline_resource_data.json"
+        },
+        {
+            "$ref": "file:lr/schema/v_0_23/linked_resource_data.json"
+        }
+        
+    ]
+}

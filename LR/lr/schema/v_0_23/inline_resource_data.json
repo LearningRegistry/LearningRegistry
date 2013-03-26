@@ -1,0 +1,48 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "resource_data",
+    "description": "Resource Data version 0.23 for inline payload",
+    
+    "extends":{
+        "$ref": "file:lr/schema/abstract_inline_resource_data.json"
+    },
+    "properties":{
+        "doc_type": {},
+        "doc_ID": {},
+        "resource_data_type":{},
+        "active":{},
+        "identity": {},
+        "submitter_timestamp":{},
+        "submitter_TTL":{},
+        "publishing_node":{},
+        "node_timestamp": {},
+        "create_timestamp": {},
+        "update_timestamp": {},
+        "TOS": {},
+        "do_not_distribute": {},
+        "weight": {},
+        "digital_signature": {},
+        "resource_locator": {
+            "type": "string",
+            "required": true
+        },
+        "keys": {},
+        "resource_TTL": {},
+        "payload_schema": {},
+        "payload_placement": {},
+        "payload_schema_locator": {},
+        "payload_schema_format": {},
+        "resource_data": {},
+        "doc_version": {
+            "type": "string",
+            "enum": ["0.23.0"],
+            "required": true
+        }
+
+    },
+    "patternProperties": {
+        "X_.*" : {}
+    },
+    "additionalProperties": false
+
+}

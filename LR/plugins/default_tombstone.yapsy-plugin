@@ -1,0 +1,9 @@
+[Core]
+Name = Default Tombstone Plugin
+Module = default_tombstone
+   
+[Documentation]
+Description = Permits a tombstone creation only if the original signing key matches the replacement signing key.
+Author = Jim Klo
+Version = 0.1.0
+Website = http://www.learningregistry.org

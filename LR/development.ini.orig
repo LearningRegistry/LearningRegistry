@@ -77,6 +77,7 @@ couchdb.threshold.distributes = 1000
 couchdb.threshold.viewupdate = 100
 couchdb.threshold.compaction = 10000
 couchdb.stale.flag = update_after
+lr.plugins = %(here)s/plugins
 lr.publish.signing.privatekeyid = KEYID
 lr.publish.signing.passphrase = 0
 lr.publish.signing.gnupghome = .gnupg
@@ -98,6 +99,8 @@ lr.policy.docid = administrative:Resource Distribution Network Policy service
 lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
 lr.distribute_incoming_url = http://localhost/incoming
+schema.resource_data = file:lr/schema/any/resource_data.json
+schema.tombstone = file:lr/schema/v_0_49/tombstone.json
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 

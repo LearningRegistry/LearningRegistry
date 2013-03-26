@@ -1,0 +1,24 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "abstract_linked_resource_data",
+    "description": "Abstract Linked Resource Data",
+    "extends": {
+        "$ref": "file:lr/schema/abstract_resource_data.json"
+    },
+    "properties":{
+        "payload_placement": {
+            "description": "\"inline\" -- resource data is in an object that follows; \"linked\" -- resource data is at the link provided; \"attached\" -- resource data is in an attachment",
+            "type": "string",
+            "enum": ["linked"],
+            "required": true
+        },
+        "payload_locator": {
+            "type": "string",
+            "required": true
+        },
+        "payload_schema": {
+            "required": true
+        }
+
+    }
+}

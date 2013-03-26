@@ -6,6 +6,9 @@ from lr.lib import SpecValidationException, helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
 from lr.model import ResourceDataModel
 from couchdb import ResourceConflict
+from lr.lib.replacement_helper import ResourceDataReplacement
+from lr.lib.schema_helper import ResourceDataModelValidator
+
 log = logging.getLogger(__name__)
 
 # this doesn't need to be done... should be handled by pylons.config
@@ -29,6 +32,7 @@ class IncomingCopyHandler(BaseChangeHandler):
         self.documents = []
         s = couchdb.Server(self._serverUrl)
         self._db = s[self._targetName]
+        self.repl_helper = ResourceDataReplacement()
 
     def _canHandle(self, change, database):
         if ((_DOC in change) and \
@@ -41,9 +45,11 @@ class IncomingCopyHandler(BaseChangeHandler):
         def handleDocument(newDoc):
             should_delete = True
             try:
-                newDoc['node_timestamp'] = h.nowToISO8601Zformat()
-                rd = ResourceDataModel(newDoc)
-                rd.save(log_exceptions=False)
+                # newDoc['node_timestamp'] = h.nowToISO8601Zformat()
+                ResourceDataModelValidator.set_timestamps(newDoc)
+                repl_helper.handle(newDoc)
+                # rd = ResourceDataModel(newDoc)
+                # rd.save(log_exceptions=False)
             except SpecValidationException as e:
                 log.error(newDoc['_id'] + str(e))
             except ResourceConflict:

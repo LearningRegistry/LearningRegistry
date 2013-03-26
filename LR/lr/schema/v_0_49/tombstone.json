@@ -1,0 +1,79 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "tombstone",
+    "description": "Tombstone for Resource Data version 0.49.0",
+    "properties": {
+        "doc_ID": {
+            "type": "string",
+            "description": "The document id of the RD3 that this tombstone replaces",
+            "required": true
+        },
+        "doc_type": {
+            "type": "string",
+            "enum": ["tombstone"],
+            "required": true,
+            "description": "The document type to indicate the node such that it if excluded from default harvest"
+        },
+        "doc_version": {
+            "type": "string",
+            "enum": ["0.49.0"],
+            "required": true,
+            "description": "The literal for the version number of this tombstone document"
+        },
+        "replaces": {
+            "type": "array",
+            "required": false,
+            "items": {
+                "type": "string"
+            },
+            "description": "The ‘replaces’ property of the RD3 that this tombstone replaces."
+        },
+        "replaced_by": {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "doc_ID": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The doc_ID of the first RD3 encountered by node to signal tombstone creation"
+                },
+                "public_key_fingerprint": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The OpenPGP fingerprint of the signing key used to verify the first RD3 that signaled tombstone"
+                },
+                "public_key_locations": {
+                    "type": "array",
+                    "required": true,
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A list of URLs that the public_key used for verifying the first RD3 that signaled tombstone may be retrieved"
+                }
+
+            }
+        },
+        "create_timestamp": {
+            "type": "string",
+            "format": "date-time-us",
+            "required": true,
+            "description": "timestamp of when tombstone was first created"
+        },
+        "resource_locator": {
+            "type": ["string", "array"],
+            "items": {
+                "type": "string"
+            },
+            "description": "The resource locator(s) of the RD3 this tombstone marks.",
+            "required": false
+        },
+        "do_not_distribute": {
+            "type": "boolean",
+            "enum": [true],
+            "required": true,
+            "description": "Flag to indicate that this instance MUST not be distributed to other nodes."
+        }
+
+    }
+}

@@ -23,7 +23,7 @@ class ExtractController(BaseController):
         args = {'include_docs':includeDocs}
         if len(keys) > 0:
             args['keys'] = keys
-        args['reduce']= False
+        args['reduce'] = False
         args['stale'] = appConfig['couchdb.stale.flag']
         if startKey is not None:
             args['startkey'] = startKey
@@ -32,7 +32,9 @@ class ExtractController(BaseController):
         db_url = '/'.join([appConfig['couchdb.url'],appConfig['couchdb.db.resourcedata']])        
         view = h.getResponse(database_url=db_url,view_name=view,**args)
         return view
-    def _convertDateTime(self,dt):
+
+
+    def _convertDateTime(self, dt):
         try:
             epoch = parse_date("1970-01-01T00:00:00Z")        
             if isinstance(dt, str) or isinstance(dt,unicode):
@@ -172,9 +174,9 @@ class ExtractController(BaseController):
             return startKey, endKey
             # else:
             #     startKey.append('')
-            #     endKey.append(u'\ud7af') 
+            #     endKey.append(u'\ud7af')
         startKey=[]
-        endKey=[]      
+        endKey=[]
         includeDocs = True
         if "ids_only" in params:
             includeDocs = not params
