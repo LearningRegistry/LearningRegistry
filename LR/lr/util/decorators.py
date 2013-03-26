@@ -6,17 +6,22 @@ Created on Oct 11, 2011
 from contextlib import closing
 from functools import wraps
 from ijson.parse import items
+from lr.lib.signing import reloadGPGConfig
 from pylons import config
 from uuid import uuid1
+from LRSignature.sign.Sign  import Sign_0_21
 import base64
 import copy
 import couchdb
+import gnupg
 import ijson
 import json
 import logging
 import os
+import shutil
+import tempfile
 import time
-import urllib, urlparse, oauth2
+import urllib, urlparse, oauth2, socket, uuid
 import urllib2
 
 log = logging.getLogger(__name__)
@@ -90,7 +95,7 @@ def ForceCouchDBIndexing():
     }
 
     def indexTestData(obj):
-        
+
         opts = {
                 "startkey":"_design/",
                 "endkey": "_design0",
@@ -108,7 +113,10 @@ def ForceCouchDBIndexing():
                     # log.debug("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
-                    res = urllib2.urlopen(req)
+                    try:
+                        res = urllib2.urlopen(req)
+                    except Exception, e:
+                        log.info("Problem indexing: %s", req)
 #                    view_result = obj.db.view(view_name, **index_opts)
                     # log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
             else:
@@ -142,19 +150,36 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
     }
     
     @ModifiedServiceDoc(config['lr.publish.docid'], update_authz())
-    def writeTestData(obj):
+    def writeTestData(obj, **kw):
+        
+        try:
+            key = kw["pgp_keys"][0]
+            signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+        except:
+            signer = None
+
         if not hasattr(obj, "test_data_ids"):
             obj.test_data_ids = {}
         
         obj.test_data_ids[prefix] = []
         with open(test_data_log, "w") as plog:
             for doc in sourceData:
-                doc["doc_ID"] = prefix+str(uuid1())
+                if "doc_ID" not in doc:
+                    doc["doc_ID"] = prefix+str(uuid1())
+
+                try:
+                    doc = signer.sign(doc)
+                except:
+                    pass
+
                 obj.app.post('/publish', params=json.dumps({"documents": [ doc ]}), headers=json_headers)
                 plog.write(doc["doc_ID"] + os.linesep)
                 obj.test_data_ids[prefix].append(doc["doc_ID"])
                 if sleep > 0:
                     time.sleep(sleep)
+            kw["test_data_ids"] = obj.test_data_ids[prefix]
+
+        return kw
     
     def indexTestData(obj):
         
@@ -177,13 +202,16 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
                     # log.error("Indexing: {0}".format( view_name))
                     req = urllib2.Request("{url}/{resource_data}/{view}?{opts}".format(view=view_name, opts=urllib.urlencode(index_opts), **couch), 
                                           headers=json_headers)
-                    res = urllib2.urlopen(req)
+                    try:
+                        res = urllib2.urlopen(req)
+                    except Exception, e:
+                        log.info("Problem forcing index: %s", e)
 #                    view_result = obj.db.view(view_name, **index_opts)
                     # log.error("Indexed: {0}, got back: {1}".format(view_name, json.dumps(res.read())))
             else:
                 pass# log.error("Not Indexing: {0}".format( row.key))
     
-    def cacheTestData(obj):
+    def cacheTestData(obj, **kw):
         req = urllib2.Request("{url}/{resource_data}/_all_docs?include_docs=true".format(**couch), 
                               data=json.dumps({"keys":obj.test_data_ids[prefix]}), 
                               headers=json_headers)
@@ -192,8 +220,17 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
         
         if not hasattr(obj, "test_data_sorted"):
             obj.test_data_sorted = {}
-            
-        obj.test_data_sorted[prefix] = sorted(docs, key=lambda k: k['node_timestamp'])
+        
+        def sortkey(k):
+            try:
+                return k['node_timestamp']
+            except:
+                return k['create_timestamp']
+
+        obj.test_data_sorted[prefix] = sorted(docs, key=lambda k: sortkey(k))
+        kw["test_data_sorted"] = obj.test_data_sorted[prefix]
+
+        return kw
         
         
         
@@ -223,9 +260,9 @@ def PublishTestDocs(sourceData, prefix, sleep=0, force_index=True):
         def test_decorated(self, *args, **kw):
             try:
                 #print "Wrapper Before...."
-                writeTestData(self)
+                kw = writeTestData(self, **kw)
                 indexTestData(self)
-                cacheTestData(self)
+                kw = cacheTestData(self, **kw)
                 return fn(self, *args, **kw)
             except :
                 raise
@@ -409,5 +446,88 @@ class BasicAuthRequest(object):
                 delete_user(user_doc)
 
         return wrap
+
+
+def _backup(prop_list=[]):
+    backup = {}
+    for prop in prop_list:
+        backup[prop] = config["app_conf"][prop]
+    return backup
+
+def _restore(backup={}):
+    config["app_conf"].update(backup)
+
+class make_gpg_keys(object):
+    '''decorator that makes at least 1 gpg key.  first key is set at the node key'''
+    def __init__(self, count=1):
+        self.count = count
+        self.gnupghome = tempfile.mkdtemp(prefix="gnupg_", dir=".")
+        self.gpgbin = "gpg"
+        self.gpg = gnupg.GPG(gnupghome=self.gnupghome, gpgbinary=self.gpgbin)
+        self.gpg.encoding = 'utf-8'
+        self.keys = []
+        
+
+    def __call__(self, f):
+        @wraps(f)
+        def wrapped(*args, **kw):
+                for i in range(self.count):
+                    cfg = {
+                        "key_type": "RSA",
+                        "key_length": 1024,
+                        "name_real": "Test Key #%d" % i,
+                        "name_comment": "Test key for %s" % f.__class__.__name__,
+                        "name_email": "test-%d@example.com" % i,
+                        "passphrase": "secret"
+                    }
+                    key = self.gpg.gen_key(self.gpg.gen_key_input(**cfg))
+                    assert key is not None, "GPG key not generated"
+                    assert key.fingerprint is not None, "Key missing fingerprint"
+
+                    cfg.update({
+                        "key": key,
+                        "fingerprint": key.fingerprint,
+                        "key_id": key.fingerprint[-16:],
+                        "locations": ["http://www.example.com/pubkey/%s" % key.fingerprint[-16:] ],
+                        "owner": "%s (%s)" % (cfg["name_real"], cfg["name_email"]) 
+                        })
+                    self.keys.append(cfg)
+
+                kw["pgp_keys"] = self.keys
+                kw["gnupghome"] = self.gnupghome
+                kw["gpgbin"] = self.gpgbin
+                kw["gpg"] = self.gpg
+
+                backup_props = [
+                    "lr.publish.signing.privatekeyid",
+                    "lr.publish.signing.passphrase",
+                    "lr.publish.signing.gnupghome",
+                    "lr.publish.signing.gpgbin",
+                    "lr.publish.signing.publickeylocations",
+                    "lr.publish.signing.signer"
+                ]
+                backup_conf = _backup(backup_props)
+
+                config["app_conf"].update({
+                    "lr.publish.signing.privatekeyid": self.keys[0]["key_id"],
+                    "lr.publish.signing.passphrase": self.keys[0]["passphrase"],
+                    "lr.publish.signing.gnupghome": self.gnupghome,
+                    "lr.publish.signing.gpgbin": self.gpgbin,
+                    "lr.publish.signing.publickeylocations": '''["http://localhost/pubkey"]''',
+                    "lr.publish.signing.signer": self.keys[0]["owner"]
+                    })
+
+                reloadGPGConfig(config["app_conf"])
+
+                try:
+                    return f(*args, **kw)
+                finally:
+                    shutil.rmtree(self.gnupghome)
+                    _restore(backup_conf)
+                    reloadGPGConfig(config["app_conf"])
+
+        return wrapped
+
+
 
 

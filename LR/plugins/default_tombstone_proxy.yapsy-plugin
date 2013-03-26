@@ -1,0 +1,9 @@
+[Core]
+Name = Default Proxy Tombstone Plugin
+Module = default_tombstone_proxy
+   
+[Documentation]
+Description = When resource data description document is signed by this node. Validate that the original rd3 were submitted by the same entity.
+Author = Jim Klo
+Version = 0.1.0
+Website = http://www.learningregistry.org

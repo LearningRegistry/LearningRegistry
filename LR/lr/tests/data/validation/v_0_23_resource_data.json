@@ -1,0 +1,210 @@
+[
+    {
+        "description": "validate linked",
+        "schema":{ "$ref": "file:lr/schema/v_0_23/linked_resource_data.json" },
+        "default_data": {
+            "doc_type": "resource_data",
+            "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F",
+            "resource_data_type": "paradata",
+            "active": true,
+            "identity": {
+                "submitter_type": "agent",
+                "submitter": "publisher@learningregistry.org"
+            },
+            "publishing_node": "local",
+            "node_timestamp": "2013-01-23T12:00:00Z",
+            "update_timestamp": "2013-01-23T12:00:00Z",
+            "create_timestamp": "2013-01-23T12:00:00Z",
+            "TOS": {
+                "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+            },
+            "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+            "payload_placement": "linked",
+            "payload_schema": ["comm_para 1.0", "oai_paradata"],
+            "payload_locator": "http://www.example.com/payload_locator"
+        },
+        "tests":[
+            {
+                "description": "Required Fields Only for inline",
+                "data": {
+                    "doc_version": "0.23.0"
+                },
+                "valid": true
+            },
+            {
+                "description": "missing resource_locator",
+                "data": { },
+                "rm_data": ["resource_locator"],
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "validate inline",
+        "schema":{ "$ref": "file:lr/schema/v_0_23/inline_resource_data.json" },
+        "default_data": {
+                    "doc_type": "resource_data",
+                    "doc_version": "0.23.0",
+                    "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F",
+                    "resource_data_type": "paradata",
+                    "active": true,
+                    "identity": {
+                        "submitter_type": "agent",
+                        "submitter": "publisher@learningregistry.org"
+                    },
+                    "publishing_node": "local",
+                    "node_timestamp": "2013-01-23T12:00:00Z",
+                    "update_timestamp": "2013-01-23T12:00:00Z",
+                    "create_timestamp": "2013-01-23T12:00:00Z",
+                    "TOS": {
+                        "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+                    },
+                    "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+                    "payload_placement": "inline",
+                    "payload_schema": ["comm_para 1.0", "oai_paradata"],
+                    "resource_data": "<metadata xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n\n<commParadata xmlns=\"http://ns.nsdl.org/ncs/comm_para\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://ns.nsdl.org/ncs/comm_para http://ns.nsdl.org/ncs/comm_para/1.00/schemas/comm_para.xsd\">\n\t<recordId catalog=\"work-cmr-id\">30085/0/0</recordId>\n\t<usageDataResourceURL>http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/</usageDataResourceURL>\n<usageDataProvidedForName>\n\t<string language=\"sv\">Byggarbetsplatsen 2 - Situations&#246;vningar</string>\n</usageDataProvidedForName>\n\t<usageDataSummary>\n\t\t<integer type=\"favorited\" dateTimeStart=\"2011-02-16T13:08:01\" dateTimeEnd=\"2011-02-16T13:08:01\">1</integer>\n\t\t<integer type=\"tagged\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"rated\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"commented\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<rating type=\"star\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\" min=\"1\" max=\"5\" total=\"0\">0</rating>\n\t</usageDataSummary>\n</commParadata>\n\n</metadata>\n"
+                },
+        "tests":[
+            {
+                "description": "Required Fields Only for inline",
+                "data": {
+                    "doc_version": "0.23.0"
+                },
+                "valid": true
+            },
+            {
+                "description": "missing resource_locator",
+                "data": { },
+                "rm_data": ["resource_locator"],
+                "valid": false
+            },
+            {
+                "description": "Paradata no signature",
+                "data": {
+                    "doc_type": "resource_data",
+                    "resource_data": "<metadata xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n\n<commParadata xmlns=\"http://ns.nsdl.org/ncs/comm_para\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://ns.nsdl.org/ncs/comm_para http://ns.nsdl.org/ncs/comm_para/1.00/schemas/comm_para.xsd\">\n\t<recordId catalog=\"work-cmr-id\">30085/0/0</recordId>\n\t<usageDataResourceURL>http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/</usageDataResourceURL>\n<usageDataProvidedForName>\n\t<string language=\"sv\">Byggarbetsplatsen 2 - Situations&#246;vningar</string>\n</usageDataProvidedForName>\n\t<usageDataSummary>\n\t\t<integer type=\"favorited\" dateTimeStart=\"2011-02-16T13:08:01\" dateTimeEnd=\"2011-02-16T13:08:01\">1</integer>\n\t\t<integer type=\"tagged\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"rated\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"commented\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<rating type=\"star\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\" min=\"1\" max=\"5\" total=\"0\">0</rating>\n\t</usageDataSummary>\n</commParadata>\n\n</metadata>\n",
+                    "keys": ["EUN", "paradata", "LRE", "learning resource exchange", "social data", "reputation", "reputation facet"],
+                    "TOS": {
+                        "submission_attribution": "Copyright 2011, European School Net: CC-BY-3.0",
+                        "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+                    },
+                    "resource_data_type": "paradata",
+                    "payload_placement": "inline",
+                    "payload_schema": ["comm_para 1.0", "oai_paradata"],
+                    "doc_version": "0.23.0",
+                    "active": true,
+                    "publishing_node": "local",
+                    "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+                    "identity": {
+                        "owner": "eun.org",
+                        "submitter": "publisher@learningregistry.org",
+                        "submitter_type": "agent",
+                        "curator": "eun.org"
+                    },
+                    "create_timestamp": "2013-01-23T12:00:00Z",
+                    "update_timestamp": "2013-01-23T12:00:00Z",
+                    "node_timestamp": "2013-01-23T12:00:00Z",
+                    "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F"
+                },
+                "valid": true
+            },
+            {
+                "description": "Bad timestamp #1",
+                "data": {
+                    "doc_type": "resource_data",
+                    "resource_data": "<metadata xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n\n<commParadata xmlns=\"http://ns.nsdl.org/ncs/comm_para\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://ns.nsdl.org/ncs/comm_para http://ns.nsdl.org/ncs/comm_para/1.00/schemas/comm_para.xsd\">\n\t<recordId catalog=\"work-cmr-id\">30085/0/0</recordId>\n\t<usageDataResourceURL>http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/</usageDataResourceURL>\n<usageDataProvidedForName>\n\t<string language=\"sv\">Byggarbetsplatsen 2 - Situations&#246;vningar</string>\n</usageDataProvidedForName>\n\t<usageDataSummary>\n\t\t<integer type=\"favorited\" dateTimeStart=\"2011-02-16T13:08:01\" dateTimeEnd=\"2011-02-16T13:08:01\">1</integer>\n\t\t<integer type=\"tagged\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"rated\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"commented\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<rating type=\"star\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\" min=\"1\" max=\"5\" total=\"0\">0</rating>\n\t</usageDataSummary>\n</commParadata>\n\n</metadata>\n",
+                    "keys": ["EUN", "paradata", "LRE", "learning resource exchange", "social data", "reputation", "reputation facet"],
+                    "TOS": {
+                        "submission_attribution": "Copyright 2011, European School Net: CC-BY-3.0",
+                        "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+                    },
+                    "resource_data_type": "paradata",
+                    "payload_placement": "inline",
+                    "payload_schema": ["comm_para 1.0", "oai_paradata"],
+                    "doc_version": "0.23.0",
+                    "active": true,
+                    "publishing_node": "local",
+                    "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+                    "identity": {
+                        "owner": "eun.org",
+                        "submitter": "publisher@learningregistry.org",
+                        "submitter_type": "agent",
+                        "curator": "eun.org"
+                    },
+                    "create_timestamp": "2013-01-23T12-00-00Z",
+                    "update_timestamp": "2013-01-23T12:00:00Z",
+                    "node_timestamp": "2013-01-23T12:00:00Z",
+                    "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F"
+                },
+                "valid": false
+            },
+            {
+                "description": "Bad timestamp #2",
+                "data": {
+                    "doc_type": "resource_data",
+                    "resource_data": "<metadata xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n\n<commParadata xmlns=\"http://ns.nsdl.org/ncs/comm_para\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://ns.nsdl.org/ncs/comm_para http://ns.nsdl.org/ncs/comm_para/1.00/schemas/comm_para.xsd\">\n\t<recordId catalog=\"work-cmr-id\">30085/0/0</recordId>\n\t<usageDataResourceURL>http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/</usageDataResourceURL>\n<usageDataProvidedForName>\n\t<string language=\"sv\">Byggarbetsplatsen 2 - Situations&#246;vningar</string>\n</usageDataProvidedForName>\n\t<usageDataSummary>\n\t\t<integer type=\"favorited\" dateTimeStart=\"2011-02-16T13:08:01\" dateTimeEnd=\"2011-02-16T13:08:01\">1</integer>\n\t\t<integer type=\"tagged\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"rated\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<integer type=\"commented\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\">0</integer>\n\t\t<rating type=\"star\" dateTimeStart=\"2011-10-22T00:00:15\" dateTimeEnd=\"2011-10-22T00:00:15\" min=\"1\" max=\"5\" total=\"0\">0</rating>\n\t</usageDataSummary>\n</commParadata>\n\n</metadata>\n",
+                    "keys": ["EUN", "paradata", "LRE", "learning resource exchange", "social data", "reputation", "reputation facet"],
+                    "TOS": {
+                        "submission_attribution": "Copyright 2011, European School Net: CC-BY-3.0",
+                        "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+                    },
+                    "resource_data_type": "paradata",
+                    "payload_placement": "inline",
+                    "payload_schema": ["comm_para 1.0", "oai_paradata"],
+                    "doc_version": "0.23.0",
+                    "active": true,
+                    "publishing_node": "local",
+                    "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+                    "identity": {
+                        "owner": "eun.org",
+                        "submitter": "publisher@learningregistry.org",
+                        "submitter_type": "agent",
+                        "curator": "eun.org"
+                    },
+                    "create_timestamp": "2013-02-31T12:00:00Z",
+                    "update_timestamp": "2013-01-23T12:00:00Z",
+                    "node_timestamp": "2013-01-23T12:00:00Z",
+                    "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F"
+                },
+                "valid": false
+            },
+            {
+                "description": "Data from Publish Test",
+                "data": {
+                    "doc_type": "resource_data",
+                    "resource_locator": "http://example.com",
+                    "resource_data": "\n<nsdl_dc:nsdl_dc xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n xmlns:dct=\"http://purl.org/dc/terms/\"\n xmlns:ieee=\"http://www.ieee.org/xsd/LOMv1p0\"\n xmlns:nsdl_dc=\"http://ns.nsdl.org/nsdl_dc_v1.02/\"\n schemaVersion=\"1.02.020\"\n xsi:schemaLocation=\"http://ns.nsdl.org/nsdl_dc_v1.02/ http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd\">\n <dc:identifier xsi:type=\"dct:URI\">http://www.myboe.org/go/resource/23466</dc:identifier>\n <dc:title>Posters to Go</dc:title>\n <dc:description>PDF version of a set of fifteen posters from the National Portrait Gallery and the Smithsonian American Art Museum. Includes an application for receiving the actual posters for the classroom. Arranged into themes: Westward Expansion Civil War Harlem Renaissance World War II and the Sixties.</dc:description>\n <dc:creator/>\n <dc:language>en-US</dc:language>\n <dct:accessRights xsi:type=\"nsdl_dc:NSDLAccess\">Free access</dct:accessRights>\n <dc:format>text/html</dc:format>\n <dc:date>2010-07-26</dc:date>\n <dct:modified>2010-07-26</dct:modified>\n</nsdl_dc:nsdl_dc>",
+                    "update_timestamp": "2013-02-04T20:16:47.327083Z",
+                    "TOS": {
+                        "submission_attribution": "Smithsonian Education",
+                        "submission_TOS": "http://si.edu/Termsofuse"
+                    },
+                    "resource_data_type": "metadata",
+                    "payload_schema_locator": "http://ns.nsdl.org/schemas/nsdl_dc/nsdl_dc_v1.02.xsd",
+                    "payload_placement": "inline",
+                    "payload_schema": ["NSDL DC 1.02.020"],
+                    "node_timestamp": "2013-02-04T20:16:47.327083Z",
+                    "digital_signature": {
+                        "key_location": ["http://www.example.com/key"],
+                        "key_owner": "walt grata <wegrata@gmail.com>",
+                        "signing_method": "LR-PGP.1.0",
+                        "signature": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\n\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1.4.11 (GNU/Linux)\n\niQEcBAEBAgAGBQJQUzHaAAoJEMNbqtmn2aps0CwH/j63/T2tkLv2dCp3cU7vlPwG\n/vmi0Bq3dDvXOVDkFobY3mQcXxsLjExtN2PKKjqYZ+KWdLfOq36/77QAI7VOQ1+r\nXy3b7aWGMYEjtRmAUcO9Ov39aj2OCGZ8k2aPDhvL968v89X7B1v53wD1wi7+Lges\n1WfAfEyXrnWIVBNubNtuazLA4322K+CAI4bvYiecz4cw7J51xlhf7dacCZb+wts3\n+q1HxTMg3fIQ3l3Xd3SyHc48jXqyBlFpLr56UR0thwRC54fICgd/gEnebSbfVRXQ\nqAZXP6lF7/C9/m3ZDDjvV+vkQCmLLg8LMn7WStenJR1tB+KE/6MTVcY6JOucZIo=\n=DhqM\n-----END PGP SIGNATURE-----\n"
+                    },
+                    "create_timestamp": "2013-02-04T20:16:47.327083Z",
+                    "doc_version": "0.23.0",
+                    "active": true,
+                    "publishing_node": "4f5e03767d574a9194da203dd5d75468",
+                    "doc_ID": "urn:jim-klo-macbook.local:nosetest:ce1b36f8-6f07-11e2-8c85-109add5279f3",
+                    "identity": {
+                        "signer": "Smithsonian Education <learning@si.edu>",
+                        "submitter": "Brokers of Expertise on behalf of Smithsonian Education",
+                        "submitter_type": "agent",
+                        "curator": "Smithsonian Education",
+                        "owner": "Smithsonian American Art Museum"
+                    }
+                },
+                "valid": true
+            }
+        ]
+    }
+]

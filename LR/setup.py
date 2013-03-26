@@ -7,16 +7,17 @@ except ImportError:
 
 setup(
     name='LR',
-    version='0.23.10',
+    version='0.50.1',
     description='',
     author='',
     author_email='',
     url='',
     install_requires=[
-        "WebOb==1.1.1", "Pylons==1.0", "pyparsing==1.5.5", "restkit==3.2.3",
+        "WebOb==1.2.3", "Pylons==1.0", "pyparsing==1.5.5", "restkit==3.2.3",
         "couchdb==0.8", "lxml==2.3", "iso8601plus==0.1.5", "ijson==0.8.0",
         "pystache==0.3.1", "PyJWT==0.1.4", "Couchapp==0.8.1", "PyBrowserID>=0.5.0",
-        "LRSignature>=0.1.11", "python-gnupg>=0.3.0", "oauth2==1.5.211"
+        "LRSignature>=0.1.13", "python-gnupg>=0.3.0", "oauth2==1.5.211", "jsonschema==0.8.0",
+        "Sphinx>=1.1.3", "sphinxcontrib-httpdomain==1.1.7", "Yapsy==1.10.1-pythons2n3"
     ],
     packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,

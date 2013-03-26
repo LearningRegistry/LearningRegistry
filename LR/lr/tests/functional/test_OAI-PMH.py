@@ -62,7 +62,7 @@ class TestOaiPmhControllerSpecialData(TestController):
         pass
 
     @PublishTestDocs(getTestDataForEmbeddedXMLDOCTYPEHeaders(), "XML-HEADERS-AND-DOCTYPES")
-    def test_documents_with_xml_header_or_doctype_declarations(self):
+    def test_documents_with_xml_header_or_doctype_declarations(self, *var, **kw):
         ''''verify that xml resource_data with embedded <?xml?> and <!DOCTYPE> declarations can be retrieved.'''
 
         test_docs = self.test_data_sorted["XML-HEADERS-AND-DOCTYPES"]
@@ -107,7 +107,7 @@ class TestOaiPmhControllerSpecialData(TestController):
     
 
     @PublishTestDocs(getTestDataForMetadataFormats(1), "LMF-schema-syntax")
-    def test_listMetadataFormats_schema_format_syntax(self):
+    def test_listMetadataFormats_schema_format_syntax(self, *var, **kw):
         '''validates that the schema format provided by the response to verb ListMetadataFormats is of the acceptable OAI-PMH format.'''
         validPrefix = '''^[A-Za-z0-9\-_\.!~\*'\(\)]+$'''
         
@@ -133,7 +133,7 @@ class TestOaiPmhControllerSpecialData(TestController):
         checkFormats(response)
         
     @PublishTestDocs(getTestDataForMetadataFormats(1), "GR-schema-syntax")
-    def test_getRecord_schema_format_syntax(self):
+    def test_getRecord_schema_format_syntax(self, *var, **kw):
         '''validate that both good and bad metadataPrefixes are used when requesting GetRecord the appropriate response is returned'''
         validPrefix = '''^[A-Za-z0-9\-_\.!~\*'\(\)]+$'''
         
@@ -810,7 +810,7 @@ class TestOaiPmhController(TestController):
         
         try:
             (from_, until_) = self._get_timestamps(doc1, doc2)
-                
+             
             response = self.app.get("/OAI-PMH", params={'verb': 'ListRecords', 'metadataPrefix': 'nsdl_dc', 'from': from_, 'until': until_})
             validate_xml_content_type(response)
             try:

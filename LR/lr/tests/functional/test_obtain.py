@@ -1,6 +1,8 @@
 from lr.lib.harvest import harvest
+from lr.lib.schema_helper import TombstoneValidator, ResourceDataModelValidator
 from lr.tests import *
-from lr.util.decorators import ForceCouchDBIndexing,SetFlowControl,ModifiedServiceDoc,update_authz
+from lr.util.decorators import ForceCouchDBIndexing, PublishTestDocs, SetFlowControl, ModifiedServiceDoc, update_authz, make_gpg_keys
+from lr.util.testdata import getTestDataForReplacement, getTestDataForMultipleResourceLocator
 from pylons import config
 from webtest import AppError
 import couchdb
@@ -11,6 +13,161 @@ import time
 import urllib
 log = logging.getLogger(__name__)
 headers={'Content-Type': 'application/json'}
+
+def checkTombstone(doc):
+    TombstoneValidator.validate_model(doc)
+
+def checkResourceData(doc):
+    ResourceDataModelValidator.validate_model(doc)
+
+class TestObtainControllerWithMultipleResourceLocator(TestController):
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.db =  self.server[config['couchdb.db.resourcedata']] 
+
+    def _getInitialPostData(self):
+        data = {
+            "by_doc_ID":False,
+            "ids_only":False
+        }
+        return data
+
+    def _validateResponse(self,resp,requestData,testids,special=None):
+        data = json.loads(resp.body)
+        requestData = json.loads(requestData)
+        assert 'documents' in data
+        assert len(data['documents'])>0, json.dumps(data['documents'])
+        byDocId = requestData.has_key('by_doc_ID') and requestData['by_doc_ID']
+        # import pdb; pdb.set_trace()
+        for d in data['documents']:
+            if byDocId:
+                assert d['doc_ID'] in testids
+            else:
+                testids = [urllib.unquote_plus(x) for x in testids]
+                assert urllib.unquote_plus(d['doc_ID']) in testids
+            if not requestData.has_key('ids_only') or (requestData.has_key('ids_only') and not requestData['ids_only']):
+                for doc in d['document']:
+                    if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
+                        assert doc['doc_ID'] == d['doc_ID']
+                    elif isinstance(doc['resource_locator'], basestring):
+                        assert urllib.unquote_plus(doc['resource_locator']) == urllib.unquote_plus(d['doc_ID'])
+
+                    if special is not None:
+                        special(doc)
+
+    @make_gpg_keys(1)
+    @PublishTestDocs(getTestDataForMultipleResourceLocator(3), "OB-Delete")
+    def test_multiple_locators(self, *args, **kwargs):
+        '''test_multiple_locators: 1 doc is published with multiple resource_locator's, check that we can harvest by each locator.'''
+
+        data = kwargs["test_data_sorted"]
+        test_ids = kwargs["test_data_ids"]
+        assert len(data) == len(test_ids) and len(data) == 1, "Not all envelopes got published!"
+
+        test_rd3 = data[0]
+        assert len(test_rd3["resource_locator"]) == 3, "Not enough resource_locator's"
+
+        def checkDocID(doc):
+            assert doc['doc_ID'] == test_rd3['doc_ID'], "unexpected doc_ID: {0} expected: {1}".format(doc['doc_ID'], test_rd3['doc_ID'])
+
+            checkResourceData(doc)
+
+
+        for uri in test_rd3["resource_locator"]:
+            #check if first doc exists as a tombstone.
+            params = self._getInitialPostData()
+            params['request_id'] = uri
+            response = self.app.get(url(controller='obtain', **params))
+            self._validateResponse(response, json.dumps(params), test_rd3["resource_locator"], checkDocID)
+
+
+
+
+class TestObtainControllerWithReplacments(TestController):
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.server = couchdb.Server(config['couchdb.url.dbadmin'])
+        self.db =  self.server[config['couchdb.db.resourcedata']] 
+
+    def _getInitialPostData(self):
+        data = {
+            "by_doc_ID":True,
+            "ids_only":False
+        }
+        return data
+
+    def _validateResponse(self,resp,requestData,testids,special=None):
+        data = json.loads(resp.body)
+        requestData = json.loads(requestData)
+        assert 'documents' in data
+        assert len(data['documents'])>0, json.dumps(data['documents'])
+        byDocId = requestData.has_key('by_doc_ID') and requestData['by_doc_ID']
+        for d in data['documents']:
+            if byDocId:
+                assert d['doc_ID'] in testids
+            else:
+                testids = [urllib.unquote_plus(x) for x in testids]
+                assert urllib.unquote_plus(d['doc_ID']) in testids
+            if not requestData.has_key('ids_only') or (requestData.has_key('ids_only') and not requestData['ids_only']):
+                for doc in d['document']:
+                    if requestData.has_key('by_doc_ID') and requestData['by_doc_ID']:
+                        assert doc['doc_ID'] == d['doc_ID']
+                    else:
+                        assert urllib.unquote_plus(doc['resource_locator']) == urllib.unquote_plus(d['doc_ID'])
+                    if special is not None:
+                        special(doc)
+
+    @make_gpg_keys(1)
+    @PublishTestDocs(getTestDataForReplacement(2, True), "OB-Delete")
+    def test_obtain_delete(self, *args, **kwargs):
+        '''test_obtain_delete: checks to see that replaced document's tombstone is retrievable and the
+        replacement resource_data signaling a delete is also obtainable by api'''
+
+        data = kwargs["test_data_sorted"]
+        test_ids = kwargs["test_data_ids"]
+        assert len(data) == len(test_ids) and len(data) == 2, "Not all envelopes got published!"
+
+
+        #check if first doc exists as a tombstone.
+        params = self._getInitialPostData()
+        params['request_id'] = test_ids[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response, json.dumps(params), test_ids, checkTombstone)
+
+        #check for deleted document.
+        params = self._getInitialPostData()
+        params['request_id'] = test_ids[1]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response, json.dumps(params), test_ids, checkResourceData)
+
+
+
+    @make_gpg_keys(1)
+    @PublishTestDocs(getTestDataForReplacement(2, False), "OB-Replacement")
+    def test_obtain_replacement(self, *args, **kwargs):
+        '''test_obtain_replacement: checks to see that replaced document's tombstone is retrievable and the
+        replacement resource_data is obtainable by api'''
+        
+        data = kwargs["test_data_sorted"]
+        test_ids = kwargs["test_data_ids"]
+        assert len(data) == len(test_ids) and len(data) == 2, "Not all envelopes got published!"
+
+
+        #check if first doc exists as a tombstone.
+        params = self._getInitialPostData()
+        params['request_id'] = test_ids[0]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response, json.dumps(params), test_ids, checkTombstone)
+
+        #check for replacement document.
+        params = self._getInitialPostData()
+        params['request_id'] = test_ids[1]
+        response = self.app.get(url(controller='obtain', **params))
+        self._validateResponse(response, json.dumps(params), test_ids, checkResourceData)
+
+
+
 class TestObtainController(TestController):
     def __init__(self, *args, **kwargs):
         TestController.__init__(self,*args,**kwargs)

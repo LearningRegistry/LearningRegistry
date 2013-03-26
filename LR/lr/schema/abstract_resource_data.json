@@ -1,0 +1,202 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "abstract_resource_data",
+    "description": "Abstract Resource Data",
+    "properties": {
+        "doc_type": {
+            "type": "string",
+            "enum": ["resource_data"],
+            "required": true
+        },
+        "doc_ID": {
+            "type": "string",
+            "required": true
+        },
+        "doc_version": {
+            "type": "string",
+            "required": true
+        },
+        "resource_data_type": {
+            "type": "string",
+            "required": true
+        },
+        "active": {
+            "type": "boolean",
+            "required": true
+        },
+        "identity": {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "submitter_type": {
+
+                    "type": "string",
+                    "enum": ["anonymous", "user", "agent"],
+                    "required": true
+                },
+                "submitter": {
+                    "description": "identity of the submitter of the resource data; immutable",
+                    "type": "string",
+                    "required": true
+                },
+                "curator": {
+                    "description": "identity of the curator of the resource data description who manages the resource data description; immutable",
+                    "type": "string",
+                    "required": false
+                },
+                "owner": {
+                    "description": "identity of the owner of the resource who owns what is referenced in the resource locator; immutable",
+                    "type": "string",
+                    "required": false
+                },
+                "signer": {
+                    "description": "identity of key owner used to sign the submission; immutable",
+                    "type": "string",
+                    "required": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "submitter_timestamp": {
+            "description": "submitter-created timestamp",
+            "type": "string",
+            "required": false,
+            "format": "date-time-us"
+        },
+        "submitter_TTL": {
+            "description": "submitter statement of TTL of validity of submission",
+            "type": "string",
+            "required": false,
+            "format": "date-time-us"
+        },
+        "publishing_node": {
+            "description": "node_id of node where injected into the network; provided by the initial publish node (not distribution)",
+            "type": "string",
+            "required": true
+        },
+        "node_timestamp": {
+            "description": "timestamp of when received by the current node",
+            "type": "string",
+            "required": true,
+            "format": "date-time-us"
+        },
+        "create_timestamp": {
+            "description": "timestamp of when first published to the network independent of updates; immutable; provided by the initial publishing node on first publish not by a distribution node or not an update",
+            "type": "string",
+            "required": true,
+            "format": "date-time-us"
+        },
+        "update_timestamp": {
+            "description": "??? UNKNOWN !!!",
+            "type": "string",
+            "required": true,
+            "format": "date-time-us"
+        },
+        "TOS": {
+            "description": "terms of service",
+            "type": "object",
+            "required": true,
+            "properties": {
+                "submission_TOS": {
+                    "description": "agreed terms of service by submitter",
+                    "type": "string",
+                    "required": true
+                },
+                "submission_attribution": {
+                    "description": "attribution statement from submitter",
+                    "type": "string",
+                    "required": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "do_not_distribute": {
+            "description": "system provided key-value pair",
+            "type": "string",
+            "required": false
+        },
+        "weight": {
+            "description": "submitter assigned weight (strength)",
+            "type": "integer",
+            "minimum": -100,
+            "maximum": 100,
+            "required": false
+        },
+        "digital_signature": {
+            "description": "digital signature of the submission, optional",
+            "type": "object",
+            "required": false,
+            "properties": {
+                "signature": {
+                    "type": "string",
+                    "required": true
+                },
+                "key_location": {
+                    "type": "array",
+                    "minItems": 1,
+                    "required": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "signing_method": {
+                    "type": "string",
+                    "enum": ["LR-PGP.1.0"],
+                    "required": true
+                },
+                "key_owner": {
+                    "type": "string",
+                    "required": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "resource_locator": {
+            "description": "unique locator for the resource described",
+            "type": ["string","array"],
+            "required": false
+        },
+        "keys": {
+            "description": "array of hashtag, keyword value list used for filtering",
+            "type": "array",
+            "required": false,
+            "items": {
+                "type": "string"
+            }
+
+        },
+        "resource_TTL": {
+            "description": "TTL from resource owner for the resource itself, in days",
+            "type": "integer",
+            "required": false
+        },
+        "payload_schema": {
+            "description": "array of  schema description/keywords for the resource data",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "string"
+            },
+            "required": false
+        },
+        "payload_placement": {
+            "description": "\"inline\" -- resource data is in an object that follows; \"linked\" -- resource data is at the link provided; \"attached\" -- resource data is in an attachment; \"none\": no resource data follows, signaling deletion",
+            "type": "string",
+            "enum": ["inline", "linked", "attached", "none"],
+            "required": false
+        },
+        "payload_schema_locator": {
+            "description": "schema locator for the resource data",
+            "type": "string",
+            "required": false
+        },
+        "payload_schema_format": {
+            "description": "schema MIME type",
+            "type": "string",
+            "required": false
+        }
+    },
+    "patternProperties" : {
+        "X_.*": { "type":"any" }
+    }
+}

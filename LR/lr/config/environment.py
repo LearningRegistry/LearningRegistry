@@ -10,6 +10,7 @@ import lr.lib.helpers
 from lr.config.routing import make_map
 import logging
 import logging.config
+
 def load_environment(global_conf, app_conf):
     """Configure the Pylons environment via the ``pylons.config``
     object
@@ -53,5 +54,6 @@ def load_environment(global_conf, app_conf):
     db = server[config['couchdb.db.node']]
     doc = db[config['lr.nodestatus.docid']]
     doc['start_time'] = helpers.nowToISO8601Zformat()
-    db.save(doc)    
+    db.save(doc)  
+
     return config

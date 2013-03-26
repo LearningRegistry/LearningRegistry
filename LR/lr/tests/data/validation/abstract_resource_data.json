@@ -1,0 +1,1006 @@
+[
+    {
+        "description": "validate simple required fields",
+        "schema":{ 
+            "$ref": "file:lr/schema/abstract_resource_data.json"
+        },
+        "default_data": {
+            "doc_type": "resource_data",
+            "doc_version": "0.49.0",
+            "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F",
+            "resource_data_type": "paradata",
+            "active": true,
+            "identity": {
+                "submitter_type": "agent",
+                "submitter": "publisher@learningregistry.org"
+            },
+            "publishing_node": "local",
+            "node_timestamp": "2013-01-23T12:00:00Z",
+            "update_timestamp": "2013-01-23T12:00:00Z",
+            "create_timestamp": "2013-01-23T12:00:00Z",
+            "TOS": {
+                "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+            },
+            "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+            "payload_placement": "linked",
+            "payload_schema": ["comm_para 1.0", "oai_paradata"],
+            "payload_locator": "http://www.example.com/payload_locator"
+        },
+        "tests":[
+            {
+                "description": "good doc_type",
+                "data": { "doc_type": "resource_data" },
+                "valid": true
+            },
+            {
+                "description": "bad doc_type",
+                "data": { "doc_type": "activity_data" },
+                "valid": false
+            },
+            {
+                "description": "missing doc_type",
+                "data": {  },
+                "rm_data": ["doc_type"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good doc_ID",
+                "data": {
+                    "doc_ID": "someDocumentID"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad doc_ID wrong type 1",
+                "data": {
+                    "doc_ID": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad doc_ID wrong type 2",
+                "data": {
+                    "doc_ID": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing doc_ID",
+                "data": { },
+                "rm_data": ["doc_ID"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good doc_version",
+                "data": {
+                    "doc_version": "xxxx"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad doc_version wrong type 1",
+                "data": {
+                    "doc_version": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad doc_version wrong type 2",
+                "data": {
+                    "doc_version": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing doc_version",
+                "data": { },
+                "rm_data": ["doc_version"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good resource_data_type",
+                "data": {
+                    "resource_data_type": "xxxx"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad resource_data_type wrong type 1",
+                "data": {
+                    "resource_data_type": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad resource_data_type wrong type 2",
+                "data": {
+                    "resource_data_type": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing resource_data_type",
+                "data": { },
+                "rm_data": ["resource_data_type"],
+                "valid": false
+            },
+
+
+
+            {
+                "description": "good active",
+                "data": {
+                    "active": true
+                },
+                "valid": true
+            },
+            {
+                "description": "bad active wrong type 1",
+                "data": {
+                    "active": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad active wrong type 2",
+                "data": {
+                    "active": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing active",
+                "data": { },
+                "rm_data": ["active"],
+                "valid": false
+            },
+
+            {
+                "description": "good identity 1",
+                "data": {
+                    "identity": {
+                        "submitter_type": "anonymous",
+                        "submitter": "Some submitter name"
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "good identity 2",
+                "data": {
+                    "identity": {
+                        "submitter_type": "user",
+                        "submitter": "Some submitter name"
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "good identity 3",
+                "data": {
+                    "identity": {
+                        "submitter_type": "agent",
+                        "submitter": "Some submitter name"
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "extra field",
+                "data": {
+                    "identity": {
+                        "submitter_type": "agent",
+                        "submitter": "Some submitter name",
+                        "extrafield": "foo"
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "bad identity.submitter_type",
+                "data": {
+                    "identity": {
+                        "submitter_type": "unknown",
+                        "submitter": "Some submitter name"
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "missing identity.submitter",
+                "data": {
+                    "identity": {
+                        "submitter_type": "anonymous"
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "missing identity",
+                "data": {},
+                "rm_data": ["identity"],
+                "valid": false
+            },
+            
+
+
+            {
+                "description": "good publishing_node",
+                "data": {
+                    "publishing_node": "node name"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad publishing_node wrong type 1",
+                "data": {
+                    "publishing_node": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad publishing_node wrong type 2",
+                "data": {
+                    "publishing_node": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing publishing_node",
+                "data": { },
+                "rm_data": ["publishing_node"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good node_timestamp",
+                "data": {
+                    "node_timestamp": "1972-10-27T23:59:59Z"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad node_timestamp wrong format",
+                "data": {
+                    "node_timestamp": "October 27, 1972 23:59:59 Zulu"
+                },
+                "valid": false
+            },
+            {
+                "description": "bad node_timestamp wrong type 1",
+                "data": {
+                    "node_timestamp": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad node_timestamp wrong type 2",
+                "data": {
+                    "node_timestamp": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing node_timestamp",
+                "data": { },
+                "rm_data": ["node_timestamp"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good create_timestamp",
+                "data": {
+                    "create_timestamp": "1972-10-27T23:59:59Z"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad create_timestamp wrong format",
+                "data": {
+                    "create_timestamp": "October 27, 1972 23:59:59 Zulu"
+                },
+                "valid": false
+            },
+            {
+                "description": "bad create_timestamp wrong type 1",
+                "data": {
+                    "create_timestamp": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad create_timestamp wrong type 2",
+                "data": {
+                    "create_timestamp": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing create_timestamp",
+                "data": { },
+                "rm_data": ["create_timestamp"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good update_timestamp",
+                "data": {
+                    "update_timestamp": "1972-10-27T23:59:59Z"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad update_timestamp wrong format",
+                "data": {
+                    "update_timestamp": "October 27, 1972 23:59:59 Zulu"
+                },
+                "valid": false
+            },
+            {
+                "description": "bad update_timestamp wrong type 1",
+                "data": {
+                    "update_timestamp": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad update_timestamp wrong type 2",
+                "data": {
+                    "update_timestamp": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing update_timestamp",
+                "data": { },
+                "rm_data": ["update_timestamp"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good TOS",
+                "data": {
+                    "TOS": {
+                        "submission_TOS": "agreed"
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "empty TOS",
+                "data": {
+                    "TOS": { }
+                },
+                "valid": false
+            },
+            {
+                "description": "missing TOS",
+                "data": {},
+                "rm_data": ["TOS"],
+                "valid": false
+            },
+
+
+            {
+                "description": "good digital_signature",
+                "data": {
+                    "digital_signature": {
+                        "signature": "agreed",
+                        "key_location": [ "http://www.example.com/key" ],
+                        "signing_method": "LR-PGP.1.0"
+                    }
+                },
+                "valid": true
+            },
+            {
+                "description": "digital_signature extra fields",
+                "data": {
+                    "digital_signature": {
+                        "signature": "agreed",
+                        "key_location": [ "http://www.example.com/key" ],
+                        "signing_method": "LR-PGP.1.0",
+                        "cosigner": "jack the ripper"
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "empty digital_signature",
+                "data": {
+                    "digital_signature": { }
+                },
+                "valid": false
+            },
+            {
+                "description": "missing digital_signature",
+                "data": {},
+                "rm_data": ["digital_signature"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good resource_locator",
+                "data": {
+                    "resource_locator": "http://example.com"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad resource_locator wrong type 1",
+                "data": {
+                    "resource_locator": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad resource_locator wrong type 2",
+                "data": {
+                    "resource_locator": 1
+                },
+                "valid": false
+            },
+
+
+            {
+                "description": "good payload_schema",
+                "data": {
+                    "payload_schema": ["some kind of schema"]
+                },
+                "valid": true
+            },
+            {
+                "description": "empty payload_schema",
+                "data": {
+                    "payload_schema": []
+                },
+                "valid": false
+            },
+            {
+                "description": "multiple payload_schema",
+                "data": {
+                    "payload_schema": ["schema 1", "schema 2", "schema 3"]
+                },
+                "valid": true
+            },
+            {
+                "description": "bad payload_schema wrong type 1",
+                "data": {
+                    "payload_schema": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad payload_schema wrong type 2",
+                "data": {
+                    "payload_schema": 1
+                },
+                "valid": false
+            }
+
+        ]
+    },
+
+
+    {
+        "description": "validate identity fields",
+        "schema":{ 
+            "$ref": "file:lr/schema/abstract_resource_data.json#properties/identity"
+        },
+    
+        "tests":[
+            {
+                "description": "valid identity",
+                "data": {
+     
+                        "submitter_type": "agent",
+                        "submitter": "doesn't matter"
+                },
+                "valid": true
+            },
+            {
+                "description": "all fields",
+                "data": {
+     
+                        "submitter_type": "agent",
+                        "submitter": "doesn't matter",
+                        "curator": "some dude",
+                        "owner": "some other fellow",
+                        "signer": "someone with good penmanship"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad types",
+                "data": {
+     
+                        "submitter_type": "agent",
+                        "submitter": "doesn't matter",
+                        "curator": {},
+                        "owner": "some other fellow",
+                        "signer": "someone with good penmanship"
+                },
+                "valid": false
+            }
+
+        ]
+    },
+
+    {
+        "description": "validate TOS fields",
+        "schema":{ 
+            "$ref": "file:lr/schema/abstract_resource_data.json#properties/TOS"
+        },
+    
+        "tests":[
+            {
+                "description": "valid TOS",
+                "data": {
+     
+                        "submission_TOS": "agreed",
+                        "submission_attribution": "doesn't matter"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad TOS 1",
+                "data": {
+     
+                        "submission_TOS": "agreed",
+                        "submission_attribution": true
+                },
+                "valid": false
+            },
+            {
+                "description": "bad TOS 2",
+                "data": {
+     
+                        "submission_TOS": {},
+                        "submission_attribution": "doesn't matter"
+                },
+                "valid": false
+            }
+
+        ]
+    },
+
+
+    {
+        "description": "validate digital_signature",
+        "schema":{ 
+            "$ref": "file:lr/schema/abstract_resource_data.json#properties/digital_signature"
+        },
+        "tests": [
+            {
+                "description": "bad signing_method",
+                "data": {
+
+                    "signature": "agreed",
+                    "key_location": [ "http://www.example.com/key" ],
+                    "signing_method": "xxx"
+              
+                },
+                "valid": false
+            },
+            {
+                "description": "bad signature type",
+                "data": {
+
+                    "signature": {},
+                    "key_location": [ "http://www.example.com/key" ],
+                    "signing_method": "LR-PGP.1.0"
+              
+                },
+                "valid": false
+            },
+            {
+                "description": "empty key_location",
+                "data": {
+
+                    "signature": "XYZ",
+                    "key_location": [ ],
+                    "signing_method": "LR-PGP.1.0"
+              
+                },
+                "valid": false
+            },
+            {
+                "description": "missing signature",
+                "data": {
+
+                    "key_location": [ "http://www.example.com/key" ],
+                    "signing_method": "LR-PGP.1.0"
+              
+                },
+                "valid": false
+            },
+            {
+                "description": "missing key_location",
+                "data": {
+
+                    "signature": "XYZ",
+                    "signing_method": "LR-PGP.1.0"
+              
+                },
+                "valid": false
+            },
+            {
+                "description": "missing signing_method",
+                "data": {
+
+                    "signature": "agreed",
+                    "key_location": [ "http://www.example.com/key" ]
+              
+                },
+                "valid": false
+            }
+
+        ]
+    },
+
+
+    {
+        "description": "test optional fields",
+        "schema":{ 
+            "$ref": "file:lr/schema/abstract_resource_data.json"
+        },
+        "default_data": {
+            "doc_type": "resource_data",
+            "doc_version": "0.49.0",
+            "doc_ID": "AE649259-AE12-441B-BF5D-3F3BF6826F9F",
+            "resource_data_type": "paradata",
+            "active": true,
+            "identity": {
+                "submitter_type": "agent",
+                "submitter": "publisher@learningregistry.org"
+            },
+            "publishing_node": "local",
+            "node_timestamp": "2013-01-23T12:00:00Z",
+            "update_timestamp": "2013-01-23T12:00:00Z",
+            "create_timestamp": "2013-01-23T12:00:00Z",
+            "TOS": {
+                "submission_TOS": "http://creativecommons.org/publicdomain/zero/1.0/legalcode"
+            },
+            "resource_locator": "http://develix.iml.umu.se/projects/external/cfl/safir.kurser.yrkesspar/Byggarbetsplatsen2/",
+            "payload_placement": "linked",
+            "payload_schema": ["comm_para 1.0", "oai_paradata"],
+            "payload_locator": "http://www.example.com/payload_locator"
+        },
+        "tests":[
+            {
+                "description": "good submitter_timestamp",
+                "data": {
+                    "submitter_timestamp": "1972-10-27T23:59:59Z"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad submitter_timestamp wrong format",
+                "data": {
+                    "submitter_timestamp": "October 27, 1972 23:59:59 Zulu"
+                },
+                "valid": false
+            },
+            {
+                "description": "bad submitter_timestamp wrong type 1",
+                "data": {
+                    "submitter_timestamp": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad submitter_timestamp wrong type 2",
+                "data": {
+                    "submitter_timestamp": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing submitter_timestamp",
+                "data": { },
+                "rm_data": ["submitter_timestamp"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good submitter_TTL",
+                "data": {
+                    "submitter_TTL": "1972-10-27T23:59:59Z"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad submitter_TTL wrong format",
+                "data": {
+                    "submitter_TTL": "October 27, 1972 23:59:59 Zulu"
+                },
+                "valid": false
+            },
+            {
+                "description": "bad submitter_TTL wrong type 1",
+                "data": {
+                    "submitter_TTL": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad doc_ID wrong type 2",
+                "data": {
+                    "submitter_TTL": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing submitter_TTL",
+                "data": { },
+                "rm_data": ["submitter_TTL"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good do_not_distribute",
+                "data": {
+                    "do_not_distribute": "fails dcma"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad do_not_distribute wrong type 1",
+                "data": {
+                    "do_not_distribute": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad doc_ID wrong type 2",
+                "data": {
+                    "do_not_distribute": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing do_not_distribute",
+                "data": { },
+                "rm_data": ["do_not_distribute"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good weight",
+                "data": {
+                    "weight": 10
+                },
+                "valid": true
+            },
+            {
+                "description": "good min weight",
+                "data": {
+                    "weight": -100
+                },
+                "valid": true
+            },
+            {
+                "description": "good max weight",
+                "data": {
+                    "weight": 100
+                },
+                "valid": true
+            },
+            {
+                "description": "bad min weight",
+                "data": {
+                    "weight": -101
+                },
+                "valid": false
+            },
+            {
+                "description": "bad max weight",
+                "data": {
+                    "weight": 101
+                },
+                "valid": false
+            },
+            {
+                "description": "bad weight wrong type 1",
+                "data": {
+                    "weight": 1.5
+                },
+                "valid": false
+            },
+            {
+                "description": "bad weight wrong type 2",
+                "data": {
+                    "weight": "1"
+                },
+                "valid": false
+            },
+            {
+                "description": "missing weight",
+                "data": { },
+                "rm_data": ["weight"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good empty keys",
+                "data": {
+                    "keys": [ ]
+                },
+                "valid": true
+            },
+            {
+                "description": "good single keys",
+                "data": {
+                    "keys": [ "one" ]
+                },
+                "valid": true
+            },
+            {
+                "description": "good multiple keys",
+                "data": {
+                    "keys": [ "one", "two", "three" ]
+                },
+                "valid": true
+            },
+            {
+                "description": "missing keys",
+                "data": {},
+                "rm_data": ["keys"],
+                "valid": true
+            },
+            {
+                "description": "bad keys",
+                "data": {
+                    "keys": "one, two, three"
+                },
+                "valid": false
+            },
+
+
+
+
+            {
+                "description": "good resource_TTL",
+                "data": {
+                    "resource_TTL": 10
+                },
+                "valid": true
+            },
+            {
+                "description": "bad resource_TTL wrong type 1",
+                "data": {
+                    "resource_TTL": 1.5
+                },
+                "valid": false
+            },
+            {
+                "description": "bad resource_TTL wrong type 2",
+                "data": {
+                    "resource_TTL": "1"
+                },
+                "valid": false
+            },
+            {
+                "description": "missing resource_TTL",
+                "data": { },
+                "rm_data": ["resource_TTL"],
+                "valid": true
+            },
+
+
+
+            {
+                "description": "good payload_placement",
+                "data": { "payload_placement": "inline" },
+                "valid": true
+            },
+            {
+                "description": "good payload_placement",
+                "data": { "payload_placement": "linked" },
+                "valid": true
+            },
+            {
+                "description": "good payload_placement",
+                "data": { "payload_placement": "attached" },
+                "valid": true
+            },
+            {
+                "description": "bad payload_placement",
+                "data": { "payload_placement": "hung" },
+                "valid": false
+            },
+            {
+                "description": "missing payload_placement",
+                "data": {  },
+                "rm_data": ["payload_placement"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good payload_schema_locator",
+                "data": {
+                    "payload_schema_locator": "http://example.com"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad payload_schema_locator wrong type 1",
+                "data": {
+                    "payload_schema_locator": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad payload_schema_locator wrong type 2",
+                "data": {
+                    "payload_schema_locator": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing payload_schema_locator",
+                "data": { },
+                "rm_data": ["payload_schema_locator"],
+                "valid": true
+            },
+
+
+            {
+                "description": "good payload_schema_format",
+                "data": {
+                    "payload_schema_format": "http://example.com"
+                },
+                "valid": true
+            },
+            {
+                "description": "bad payload_schema_format wrong type 1",
+                "data": {
+                    "payload_schema_format": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "bad payload_schema_format wrong type 2",
+                "data": {
+                    "payload_schema_format": 1
+                },
+                "valid": false
+            },
+            {
+                "description": "missing payload_schema_format",
+                "data": { },
+                "rm_data": ["payload_schema_format"],
+                "valid": true
+            },
+
+
+
+            {
+                "description": "good additional properties",
+                "data": {
+                    "X_somethingnew": { "foo": "bar" }
+                },
+                "valid": true
+            }
+        ]  
+    }
+
+
+
+]
+

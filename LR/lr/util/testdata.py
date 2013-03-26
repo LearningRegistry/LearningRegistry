@@ -4,6 +4,8 @@ Created on Oct 12, 2011
 @author: jklo
 '''
 
+import socket, uuid
+
 
 def getDC_v1_1(resource_url="http://www.learningregistry.org/test-data"):
     blob = '''<metadata
@@ -46,6 +48,73 @@ def buildTestDoc(submitter, keys, type, schemas, data, locator, schema_locator):
                          }
              }
   return testDoc
+
+def gen_doc_id(scope="nosetest"):
+  base_doc_id = 'urn:{domain}:{scope}:{uuid}'.format(domain=socket.gethostname(), scope=scope, uuid=uuid.uuid1())
+  rev = 0
+  while True:
+    yield "%s-%d" % (base_doc_id, rev)
+    rev += 1
+
+def buildReplacementTestDoc(doc_ID):
+  base_rd3 = {
+    'doc_ID': doc_ID,
+    'TOS': {
+        'submission_attribution': 'Example', 
+        'submission_TOS': 'http://example.com/terms'
+    }, 
+    'payload_placement': 'inline', 
+    'active': True, 
+    'identity': {
+        'submitter': 'Test Agent', 
+        'submitter_type': 'agent'
+    }, 
+    'resource_locator': 'http://example.com', 
+    'doc_type': 'resource_data', 
+    'resource_data': {
+        "testing":"data", 
+        "version":0
+    },
+    'resource_data_type': 'metadata', 
+    'payload_schema_locator': 'http://example.com/schema/locator', 
+    'payload_schema': ['example'], 
+    'doc_version': '0.49.0'
+  }
+  return base_rd3
+
+def getTestDataForMultipleResourceLocator(locator_count=2, scope="nosetest"):
+  doc_id = gen_doc_id()
+  doc = buildReplacementTestDoc(doc_ID=doc_id.next())
+  locator_tmpl = doc["resource_locator"] + "/" + doc["doc_ID"] + "/{0}"
+  doc["resource_locator"] = []
+  for i in range(locator_count):
+    doc["resource_locator"].append(locator_tmpl.format(i))
+
+  return [doc]
+
+def getTestDataForReplacement(count=2, delete_last=False, scope="nosetest"):
+  data = []
+  doc_id = gen_doc_id()
+  for i in range(count):
+    data.append(buildReplacementTestDoc(doc_ID=doc_id.next()))
+    if i > 0:
+      data[-1].update({
+          "replaces": [ data[-2]["doc_ID"] ]
+        })
+      data[-1]["resource_data"].update({
+          "version": data[-2]["resource_data"]["version"]+1
+        })
+
+  if delete_last == True:
+    data[-1].update({
+      "payload_placement": "none"
+      })
+    del data[-1]["resource_locator"]
+    del data[-1]["resource_data"]
+    del data[-1]["payload_schema_locator"]
+    del data[-1]["payload_schema"]
+
+  return data
 
 def getTestDataForMetadataFormats(count=1):
   args = {
