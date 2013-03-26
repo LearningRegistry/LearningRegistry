@@ -45,9 +45,9 @@ Distribute and Pip
 
   ::
 
-    curl -O http://python-distribute.org/distribute\_setup.py
+    curl -O http://python-distribute.org/distribute_setup.py
 
-    python distribute\_setup.py
+    python distribute_setup.py
 
     curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
 
@@ -175,7 +175,7 @@ document.
 
       "doc_type": "resource_data",
 
-      "doc_version": "0.23.0",
+      "doc_version": "0.49.0",
 
       "identity": {
 
@@ -437,7 +437,158 @@ Verifying Signatures
 
     {"results": [{"resource\_locator": "http://resource\_locator\_url\_will\_appear\_here", "verified": true}]}
 
-OK! That's a full round-trip. You created and uploaded a valid Learning Registry document, and then downloaded a copy back to your local machine.
+OK! That's a full round-trip. You created and uploaded a valid Learning Registry document, and then downloaded a copy back to your local machine. 
+
+
+--------------
+Replacing Data
+--------------
+
+At some point in you publishing endeavors, you may need to update or delete previously published document.  You might need to do this because:
+
+
+  * A resource moved so you need to update the resource locator.
+  * Metadata/paradata for a resource is out-of-date and needs updating.
+  * A resource no longer exists so the resource data should be deleted.
+  * Something got erroneously published and needs replacement or removal.
+
+
+Learning Registry V 0.50.1 introduces the concept of document replacement, where you may publish a new document to replace a previously published version.  There are some caveats to this process:
+
+  1. Replacement documents must be signed with the same private key as the original document.
+    
+    - If replacment and original documents were signed by a node using proxy signing services, the ``submitter`` fields must also match.
+
+  2. Replacement documents must indicate exactly which document they are replacing, using the ``doc_ID`` in the ``replaces`` field of the `Resource Data Description Document <Resource Data Description Data Model>`_. You may specify more than one ``doc_ID`` to replace.
+
+
+Note: A node may specify a "super key" as a trusted signer which can serve as a mechanism to sign replacement documents where the original signing key is missing.
+
+
+Updating a Learning Registry Document
+-------------------------------------
+
+This process is identical to steps followed in `Create the JSON File`_ however you will be adding an additional field, ``replaces`` as an array of ``doc_ID``, to the JSON document that contains your update.
+
+  .. sourcecode:: javascript
+    :emphasize-lines: 3,57,61
+
+    {
+
+      "replaces": [ "doc_ID of original document" ],
+
+      "TOS": {
+
+        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+
+      },
+
+      "active": true,
+
+      "doc_type": "resource_data",
+
+      "doc_version": "0.49.0",
+
+      "identity": {
+
+        "curator": "",
+
+        "owner": "",
+
+        "submitter": "your name or organization here",
+
+        "signer": "your name or org, if you're signing the document",
+
+        "submitter_type": "agent"
+
+      },
+
+      "keys": [
+
+        "science",
+
+        "Newton",
+
+        "apple",
+
+        "what_ever_you_want"
+
+      ],
+
+      "payload_placement": "inline",
+
+      "payload_schema": [
+
+        "hashtags",
+
+        "describing",
+
+        "resource_locator",
+
+        "format"
+
+      ],
+
+      "resource_data": "Your modified or updated data",
+
+      "resource_data_type": "metadata",
+
+      "resource_locator": "updated_URI_of_resource"
+
+    }
+
+You can now continue with the signing and publishing process detailed in `Signing the Document`_
+
+
+Deleting a Learning Registry Document
+-------------------------------------
+
+Removal of documents from Learning Registry follows a similar process as described in `Updating a Learning Registry Document`_ with the only difference being the contents of the published document.
+
+The key differences are:
+  * Set the ``"payload_placement": "none"`` 
+  * The ``"resource_locator"``. ``"payload_schema"``, ``"resource_data"``, and ``"recource_data_types"`` properties of the Learning Registry Document may be omitted.
+
+An example of Learning Registry Delete Document is:
+
+  .. sourcecode:: javascript
+    :emphasize-lines: 3,31
+
+    {
+
+      "replaces": [ "doc_ID of original document being deleted" ],
+
+      "TOS": {
+
+        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+
+      },
+
+      "active": true,
+
+      "doc_type": "resource_data",
+
+      "doc_version": "0.49.0",
+
+      "identity": {
+
+        "curator": "",
+
+        "owner": "",
+
+        "submitter": "your name or organization here",
+
+        "signer": "your name or org, if you're signing the document",
+
+        "submitter_type": "agent"
+
+      },
+
+      "payload_placement": "none"
+
+    }
+
+Again, to publish repeat the steps in `Signing the Document`_ to sign and publish to the Learning Registry node.
 
 
 ----------------------------
@@ -581,6 +732,8 @@ Version       Date          Description
 
 1.09          2013-03-21    Converted into RestructuredText from the original version. Minor edits.
                             `Archive Copy (V 1.08) <https://docs.google.com/document/d/12nvvm5ClvLxSWptlo52rTwIDvobiFylYhWLVPbVcesU/edit>`_
+
+1.10          2013-03-26    Added section on publishing replacement documents.                            
 ===========   ==========    =========================================================================
 
 
