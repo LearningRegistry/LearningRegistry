@@ -31,7 +31,14 @@ function(doc) {
 					emit([makeValidSchema(doc.payload_schema[i]), "by_doc_ID",doc.doc_ID], (doc.payload_schema_locator ? doc.payload_schema_locator : null));
 				}
 				if (doc.resource_locator) {
-					emit([makeValidSchema(doc.payload_schema[i]), "by_resource_locator",doc.resource_locator], (doc.payload_schema_locator ? doc.payload_schema_locator : null));
+					if (Object.prototype.toString.call( doc.resource_locator ) === '[object Array]') {
+			            for (j=0; j<doc.resource_locator.length; j++) {
+							emit([makeValidSchema(doc.payload_schema[i]), "by_resource_locator",doc.resource_locator[j]], (doc.payload_schema_locator ? doc.payload_schema_locator : null));
+			            }
+			        } else {
+						emit([makeValidSchema(doc.payload_schema[i]), "by_resource_locator",doc.resource_locator], (doc.payload_schema_locator ? doc.payload_schema_locator : null));
+			        }
+
 				}
 				
 			}

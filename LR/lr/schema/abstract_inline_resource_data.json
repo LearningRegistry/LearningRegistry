@@ -15,6 +15,9 @@
         "resource_data": {
             "type": "any",
             "required": true
+        },
+        "payload_schema": {
+            "required": true
         }
 
     }

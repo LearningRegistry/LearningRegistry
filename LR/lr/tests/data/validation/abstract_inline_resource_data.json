@@ -70,6 +70,12 @@
                     "resource_data": {}
                 },
                 "valid": false
+            },
+            {
+                "description": "missing payload_schema",
+                "data": { },
+                "rm_data": ["payload_schema"],
+                "valid": false
             }
         ]
     }

@@ -15,6 +15,9 @@
         "payload_locator": {
             "type": "string",
             "required": true
+        },
+        "payload_schema": {
+            "required": true
         }
 
     }
