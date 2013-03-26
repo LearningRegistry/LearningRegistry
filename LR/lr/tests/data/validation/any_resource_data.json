@@ -211,6 +211,26 @@
         "rm_data": ["resource_locator"],
         "valid": false
     }, {
+        "description": "resource_locator as array",
+        "data": {
+            "doc_version": "0.49.0",
+            "resource_locator": [
+                "http://www.example.com/0",
+                "http://www.example.com/1"
+            ]
+        },
+        "valid": true
+    }, {
+        "description": "bad resource_locator as array",
+        "data": {
+            "doc_version": "0.23.0",
+            "resource_locator": [
+                "http://www.example.com/0",
+                "http://www.example.com/1"
+            ]
+        },
+        "valid": false
+    }, {
         "description": "replaces multiple",
         "data": {
             "replaces": ["xyz", "123"]
@@ -261,6 +281,26 @@
             "doc_version": "0.23.0"
         },
         "valid": true
+    }, {
+        "description": "array resource_locator",
+        "data": {
+            "doc_version": "0.49.0",
+            "resource_locator": [
+                "http://www.example.com/0",
+                "http://www.example.com/1"
+            ]
+        },
+        "valid": true
+    }, {
+        "description": "array resource_locator pre .49",
+        "data": {
+            "doc_version": "0.23.0",
+            "resource_locator": [
+                "http://www.example.com/0",
+                "http://www.example.com/1"
+            ]
+        },
+        "valid": false
     }, {
         "description": "missing resource_locator",
         "data": {},

@@ -82,6 +82,16 @@ def buildReplacementTestDoc(doc_ID):
   }
   return base_rd3
 
+def getTestDataForMultipleResourceLocator(locator_count=2, scope="nosetest"):
+  doc_id = gen_doc_id()
+  doc = buildReplacementTestDoc(doc_ID=doc_id.next())
+  locator_tmpl = doc["resource_locator"] + "/" + doc["doc_ID"] + "/{0}"
+  doc["resource_locator"] = []
+  for i in range(locator_count):
+    doc["resource_locator"].append(locator_tmpl.format(i))
+
+  return [doc]
+
 def getTestDataForReplacement(count=2, delete_last=False, scope="nosetest"):
   data = []
   doc_id = gen_doc_id()

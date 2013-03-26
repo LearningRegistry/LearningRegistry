@@ -1,7 +1,7 @@
 from lr.tests import *
 from lr.model import ResourceDataModel
 from lr.util import decorators
-from lr.util.testdata import getTestDataForReplacement
+from lr.util.testdata import getTestDataForReplacement, getTestDataForMultipleResourceLocator
 from lr.lib.schema_helper import TombstoneValidator, ResourceDataModelValidator
 from lr.lib.signing import reloadGPGConfig
 from time import sleep
@@ -101,6 +101,105 @@ class make_gpg_keys(object):
         return wrapped
 
 
+
+class TestMultiLocatorPublisherController(TestController):
+
+    _PUBLISH_UNSUCCESSFUL_MSG = "Publish was not successful"
+
+    def __init__(self, *args, **kwargs):
+        TestController.__init__(self,*args,**kwargs)
+        self.controllerName = "publish"
+        
+        self.oauth_info = {
+                "name": "tester@example.com",
+                "full_name": "Joe Tester"
+        }
+
+        self.oauth_user = {
+           "_id": "org.couchdb.user:{0}".format(self.oauth_info["name"]),
+           "type": "user",
+           "name": self.oauth_info["name"],
+           "roles": [
+               "browserid"
+           ],
+           "browserid": True,
+           "oauth": {
+               "consumer_keys": {
+                   self.oauth_info["name"] : "ABC_consumer_key_123"
+               },
+               "tokens": {
+                   "node_sign_token": "QWERTY_token_ASDFGH",
+               }
+           },
+           "lrsignature": {
+               "full_name": self.oauth_info["full_name"]
+           }
+        }
+
+
+        self.oauth_info2 = {
+                "name": "tester2@example.com",
+                "full_name": "Jane Tester"
+        }
+
+        self.oauth_user2 = {
+           "_id": "org.couchdb.user:{0}".format(self.oauth_info2["name"]),
+           "type": "user",
+           "name": self.oauth_info2["name"],
+           "roles": [
+               "browserid"
+           ],
+           "browserid": True,
+           "oauth": {
+               "consumer_keys": {
+                   self.oauth_info2["name"] : "XXX_ABC_consumer_key_123"
+               },
+               "tokens": {
+                   "node_sign_token": "XXX_QWERTY_token_ASDFGH",
+               }
+           },
+           "lrsignature": {
+               "full_name": self.oauth_info2["full_name"]
+           }
+        }
+
+        self.bauth_user = {
+                "name": "mrbasicauth",
+                "password": "ABC_123"
+        }
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    @make_gpg_keys(1)
+    def test_publish_multiple_resource_locator(self, *args, **kw):
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        docs = getTestDataForMultipleResourceLocator(3)
+
+        assert len(docs) == 1, "Not enough test data."
+        test_rd3 = docs[0]
+
+        assert isinstance(test_rd3["resource_locator"], list) and len(test_rd3["resource_locator"]) > 0, "resource_locator isn't an array in the test data"
+
+        key = kw["pgp_keys"][0]
+        signer = Sign_0_21(privateKeyID=key["fingerprint"], passphrase=key["passphrase"], gnupgHome=kw["gnupghome"], gpgbin=kw["gpgbin"], publicKeyLocations=key["locations"])
+
+        signed_rd3 = signer.sign(test_rd3)
+        data = { "documents": [signed_rd3] }
+        result = json.loads(self.app.post('/publish', params=json.dumps(data), headers=headers).body)
+
+        assert(result['OK']), self._PUBLISH_UNSUCCESSFUL_MSG
+        assert(len(result['document_results']) == 1), "Expected 1 result and got {0}".format(len(result['document_results']))
+        for index, docResults in enumerate(result['document_results']):
+
+            assert(docResults['OK'] == True), "Document did not publish for doc_ID: {0}".format(data['documents'][index]['doc_ID'])
+            assert('doc_ID' in docResults), "Expected doc_ID: {0} in result.".format(data['documents'][index]['doc_ID'])  
+            assert(docResults['doc_ID'] == signed_rd3["doc_ID"]), "Expected doc_id: {0}, got {1}".format(signed_rd3["doc_ID"], docResults['doc_ID'])          
+            published_document = db[docResults['doc_ID']]
+            assert published_document['digital_signature']['key_owner'] == signed_rd3['digital_signature']['key_owner'], "key_owner doesn't match"
+            assert published_document['digital_signature']['signature'] == signed_rd3['digital_signature']['signature'], "signature doesn't match"
+            assert published_document['resource_locator'] == signed_rd3['resource_locator'], "resource_locator's don't match."
+            ResourceDataModelValidator.validate_model(published_document)
 
 
 class TestReplacementDocsController(TestController):
