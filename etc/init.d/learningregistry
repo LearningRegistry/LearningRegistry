@@ -31,8 +31,8 @@ lr_start () {
         echo "LR Node is already running"
         exit 1
     fi
-
-    su $LR_USER -c "source $LR_VIRTUALENV/bin/activate; uwsgi --ini-paste $LR_HOME/development.ini start -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG;deactivate"
+    cd $LR_HOME
+    su $LR_USER -c "source $LR_VIRTUALENV/bin/activate; uwsgi --ini-paste $LR_HOME/development.ini start -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG --master -p 4;deactivate"
     echo "LR Node is starting. Log: $LR_LOG   PID: $LR_PID"
 }
 
@@ -48,8 +48,9 @@ lr_stop () {
 lr_restart () {
     if [ -e $LR_PID ]
     then
+        cd $LR_HOME
         su $LR_USER -c "source $LR_VIRTUALENV/bin/activate;uwsgi --stop $LR_PID;rm -f $LR_PID"
-        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate; uwsgi --ini-paste $LR_HOME/development.ini start -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG;deactivate"
+        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate; uwsgi --ini-paste $LR_HOME/development.ini start -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG --master -p 4;deactivate"
         echo "LR Node is restarting. Log: $LR_LOG   PID: $LR_PID"
     fi
 
