@@ -18,7 +18,7 @@ class BaseController(WSGIController):
     def options(self):        
     	response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     	response.headers['Access-Control-Max-Age'] = '1728000'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Origin,Accept'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Origin,Accept,Authorization'
     def setOrigin(self):
         if 'origin' in request.headers:
            response.headers['Access-Control-Allow-Origin'] = request.headers['origin']
