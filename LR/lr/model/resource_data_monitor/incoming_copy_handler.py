@@ -47,7 +47,7 @@ class IncomingCopyHandler(BaseChangeHandler):
             try:
                 # newDoc['node_timestamp'] = h.nowToISO8601Zformat()
                 ResourceDataModelValidator.set_timestamps(newDoc)
-                repl_helper.handle(newDoc)
+                self.repl_helper.handle(newDoc)
                 # rd = ResourceDataModel(newDoc)
                 # rd.save(log_exceptions=False)
             except SpecValidationException as e:
