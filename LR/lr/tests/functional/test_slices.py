@@ -298,16 +298,30 @@ class TestSlicesController(TestController):
     def _loadAllDocs(self, parameters, response):
         data = json.loads(response.body)
         docs = data["documents"]
+        doc_Ids = set()
         while("resumption_token" in data):
             resumption_token = data["resumption_token"]
             parameters[RESUMPTION] = resumption_token
             response = self._slice(parameters)
             data = json.loads(response.body)
-            docs.extend(data["documents"])
+            for doc in data['documents']:
+                if doc['doc_ID'] in doc_Ids:
+                    raise Exception("Duplicate Document")
+                doc_Ids.add(doc['doc_ID'])
+                docs.add(doc)
         return docs
-    def _validate_page(self, parameters, response, test, max_pages):
+
+
+    def _validate_page(self, parameters, response, test, max_pages, validate_fn=None):
         data = json.loads(response.body)
+        doc_Ids = set()
         while "resumption_token" in data and max_pages > 0:
+            for doc in data['documents']:
+                if validate_fn is not None and not validate_fn(doc):
+                    raise Exception("Invalid Document")
+                if doc['doc_ID'] in doc_Ids:
+                    raise Exception("Duplicate Document")
+                doc_Ids.add(doc['doc_ID'])
             max_pages -= 1
             test(data['documents'])
             resumption_token = data["resumption_token"]
@@ -420,11 +434,14 @@ class TestSlicesController(TestController):
         parameters = {}
         parameters[START_DATE] = self.test_start_date_string
         parameters[IDS_ONLY] = False
+        parameters[ANY_TAGS] = self.testKeys[0] + 'test_resumption'
         response = self._slice(parameters)
         result = json.loads(response.body)
         assert "resumption_token" in result
+        test_key = self.testKeys[0] + 'test_resumption'
 
         def validate_page(docs):
             assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
             assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
-        self._validate_page(parameters, response, validate_page, 10)
+            assert all(test_key in doc['resource_data_description']["keys"] for doc in docs)
+        self._validate_page(parameters, response, validate_page, 10, )

@@ -22,7 +22,8 @@ def parse_token(serviceid, token):
 
     return decoded
 
-def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None):
+
+def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None, any_tags=None, identity=None):
     payload = {}
 
     payload["startkey"] = startkey
@@ -37,6 +38,12 @@ def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, u
     if startkey_docid:
         payload["startkey_docid"] = startkey_docid
 
+    if any_tags:
+        payload['any_tags'] = any_tags
+
+    if identity:
+        payload['identity'] = identity
+
     if from_date and isinstance(from_date, datetime.datetime):
         from lr.lib import helpers as h
         payload["from_date"] = h.convertToISO8601Zformat(from_date)
@@ -44,6 +51,7 @@ def get_payload(startkey=None, endkey={}, startkey_docid=None, from_date=None, u
         payload["until_date"] = h.convertToISO8601Zformat(until_date)
 
     return payload
+
 
 def get_offset_payload(offset=None, keys=None, maxResults=None):
     payload = {}
@@ -57,8 +65,14 @@ def get_offset_payload(offset=None, keys=None, maxResults=None):
 
     return payload
 
-def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None, maxResults=None):
+
+def get_token_slice(serviceid, startkey=None, endkey={}, startkey_docid=None, any_tags=None, identity=None, maxResults=None):
+    return jwt.encode(get_payload(startkey, endkey, startkey_docid, None, None, None, None, any_tags, identity), serviceid, __JWT_ALG)
+
+
+def get_tokenget_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None, maxResults=None):
     return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date, key, keys), serviceid, __JWT_ALG)
+
 
 def get_offset_token(serviceid, offset=None, keys=None, maxResults=None):
     return jwt.encode(get_offset_payload(offset, keys, maxResults), serviceid, __JWT_ALG)
