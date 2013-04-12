@@ -99,6 +99,7 @@ class SliceController(BaseController):
         if self.enable_flow_control and resumptionToken is not None:
             if "startkey_docid" in params:
                 opts['startkey_docid'] = params['startkey_docid']
+            opts["skip"] = 1
         opts['startkey'] = params['startkey']
         opts['endkey'] = params['endkey']
         print("OPTS: {0}".format(params))
@@ -164,6 +165,7 @@ class SliceController(BaseController):
             num_sent = 0
             doc_count = 0
             startkey_docid = None
+            startkey = params.get('startkey', None)
             update_resumption_max_results = current_rt and "maxResults" in current_rt and current_rt["maxResults"] != None
             if docs is not None:
                 for row in docs:
@@ -172,6 +174,7 @@ class SliceController(BaseController):
                     if not alreadySent or not forceUnique:
                         sentIDs.append(row["id"])
                         startkey_docid = row["id"]
+                        startkey = row['key']
                         if keys_only:
                             return_data = {"doc_ID": row["id"]}
                         else:
@@ -195,7 +198,7 @@ class SliceController(BaseController):
             if self.enable_flow_control:
                 if num_sent < maxResults:
                     token = resumption_token.get_token_slice(self.service_id, maxResults=maxResults, startkey_docid=startkey_docid,
-                                                             startkey=params.get('startkey', None), endkey=params.get('endkey', None),
+                                                             startkey=startkey, endkey=params.get('endkey', None),
                                                              any_tags=params.get(ANY_TAGS), identity=params.get(IDENTITY))
                     rt = ''' "resumption_token":"{0}", '''.format(token)
             db = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]

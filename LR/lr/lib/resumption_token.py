@@ -70,7 +70,7 @@ def get_token_slice(serviceid, startkey=None, endkey={}, startkey_docid=None, an
     return jwt.encode(get_payload(startkey, endkey, startkey_docid, None, None, None, None, any_tags, identity), serviceid, __JWT_ALG)
 
 
-def get_tokenget_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None, maxResults=None):
+def get_token(serviceid, startkey=None, endkey={}, startkey_docid=None, from_date=None, until_date=None, key=None, keys=None, maxResults=None):
     return jwt.encode(get_payload(startkey, endkey, startkey_docid, from_date, until_date, key, keys), serviceid, __JWT_ALG)
 
 
