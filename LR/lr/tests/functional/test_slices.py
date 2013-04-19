@@ -314,10 +314,13 @@ class TestSlicesController(TestController):
         while "resumption_token" in data and max_pages > 0:
             page = set()
             for doc in data['documents']:
+                #make sure no duplicated is current page of results
                 assert doc['doc_ID'] not in page
                 page.add(doc['doc_ID'])
             page = frozenset(page)
+            #empty pages give a false positive
             if len(page) > 0:
+                #make sure no page is duplicated
                 assert page not in pages, (page, pages)
                 pages.add(page)
             max_pages -= 1
