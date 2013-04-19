@@ -196,7 +196,8 @@ class SliceController(BaseController):
 
             rt = " "
             if self.enable_flow_control:
-                if num_sent < maxResults:
+                #only create resumption_token if we have sent docs, and we have a next doc to start with
+                if num_sent < maxResults and startkey_docid is not None:
                     token = resumption_token.get_token_slice(self.service_id, maxResults=maxResults, startkey_docid=startkey_docid,
                                                              startkey=startkey, endkey=params.get('endkey', None),
                                                              any_tags=params.get(ANY_TAGS), identity=params.get(IDENTITY))

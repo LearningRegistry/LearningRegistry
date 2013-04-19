@@ -290,6 +290,7 @@ class TestSlicesController(TestController):
 
     #call slice with the supplied parameters
     def _slice(self, parameters):
+        print(parameters)
         response = self.app.get('/slice', params=parameters, headers=json_headers)
         #print "sliceresponse: " + str(response)
         return response
@@ -298,35 +299,31 @@ class TestSlicesController(TestController):
     def _loadAllDocs(self, parameters, response):
         data = json.loads(response.body)
         docs = data["documents"]
-        doc_Ids = set()
         while("resumption_token" in data):
             resumption_token = data["resumption_token"]
             parameters[RESUMPTION] = resumption_token
-            response = self._slice(parameters)
+            response = self._slice({RESUMPTION: resumption_token})
             data = json.loads(response.body)
             for doc in data['documents']:
-                if doc['doc_ID'] in doc_Ids:
-                    raise Exception("Duplicate Document")
-                doc_Ids.add(doc['doc_ID'])
                 docs.add(doc)
         return docs
 
-
-    def _validate_page(self, parameters, response, test, max_pages, validate_fn=None):
+    def _validate_page(self, parameters, response, test, max_pages):
         data = json.loads(response.body)
-        doc_Ids = set()
+        pages = set()
         while "resumption_token" in data and max_pages > 0:
+            page = set()
             for doc in data['documents']:
-                if validate_fn is not None and not validate_fn(doc):
-                    raise Exception("Invalid Document")
-                if doc['doc_ID'] in doc_Ids:
-                    raise Exception("Duplicate Document")
-                doc_Ids.add(doc['doc_ID'])
+                assert doc['doc_ID'] not in page
+                page.add(doc['doc_ID'])
+            page = frozenset(page)
+            if len(page) > 0:
+                assert page not in pages, (page, pages)
+                pages.add(page)
             max_pages -= 1
             test(data['documents'])
             resumption_token = data["resumption_token"]
-            parameters[RESUMPTION] = resumption_token
-            response = self._slice(parameters)
+            response = self._slice({RESUMPTION: resumption_token})
             data = json.loads(response.body)
 
     @DataCleaner('test_by_date')
@@ -444,4 +441,4 @@ class TestSlicesController(TestController):
             assert len(docs) <= page_size, "resumption assert will fail. doc count is: " + str(len(docs))
             assert len([x for x in docs if helpers.convertDateTime(x['resource_data_description']["node_timestamp"]) >= date_int]) == len(docs)
             assert all(test_key in doc['resource_data_description']["keys"] for doc in docs)
-        self._validate_page(parameters, response, validate_page, 10, )
+        self._validate_page(parameters, response, validate_page, 10)
