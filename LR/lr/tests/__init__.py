@@ -49,4 +49,4 @@ class TestController(TestCase):
             assert res.headers['Access-Control-Allow-Origin'] == 'http://foo.bar'
             assert res.headers['Access-Control-Allow-Methods'] == 'GET, POST, OPTIONS'
             assert res.headers['Access-Control-Max-Age'] == '1728000'
-            assert res.headers['Access-Control-Allow-Headers'] == 'Content-Type,Origin,Accept'
+            assert res.headers['Access-Control-Allow-Headers'] == 'Content-Type,Origin,Accept,Authorization'
