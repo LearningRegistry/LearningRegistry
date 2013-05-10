@@ -36,7 +36,7 @@ class DistributeThresholdHandler(BaseChangeThresholdHandler):
         try:
             response = urllib2.urlopen(request)   
         except urllib2.HTTPError as err:
-            log.warn("Got {0} ERROR when requesting \"{1}\"".format(err.code, request.get_full_url()))
+            log.warning("Got {0} ERROR when requesting \"{1}\"".format(err.code, request.get_full_url()))
 
         log.debug('end distribute') 
     
