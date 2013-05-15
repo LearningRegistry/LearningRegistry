@@ -22,7 +22,7 @@ from node_service import NodeServiceModel
 from network_policy import NetworkPolicyModel
 from  node_config import LRNodeModel
 from base_model import defaultCouchServer
-from resource_data_monitor import monitorResourceDataChanges
+from resource_data_monitor import MonitorResourceDataChanges
 
 
 def _getNodeDocument(docModel, docType, numType=None, isRequired=True):
@@ -76,7 +76,7 @@ LRNode = LRNodeModel(getNodeConfig())
 # Start process that listens the resource_data  databasechange feed in order 
 # to mirror distributable/resource_data type documents, udpate views and fire
 # periodic distribution.
-monitorResourceDataChanges()
+MonitorResourceDataChanges.getInstance()
 
 
 

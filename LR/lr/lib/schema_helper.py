@@ -6,7 +6,7 @@ from pylons import config
 from uuid import uuid4
 
 
-import couchdb, logging, pprint
+import couchdb, logging, pprint, traceback
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ class SchemaBackedModelHelper(object):
             
             try:
                 _id, _rev = db.save(model)
-                
+                log.debug("SAVED: %s", _id)
                 if _ID not in model:
                     model[_ID] = _id
 
@@ -87,7 +87,7 @@ class SchemaBackedModelHelper(object):
                 result['ERROR'] = "CouchDB save error:  "+str(e)
                 if log_exceptions:
                     log.exception("CouchDB save error:\n%s\n" % (pprint.pformat({ "result": result, "model": model}, indent=4),))
-                        
+                    log.debug("TRACEBACK: %s", "".join(traceback.format_stack()))    
             return result
 
 

@@ -1,4 +1,4 @@
-import logging
+import logging, time
 import couchdb
 from threading import Thread
 from pylons import config
@@ -26,6 +26,7 @@ _DOCUMENT_UPDATE_THRESHOLD = 100
 
 
 class IncomingCopyHandler(BaseChangeHandler):
+
     def __init__(self):
         self._serverUrl = config["couchdb.url.dbadmin"]
         self._targetName = config["couchdb.db.resourcedata"]
@@ -33,6 +34,8 @@ class IncomingCopyHandler(BaseChangeHandler):
         s = couchdb.Server(self._serverUrl)
         self._db = s[self._targetName]
         self.repl_helper = ResourceDataReplacement()
+        self.threads = {}
+        self.max_threads = 50
 
     def _canHandle(self, change, database):
         if ((_DOC in change) and \
@@ -42,29 +45,50 @@ class IncomingCopyHandler(BaseChangeHandler):
         return False
 
     def _handle(self, change, database):
+        def threadName(doc):
+            return "T-"+doc["_id"]
+
         def handleDocument(newDoc):
             should_delete = True
             try:
                 # newDoc['node_timestamp'] = h.nowToISO8601Zformat()
                 ResourceDataModelValidator.set_timestamps(newDoc)
+                del newDoc["_rev"]
                 self.repl_helper.handle(newDoc)
                 # rd = ResourceDataModel(newDoc)
                 # rd.save(log_exceptions=False)
             except SpecValidationException as e:
-                log.error(newDoc['_id'] + str(e))
-            except ResourceConflict:
-                log.error('conflict')
+                log.error("SpecValidationException: %s, %s",newDoc['_id'],str(e))
+            except couchdb.ResourceConflict as rc:
+                log.error("Document conflicts", exc_info=1)
             except Exception as ex:
                 should_delete = False  # don't delete something unexpected happend
-                log.error(ex)
+                log.error("Unable to save %s", newDoc['_id'], exc_info=ex)
             if should_delete:
                 try:
                     del database[newDoc['_id']]
                 except Exception as ex:
                     log.error(ex)
+            try:
+                del self.threads[threadName(newDoc)]
+            except:
+                pass
+                    
         self.documents.append(change[_DOC])
         if len(self.documents) >= _DOCUMENT_UPDATE_THRESHOLD or len(self.documents) >= database.info()['doc_count']:
             for doc in self.documents:
-                t = Thread(target=handleDocument, args=(doc,))
+                tname = threadName(doc)
+                t = Thread(target=handleDocument, name=tname, args=(doc,))
+                self.threads[tname] = t
                 t.start()
+                while len(self.threads) > self.max_threads:
+                    time.sleep(.1)
+
             self.documents = []
+
+    def isRunning(self):
+        return len(self.threads) > 0
+
+
+    def threadCount(self):
+        return len(self.threads)
