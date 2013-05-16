@@ -2,6 +2,7 @@ import logging
 import couchdb
 from threading import Thread
 from pylons import config
+from os import getpid
 from lr.lib import SpecValidationException, helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
 from lr.model import ResourceDataModel
@@ -47,13 +48,14 @@ class IncomingCopyHandler(BaseChangeHandler):
             try:
                 # newDoc['node_timestamp'] = h.nowToISO8601Zformat()
                 ResourceDataModelValidator.set_timestamps(newDoc)
-                repl_helper.handle(newDoc)
+                del newDoc['_rev']
+                self.repl_helper.handle(newDoc)
                 # rd = ResourceDataModel(newDoc)
                 # rd.save(log_exceptions=False)
             except SpecValidationException as e:
                 log.error(newDoc['_id'] + str(e))
-            except ResourceConflict:
-                log.error('conflict')
+            except ResourceConflict as ex:
+                log.exception(ex)
             except Exception as ex:
                 should_delete = False  # don't delete something unexpected happend
                 log.error(ex)

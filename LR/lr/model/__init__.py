@@ -9,7 +9,7 @@ Created on Feb 24, 2011
 from pylons import *
 from lr.lib import ModelParser, SpecValidationException, helpers as h
 from uuid import uuid4
-import couchdb, os, logging, datetime, re, pprint 
+import couchdb, os, logging, datetime, re, pprint
 log = logging.getLogger(__name__)
 
 from resource_data import ResourceDataModel, appConfig
@@ -26,11 +26,11 @@ from resource_data_monitor import monitorResourceDataChanges
 
 
 def _getNodeDocument(docModel, docType, numType=None, isRequired=True):
-    
+
     docs = docModel.getAll()
     docModels = filter(lambda row :'doc_type' in row and row['doc_type']==docType, docs)
     numModelDocs = len(docModels)
-    
+
     if numType is not None and isRequired and numModelDocs != numType:
             raise(Exception("Error {0} of type '{1}' is required in database '{2}'".
                     format(numType, docType, docModel._defaultDB.name)))
@@ -42,7 +42,7 @@ def _getNodeDocument(docModel, docType, numType=None, isRequired=True):
         return {}
     else:
         results = []
-        for d in docModels: 
+        for d in docModels:
             model = docModel(d)
             model.validate()
             results.append(model.specData)
@@ -54,29 +54,29 @@ def getNodeConfig():
     #get community desciption.
     docs = CommunityModel.getAll()
     nodeConfig = {}
-    
+
     nodeConfig['community_description']=_getNodeDocument(CommunityModel,
                                                                                 'community_description', 1)
-    nodeConfig['network_description'] = _getNodeDocument(NetworkModel, 
+    nodeConfig['network_description'] = _getNodeDocument(NetworkModel,
                                                                                 'network_description', 1)
     nodeConfig['network_policy_description'] = _getNodeDocument(NetworkPolicyModel,
                                                                                 'policy_description', 1)
-    nodeConfig['node_description'] = _getNodeDocument(NodeModel, 
+    nodeConfig['node_description'] = _getNodeDocument(NodeModel,
                                                                                 "node_description", 1)
     nodeConfig['node_filter_description'] = _getNodeDocument(NodeFilterModel,
                                                                                 "filter_description", 1, False)
-    nodeConfig['node_services'] =_getNodeDocument(NodeServiceModel, 
+    nodeConfig['node_services'] =_getNodeDocument(NodeServiceModel,
                                                                                     "service_description",None)
     nodeConfig['node_connectivity'] = _getNodeDocument(NodeConnectivityModel,
                                                                                 "connection_description", None)
     return nodeConfig
-    
+
 LRNode = LRNodeModel(getNodeConfig())
 
-# Start process that listens the resource_data  databasechange feed in order 
+# Start process that listens the resource_data  databasechange feed in order
 # to mirror distributable/resource_data type documents, udpate views and fire
 # periodic distribution.
-monitorResourceDataChanges()
+# monitorResourceDataChanges()
 
 
 
