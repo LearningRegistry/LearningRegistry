@@ -24,5 +24,6 @@ LR/*.backup
 /utils/testconfig.ini
 
 env
-couchdb/apps/kanso/oauth-key-management/packages
-couchdb/apps/kanso/restrict-writers/packages
+couchdb/apps/kanso/*/packages
+
+LR/data/sessions/*

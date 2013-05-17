@@ -82,13 +82,13 @@ class SliceController(BaseController):
             params[IDS_ONLY] = req_params[IDS_ONLY] in ['T', 't', 'True', 'true', True]
         else:
             params[IDS_ONLY] = False
-        if RESUMPTION_TOKEN in params and params[RESUMPTION_TOKEN] is not None:
-            params[RESUMPTION_TOKEN] = resumption_token.parse_token(self.service_id, params[RESUMPTION_TOKEN])
-            if len([i for i in ["offset", "search"] if i in params[RESUMPTION_TOKEN]]) != 2:
-                msg = ": Unknown Error"
-                if "error" in params[RESUMPTION_TOKEN]:
-                    msg = ": %s" % params[RESUMPTION_TOKEN]["error"]
-                raise BadArgumentError("Bad Resumption Token%s" % msg)
+        if RESUMPTION_TOKEN in req_params and req_params[RESUMPTION_TOKEN] is not None:
+            resp_params = resumption_token.parse_token(self.service_id, req_params[RESUMPTION_TOKEN])
+            params[RESUMPTION_TOKEN] = resp_params
+            if ANY_TAGS in resp_params:
+                params[ANY_TAGS] = resp_params[ANY_TAGS]
+            if IDENTITY in resp_params:
+                params[IDENTITY] = resp_params[IDENTITY]
         return params
 
     def _get_view(self, view_name, params, include_docs=False, resumptionToken=None, limit=None):
@@ -96,28 +96,38 @@ class SliceController(BaseController):
         opts = {"stale": appConfig['couchdb.stale.flag'], "reduce": False}
         if include_docs:
             opts["include_docs"] = True
-        if self.enable_flow_control and resumptionToken != None:
-            if resumptionToken != None:
-                opts["skip"] = resumptionToken["offset"]
-                opts['startkey'] = resumptionToken['startkey']
-                opts['endkey'] = resumptionToken['endkey']
-        else:
-            opts.update(self._get_couch_opts(params))
-        if limit != None:
+        if self.enable_flow_control and resumptionToken is not None:
+            if "startkey_docid" in params:
+                opts['startkey_docid'] = params['startkey_docid']
+            opts["skip"] = 1
+        opts['startkey'] = params['startkey']
+        opts['endkey'] = params['endkey']
+        print("OPTS: {0}".format(params))
+        if limit is not None:
             opts["limit"] = limit
+
         return h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
 
     def _get_couch_opts(self, params):
         opts = {}
-        if START_DATE in params and IDENTITY in params:
+        if RESUMPTION_TOKEN in params:
+            params.update(params[RESUMPTION_TOKEN])
+        opts.update(params)
+
+        if RESUMPTION_TOKEN in params and "startkey_docid" in params[RESUMPTION_TOKEN]:
+            opts['startkey_docid'] = params[RESUMPTION_TOKEN]['startkey_docid']
+        if "startkey" in params and "endkey" in params:
+            opts['startkey'] = params['startkey']
+            opts['endkey'] = params['endkey']
+        elif START_DATE in params and IDENTITY in params:
             opts['startkey'] = [params[IDENTITY], params[START_DATE]]
             opts['endkey'] = [params[IDENTITY], params[END_DATE]]
         elif START_DATE in params and ANY_TAGS in params:
             opts['startkey'] = [params[ANY_TAGS], params[START_DATE]]
             opts['endkey'] = [params[ANY_TAGS], params[END_DATE]]
-        if START_DATE in params:
-            params['startkey'] = params[START_DATE]
-            params['endkey'] = params[END_DATE]
+        elif START_DATE in params:
+            opts['startkey'] = params[START_DATE]
+            opts['endkey'] = params[END_DATE]
         return opts
 
     def _get_index(self, params):
@@ -133,12 +143,9 @@ class SliceController(BaseController):
             return resumptionToken["maxResults"]
         db_url = '/'.join([appConfig['couchdb.url'], appConfig['couchdb.db.resourcedata']])
         opts = {"stale": appConfig['couchdb.stale.flag'], "group": True}
-        if self.enable_flow_control and resumptionToken != None:
-            if resumptionToken != None:
-                opts['startkey'] = resumptionToken['startkey']
-                opts['endkey'] = resumptionToken['endkey']
-        else:
-            opts.update(self._get_couch_opts(params))
+        if "startkey" in params and "endkey" in params:
+            opts['startkey'] = params['startkey']
+            opts['endkey'] = params['endkey']
         totalDocs = 0
         view = h.getView(database_url=db_url, method="POST", view_name=view_name, **opts)
         for row in view:
@@ -158,6 +165,7 @@ class SliceController(BaseController):
             num_sent = 0
             doc_count = 0
             startkey_docid = None
+            startkey = params.get('startkey', None)
             update_resumption_max_results = current_rt and "maxResults" in current_rt and current_rt["maxResults"] != None
             if docs is not None:
                 for row in docs:
@@ -166,6 +174,7 @@ class SliceController(BaseController):
                     if not alreadySent or not forceUnique:
                         sentIDs.append(row["id"])
                         startkey_docid = row["id"]
+                        startkey = row['key']
                         if keys_only:
                             return_data = {"doc_ID": row["id"]}
                         else:
@@ -187,14 +196,11 @@ class SliceController(BaseController):
 
             rt = " "
             if self.enable_flow_control:
-                pass
-                if current_rt != None and "offset" in current_rt and current_rt["offset"] is not None:
-                    offset = current_rt["offset"]
-                else:
-                    offset = 0
-                if offset + doc_count < maxResults:
-                    token = resumption_token.get_token(self.service_id, maxResults=maxResults, startkey_docid=startkey_docid,
-                                                       startkey=params.get('startkey', None), endkey=params.get('endkey', None))
+                #only create resumption_token if we have sent docs, and we have a next doc to start with
+                if num_sent < maxResults and startkey_docid is not None:
+                    token = resumption_token.get_token_slice(self.service_id, maxResults=maxResults, startkey_docid=startkey_docid,
+                                                             startkey=startkey, endkey=params.get('endkey', None),
+                                                             any_tags=params.get(ANY_TAGS), identity=params.get(IDENTITY))
                     rt = ''' "resumption_token":"{0}", '''.format(token)
             db = couchdb.Server(appConfig['couchdb.url'])[appConfig['couchdb.db.resourcedata']]
             yield '\n],' + rt + '"resultCount":' + str(maxResults) + ',"viewUpToDate":' + h.isViewUpdated(db, SLICE_DOCUMENT) + '}'
@@ -228,7 +234,7 @@ class SliceController(BaseController):
         # try:
         req_params = self._get_params()
         self._validate_params(req_params)
-        params = self._parse_params(req_params)
+        params = self._get_couch_opts(self._parse_params(req_params))
         return getResponse(params)
         # except BadArgumentError as bae:
         #     return '{ "error": "{0}" }'.format(bae.msg)

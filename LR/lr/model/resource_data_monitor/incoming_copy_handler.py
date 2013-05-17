@@ -2,7 +2,6 @@ import logging
 import couchdb
 from threading import Thread
 from pylons import config
-from os import getpid
 from lr.lib import SpecValidationException, helpers as h
 from lr.lib.couch_change_monitor import BaseChangeHandler
 from lr.model import ResourceDataModel
