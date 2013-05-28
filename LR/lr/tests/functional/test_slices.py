@@ -226,7 +226,7 @@ class TestSlicesController(TestController):
             doc = self.db[doc_id]
             doc["node_timestamp"] = self.test_start_date_string + self.test_time_string
             self.db[doc.id] = doc
-        urlopen(self.couch_url + "/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
+        urlopen(self.couch_url + "/resource_data/_design/learningregistry-slicelite/_view/docs?limit=1")
 
     #take an array of docs and apply a number of test dates to their node timestamps
     def updateTestDataWithMultipleTestDates(self, docs, testName):
@@ -243,7 +243,7 @@ class TestSlicesController(TestController):
                 doc["node_timestamp"] = self.test_end_date_string + self.test_time_string
 
             self.db[doc.id] = doc
-        urlopen(self.couch_url + "/resource_data/_design/learningregistry-slice/_view/docs?limit=1")
+        urlopen(self.couch_url + "/resource_data/_design/learningregistry-slicelite/_view/docs?limit=1")
 
     #returns true if one of the doc's indentities matches the argument
     def _checkIdentity(self, doc, identity):
