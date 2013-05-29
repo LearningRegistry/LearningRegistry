@@ -11,6 +11,14 @@ Created on August 18, 2011
 
 
 class BaseChangeHandler(object):
+
+    singleton_instance = None
+    @classmethod
+    def getInstance(cls, *args, **kwargs):
+        if cls.singleton_instance == None:
+            cls.singleton_instance = cls(*args, **kwargs)
+        return cls.singleton_instance
+
     def _canHandle(self, change, database):
         """Handler subclass must implement. Returns True if the handler object can or
         wants to handle the change. Otherwise returns False."""

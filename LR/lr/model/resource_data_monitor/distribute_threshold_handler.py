@@ -33,6 +33,10 @@ class DistributeThresholdHandler(BaseChangeThresholdHandler):
         data = json.dumps({"dist":"dist"})
         request = urllib2.Request(appConfig['lr.distribute.url'],data,{'Content-Type':'application/json; charset=utf-8'})
         log.debug(pprint.pformat(request))
-        response = urllib2.urlopen(request)   
+        try:
+            response = urllib2.urlopen(request)   
+        except urllib2.HTTPError as err:
+            log.warning("Got {0} ERROR when requesting \"{1}\"".format(err.code, request.get_full_url()))
+
         log.debug('end distribute') 
     

@@ -9,7 +9,7 @@ Created on August 18, 2011
 from multiprocessing import Queue
 from threading import Thread
 import couchdb
-import logging
+import logging, thread
 import pprint
 from base_change_handler import BaseChangeHandler
 from base_change_monitor import BaseChangeMonitor
@@ -40,7 +40,21 @@ class MonitorChanges(BaseChangeMonitor):
         self._initOptions(changeOptions)
         self._initLastChangeSequence()
         self._initChangeHandlers(changeHandlers)
+        self._lock = thread.allocate_lock()
     
+    def __enter__(self):
+        log.debug("Getting Lock...")
+        self._lock.acquire()
+        log.debug("Got Lock....")
+        return self
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._lock.release()
+        log.debug("Released Lock....")
+        return False
+
+
     def _initOptions(self, changeOptions):
         if hasattr(self, "_changeOptions"):
             return
@@ -110,14 +124,18 @@ class MonitorChanges(BaseChangeMonitor):
         self._updateChangeHandlerSet()
 
     def _processChanges(self):
-        #Add the last change sequence options as since 
-        self._changeOptions['since'] =  self._lastChangeSequence
-        changes =  self._database.changes(**self._changeOptions)
-        for change in changes:
-            self._handleChange(change)
-            if 'seq' in change:
-                self._lastChangeSequence = change['seq']
-                log.debug("--Last change sequence: {0}\n\n".format(self._lastChangeSequence))
+        try:
+            #Add the last change sequence options as since 
+            self._changeOptions['since'] =  self._lastChangeSequence
+            self._lock.acquire()
+            changes =  self._database.changes(**self._changeOptions)
+            for change in changes:
+                self._handleChange(change)
+                if 'seq' in change:
+                    self._lastChangeSequence = change['seq']
+                    log.debug("--Last change sequence: {0}\n\n".format(self._lastChangeSequence))
+        finally:
+            self._lock.release()
 
     def addHandler(self, handler):
         #Use queue to deal with cross process
@@ -128,6 +146,9 @@ class MonitorChanges(BaseChangeMonitor):
         #Use queue to deal with cross process
         if isinstance(handler, DatabaseChangeHandler):
             self._removeHandlerQueue.put(handler)
+
+    def lock(self):
+        return self._lock
 
     def run(self):
         #initialize the database in run side

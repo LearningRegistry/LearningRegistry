@@ -30,14 +30,14 @@ _CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
     TrackLastSequence(_CHANGE_ID),
-    UpdateViewsHandler(appConfig['couchdb.threshold.viewupdate']),
-    DistributeThresholdHandler(appConfig['couchdb.threshold.distributes']),
-    CompactionHandler(appConfig['couchdb.threshold.compaction'])
+    UpdateViewsHandler.getInstance(appConfig['couchdb.threshold.viewupdate']),
+    DistributeThresholdHandler.getInstance(appConfig['couchdb.threshold.distributes']),
+    CompactionHandler.getInstance(appConfig['couchdb.threshold.compaction'])
     ]
 
 _INCOMING_CHANGE_HANDLERS=[
     TrackLastSequence(_CHANGE_ID),
-    IncomingCopyHandler()
+    IncomingCopyHandler.getInstance()
     ]
 
 try:
@@ -52,29 +52,41 @@ def _getLastSavedSequence():
     return lastSavedSequence
 
     
-def monitorResourceDataChanges(): 
-    options = {'since':_getLastSavedSequence()}
-    log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
+class MonitorResourceDataChanges(object): 
     
-    resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
-                                                        appConfig['couchdb.db.resourcedata'],
-                                                        _RESOURCE_DATA_CHANGE_HANDLERS,
-                                                        options)
-    resourceDataChangeMonitor.start()
-        
-    incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
-                                                        incomingDB,
-                                                        _INCOMING_CHANGE_HANDLERS,
-                                                        {'since':-1})
-    incomingChangeMonitor.start()
-    
+    _instance = None
 
-    #changeMonitor.start(threading.current_thread())
-    def atExitHandler():
-        
-        resourceDataChangeMonitor.terminate()
-        incomingChangeMonitor.terminate()
-        log.debug("Last change in Resource Data: {0}\n\n".format(resourceDataChangeMonitor._lastChangeSequence))        
-        log.debug("Last change in Incoming: {0}\n\n".format(incomingChangeMonitor._lastChangeSequence))
+    @classmethod
+    def getInstance(cls, *args, **kwargs):
+        if cls._instance == None:
+            cls._instance = cls()
 
-    atexit.register(atExitHandler)
+        return cls._instance
+
+
+    def __init__(self, *args, **kwargs):
+        options = {'since':_getLastSavedSequence()}
+        log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
+        
+        self.resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
+                                                            appConfig['couchdb.db.resourcedata'],
+                                                            _RESOURCE_DATA_CHANGE_HANDLERS,
+                                                            options)
+        self.resourceDataChangeMonitor.start()
+            
+        self.incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
+                                                            incomingDB,
+                                                            _INCOMING_CHANGE_HANDLERS,
+                                                            {'since':-1})
+        self.incomingChangeMonitor.start()
+        
+
+        #changeMonitor.start(threading.current_thread())
+        def atExitHandler():
+            
+            self.resourceDataChangeMonitor.terminate()
+            self.incomingChangeMonitor.terminate()
+            log.debug("Last change in Resource Data: {0}\n\n".format(self.resourceDataChangeMonitor._lastChangeSequence))        
+            log.debug("Last change in Incoming: {0}\n\n".format(self.incomingChangeMonitor._lastChangeSequence))
+
+        atexit.register(atExitHandler)
