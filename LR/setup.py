@@ -7,11 +7,11 @@ except ImportError:
 
 setup(
     name='LR',
-    version='0.50.1',
+    version='0.50.2',
     description='',
     author='',
     author_email='',
-    url='',
+    url='http://www.learningregistry.org',
     install_requires=[
         "WebOb==1.1.1", "nose==1.2.0", "Pylons==1.0", "pyparsing==1.5.5", "restkit==3.2.3",
         "couchdb==0.8", "lxml==2.3", "iso8601plus==0.1.5", "ijson==0.8.0", "WebTest==1.1",
