@@ -73,10 +73,10 @@ def getNodeConfig():
     
 LRNode = LRNodeModel(getNodeConfig())
 
-# Start process that listens the resource_data  databasechange feed in order 
-# to mirror distributable/resource_data type documents, udpate views and fire
-# periodic distribution.
-MonitorResourceDataChanges.getInstance()
+# # Start process that listens the resource_data  databasechange feed in order 
+# # to mirror distributable/resource_data type documents, udpate views and fire
+# # periodic distribution.
+# MonitorResourceDataChanges.getInstance()
 
 
 

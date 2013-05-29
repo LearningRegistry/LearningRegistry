@@ -1,5 +1,6 @@
 import logging, time
 import couchdb
+from collections import deque
 from threading import Thread
 from pylons import config
 from lr.lib import SpecValidationException, helpers as h
@@ -30,7 +31,7 @@ class IncomingCopyHandler(BaseChangeHandler):
     def __init__(self):
         self._serverUrl = config["couchdb.url.dbadmin"]
         self._targetName = config["couchdb.db.resourcedata"]
-        self.documents = []
+        self.documents = deque()
         s = couchdb.Server(self._serverUrl)
         self._db = s[self._targetName]
         self.repl_helper = ResourceDataReplacement()
@@ -68,7 +69,7 @@ class IncomingCopyHandler(BaseChangeHandler):
                 try:
                     del database[newDoc['_id']]
                 except Exception as ex:
-                    log.error(ex)
+                    log.error("Error when deleting", exc_info=ex)
             try:
                 del self.threads[threadName(newDoc)]
             except:
@@ -76,7 +77,8 @@ class IncomingCopyHandler(BaseChangeHandler):
                     
         self.documents.append(change[_DOC])
         if len(self.documents) >= _DOCUMENT_UPDATE_THRESHOLD or len(self.documents) >= database.info()['doc_count']:
-            for doc in self.documents:
+            while len(self.documents) > 0:
+                doc = self.documents.popleft()
                 tname = threadName(doc)
                 t = Thread(target=handleDocument, name=tname, args=(doc,))
                 self.threads[tname] = t
@@ -84,7 +86,8 @@ class IncomingCopyHandler(BaseChangeHandler):
                 while len(self.threads) > self.max_threads:
                     time.sleep(.1)
 
-            self.documents = []
+
+
 
     def isRunning(self):
         return len(self.threads) > 0

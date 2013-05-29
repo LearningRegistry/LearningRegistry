@@ -30,14 +30,14 @@ _CHANGE_ID =  "_local/Last_Processed_Change_Sequence"
 
 _RESOURCE_DATA_CHANGE_HANDLERS=[
     TrackLastSequence(_CHANGE_ID),
-    UpdateViewsHandler(appConfig['couchdb.threshold.viewupdate']),
-    DistributeThresholdHandler(appConfig['couchdb.threshold.distributes']),
-    CompactionHandler(appConfig['couchdb.threshold.compaction'])
+    UpdateViewsHandler.getInstance(appConfig['couchdb.threshold.viewupdate']),
+    DistributeThresholdHandler.getInstance(appConfig['couchdb.threshold.distributes']),
+    CompactionHandler.getInstance(appConfig['couchdb.threshold.compaction'])
     ]
 
 _INCOMING_CHANGE_HANDLERS=[
     TrackLastSequence(_CHANGE_ID),
-    IncomingCopyHandler().getInstance()
+    IncomingCopyHandler.getInstance()
     ]
 
 try:
