@@ -13,6 +13,8 @@ import platform
 
 class __BaseDefaultMonitor(Process):
     monitorId = property(lambda self: self.pid, None, None, None)
+    def __init__(self, *args, **kwargs):
+        Process.__init__(self, *args, **kwargs)
 
     
 class __BaseWindowsMonitor(Thread):

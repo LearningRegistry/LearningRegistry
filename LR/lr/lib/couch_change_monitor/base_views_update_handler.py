@@ -23,7 +23,11 @@ class BaseViewsUpdateHandler(BaseChangeThresholdHandler):
     """
     def _updateView(self, viewUrl):
         log.debug('start view update %s' % viewUrl)
-        log.debug(urllib2.urlopen(viewUrl).read())
+        try:
+            log.debug(urllib2.urlopen(viewUrl).read())
+        except urllib2.HTTPError as err:
+            log.warning("Got {0} ERROR when trying to access \"{1}\"".format(err.code, viewUrl))
+
     def _handle (self, change, database):
         log.debug("class: {0} Updating views ...".format(self.__class__.__name__))
         try:
