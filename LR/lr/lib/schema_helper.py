@@ -104,7 +104,10 @@ class ResourceDataHelper(SchemaBackedModelHelper):
     def __init__(self, schemaRef, defaultDBName, server=_defaultCouchServer):
         super(ResourceDataHelper, self).__init__(schemaRef, defaultDBName, server)
 
-    def set_timestamps(self, model, timestamp=helpers.nowToISO8601Zformat()):
+    def set_timestamps(self, model, timestamp=None):
+        if timestamp == None:
+            timestamp = helpers.nowToISO8601Zformat()
+            
         for stamp in ResourceDataHelper.TIME_STAMPS:
             if stamp not in model or stamp is 'node_timestamp':
                 model[stamp] = timestamp

@@ -5,6 +5,7 @@ from lr.util.testdata import getTestDataForReplacement, getTestDataForMultipleRe
 from lr.lib.schema_helper import TombstoneValidator, ResourceDataModelValidator
 from lr.lib.signing import reloadGPGConfig
 from time import sleep
+from datetime import datetime
 from pylons import config
 import copy, couchdb, gnupg, json, re, uuid, socket
 from LRSignature.sign.Sign  import Sign_0_21
@@ -1436,6 +1437,57 @@ class TestPublisherController(TestController):
         result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
         assert(result['OK'] == True), self._PUBLISH_UNSUCCESSFUL_MSG
         assert(result['document_results'][0]['OK'] == False), "Should catch document with invalid array values"
+
+    def current_timestamp(self):
+        return "%sZ"%datetime.utcnow().isoformat()
+
+    @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
+    def test_publish_created_timestamps(self):
+        s = Server(config["app_conf"]['couchdb.url.dbadmin'])
+        db = s[config["app_conf"]['couchdb.db.resourcedata']]
+
+        ts_fields = ['create_timestamp', 'update_timestamp', 'node_timestamp']
+
+        data = { 
+                "documents": 
+                     [
+                        { 
+                        "active" : True,
+                        "doc_type" : "resource_data",
+                        "doc_version": "0.23.0",
+                        "payload_schema": ["none"],
+                        "resource_data_type": "metadata",
+                        "resource_locator" : "http://example.com",
+                        "identity": { "submitter" : "anonymous", "submitter_type" : "anonymous"},
+                        "payload_placement": "inline",
+                        "resource_data" : "something",
+                        "TOS" : { "submission_TOS" : "http://example.com" },
+                        "weight" : 0,
+                        "resource_TTL" : 0,
+                        }
+                     ]
+                }
+        def publish_doc():
+            sleep(1)
+            start_time = self.current_timestamp()
+            sleep(1)
+            result = json.loads(self.app.post('/publish',params=json.dumps(data), headers=headers).body)
+            sleep(1)
+            end_time = self.current_timestamp()
+            assert start_time < end_time, "not enough time has passed."
+            assert(result['OK'] == True), self._PUBLISH_UNSUCCESSFUL_MSG
+            assert(result['document_results'][0]['OK'] == True), "Should have published successfully."
+            published = db[result['document_results'][0]['doc_ID']]
+
+            for field in ts_fields:
+                assert start_time < published[field] and end_time > published[field], "bad timestamp set for %s"%field
+        
+        publish_doc()
+        
+        publish_doc()        
+
+
+
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
     def test_empty_document_array(self):
