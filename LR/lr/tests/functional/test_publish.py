@@ -1,6 +1,7 @@
 from lr.tests import *
 from lr.model import ResourceDataModel
 from lr.util import decorators
+from lr.util.decorators import make_gpg_keys
 from lr.util.testdata import getTestDataForReplacement, getTestDataForMultipleResourceLocator
 from lr.lib.schema_helper import TombstoneValidator, ResourceDataModelValidator
 from lr.lib.signing import reloadGPGConfig
@@ -20,86 +21,89 @@ def _cmp_version(version1, version2):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
     return cmp(normalize(version1), normalize(version2))
 
+################################
+## MOVED make_gpg_keys TO lr.util.decorators 
+################################
 
-def backup(prop_list=[]):
-    backup = {}
-    for prop in prop_list:
-        backup[prop] = config["app_conf"][prop]
-    return backup
+# def backup(prop_list=[]):
+#     backup = {}
+#     for prop in prop_list:
+#         backup[prop] = config["app_conf"][prop]
+#     return backup
 
-def restore(backup={}):
-    config["app_conf"].update(backup)
+# def restore(backup={}):
+#     config["app_conf"].update(backup)
 
-class make_gpg_keys(object):
-    '''decorator that makes at least 1 gpg key.  first key is set at the node key'''
-    def __init__(self, count=1):
-        self.count = count
-        self.gnupghome = tempfile.mkdtemp(prefix="gnupg_", dir=".")
-        self.gpgbin = "gpg"
-        self.gpg = gnupg.GPG(gnupghome=self.gnupghome, gpgbinary=self.gpgbin)
-        self.gpg.encoding = 'utf-8'
-        self.keys = []
+# class make_gpg_keys(object):
+#     '''decorator that makes at least 1 gpg key.  first key is set at the node key'''
+#     def __init__(self, count=1):
+#         self.count = count
+#         self.gnupghome = tempfile.mkdtemp(prefix="gnupg_", dir=".")
+#         self.gpgbin = "gpg"
+#         self.gpg = gnupg.GPG(gnupghome=self.gnupghome, gpgbinary=self.gpgbin)
+#         self.gpg.encoding = 'utf-8'
+#         self.keys = []
         
 
-    def __call__(self, f):
-        @wraps(f)
-        def wrapped(*args, **kw):
-                for i in range(self.count):
-                    cfg = {
-                        "key_type": "RSA",
-                        "key_length": 1024,
-                        "name_real": "Test Key #%d" % i,
-                        "name_comment": "Test key for %s" % f.__class__.__name__,
-                        "name_email": "test-%d@example.com" % i,
-                        "passphrase": "secret"
-                    }
-                    key = self.gpg.gen_key(self.gpg.gen_key_input(**cfg))
-                    assert key is not None, "GPG key not generated"
-                    assert key.fingerprint is not None, "Key missing fingerprint"
+#     def __call__(self, f):
+#         @wraps(f)
+#         def wrapped(*args, **kw):
+#                 for i in range(self.count):
+#                     cfg = {
+#                         "key_type": "RSA",
+#                         "key_length": 1024,
+#                         "name_real": "Test Key #%d" % i,
+#                         "name_comment": "Test key for %s" % f.__class__.__name__,
+#                         "name_email": "test-%d@example.com" % i,
+#                         "passphrase": "secret"
+#                     }
+#                     key = self.gpg.gen_key(self.gpg.gen_key_input(**cfg))
+#                     assert key is not None, "GPG key not generated"
+#                     assert key.fingerprint is not None, "Key missing fingerprint"
 
-                    cfg.update({
-                        "key": key,
-                        "fingerprint": key.fingerprint,
-                        "key_id": key.fingerprint[-16:],
-                        "locations": ["http://www.example.com/pubkey/%s" % key.fingerprint[-16:] ],
-                        "owner": "%s (%s)" % (cfg["name_real"], cfg["name_email"]) 
-                        })
-                    self.keys.append(cfg)
+#                     cfg.update({
+#                         "key": key,
+#                         "fingerprint": key.fingerprint,
+#                         "key_id": key.fingerprint[-16:],
+#                         "locations": ["http://www.example.com/pubkey/%s" % key.fingerprint[-16:] ],
+#                         "owner": "%s (%s)" % (cfg["name_real"], cfg["name_email"]) 
+#                         })
+#                     self.keys.append(cfg)
 
-                kw["pgp_keys"] = self.keys
-                kw["gnupghome"] = self.gnupghome
-                kw["gpgbin"] = self.gpgbin
-                kw["gpg"] = self.gpg
+#                 kw["pgp_keys"] = self.keys
+#                 kw["gnupghome"] = self.gnupghome
+#                 kw["gpgbin"] = self.gpgbin
+#                 kw["gpg"] = self.gpg
 
-                backup_props = [
-                    "lr.publish.signing.privatekeyid",
-                    "lr.publish.signing.passphrase",
-                    "lr.publish.signing.gnupghome",
-                    "lr.publish.signing.gpgbin",
-                    "lr.publish.signing.publickeylocations",
-                    "lr.publish.signing.signer"
-                ]
-                backup_conf = backup(backup_props)
+#                 backup_props = [
+#                     "lr.publish.signing.privatekeyid",
+#                     "lr.publish.signing.passphrase",
+#                     "lr.publish.signing.gnupghome",
+#                     "lr.publish.signing.gpgbin",
+#                     "lr.publish.signing.publickeylocations",
+#                     "lr.publish.signing.signer"
+#                 ]
+#                 backup_conf = backup(backup_props)
 
-                config["app_conf"].update({
-                    "lr.publish.signing.privatekeyid": self.keys[0]["key_id"],
-                    "lr.publish.signing.passphrase": self.keys[0]["passphrase"],
-                    "lr.publish.signing.gnupghome": self.gnupghome,
-                    "lr.publish.signing.gpgbin": self.gpgbin,
-                    "lr.publish.signing.publickeylocations": '''["http://localhost/pubkey"]''',
-                    "lr.publish.signing.signer": self.keys[0]["owner"]
-                    })
+#                 config["app_conf"].update({
+#                     "lr.publish.signing.privatekeyid": self.keys[0]["key_id"],
+#                     "lr.publish.signing.passphrase": self.keys[0]["passphrase"],
+#                     "lr.publish.signing.gnupghome": self.gnupghome,
+#                     "lr.publish.signing.gpgbin": self.gpgbin,
+#                     "lr.publish.signing.publickeylocations": '''["http://localhost/pubkey"]''',
+#                     "lr.publish.signing.signer": self.keys[0]["owner"]
+#                     })
 
-                reloadGPGConfig(config["app_conf"])
+#                 reloadGPGConfig(config["app_conf"])
 
-                try:
-                    return f(*args, **kw)
-                finally:
-                    shutil.rmtree(self.gnupghome)
-                    restore(backup_conf)
-                    reloadGPGConfig(config["app_conf"])
+#                 try:
+#                     return f(*args, **kw)
+#                 finally:
+#                     shutil.rmtree(self.gnupghome)
+#                     restore(backup_conf)
+#                     reloadGPGConfig(config["app_conf"])
 
-        return wrapped
+#         return wrapped
 
 
 
@@ -170,7 +174,7 @@ class TestMultiLocatorPublisherController(TestController):
         }
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     def test_publish_multiple_resource_locator(self, *args, **kw):
         s = Server(config["app_conf"]['couchdb.url.dbadmin'])
         db = s[config["app_conf"]['couchdb.db.resourcedata']]
@@ -269,7 +273,7 @@ class TestReplacementDocsController(TestController):
         }
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     def test_publish_replacement_with_delete(self, **kw):
         '''test_publish_replacement_with_delete: publishes 3 documents, doc 1 ordinary, doc 2 is a replacment, doc 3 is a delete replacment.'''
         s = Server(config["app_conf"]['couchdb.url.dbadmin'])
@@ -313,7 +317,7 @@ class TestReplacementDocsController(TestController):
 
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     def test_publish_replacement_docs(self, **kw):
         '''test_publish_replacement_docs: publishes 10 docs. each subsequent doc replaces the previous.
            the first document published is version 0.23.0'''
@@ -397,7 +401,7 @@ class TestReplacementDocsController(TestController):
                         assert repl_doc["replaced_by"]["doc_ID"] == published_document["doc_ID"], "Tombstone has wrong replacement doc_ID."
   
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     @decorators.OAuthRequest(path="/publish", http_method="POST")
     def test_publish_proxy_signed_replacement_docs(self, **kw):
         '''test_publish_proxy_signed_replacement_docs: publishes 10 documents by proxy signing. subsequent documents
@@ -506,7 +510,7 @@ class TestReplacementDocsController(TestController):
         return result
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz(basicauth=False, oauth=True))
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     def test_multi_user_publish_proxy_signed_replacement_docs(self, **kw):
         '''test_multi_user_publish_proxy_signed_replacement_docs: publishes 2 documents by proxy signing with different users. second document
            published attempts to replace the previous document, however should fail in replacement AND in publishing.'''
@@ -611,7 +615,7 @@ class TestReplacementDocsController(TestController):
 
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     def test_publish_resource_over_tombstone(self, **kw):
         '''test_publish_resource_over_tombstone: This creates a resource, tombstones it with a replacement, then tries to publish a resource
            with the same doc_ID as the tombstoned resource, which is expected to fail.'''
@@ -710,7 +714,7 @@ class TestReplacementDocsController(TestController):
 
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
-    @make_gpg_keys(1)
+    @decorators.make_gpg_keys(1)
     def test_publish_replacement_existing_tombstone(self, **kw):
         '''test_publish_replacement_existing_tombstone: publishes 1 resource, 2 updates.  1st update should successfully tombstone the first, and the second should
            try to tombstone both 1 and 2, however should fail on first, succeed on second'''
@@ -803,7 +807,7 @@ class TestReplacementDocsController(TestController):
                           
 
     @decorators.ModifiedServiceDoc(config["app_conf"]['lr.publish.docid'], decorators.update_authz())
-    @make_gpg_keys(2)
+    @decorators.make_gpg_keys(2)
     def test_publish_replacement_conflict(self, **kw):
         '''test_publish_replacement_conflict: Publish 2 documents each signed with different keys. The 
            second document tries to replace the first, which should fail, however the first document is
