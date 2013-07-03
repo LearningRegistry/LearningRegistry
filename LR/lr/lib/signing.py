@@ -84,13 +84,18 @@ def get_verification_info(document, attempt=0):
         elif attempt == len(_KEYSERVERS):
             try:
                 for loc in document["digital_signature"]["key_location"]:
+                    keys = []
                     try:
                         keys = util.fetchkeys(loc)
-                        for key in keys:
-                            util.storekey(key, this.gpg.gnupghome, this.gpg.gpgbinary)
                     except Exception, e:
-                        log.info("Problem importing or storing key from location: %s", e)
-                
+                        log.info("Problem fetching key from location: %s", e)
+                    
+                    for key in keys:
+                        try:
+                            util.storekey(key, gpg.gnupghome, gpg.gpgbinary)
+                        except Exception, e:
+                            log.info("Problem importing or storing key from location: %s", e)
+                            
                 # try again...
                 return get_verification_info(document, attempt+1)
             except:
