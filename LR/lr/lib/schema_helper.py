@@ -6,7 +6,7 @@ from pylons import config
 from uuid import uuid4
 
 
-import couchdb, logging, pprint
+import couchdb, logging, pprint, traceback
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ class SchemaBackedModelHelper(object):
             
             try:
                 _id, _rev = db.save(model)
-                
+                log.debug("SAVED: %s", _id)
                 if _ID not in model:
                     model[_ID] = _id
 
@@ -87,7 +87,7 @@ class SchemaBackedModelHelper(object):
                 result['ERROR'] = "CouchDB save error:  "+str(e)
                 if log_exceptions:
                     log.exception("CouchDB save error:\n%s\n" % (pprint.pformat({ "result": result, "model": model}, indent=4),))
-                        
+                    log.debug("TRACEBACK: %s", "".join(traceback.format_stack()))    
             return result
 
 
@@ -104,7 +104,10 @@ class ResourceDataHelper(SchemaBackedModelHelper):
     def __init__(self, schemaRef, defaultDBName, server=_defaultCouchServer):
         super(ResourceDataHelper, self).__init__(schemaRef, defaultDBName, server)
 
-    def set_timestamps(self, model, timestamp=helpers.nowToISO8601Zformat()):
+    def set_timestamps(self, model, timestamp=None):
+        if timestamp == None:
+            timestamp = helpers.nowToISO8601Zformat()
+            
         for stamp in ResourceDataHelper.TIME_STAMPS:
             if stamp not in model or stamp is 'node_timestamp':
                 model[stamp] = timestamp
