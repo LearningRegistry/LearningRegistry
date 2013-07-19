@@ -5,7 +5,6 @@ import pylons.test
 
 from lr.config.environment import load_environment
 from lr.plugins import init_plugins
-from lr.model.resource_data_monitor import MonitorResourceDataChanges
 
 log = logging.getLogger(__name__)
 
@@ -20,4 +19,4 @@ def setup_app(command, conf, vars):
     # Start process that listens the resource_data  databasechange feed in order 
     # to mirror distributable/resource_data type documents, udpate views and fire
     # periodic distribution.
-    MonitorResourceDataChanges.getInstance()
+    

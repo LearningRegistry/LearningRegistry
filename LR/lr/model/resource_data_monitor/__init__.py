@@ -67,7 +67,7 @@ class MonitorResourceDataChanges(object):
     def __init__(self, *args, **kwargs):
         options = {'since':_getLastSavedSequence()}
         log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
-        
+        print('got here')
         self.resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
                                                             appConfig['couchdb.db.resourcedata'],
                                                             _RESOURCE_DATA_CHANGE_HANDLERS,
