@@ -11,7 +11,6 @@ Created on August 18, 2011
 from datetime import timedelta, datetime
 import logging
 from base_change_handler import BaseChangeHandler
-
 log = logging.getLogger(__name__)
 
 class BaseChangeThresholdHandler(BaseChangeHandler):
@@ -20,7 +19,7 @@ class BaseChangeThresholdHandler(BaseChangeHandler):
         self._timeThreshold = timeThreshold
         self._changeCount = 0
         self._lastActionTime = datetime.now()
-    
+
     def _resetChangeToThreshold(self):
         """Resets each threshold independently"""
         if self._changeCount >= self._countThreshold:
@@ -30,7 +29,7 @@ class BaseChangeThresholdHandler(BaseChangeHandler):
 
     def _shouldTakeAction(self):
         # log.debug("class: {0} count: {1} countThreshold: {2} timedelta: {3} timethreshold: {4}\n\n".format(
-        #              self.__class__.__name__, self._changeCount, self._countThreshold, 
+        #              self.__class__.__name__, self._changeCount, self._countThreshold,
         #              (datetime.now() -self._lastActionTime) , self._timeThreshold))
 
         if ((self._changeCount >= self._countThreshold) or
@@ -43,7 +42,7 @@ class BaseChangeThresholdHandler(BaseChangeHandler):
         #check to see if we can care about the change. if so increase the count.
         if self._canHandle(change, database):
             self._changeCount = self._changeCount + 1
-        
+
             if self._shouldTakeAction():
                 self._handle(change, database)
                 self._resetChangeToThreshold()

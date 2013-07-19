@@ -32,15 +32,16 @@ class CompactionHandler(BaseChangeThresholdHandler):
         #curl -H "Content-Type: application/json" -X POST http://localhost:5984/dbname/_compact/designname
 
         req = urllib2.Request(compactUrl, data="", headers={"Content-Type": "application/json"})
-        base64string = base64.encodestring('%s:%s' % credentials).replace('\n', '')
-        req.add_header("Authorization", "Basic %s" % base64string)
+        if credentials is not None and len(credentials) > 0:
+            base64string = base64.encodestring('%s:%s' % credentials).replace('\n', '')
+            req.add_header("Authorization", "Basic %s" % base64string)
         log.debug(urllib2.urlopen(req).read())
 
     def _handle(self, change, database):
         log.debug("class: {0} Updating views ...".format(self.__class__.__name__))
         try:
             designDocs = database.view('_all_docs', include_docs=True,
-                                                        startkey='_design%2F', endkey='_design0')
+                                       startkey='_design%2F', endkey='_design0')
             for designDoc in designDocs:
                 viewInfo = "{0}/{1}/_info".format(database.resource.url, designDoc.id)
                 viewInfo = json.load(urllib2.urlopen(viewInfo))

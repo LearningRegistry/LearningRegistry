@@ -1,4 +1,4 @@
-import logging, time
+import logging
 import couchdb
 from collections import deque
 from threading import Thread
