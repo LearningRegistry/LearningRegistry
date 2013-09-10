@@ -4,7 +4,7 @@
 The Learning Registry makes digital learning resources easier to find, easier to access and easier to integrate into learning environments wherever they are stored -- around the country and the world. This will enable teachers, students, parents, schools, governments, corporations and non-profits to build and access better, more interconnected and personalized learning solutions needed for a 21st-century education.  You can find more information on the Learning Registry project at the [Learning Registry Web Site](http://www.learningregistry.org/).
 
 ## Getting Started 	
-The [Learning Registry in 20 Minutes or Less guide](https://docs.google.com/document/d/12nvvm5ClvLxSWptlo52rTwIDvobiFylYhWLVPbVcesU/edit?hl=en_US) will get you rolling with creating, uploading, downloading, and verifying envelopes in and out of Learning Registry servers whether you're using Windows, Linux, or Mac OS X.
+The [Learning Registry in 20 Minutes or Less guide](http://docs.learningregistry.org/en/latest/start/20min.html) will get you rolling with creating, uploading, downloading, and verifying envelopes in and out of Learning Registry servers whether you're using Windows, Linux, or Mac OS X.
 
 ##Setting Up a Learning Registry Node
 
