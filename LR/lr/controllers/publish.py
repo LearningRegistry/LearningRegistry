@@ -172,7 +172,7 @@ class PublishController(BaseController):
             result[self.__ERROR]  = "\n"+pprint.pformat(str(ex), indent=4)
         except Exception as ex:
             log.exception(ex)
-            result[self.__ERROR]  = 'internal error'
+            result[self.__ERROR]  = str(ex)
             
         if result.has_key(self.__ERROR):
             result[self.__OK] = False
