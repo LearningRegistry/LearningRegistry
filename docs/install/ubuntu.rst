@@ -12,9 +12,9 @@ Gotchas
 While we try to keep documentation up-to-date. Some dependencies update more frequently than these instructions. The following are some
 commonly known stumbling blocks:
 
-* CouchDB with BrowserID plugin 
+* CouchDB with BrowserID plugin
     - the BrowserID integrates with `Mozilla's Persona <https://developer.mozilla.org/en-US/docs/Persona>`_ whose protocol is still developmental, however relatively stable.  Revisions to the protocol have often required configuration changes to the updated plugin. Please refer to the `developer's site <https://github.com/iriscouch/browserid_couchdb>`_ for more information
-                              
+
 
 -----
 Steps
@@ -35,6 +35,7 @@ Steps
 
     sudo apt-get update
     sudo apt-get upgrade
+    sudo reboot
 
 
 3. Install system dependencies
@@ -57,8 +58,12 @@ Steps
     sudo adduser couchdb
     sudo adduser learnreg
 
+.. note::
 
-5. Build CouchDB 1.2.0 with some additional plugins
+    You may set passwords for these accounts, OR they can be left blank as service accounts.
+
+
+5. Build CouchDB 1.2.2 with some additional plugins
 ---------------------------------------------------
 
 ::
@@ -70,15 +75,16 @@ Steps
     cd build-couchdb
     git submodule init
     git submodule update
-    rake install=/opt/couchdb/1.2.0 git="git://github.com/apache/couchdb tags/1.2.0" plugins="git://github.com/iriscouch/browserid_couchdb origin/master,git://github.com/couchbase/geocouch origin/couchdb1.2.x"
+    rake install=/opt/couchdb/1.2.2 git="git://github.com/apache/couchdb tags/1.2.2" plugins="git://github.com/iriscouch/browserid_couchdb origin/master,git://github.com/couchbase/geocouch origin/couchdb1.2.x"
+    exit           ## exit out of couchdb account
 
 .. note::
 
     1. Ensure that the rake command uses the correct git path and branch/tag for the plugins parameter.
-    2. At the time of this writing, ``git://github.com/iriscouch/build-couchdb`` had reliablity issues for Ubuntu 12.04, which may be fixed. If the listed location in the source does not work, try the original.
+    2. At the time of this writing, ``git://github.com/iriscouch/build-couchdb`` had reliability issues for Ubuntu 12.04, which may be fixed. If the listed location in the source does not work, try the original.
     3. You may omit the geocouch plugin as it not currently utilized, but may have planned future use.  It may be added in the future when needed.  If you wish to omit, remove ``git://github.com/couchbase/geocouch origin/couchdb1.2.x`` from the rake command
 
-While CouchDB builds (it takes a long time), you can log into a separate session and begin installing Learning Registry at 5b
+While CouchDB builds (it takes a long time), you can log into a separate session and begin installing Learning Registry at Step 6
 
 
 6. Install Learning Registry code
@@ -91,9 +97,8 @@ Clone from GitHub:
     sudo su - learnreg
     git clone git://github.com/LearningRegistry/LearningRegistry
 
-
 .. note::
-  
+
     If you require a different branch other than head, please refer to the git documentation for checking out an alternate version
 
 
@@ -105,6 +110,7 @@ Create the Python virtualenv and install uwsgi and the node software:
     . env/bin/activate
     pip install uwsgi
     pip install -e ./LearningRegistry/LR/
+    exit           ## exit out of learnreg account
 
 
 
@@ -115,15 +121,15 @@ Create the Python virtualenv and install uwsgi and the node software:
 ::
 
     cd /opt/couchdb/
-    ln -s ./1.2.0 current
-    cd 1.2.0
+    ln -s ./1.2.2 current
+    cd 1.2.2
     vim env.sh
 
 Within the main() function, after the last dir_to_path line (about line 40) add the following by using arrow keys to navigate, then press "<ESC> o" and type:
 
 ::
 
-    export ERL_FLAGS="-pa /opt/couchdb/1.2.0/lib/couchdb/plugins/geocouch/ebin /opt/couchdb/1.2.0/lib/couchdb/plugins/browserid_couchdb/ebin"
+    export ERL_FLAGS="-pa /opt/couchdb/1.2.2/lib/couchdb/plugins/geocouch/ebin /opt/couchdb/1.2.2/lib/couchdb/plugins/browserid_couchdb/ebin"
 
 Save and exit by pressing "<ESC> :wq"
 
@@ -136,7 +142,7 @@ Navigate using the arrow keys after the line with ``LSB_LIBRARY=...`` (around li
 
 ::
 
-    export ERL_FLAGS="-pa /opt/couchdb/1.2.0/lib/couchdb/plugins/geocouch/ebin /opt/couchdb/1.2.0/lib/couchdb/plugins/browserid_couchdb/ebin"
+    export ERL_FLAGS="-pa /opt/couchdb/1.2.2/lib/couchdb/plugins/geocouch/ebin /opt/couchdb/1.2.2/lib/couchdb/plugins/browserid_couchdb/ebin"
 
 
 Save and exit by pressing "<ESC> :wq"
@@ -167,7 +173,7 @@ You should see:
 
 ::
 
-    {"couchdb":"Welcome","version":"1.2.0"}
+    {"couchdb":"Welcome","version":"1.2.2"}
 
 Next let's make sure we can authenticate:
 
@@ -175,7 +181,7 @@ Next let's make sure we can authenticate:
 
     curl 'http://admin:password@localhost:5984/_session'
 
-We should get a response like this: 
+We should get a response like this:
 
 ::
 
@@ -187,7 +193,7 @@ Next we want to make sure our plugin got installed correctly:
 
     curl http://localhost:5984/_browserid/main.js
 
-You should see the contents of a Javascript code returned.  If you see a single line that indicates an error, read on. A common problem is to use the wrong plugin url which produces a plugin directories that end in ".git". Check in ``/opt/couchdb/1.2.0/lib/couchdb/plugins``, and if you see any directories that end in ".git" (ie browserid_couchdb.git or geocouch.git) this is incorrect and plugins will need to be rebuilt. Recheck the 'rake' command you used and try rebuilding. Ensure that the git URI's for the plugins parameters do NOT end in ".git" (however they should begin with "git://").
+You should see the contents of a Javascript code returned.  If you see a single line that indicates an error, read on. A common problem is to use the wrong plugin url which produces a plugin directories that end in ".git". Check in ``/opt/couchdb/1.2.2/lib/couchdb/plugins``, and if you see any directories that end in ".git" (ie browserid_couchdb.git or geocouch.git) this is incorrect and plugins will need to be rebuilt. Recheck the 'rake' command you used and try rebuilding. Ensure that the git URI's for the plugins parameters do NOT end in ".git" (however they should begin with "git://").
 
 Stop couchdb for now and exit couchdb user shell:
 
@@ -210,10 +216,11 @@ We are done with configuration of CouchDB for now, you can refer to ``/opt/couch
 8. Configure GPG, NGINX, and LR
 -------------------------------
 
-If you do not have an existing GPG Keypair for the node, create a new one via:
+Switch to the learnreg account, and if you do not have an existing GPG Keypair for the node, create a new one via:
 
 ::
 
+    sudo su - learnreg
     gpg --gen-key
 
 After doing this, take note of the key id, which is the last 16 characters of the key fingerprint.  You can get this by doing:
@@ -222,7 +229,7 @@ After doing this, take note of the key id, which is the last 16 characters of th
 ::
 
     gpg --list-secret-keys --fingerprint
-    
+
     /home/learnreg/.gnupg/secring.gpg
     ---------------------------------
     sec   2048R/017491D1 2012-06-15
@@ -232,6 +239,13 @@ After doing this, take note of the key id, which is the last 16 characters of th
 
 "E33CDDFF017491D1" is the key ID from the example above.
 
+Switch back to the virtual environment (while still logged in as learnreg):
+
+::
+
+    cd /home/learnreg
+    . env/bin/activate
+
 ::
 
     cd /home/learnreg/LearningRegistry/config
@@ -239,7 +253,7 @@ After doing this, take note of the key id, which is the last 16 characters of th
 
 Follow the prompts.  Be sure to enable OAuth and Node Signing. Tip: Login a separate shell if you need to investigate some of the questions (path to NGINX, certs, etc)
 
-In a separate shell (one that has sudo privleges) do the following:
+In a separate shell (one that has sudo privleges) do the following to configure nginx:
 
 ::
 
@@ -254,7 +268,7 @@ In a separate shell (one that has sudo privleges) do the following:
 9. Start LR for the first time
 ------------------------------
 
-Switch back to the learnreg user account:
+Switch back to the learnreg user account (sudo su - learnreg) and start the LR:
 
 ::
 
@@ -285,16 +299,16 @@ Since your node is empty, don't expect any data, but there shouldn't
 be any errors.
 
 
-You should also verify that you can reach the user registration for node signing, this should redirect to the login interface.  
+You should also verify that you can reach the user registration for node signing, this should redirect to the login interface.
 
 ::
 
     http://192.168.96.134/auth
-    
+
 
 
 .. note::
-    
+
     If you have problems with accessing the registration page, check the NGINX configuration file to ensure it is appropriate for your environment.  The configuration should be located ``/etc/nginx/sites-enabled/learningregistry.conf``.
 
 
@@ -309,14 +323,16 @@ the process
 
 ::
 
-    sudo su - learnreg cd /home/learnreg/LearningRegistry/config .
-    ../../env/bin/activate python ./service\_util.py exit sudo cp
-    /home/learnreg/LearningRegistry/config/learningregistry.sh
-    /etc/init.d/learningregistry sudo chmod +x
-    /etc/init.d/learningregistry sudo update-rc.d learningregistry
-    defaults sudo service learningregistry start sudo cp
-    /home/learnreg/LearningRegistry/etc/logrotate.d/learningregistry
-    /etc/logrotate.d/
+    sudo su - learnreg
+    cd /home/learnreg/LearningRegistry/config
+    . ../../env/bin/activate
+    python ./service_util.py
+    exit
+    sudo cp /home/learnreg/LearningRegistry/config/learningregistry.sh /etc/init.d/learningregistry
+    sudo chmod +x /etc/init.d/learningregistry
+    sudo update-rc.d learningregistry defaults
+    sudo service learningregistry start
+    sudo cp /home/learnreg/LearningRegistry/etc/logrotate.d/learningregistry /etc/logrotate.d/
 
 
 11. Learning Registry Node Should be up and running
