@@ -162,6 +162,19 @@ Navigate to the end of the file and locate the [admins] section. Create an admin
 
 Substituting the password of your choice. The password will be hashed after startup. Save and exit by pressing "<ESC> :wq".
 
+::
+
+    vim etc/couchdb/default.d/browserid.ini
+
+
+For browser-based setup of OAuth accounts, you will need to update the **browserid** plugin's audience parameter to the domain name of your node. Navigate using the arrow keys after the line with ``audience = http://example.com`` and then enter replacement mode by pressing "R" and update the parameter with your domain, for example:
+
+::
+
+    audience = http://alpha.learningregistry.org
+
+Save and exit by pressing "<ESC> :wq"
+
 Try starting couchdb:
 
 ::
