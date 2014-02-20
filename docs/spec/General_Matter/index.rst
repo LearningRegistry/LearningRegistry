@@ -406,7 +406,8 @@ Change Log
 +-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.1      | 20130312 | JK         | Converted spec source format to RestructuredText. `Archive copy (V GM:0.50.0) <https://docs.google.com/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit>`_                                                |
 +-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.51.0      | 20140219 | jH         | Updated version number and shading of changes only. Updates to the spec are in the :doc:`Resource Data Data Model <../Resource_Data_Data_Model/index>` `Archive copy (V GM:0.50.0) <http://docs.learningregistry.org/en/0.50.1/spec/General_Matter/index.html>`_                                                |
+| 0.51.0      | 20140219 | jH         | Updated version number and shading of changes only. Updates to the spec are in the :doc:`Resource Data Data Model <../Resource_Data_Data_Model/index>`.
+                                        `Archive copy (V GM:0.50.0) <http://docs.learningregistry.org/en/0.50.1/spec/General_Matter/index.html>`                                                                                                              |
 +-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
