@@ -2,7 +2,7 @@
 
 
 =========================================================================
-General Matter: Learning Registry Technical Specification - V GM:0.50.1
+General Matter: Learning Registry Technical Specification - V GM:0.51.0
 =========================================================================
 
 .. include:: ../stability.txt
@@ -10,7 +10,7 @@ General Matter: Learning Registry Technical Specification - V GM:0.50.1
 See the `Change Log`_ for links to prior stable versions.
 
 
-:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
+:changes:`Shading indicates major changes and additions from the prior version (0.50.1). Also indicated with ▲.`
 
 :deletions:`Significant deletions are shaded.`
 
@@ -55,13 +55,9 @@ The Learning Registry provides *social* *networking* *for* *metadata* (trusted s
 Specification License
 ---------------------
 
-:deletions:`This specification is being developed under the Open Web Foundation Contributor License Agreement - Contributor Copyright Grant (CLA 0.9).
-The intent is that the final specification will be released under the Open Web Foundation Agreement (OWFa 0.9).
-Later versions may apply.`
-
-:changes:`▲The Learning Registry Technical Specification is being developed under the Open Web Foundation Contributor License Agreement 1.0 - Patent and Copyright (CLA 1.0)..
+The Learning Registry Technical Specification is being developed under the Open Web Foundation Contributor License Agreement 1.0 - Patent and Copyright (CLA 1.0)..
 The intent is that the final specification will be released under the Open Web Foundation Final Specification Agreement (OWFa 1.0).
-Later versions may apply.`
+Later versions may apply.
 
         Your use of this Specification may be subject to other third party rights.
         THIS SPECIFICATION IS PROVIDED “AS IS.” The contributors expressly disclaim any warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or title, related to the Specification.
@@ -115,7 +111,7 @@ It MAY NOT relax any constraint.
 Specification Versioning
 ------------------------
 
-:changes:`▲The following section is new in this version of the part.
+The following section is new in this version of the part.
 The remainder is not highlighted.`
 
 Different components of the Learning Registry Technical Specification and any implementation are versioned.
@@ -124,20 +120,20 @@ Version numbers of different components may be updated independently and version
 - Learning Registry Technical Specification Part Version Numbers
 
   - Each part of the Learning Registry Technical Specification has its own version number.
-    
+
 
   - The version number of any part may change independently of any other part.
 
 - Learning Registry Technical Specification Part Version Numbers
 
   - The whole of the Learning Registry Technical Specification has its own version number.
-    
+
 
   - The version number of the whole may change independently of a change to any part of the specification.
-    
+
 
   - A change in the version of a part SHALL result in a change to the version number of the whole.
-    
+
 
   - The reader SHALL NOT interpret any similarity between the version number of the whole and a version number of the part to imply that the version of a specific part is included in a specific version of the whole.
 
@@ -146,10 +142,10 @@ Version numbers of different components may be updated independently and version
   - Each data model schema has its own version number
 
   - Different version numbers for a data model schema imply a difference in the data model.
-    
+
 
   - The version number of the part of the specification where the data model is defined may change independently from the version number of the data model (the part may change without otherwise changing the data model schema).
-    
+
 
   - A change in the data model version SHALL result in a change in the version number of the part of the specification where the data model is defined.
 
@@ -200,10 +196,10 @@ The Learning Registry Technical Specification is split into several parts:
 - **Services** **and** **APIs**: The APIs used to publish and consume data and those used to operate the network.
   The APIs are designed to abstract the logical behaviors of the Learning Registry from any particular implementation tools.
 
-- :changes:`▲ **General Requirements:** Common behaviors and attributes that apply to all data models and behaviors.`
+- **General Requirements:** Common behaviors and attributes that apply to all data models and behaviors.
 
-- :changes:`▲ **Identity and Trust:** Models of trust, authentication, authorization, identity and security.
-  These models are applied to all data models and operations.`
+- **Identity and Trust:** Models of trust, authentication, authorization, identity and security.
+  These models are applied to all data models and operations.
 
 - **Operations**: Operational procedures that apply to any implementation.
 
@@ -223,7 +219,7 @@ The learning registry design and technical specification is based on several key
 - **Redundant**: There is no single point of failure in the design (an implementation may have single points of failure).
 
 - **Abstracted**: Abstraction is critical to layering capabilities, e.g., network content replication is content type agnostic.
-  
+
 
 - **Minimal**: Specify only what is required.
   Features that are community specific or can be layered on top of the core design are excluded from the specification although essential elements needed to support such modeling are included.
@@ -297,7 +293,7 @@ Additional terms may be provided in a future draft or version of the specificati
 
         network community (n)
             a group of interconnected resource distribution networks.
-        
+
 
         network node (n)
             a service end point in a resource distribution network that may provide services to process resource data and that may connect to any other nodes to distribute resource data.
@@ -409,6 +405,8 @@ Change Log
 | Future      | TBD      |            | XXXArchived copy location TBD. (V GM:x.xx.x)                                                                                                                                                                          |
 +-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.1      | 20130312 | JK         | Converted spec source format to RestructuredText. `Archive copy (V GM:0.50.0) <https://docs.google.com/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit>`_                                                |
++-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.51.0      | 20140219 | jH         | Updated version number and shading of changes only. Updates to the spec are in the :doc:`Resource Data Data Model <../Resource_Data_Data_Model/index>` `Archive copy (V GM:0.50.0) <http://docs.learningregistry.org/en/0.50.1/spec/General_Matter/index.html>`_                                                |
 +-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
