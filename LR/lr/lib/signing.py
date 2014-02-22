@@ -4,7 +4,7 @@ from lr.lib import oauth
 from lr.util import lrgpg
 from LRSignature.sign import Sign
 from LRSignature.verify import Verify
-from LRSignature.errors import MissingPublicKey
+from LRSignature.errors import MissingPublicKey, SignatureException
 from LRSignature import util
 
 log = logging.getLogger(__name__)
@@ -89,22 +89,26 @@ def get_verification_info(document, attempt=0):
                         keys = util.fetchkeys(loc)
                     except Exception, e:
                         log.info("Problem fetching key from location: %s", e)
-                    
+
                     for key in keys:
                         try:
                             util.storekey(key, gpg.gnupghome, gpg.gpgbinary)
                         except Exception, e:
                             log.info("Problem importing or storing key from location: %s", e)
-                            
+
                 # try again...
                 return get_verification_info(document, attempt+1)
             except:
                 pass
 
+    except SignatureException as ex:
+        # Catch all other SignatureExceptions to avoid trickling higher...
+        pass
+
 
     return None
 
-       
+
 _node_key_info = None
 def get_node_key_info():
     global _node_key_info
@@ -132,10 +136,10 @@ def sign_doc(doc, cb=None, session_key="oauth-sign"):
 
         submitter = params["name"]
         try:
-            submitter = "{0} <{1}>".format(params["lrsignature"]["full_name"], submitter) 
+            submitter = "{0} <{1}>".format(params["lrsignature"]["full_name"], submitter)
         except:
             pass
-            
+
         if cmp_version(doc["doc_version"], "0.21.0") >= 0:
             if "identity" not in doc:
                 doc["identity"] = {}

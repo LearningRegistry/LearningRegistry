@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 appConfig = config['app_conf']
 
 #Default couchdb server that use by all the models when none is provided.
-_defaultCouchServer =  couchdb.Server(appConfig['couchdb.url.dbadmin']) 
+_defaultCouchServer =  couchdb.Server(appConfig['couchdb.url.dbadmin'])
 
 _ID = "_id"
 _REV = "_rev"
@@ -35,7 +35,7 @@ class SchemaBackedModelHelper(object):
         self.defaultDB = _createDB(defaultDBName, server)
 
     def validate_model(self, model):
-        
+
         model_ref = deepcopy(model)
         #strip couchdb specific stuff before validation
         if _ID in model_ref or _REV in model_ref:
@@ -60,19 +60,19 @@ class SchemaBackedModelHelper(object):
 
 
     def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
-            
+
             # Make sure the spec data conforms to the spec before saving
             # it to the database
             if not skip_validation:
                 self.validate_model(model)
-                
+
             db = database
             # If no database is provided use the default one.
             if db == None:
                 db = self.defaultDB
-            
-            result = {'OK':True}   
-            
+
+            result = {'OK':True}
+
             try:
                 _id, _rev = db.save(model)
                 log.debug("SAVED: %s", _id)
@@ -81,13 +81,13 @@ class SchemaBackedModelHelper(object):
 
                 if _REV not in model:
                     model[_REV] = _rev
-                
+
             except Exception as e:
                 result['OK'] = False
                 result['ERROR'] = "CouchDB save error:  "+str(e)
                 if log_exceptions:
                     log.exception("CouchDB save error:\n%s\n" % (pprint.pformat({ "result": result, "model": model}, indent=4),))
-                    log.debug("TRACEBACK: %s", "".join(traceback.format_stack()))    
+                    log.debug("TRACEBACK: %s", "".join(traceback.format_stack()))
             return result
 
 
@@ -107,7 +107,7 @@ class ResourceDataHelper(SchemaBackedModelHelper):
     def set_timestamps(self, model, timestamp=None):
         if timestamp == None:
             timestamp = helpers.nowToISO8601Zformat()
-            
+
         for stamp in ResourceDataHelper.TIME_STAMPS:
             if stamp not in model or stamp is 'node_timestamp':
                 model[stamp] = timestamp
@@ -121,7 +121,7 @@ class ResourceDataHelper(SchemaBackedModelHelper):
             model[_ID] = model[_DOC_ID]
 
     def save(self, model, database=None, log_exceptions=True, skip_validation=False):
-        self.assign_id(model)        
+        self.assign_id(model)
 
         return SchemaBackedModelHelper.save(self, model, database, log_exceptions, skip_validation)
 

@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 appConfig = config['app_conf']
 
 #Default couchdb server that use by all the models when none is provided.
-_defaultCouchServer =  couchdb.Server(appConfig['couchdb.url.dbadmin']) 
+_defaultCouchServer =  couchdb.Server(appConfig['couchdb.url.dbadmin'])
 _db_resource_data = appConfig['couchdb.db.resourcedata']
 
 _DOC_VERSION = "doc_version"
@@ -42,7 +42,9 @@ def makeTombstone(replacement_doc, replacement_info, orig_doc_id, orig_doc=None)
         "create_timestamp": nowToISO8601Zformat()
     })
     if orig_doc is not None:
-        tombstone["resource_locator"] = orig_doc["resource_locator"]
+
+        if "resource_locator" in orig_doc:
+            tombstone["resource_locator"] = orig_doc["resource_locator"]
 
         if "replaces" in orig_doc:
             tombstone["replaces"] = orig_doc["replaces"]
@@ -61,7 +63,7 @@ class ResourceDataReplacement():
 
     def __init__(self, defaultDBName=_db_resource_data, server=_defaultCouchServer):
         self.db = self._createDB(defaultDBName, server)
-    
+
     def _createDB(self, name, server):
         try:
             server.create(name)
@@ -70,7 +72,7 @@ class ResourceDataReplacement():
         return server[name]
 
     def _make_tombstone(self, replacement_rd3, replacement_rd3_info, orig_doc_id, orig_doc):
-        
+
         tombstone = makeTombstone(replacement_rd3, replacement_rd3_info, orig_doc_id, orig_doc)
 
         tombstone["_id"] = tombstone["doc_ID"]
@@ -83,42 +85,49 @@ class ResourceDataReplacement():
 
 
     def _check_if_permitted(self, replacement_rd3, replacement_rd3_info, orig_doc, orig_doc_info):
-        # Tombstone logic needs to happen here    
-        # import pdb; pdb.set_trace()
-        allowTombstone = True
+
+        # if no tombstone policy plugins are active, permit a tombstone to be created
+        if LRPluginManager.getPluginCount(ITombstonePolicy.ID) == 0:
+            return True
+
+        # Loop through all of our policy plugins to see if any we are permitted to
+        # create a tombstone for our replacement doc
+        allowTombstone = False
         for plugin in LRPluginManager.getPlugins(ITombstonePolicy.ID):
             try:
-                allowTombstone = allowTombstone & plugin.permit(orig_doc, orig_doc_info, replacement_rd3, replacement_rd3_info)
+                checkPermit = plugin.permit(orig_doc, orig_doc_info, replacement_rd3, replacement_rd3_info)
             except DoNotPublishError, e:
                 raise e
             except Exception, e:
-                log.exception("Plugin raised exception: %s", e)
-                allowTombstone = False
-            
-            if not allowTombstone:
-                break
-        else:
-            allowTombstone = True
+                log.exception("Plugin '%s' raised exception: %s", plugin.__class__.__name__, e)
+                checkPermit = False
+
+            allowTombstone = allowTombstone | checkPermit
 
         return allowTombstone
 
     def _has_graveyard_permit(self, replacement_rd3, replacement_rd3_info, graveyard, existing_gravestones):
-        grantPermit = False
-        numPlugins = LRPluginManager.getPluginCount(ITombstonePolicy.ID)
-        for num, plugin in enumerate(LRPluginManager.getPlugins(ITombstonePolicy.ID), 1):
-            try:
-                grantPermit = grantPermit | plugin.permit_burial(replacement_rd3, replacement_rd3_info, graveyard)
-            except Exception, e:
-                log.exception("Plugin raised exception: %s", e)
-                grantPermit = False
-                
-            if grantPermit or num == numPlugins:
-                break
-        else:
-            grantPermit = True
+        # if no tombstone policy plugins are active, permit a graveyard to be buried
+        if LRPluginManager.getPluginCount(ITombstonePolicy.ID) == 0:
+            return True
 
-        log.debug("graveyard permit granted? %s", grantPermit)
-        return grantPermit
+        # Loop through our policy plugins to see if any we are permitted to bury a graveyard of tombstones
+        allowBurial = False
+        for plugin in LRPluginManager.getPlugins(ITombstonePolicy.ID):
+            try:
+                grantPermit = plugin.permit_burial(replacement_rd3, replacement_rd3_info, graveyard)
+            except Exception, e:
+                log.exception("Plugin '%s' raised exception: %s", plugin.__class__.__name__, e)
+                grantPermit = False
+
+            allowBurial = allowBurial | grantPermit
+
+            # once we find the first policy that grants us burial, go for it
+            if allowBurial:
+                break
+
+        log.debug("graveyard permit granted? %s", allowBurial)
+        return allowBurial
 
     def handle(self, replacement_rd3):
         # assign doc_id if need.
@@ -136,7 +145,7 @@ class ResourceDataReplacement():
                 for orig_doc_id in replacement_rd3[_REPLACES]:
                     try:
                         orig_doc = self.db[orig_doc_id]
-                        orig_doc_info = get_verification_info(orig_doc)
+                        orig_doc_info = get_verification_info(dict(orig_doc))
                     except couchdb.http.ResourceNotFound as rne:
                         orig_doc = None
                         orig_doc_info = None
@@ -147,10 +156,10 @@ class ResourceDataReplacement():
                     else:
                         # verify that tombstones
                         permitted = self._check_if_permitted(replacement_rd3, replacement_rd3_info, orig_doc, orig_doc_info)
-                    
+
                     log.debug("handle: permitted? {0}".format(permitted))
                     if permitted:
-                        tombstone = self._make_tombstone(replacement_rd3, replacement_rd3_info, orig_doc_id, orig_doc)               
+                        tombstone = self._make_tombstone(replacement_rd3, replacement_rd3_info, orig_doc_id, orig_doc)
                         graveyard.append(tombstone)
                     else:
                         log.debug("Replacement resource not permitted to be saved.")
@@ -175,6 +184,6 @@ class ResourceDataReplacement():
         return ResourceDataModelValidator.save(replacement_rd3, skip_validation=True)
 
 
-                
+
 
 

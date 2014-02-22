@@ -8,7 +8,9 @@
         },
         {
             "$ref": "file:lr/schema/v_0_49/resource_data.json"
+        },
+        {
+            "$ref": "file:lr/schema/v_0_51/resource_data.json"
         }
-        
     ]
 }
