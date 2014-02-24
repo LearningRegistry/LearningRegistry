@@ -104,6 +104,8 @@ The following process SHALL be used to generate the signature:
   The signer (key owner) MAY be an identity that is just used to sign the document, or it MAY be the identity of the submitter.
   Other identities SHALL NOT be used to sign the document.
 
+:changes:`▲ *NB*: The resource_data element MUST be a string, and therefore there should be no modification of values inside of the resource_data to accomodate signing.`
+
 Insert the digital signature data into the complete, unmodified UTF-8 JSON form of the resource data description document.
 Insert:
 
@@ -285,9 +287,7 @@ Change Log
 | 0.50.1      | 20130312 | JK         | Converted specification source to RestructuredText. `Archived copy (V IT:0.49.0) <https://docs.google.com/document/d/1vK66RY4S6AVtMJXB7jSqwl30J6NVBj6Gs8UWBcP-IPY/edit>`_                              |
 |             |          |            | node_timestamp removed from deprecation.                                                                                                                                                               |
 +-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.51.0      | 20140219 | jH         | Changed signing process to ignore all data `Archived copy (V IT:0.50.1) <http://docs.learningregistry.org/en/0.50.1/spec/Identity_Trust_Auth_and_Security/index.html>`_                              |
-|             |          |            | node_timestamp removed from deprecation.
-
+| 0.51.0      | 20140219 | jH         | Changed signing process to ignore all data `Archived copy (V IT:0.50.1) <http://docs.learningregistry.org/en/0.50.1/spec/Identity_Trust_Auth_and_Security/index.html>`_                                |
 +-------------+----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
