@@ -51,9 +51,9 @@ def _getLastSavedSequence():
         lastSavedSequence=ResourceDataModel._defaultDB[_CHANGE_ID][TrackLastSequence._LAST_CHANGE_SEQ]
     return lastSavedSequence
 
-    
-class MonitorResourceDataChanges(object): 
-    
+
+class MonitorResourceDataChanges(object):
+
     _instance = None
 
     @classmethod
@@ -67,26 +67,25 @@ class MonitorResourceDataChanges(object):
     def __init__(self, *args, **kwargs):
         options = {'since':_getLastSavedSequence()}
         log.debug("\n\n-----"+pprint.pformat(options)+"------\n\n")
-        print('got here')
-        self.resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
+        self.resourceDataChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'],
                                                             appConfig['couchdb.db.resourcedata'],
                                                             _RESOURCE_DATA_CHANGE_HANDLERS,
                                                             options)
         self.resourceDataChangeMonitor.start()
-            
-        self.incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'], 
+
+        self.incomingChangeMonitor = MonitorChanges(appConfig['couchdb.url.dbadmin'],
                                                             incomingDB,
                                                             _INCOMING_CHANGE_HANDLERS,
                                                             {'since':-1})
         self.incomingChangeMonitor.start()
-        
+
 
         #changeMonitor.start(threading.current_thread())
         def atExitHandler():
-            
+
             self.resourceDataChangeMonitor.terminate()
             self.incomingChangeMonitor.terminate()
-            log.debug("Last change in Resource Data: {0}\n\n".format(self.resourceDataChangeMonitor._lastChangeSequence))        
+            log.debug("Last change in Resource Data: {0}\n\n".format(self.resourceDataChangeMonitor._lastChangeSequence))
             log.debug("Last change in Incoming: {0}\n\n".format(self.incomingChangeMonitor._lastChangeSequence))
 
         atexit.register(atExitHandler)

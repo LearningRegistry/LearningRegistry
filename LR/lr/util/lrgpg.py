@@ -6,7 +6,7 @@ class LRGPG(gnupg.GPG):
 
     def list_keys(self, keyid=None, secret=False):
 
-        result = super(gnupg.GPG, self).list_keys(secret)
+        result = super(LRGPG, self).list_keys(secret)
 
         if keyid is not None:
 
