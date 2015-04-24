@@ -395,22 +395,26 @@ Change Log
 
 *NB*: See the :doc:`Learning <../Technical_Spec/index>` :doc:`Registry <../Technical_Spec/index>` :doc:`Technical <../Technical_Spec/index>` :doc:`Specification <../Technical_Spec/index>` for prior change history not listed below.
 
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Version** | **Date** | **Author** | **Change**                                                                                                                                                                                                            |
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0) <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_                            |
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.0      | 20110926 | DR         | Editorial updates to create stand alone version. Changed license from OWA CLA 0.9 to OWA CLA 1.0. Added section on versioning. Archived copy location TBD. (V GM:0.50.0)                                              |
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Future      | TBD      |            | XXXArchived copy location TBD. (V GM:x.xx.x)                                                                                                                                                                          |
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.50.1      | 20130312 | JK         | Converted spec source format to RestructuredText. `Archive copy (V GM:0.50.0) <https://docs.google.com/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit>`_                                                |
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 0.51.0      | 20140219 | jH         | Updated version number and shading of changes only. Updates to the spec are in the :doc:`Resource Data Data Model <../Resource_Data_Data_Model/index>`.
-                                        `Archive copy (V GM:0.50.0) <http://docs.learningregistry.org/en/0.50.1/spec/General_Matter/index.html>`                                                                                                              |
-+-------------+----------+------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-------------+----------+------------+----------------------------------------------------------------------------------------------------+
+| **Version** | **Date** | **Author** | **Change**                                                                                         |
++=============+==========+============+====================================================================================================+
+|             | 20110921 | DR         | This document extracted from the monolithic V 0.24.0 document. `Archived copy (V 0.24.0)           |
+|             |          |            | <https://docs.google.com/document/d/1Yi9QEBztGRzLrFNmFiphfIa5EF9pbV5B6i9Tk4XQEXs/edit?hl=en_US>`_  |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------+
+| 0.50.0      | 20110926 | DR         | Editorial updates to create stand alone version. Changed license from OWA CLA 0.9 to OWA CLA 1.0.  |
+|             |          |            | Added section on versioning. Archived copy location TBD. (V GM:0.50.0)                             |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------+
+| Future      | TBD      |            | XXXArchived copy location TBD. (V GM:x.xx.x)                                                       |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------+
+| 0.50.1      | 20130312 | JK         | Converted spec source format to RestructuredText. `Archive copy (V GM:0.50.0)                      |
+|             |          |            | <https://docs.google.com/document/d/1B5DqiN2YhjPZ5qApWGvWVyeuOjFpIOHiRlF9kjgPjzU/edit>`_           |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------+
+| 0.51.0      | 20140219 | jH         | Updated version number and shading of changes only. Updates to the spec are in the :doc:`Resource  |
+|             |          |            | Data Data Model <../Resource_Data_Data_Model/index>`. `Archive copy (V GM:0.50.0)                  |
+|             |          |            | <http://docs.learningregistry.org/en/0.50.1/spec/General_Matter/index.html>`                       |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------+
 
-
+ 
 
 
 
