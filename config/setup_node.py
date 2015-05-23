@@ -244,6 +244,9 @@ if __name__ == "__main__":
                     )
     parser.add_option("-r", "--response", dest="response_file", default=None,
                       help="Specify a filename for writing a response_file to input.")
+
+    parser.add_option("--show", dest="show_pass", action="store_true", default=False,
+                      help="Echo passwords - needed when using response files.")
     (options, args) = parser.parse_args()
     print("\n\n=========================\nNode Configuration\n")
     if options.devel:
@@ -255,6 +258,9 @@ if __name__ == "__main__":
         response_file.set(options.response_file)
 
     nodeSetup = getSetupInfo()
+
+    nodeSetup["show_pass"] = options.show_pass
+
     print("\n\n=========================\nNode Configuration\n")
     for k in nodeSetup.keys():
         print("{0}:  {1}".format(k, nodeSetup[k]))
