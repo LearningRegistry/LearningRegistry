@@ -23,7 +23,7 @@ class AdminSignedTombstone(ITombstonePolicy):
         for (dirpath, dirnames, filenames) in walk(public_key_directory):
             for f in filenames:
                 if f[-4:] == '.txt':
-                    with open(os.path.join(dirpath,f), 'r') as key_file:
+                    with open(path.join(dirpath,f), 'r') as key_file:
                         self.public_key_fingerprints.extend(gpg.import_keys(key_file.read()).fingerprints)
                         print "Loading key from %s%s" % (dirpath, f)
 
