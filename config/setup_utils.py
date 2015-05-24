@@ -311,7 +311,7 @@ def setNodeSigning(server, config, setupInfo):
         config.set("app:main","lr.publish.signing.signer",signer)
 
 
-        show_pass = !setupInfo["show_pass"]
+        show_pass = not setupInfo["show_pass"]
         passphrase = getInput("Passphrase for Signing with Private Key [typing is concealed]", "", checkPassphrase(gpg, privateKeyId), hide_input=show_pass)
         setupInfo["lr.publish.signing.passphrase"] = passphrase
         config.set("app:main","lr.publish.signing.passphrase",passphrase)
