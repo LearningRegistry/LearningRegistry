@@ -1,26 +1,35 @@
 #!/usr/bin/env python
 
 import copy, re, urllib2, json, ConfigParser
+import oauth2 as oauth
 from urllib import urlencode
 from argparse import ArgumentParser
 from pprint import pprint
 from LRSignature.sign.Sign import Sign_0_21
 
+_consumer = {
+	"key": "joe@navnorth.com",
+	"secret": "************************************"
+}
+
+_token = {
+	"key": "node_sign_token",
+	"secret": "************************************"
+}
+
+_debug_ID = ""
 
 _TOMBSTONE_DOCUMENT = {
     "replaces": [],
     "TOS": {
-        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+        "submission_TOS": "http://www.learningregistry.org/tos"
     },
-    "active": False,
+    "active":False,
     "doc_type": "resource_data",
     "doc_version": "0.49.0",
     "identity": {
-        "curator": "",
-        "owner": "",
         "submitter": "",
-        "signer": "",
-        "submitter_type": "agent"
+        "submitter_type": "user"
     },
     "payload_placement": "none",
     "resource_data_type": "metadata"
@@ -40,8 +49,9 @@ class MassDelete:
             self.signer = None
 
 
-        if not self.signer:
-            raise Exception("Failed to load document signer, please check configuration")
+        # node-based signing
+        #if not self.signer:
+        #    raise Exception("Failed to load document signer, please check configuration.")
 
     def start(self):
         resumption_token = None
@@ -49,6 +59,10 @@ class MassDelete:
         currentTombstone = self._build_tombstone()
 
         while True:
+            if len(_debug_ID):
+            	currentTombstone["replaces"] = [_debug_ID]
+            	break
+
             idRequest = self.get_document_ids(resumption_token)
 
             currentTombstone["replaces"].extend(idRequest['ids'])
@@ -81,7 +95,7 @@ class MassDelete:
         if resumption_token:
             params['resumption_token'] = resumption_token
 
-        url = self.server+'/slice?'+urlencode(params)
+        url = self.server+'/slice?from=2015-05-21T15:38:00&until=2015-05-26&'+urlencode(params)
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
 
@@ -106,15 +120,20 @@ class MassDelete:
                 tombstone["replaces"].append(docID)
 
         tombstone["identity"].update({
-            "submitter": self.options['submitter'],
-            "signer": self.options['signer']
+            "submitter": self.options['submitter']
         })
+
+        if(self.signer):
+            tombstone["identity"].update({
+                "signer": self.options['signer']
+            })
 
         return tombstone
 
     def sign_and_send(self, document):
         signed = self.sign_document(document)
-        self.upload_documents([signed])
+        #self.upload_documents([signed])
+        self.upload_documents_oauth([signed])
 
     def sign_document(self, document):
 
@@ -122,6 +141,57 @@ class MassDelete:
             return self.signer.sign(document)
 
         return document
+
+    def upload_documents_oauth(self, docs):
+
+        if len(docs) == 0: return
+
+        print "Batch sending", len(docs), "documents"
+
+        data = json.dumps({'documents':docs}, indent=4)
+
+        print data
+
+        publish_url = self.server+'publish'
+
+        consumer = oauth.Consumer(key=_consumer["key"], secret=_consumer["secret"])
+        token = oauth.Token(key=_token["key"], secret=_token["secret"])
+        # Create our client.
+        client = oauth.Client(consumer, token=token)
+        # we only need to do this because Sandbox uses a self-signed SSL cert that is untrusted. This should not be needed on production.
+        client.disable_ssl_certificate_validation = True
+        try:
+            print "Authenticating..."
+            resp, content = client.request(
+                                "https://%s/auth/oauth_verify" % options['host'],
+                                "POST",
+                                body="",
+                                headers={"Content-Type": "application/json"}
+                            )
+            content_json = json.loads(content)
+            if content_json['status'] == 'Okay':
+                print "status : Okay"
+                resp, content = client.request(
+                            publish_url,
+                            "POST",
+                            body=data,
+                            headers={"Content-Type": "application/json; charset=utf-8"}
+                        )
+                content_json = json.loads(content)
+
+
+            else:
+                print "Error authenticating with the Learning Registry."
+                print "status:", content_json['status']
+                if 'detail' in content_json:
+                    print "detail:", content_json['detail']
+
+
+            print content
+
+        except Exception, e:
+            print e
+
 
     def upload_documents(self, docs):
 
@@ -170,8 +240,8 @@ if __name__== "__main__":
                       help="[REQUIRED] Person or organization name of signer", required=True)
 
 
-    parser.add_argument('--key', help='PGP Private Key ID')
-    parser.add_argument('--key-location', help='Location the PGP Public Key can be downloaded from')
+    parser.add_argument('--key', help='PGP Private Key ID', default=None)
+    parser.add_argument('--key_location', help='Location the PGP Public Key can be downloaded from', default=None)
     parser.add_argument('--passphrase', help='Passphrase for PGP Private Key', default=None)
     parser.add_argument('--gpgbin', help='Path to GPG binary', default="gpg")
     parser.add_argument('--user',help="Username for basic auth", default=None)
