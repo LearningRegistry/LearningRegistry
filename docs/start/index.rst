@@ -8,3 +8,4 @@ Contents:
    :maxdepth: 2
 
    Learning Registry 20 Minute Guide <20min>
+   Learning Registry Distribution Guide <distribute>

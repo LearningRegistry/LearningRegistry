@@ -11,6 +11,7 @@ from threading import Thread
 import couchdb
 import logging, thread
 import pprint
+import time
 from base_change_handler import BaseChangeHandler
 from base_change_monitor import BaseChangeMonitor
 
@@ -18,14 +19,14 @@ _DEFAULT_CHANGE_OPTIONS = {'feed': 'continuous',
                            'include_docs':True}
 
 log = logging.getLogger(__name__)
-        
+
 class MonitorChanges(BaseChangeMonitor):
     """Class that monitors continously a couchdb database changes to apply a list
     of handlers the changes of the database"""
     # Number time the run will try to restart listening to the feed after an error without
     # any change in change.  This avoid getting stuck in endless loop
     _MAX_ERROR_RESTART = 10
-     
+
     def __init__(self, serverUrl, databaseName,  changeHandlers=None,  changeOptions=None, *args, **kwargs):
         """Waring *args and **kwargs will be run on the different process so the must
             be pickeable and not tied in any way to the calling process otherwise to application
@@ -41,7 +42,7 @@ class MonitorChanges(BaseChangeMonitor):
         self._initLastChangeSequence()
         self._initChangeHandlers(changeHandlers)
         self._lock = thread.allocate_lock()
-    
+
     def __enter__(self):
         log.debug("Getting Lock...")
         self._lock.acquire()
@@ -63,7 +64,7 @@ class MonitorChanges(BaseChangeMonitor):
             self._changeOptions.update(changeOptions)
         self._changeOptions.update(_DEFAULT_CHANGE_OPTIONS)
         log.debug(pprint.pformat(self._changeOptions))
-        
+
     def _initChangeHandlers(self, handlers):
         """Initialize the change handler set.  Use a set to avoid duplicate change handler"""
         if hasattr(self, "_changeHandlerSet") :
@@ -73,7 +74,7 @@ class MonitorChanges(BaseChangeMonitor):
         elif hasattr(handlers, '__iter__'):
             self._changeHandlerSet = set(
                 [h for h in handlers if isinstance(h, BaseChangeHandler)])
-        else: 
+        else:
             self._changeHandlerSet = set()
 
     def _initLastChangeSequence(self):
@@ -85,7 +86,7 @@ class MonitorChanges(BaseChangeMonitor):
                 self._lastChangeSequence = self._changeOptions['since']
             else:
                 self._lastChangeSequence =-1
-    
+
     def _selfTerminatorThread(self):
         """Method that starts a thread that will monitor the caller thread that started
         this object.  When  the caller thread is longer alive stop the monitoring """
@@ -99,7 +100,7 @@ class MonitorChanges(BaseChangeMonitor):
                 sleep(1)
             log.debug("Caller thread is longer alive ... terminate self...\n\n")
             self.terminate()
-        
+
         terminator = Thread(target=callerWatcher)
         terminator.start()
 
@@ -125,7 +126,7 @@ class MonitorChanges(BaseChangeMonitor):
 
     def _processChanges(self):
         try:
-            #Add the last change sequence options as since 
+            #Add the last change sequence options as since
             self._changeOptions['since'] =  self._lastChangeSequence
             self._lock.acquire()
             changes =  self._database.changes(**self._changeOptions)
@@ -156,7 +157,7 @@ class MonitorChanges(BaseChangeMonitor):
             self._database = couchdb.Server(self._serverUrl)[self._databaseName]
         except:
             server = couchdb.Server(self._serverUrl)
-            self._database = server.create(self._databaseName)    
+            self._database = server.create(self._databaseName)
         # As long as we are running keep monitoring the change feed for changes.
         log.debug("\n\nStart monitoring database : {0} changes PID: {1} since:{2}\n\n".format(
                     str(self._database), self.monitorId, self._lastChangeSequence))
@@ -171,19 +172,24 @@ class MonitorChanges(BaseChangeMonitor):
                 log.exception(e)
                 self._errorCount = self._errorCount + 1
 
+                # If the change monitor runs during a couchdb restart it will
+                # retry X times nearly instantly.  let's add a delay delay to
+                # assure services can restart in timely manner
+                time.sleep(5)
+
         if self._errorCount >= self._MAX_ERROR_RESTART:
             log.error("Change monitor for database {0} exceeded max errors\n\n".format(str(self._database)))
-    
+
     def terminate(self):
         BaseChangeMonitor.terminate(self)
         log.debug("\n\n------------I got terminated ...---------------\n\n")
-    
+
     def start(self, callerThread=None):
         if isinstance(callerThread, Thread):
             self._callerThread = callerThread
         self._selfTerminatorThread()
         BaseChangeMonitor.start(self)
-  
+
 
 if __name__=="__main__":
     logging.basicConfig(level=logging.DEBUG)
@@ -211,7 +217,7 @@ if __name__=="__main__":
     h1 = TestHandler()
     h2 = TestThresholdHandler(10, timedelta(seconds=60))
     h3 = TestViewUpdate(5, timedelta(seconds=15))
-    
+
     mon = MonitorChanges('http://127.0.0.1:5984', "resource_data", [h1, h2, h3])
     print ("starting the monitoring .....")
     mon.start()

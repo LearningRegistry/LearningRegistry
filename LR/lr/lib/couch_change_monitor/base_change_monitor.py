@@ -11,27 +11,27 @@ from multiprocessing import Process
 from threading import Thread
 import platform
 
-class __BaseDefaultMonitor(Process):
+class __BaseProcessMonitor(Process):
     monitorId = property(lambda self: self.pid, None, None, None)
     def __init__(self, *args, **kwargs):
         Process.__init__(self, *args, **kwargs)
 
-    
-class __BaseWindowsMonitor(Thread):
+
+class __BaseThreadMonitor(Thread):
     """Thread based class for the monitoring couchdb database change feed.
        Process does not seem to work on windows """
     def terminate(self):
         pass
-            
+
     def start(self):
-        Thread.deamon =True
+        Thread.daemon =True
         Thread.start(self)
 
     monitorId = property(lambda self :self.name, None, None, None)
- 
-   
-BaseChangeMonitor = __BaseDefaultMonitor
 
-if platform.system() == 'Windows':
-    BaseChangeMonitor = __BaseWindowsMonitor
- 
+
+# Using thread monitor over process-based monitor as process monitor creates zombies and
+# errors due to main process + workers confusing who owns child processes
+BaseChangeMonitor = __BaseThreadMonitor
+
+

@@ -33,27 +33,30 @@ lr_start () {
         echo "LR Node is already running"
         exit 1
     fi
-    cd $LR_HOME
-    su $LR_USER -c "cd $LR_HOME;source $LR_VIRTUALENV/bin/activate; uwsgi --ini-paste $LR_HOME/development.ini start -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG --master -p $LR_PROC_COUNT;deactivate"
-    echo "LR Node is starting. Log: $LR_LOG   PID: $LR_PID"
+    echo "Starting LR Node. Log: $LR_LOG   PID: $LR_PID"
+    su $LR_USER -c "cd $LR_HOME;source $LR_VIRTUALENV/bin/activate; cd $LR_HOME; uwsgi --enable-threads --no-orphans --ini-paste $LR_HOME/development.ini -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG; deactivate"
 }
 
 lr_stop () {
     if [ -e $LR_PID ]
     then
-        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate;uwsgi --stop $LR_PID;rm -f $LR_PID"
-        echo "LR Node is stopping. Log: $LR_LOG   PID: $LR_PID"
+        echo "Stopping LR Node. Log: $LR_LOG   PID: $LR_PID"
+        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate;uwsgi --stop $LR_PID; deactivate"
+        su $LR_USER -c "rm -f $LR_PID"
+    else
+        echo "LR Node not running."
     fi
-
 }
 
 lr_restart () {
     if [ -e $LR_PID ]
     then
-        cd $LR_HOME
-        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate;uwsgi --stop $LR_PID;rm -f $LR_PID"
-        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate; uwsgi --ini-paste $LR_HOME/development.ini start -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG --master -p $LR_PROC_COUNT;deactivate"
-        echo "LR Node is restarting. Log: $LR_LOG   PID: $LR_PID"
+        echo "Restarting LR Node. Log: $LR_LOG   PID: $LR_PID"
+        su $LR_USER -c "source $LR_VIRTUALENV/bin/activate;uwsgi --stop $LR_PID; deactivate"
+        su $LR_USER -c "rm -f $LR_PID"
+        su $LR_USER -c "cd $LR_HOME; source $LR_VIRTUALENV/bin/activate; uwsgi --enable-threads --no-orphans --ini-paste $LR_HOME/development.ini -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG; deactivate"
+    else
+        echo "LR Node not running.  Please use [start]"
     fi
 
 }

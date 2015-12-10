@@ -2,14 +2,14 @@
 
 
 ===============================================================================
-Resource Data Data Model: Learning Registry Technical Specification V RM:0.50.1
+Resource Data Data Model: Learning Registry Technical Specification V RM:0.51.0
 ===============================================================================
 
 .. include:: ../stability.txt
 
 See the `Change Log`_ for links to prior stable versions.
 
-:changes:`Shading indicates major changes and additions from the prior version (0.24.0). Also indicated with ▲.`
+:changes:`Shading indicates major changes and additions from the prior version (0.50.1). Also indicated with ▲.`
 
 :deletions:`Significant deletions are shaded.`
 
@@ -110,7 +110,7 @@ Other values MAY be changed only by the owner of the document.
                                         // required, mutable from T to F only
                                         // information about the submission, independent of the resource data
 
-        "identity": { 
+        "identity": {
                                         // identity and curation
 
             "submitter_type": "string",
@@ -136,7 +136,7 @@ Other values MAY be changed only by the owner of the document.
                                         // who owns what is referenced in the resource locator
                                         // optional
 
-            "signer": "string" 
+            "signer": "string"
                                         // identity of key owner used to sign the submission
                                         // optional
         },
@@ -157,14 +157,13 @@ Other values MAY be changed only by the owner of the document.
                                         // required
                                         // provided by the initial publish node (not distribution)
 
-        "update_timestamp":    "string",       
+        "update_timestamp":    "string",
                                         // timestamp of when published to the network
                                         // of latest update
                                         // time/date encoding
                                         // required
                                         // provided by the initial publishing node
                                         // not by a distribution node
-                                        // ▲ Added back, inadvertently removed from previous version of spec.
 
         "node_timestamp": "string",
                                         // timestamp of when received by the current node
@@ -172,7 +171,6 @@ Other values MAY be changed only by the owner of the document.
                                         // required
                                         // provided by the current distribution node
                                         // NOT distributed to other nodes
-                                        // ▲ Removed from deprecation
 
         "create_timestamp": "string",
                                         // timestamp of when first published to the network
@@ -181,13 +179,13 @@ Other values MAY be changed only by the owner of the document.
                                         // required, immutable
                                         // provided by the initial publishing node on first publish
                                         // not by a distribution node or not an update
-        "TOS": { 
+        "TOS": {
                                         // terms of service
             "submission_TOS": "string",
                                         // agreed terms of service by submitter
                                         // required
 
-            "submission_attribution": "string" 
+            "submission_attribution": "string"
                                         // attribution statement from submitter
                                         // optional
         },
@@ -201,7 +199,7 @@ Other values MAY be changed only by the owner of the document.
                                         // -100:100
                                         // optional
 
-        "digital_signature": { 
+        "digital_signature": {
                                         // digital signature of the submission, optional
 
             "signature": "string",
@@ -218,7 +216,7 @@ Other values MAY be changed only by the owner of the document.
         "resource_locator": "string",
                                         // unique locator for the resource described
                                         // SHALL resolve to a single unique resource
-                                        // ▲ required unless "replaces" is non-empty indicating deletion. 
+                                        // required unless "replaces" is non-empty indicating deletion.
 
         "keys": ["string"],
                                         // array of hashtag, keyword value list used for filtering
@@ -235,7 +233,7 @@ Other values MAY be changed only by the owner of the document.
                                         // "inline" -- resource data is in an object that follows
                                         // "linked" -- resource data is at the link provided
                                         // "attached" -- resource data is in an attachment
-                                        // ▲ required unless "replaces" is non-empty indicating deletion. 
+                                        // required unless "replaces" is non-empty indicating deletion.
 
         "payload_schema": ["string"],
                                         // array of schema description/keywords
@@ -256,21 +254,19 @@ Other values MAY be changed only by the owner of the document.
                                         // locator if payload_placement value is "linked"
                                         // required if "linked", otherwise ignored
 
-        "resource_data": <the resource data object>,
+        "resource_data": "string",
                                         // the actual inline resource data
-                                        // the resource data itself (resource_metadata, paradata)
-                                        // maybe a JSON object, or
-                                        // a string encoding XML or some other format, or
-                                        // a string encoding binary
-                                        // ▲ required if "inline" or "replaces" is non-empty indicating deletion, otherwise ignored
+                                        // the resource data itself (resource_metadata, paradata), encoded as a string.
+                                        // ▲ if your resource data is a JSON object, you MUST convert it to a string before publishing.
+                                        // ▲ String type is necessary to ensure data matching for signature validation.
+                                        // required if "inline" or "replaces" is non-empty indicating deletion, otherwise ignored
 
 
         "replaces": ["string"],
                                         // A list of doc_ID that refer to resource data that this resource data should replace
                                         // optional
-                                        // ▲ new field handilng replacements.
 
-        "X_xxx": ? ? ? ? ? 
+        "X_xxx": ? ? ? ? ?
                                         // placeholder for extensibility, optional
     }
 
@@ -280,23 +276,25 @@ JSON Schema
 Following is Resource Data Description Data Model described using `JSON Schema V3 <http://tools.ietf.org/html/draft-zyp-json-schema-03>`_.
 Instances of the data model describing resources MUST validate against one of the following schemas:
 
-    - file\:lr/schema/v_0_49/inline_resource_data.json : a data model where the resource data is included in the instance inline.
-    - file\:lr/schema/v_0_49/linked_resource_data.json : a data model where the resource data is linked externaly.
-    - file\:lr/schema/v_0_49/deleted_resource_data.json : a data model that indicates that a previously published inline or linked data model instance should be removed from the node.
-    - file\:lr/schema/v_0_49/resource_data.json : a union of the previous schemas
+:changes:`▲ With the exception of the inline_resource_data.json file, the other changes below are a matter of version only.`
 
-file\:lr/schema/v_0_49/resource_data.json
+    - :changes:`▲ file\:lr/schema/v_0_51/inline_resource_data.json` : a data model where the resource data is included in the instance inline.
+    - :changes:`▲ file\:lr/schema/v_0_51/linked_resource_data.json` : a data model where the resource data is linked externaly.
+    - :changes:`▲ file\:lr/schema/v_0_51/deleted_resource_data.json` : a data model that indicates that a previously published inline or linked data model instance should be removed from the node.
+    - :changes:`▲ file\:lr/schema/v_0_51/resource_data.json` : a union of the previous schemas
+
+file\:lr/schema/v_0_51/resource_data.json
 -----------------------------------------
 
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/resource_data.json
+.. literalinclude:: ../../../LR/lr/schema/v_0_51/resource_data.json
     :language: javascript
 
 
 
-file\:lr/schema/v_0_49/inline_resource_data.json
+file\:lr/schema/v_0_51/inline_resource_data.json
 ------------------------------------------------
 
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/inline_resource_data.json
+.. literalinclude:: ../../../LR/lr/schema/v_0_51/inline_resource_data.json
     :language: javascript
 
 
@@ -308,17 +306,17 @@ file\:lr/schema/abstract_inline_resource_data.json
     :language: javascript
 
 
-file\:lr/schema/v_0_49/deleted_resource_data.json
+file\:lr/schema/v_0_51/deleted_resource_data.json
 -------------------------------------------------
 
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/deleted_resource_data.json
+.. literalinclude:: ../../../LR/lr/schema/v_0_51/deleted_resource_data.json
     :language: javascript
 
 
-file\:lr/schema/v_0_49/linked_resource_data.json
+file\:lr/schema/v_0_51/linked_resource_data.json
 ------------------------------------------------
 
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/linked_resource_data.json
+.. literalinclude:: ../../../LR/lr/schema/v_0_51/linked_resource_data.json
     :language: javascript
 
 
@@ -339,7 +337,7 @@ file\:lr/schema/abstract_resource_data.json
 
 
 
-Timestamp values for update_timestamp, :changes:`▲ node_timestamp`, and create_timestamp SHALL be UTC 0.
+Timestamp values for update_timestamp, node_timestamp, and create_timestamp SHALL be UTC 0.
 
 *Open* *Question*: Is there a use case that requires create_timestamp?
 
@@ -507,10 +505,10 @@ The data model for a tombstone SHALL adhere to the following `JSON Schema <http:
 JSON SCHEMA
 ===========
 
-file\:lr/schema/v_0_49/tombstone.json
+file\:lr/schema/v_0_51/tombstone.json
 -------------------------------------
 
-.. literalinclude:: ../../../LR/lr/schema/v_0_49/tombstone.json
+.. literalinclude:: ../../../LR/lr/schema/v_0_51/tombstone.json
     :language: javascript
 
 
@@ -544,6 +542,8 @@ Change Log
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | 0.50.1      | 20130226 | JK         | Convert to RestructuredText formatting.  Adding model changes Replacement Documents and Tombstones per `Amendment (V 0.3) <https://docs.google.com/document/d/1JpwEQ4J6ruQUe502K4XzLnWqvC5L67vjasTTFKQo9e8/edit>`_. `Archived Copy (V RM:0.49.0) <https://docs.google.com/document/d/1zD0PUvQB0g-JpdbcioDL7WZByGtP79jbf0OoyQLISDM/edit>`_    |
 |             |          |            | Added missing field update_timestamp which got removed from some previous version inadvertently. node_timestamp removed from deprecation.                                                                                                                                                                                                    |
++-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| 0.51.0      | 20140219 | jH         | Changed resource_data field type to string per recent changes to signing process. Schema includes updated to 0.51.0 as well. `Archive copy (V RM:0.50.0) <http://docs.learningregistry.org/en/0.50.1/spec/Resource_Data_Data_Model/index.html>`_                                                                                             |
 +-------------+----------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 

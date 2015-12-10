@@ -25,12 +25,12 @@ level = NOTSET
 keys = console
 
 [logger_lr]
-handlers = 
+handlers =
 qualname = lr
 level = ERROR
 
 [logger_gnupg]
-handlers = 
+handlers =
 qualname = gnupg
 level = ERROR
 
@@ -42,7 +42,7 @@ handlers = console
 level = ERROR
 
 [logger_routes]
-handlers = 
+handlers =
 qualname = routes.middleware
 level = ERROR
 
@@ -100,14 +100,14 @@ lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
 lr.distribute_incoming_url = http://localhost/incoming
 schema.resource_data = file:lr/schema/any/resource_data.json
-schema.tombstone = file:lr/schema/v_0_49/tombstone.json
+schema.tombstone = file:lr/schema/any/tombstone.json
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 
 spec.models.resource_data =%(specs_dir)s/v_0_23/models/resource_data_description,
                                                 %(specs_dir)s/v_0_21/models/resource_data_description,
                                                 %(specs_dir)s/v_0_17/models/resource_data_description
-                                                 
+
 spec.models.network_policy_description =%(specs_dir)s/v_0_23/models/policy_description
 spec.models.status_description =%(specs_dir)s/v_0_23/models/status_description
 spec.models.filter_description =%(specs_dir)s/v_0_23/models/filter_description
@@ -115,9 +115,5 @@ spec.models.node_connectivity_description =%(specs_dir)s/v_0_23/models/connectio
 spec.models.community_description =%(specs_dir)s/v_0_23/models/community_description
 spec.models.network_description =%(specs_dir)s/v_0_23/models/network_description
 spec.models.node_service_description =%(specs_dir)s/v_0_23/models/service_description
-
-
-
-
-
+lr.tombstone.admin_signed.key_directory=admin/public_keys/
 
