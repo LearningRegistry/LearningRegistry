@@ -95,7 +95,7 @@ lr_start () {
     fi
 
     echo "Starting LR Node. Log: $LR_LOG   PID: $LR_PID"
-    su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --ini-paste $LR_HOME/development.ini {{#LR_VIRTUALENV}}-H $LR_VIRTUALENV{{/LR_VIRTUALENV}} --pidfile $LR_PID --daemonize $LR_LOG{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
+    su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate;{{/LR_VIRTUALENV}} cd $LR_HOME; uwsgi --enable-threads --no-orphans --ini-paste $LR_HOME/development.ini {{#LR_VIRTUALENV}}-H $LR_VIRTUALENV{{/LR_VIRTUALENV}} --pidfile $LR_PID --daemonize $LR_LOG{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
 }
 
 lr_stop () {
@@ -115,7 +115,7 @@ lr_restart () {
         echo "Restarting LR Node. Log: $LR_LOG   PID: $LR_PID"
         su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --stop $LR_PID{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
         su $LR_USER -c "rm -f $LR_PID"
-        su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}}uwsgi --ini-paste $LR_HOME/development.ini {{#LR_VIRTUALENV}}-H $LR_VIRTUALENV{{/LR_VIRTUALENV}} --pidfile $LR_PID --daemonize $LR_LOG{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
+        su $LR_USER -c "{{#LR_VIRTUALENV}}source $LR_VIRTUALENV/bin/activate; {{/LR_VIRTUALENV}} cd $LR_HOME; uwsgi --enable-threads --no-orphans --ini-paste $LR_HOME/development.ini {{#LR_VIRTUALENV}}-H $LR_VIRTUALENV{{/LR_VIRTUALENV}} --pidfile $LR_PID --daemonize $LR_LOG{{#LR_VIRTUALENV}}; deactivate{{/LR_VIRTUALENV}}"
     else
         echo "LR Node not running.  Please use [start]"
     fi

@@ -10,6 +10,8 @@ Base model class for learning registry data model
 @author: jpoyau
 '''
 import sys
+import os
+from subprocess import Popen, PIPE
 from network import NetworkModel
 from community import CommunityModel
 from node import NodeModel
@@ -77,6 +79,7 @@ class LRNodeModel(object):
         self._initConnections(config)
         self._setNodeStatus()
         self._initConfig(config)
+        self._initBuildVersion()
 
     def _initModel(self, modelClass, modelId, modelConf):
         #Try to get the model data from the database.
@@ -128,6 +131,21 @@ class LRNodeModel(object):
                                                                                 connection['connection_id'],
                                                                                 connection))
 
+    def _initBuildVersion(self):
+        try:
+            process = Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE)
+            (output, err) = process.communicate()
+            process.wait()
+
+            self._buildVersion = {
+                'current_build_revision': output.strip()
+            }
+        except Exception, e:
+            self._buildVersion = {
+                'current_build_revision': 'unknown'
+            }
+
+
     def _setNodeStatus(self):
         nodeStatus = None
         nodeStatusId = "node status"
@@ -162,6 +180,7 @@ class LRNodeModel(object):
         description.update(self._networkDescription.descriptionDict)
         description.update(self._nodeDescription.descriptionDict)
         description.update(self._networkPolicyDescription.descriptionDict)
+        description.update(self._buildVersion)
         if hasattr(self, '_filterDescription'):
             description['filter'] = self._filterDescription.descriptionDict
         return json.dumps(description, indent=2)

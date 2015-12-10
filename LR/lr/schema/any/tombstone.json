@@ -1,0 +1,13 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "tombstone",
+    "description": "Tombstone validation for any version",
+    "type": [
+        {
+            "$ref": "file:lr/schema/v_0_49/tombstone.json"
+        },
+        {
+            "$ref": "file:lr/schema/v_0_51/tombstone.json"
+        }
+    ]
+}

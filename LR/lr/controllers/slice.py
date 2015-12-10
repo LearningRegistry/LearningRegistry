@@ -102,7 +102,6 @@ class SliceController(BaseController):
             opts["skip"] = 1
         opts['startkey'] = params['startkey']
         opts['endkey'] = params['endkey']
-        print("OPTS: {0}".format(params))
         if limit is not None:
             opts["limit"] = limit
 
