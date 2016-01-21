@@ -1,0 +1,70 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "lrmi_resource_open",
+    "description": "Resource Data LRMI",
+    "id": "/",
+    "properties": {
+        "name": {
+            "id": "name",
+            "type": "string",
+            "description": "Name of the resource",
+            "required": true
+        },
+        "url": {
+            "id": "url",
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the resource",
+            "required": true,
+            "minLength": 10
+        },
+        "description": {
+            "id": "description",
+            "type": "string",
+            "description": "Short description of the resource",
+            "required": true,
+            "minLength": 10
+        },
+        "publisher": {
+            "id": "author",
+            "type": "object",
+            "description": "Identity information for the publisher of the resource",
+            "properties": {
+                "@type": {
+                    "enum": [ "Person", "Organization" ],
+                    "description": "Publisher type: Person or Organization",
+                    "required": true
+                },
+                "name": {
+                  "id": "name",
+                  "type": "string",
+                  "description": "Name of the publisher of this resource",
+                  "required": true
+                },
+                "email": {
+                  "id": "email",
+                  "type": "string",
+                  "format": "email",
+                  "description": "Contact email address of the publisher of this resource",
+                  "required": false
+                },
+                "url": {
+                    "id": "url",
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL of the publisher of this resource",
+                    "required": false,
+                    "minLength": 10
+                }
+            }
+        },
+        "useRightsUrl": {
+            "id": "useRightsUrl",
+            "type": "string",
+            "format": "uri",
+            "required": true,
+            "description": "URL of the use rights for this resource",
+            "minLength": 10
+        }
+    }
+}
