@@ -1,4 +1,4 @@
-[DEFAULT]
+ [DEFAULT]
 debug = false
 error_email_from = paste@localhost
 smtp_server = localhost
@@ -100,6 +100,7 @@ lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
 lr.distribute_incoming_url = http://localhost/incoming
 schema.resource_data = file:lr/schema/any/resource_data.json
+schema.resource_data_lrmi = file:lr/schema/resource_lrmi_open.json
 schema.tombstone = file:lr/schema/any/tombstone.json
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description

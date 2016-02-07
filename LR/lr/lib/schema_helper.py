@@ -4,6 +4,7 @@ from lr.schema.validate import LRDraft3Validator
 from lr.lib import helpers, SpecValidationException
 from pylons import config
 from uuid import uuid4
+import json
 
 
 import couchdb, logging, pprint, traceback
@@ -18,6 +19,7 @@ _defaultCouchServer =  couchdb.Server(appConfig['couchdb.url.dbadmin'])
 _ID = "_id"
 _REV = "_rev"
 _DOC_ID = "doc_ID"
+_schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 
 def _createDB(name, server=_defaultCouchServer):
     try:
@@ -48,7 +50,8 @@ class SchemaBackedModelHelper(object):
                 del model_ref[_REV]
             except:
                 pass
-
+        # primary validation of the record sent
+        #todo alter the returned messages as users are saying the do not give good feedback
         try:
             validate(model_ref, self.schema, cls=self.validator_class)
         except ValidationError as ve:
@@ -57,7 +60,18 @@ class SchemaBackedModelHelper(object):
                 msgs.append(err.message)
 
             raise SpecValidationException(",\n".join(msgs))
+        #todo secondary validation required here to validate the resource_data field
+        resource_data = model_ref['resource_data']
+        if isinstance(resource_data,str):
+            try:
+                resource_data = json.loads(resource_data)
+            except ValueError:
+                raise ValueError('The resource_data field does not contain valid JSON data')
 
+            v = self.validator_class(_schemaRef_Resource_Data_LRMI)
+            errors = sorted(v.iter_errors(resource_data), key=lambda e: e.path)
+            if errors:
+                pass
 
     def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
 
@@ -95,6 +109,7 @@ _db_resource_data = appConfig['couchdb.db.resourcedata']
 
 _schemaRef_Resource_Data = appConfig['schema.resource_data']
 _schemaRef_tombstone = appConfig['schema.tombstone']
+
 
 class ResourceDataHelper(SchemaBackedModelHelper):
     DOC_ID = _DOC_ID
