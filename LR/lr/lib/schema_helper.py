@@ -56,7 +56,7 @@ class SchemaBackedModelHelper(object):
         except ValidationError as ve:
             msgs = []
             for err in self.validator_class(self.schema).iter_errors(model_ref):
-                msgs.append(err.message)
+                msgs.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
 
             raise SpecValidationException(",\n".join(msgs))
         resource_data = model_ref['resource_data']
@@ -67,9 +67,11 @@ class SchemaBackedModelHelper(object):
                 raise ValueError('The resource_data field does not contain valid JSON data')
 
             v = self.validator_class(_schemaRef_Resource_Data_LRMI)
-            errors = sorted(v.iter_errors(resource_data), key=lambda e: e.path)
+            errors = []
+            for err in v.iter_errors(resource_data):
+                errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
             if errors:
-                pass
+                raise SpecValidationException(",\n".join(errors))
 
     def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
 
