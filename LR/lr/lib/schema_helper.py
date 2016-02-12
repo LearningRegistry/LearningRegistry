@@ -51,7 +51,6 @@ class SchemaBackedModelHelper(object):
             except:
                 pass
         # primary validation of the record sent
-        #todo alter the returned messages as users are saying the do not give good feedback
         try:
             validate(model_ref, self.schema, cls=self.validator_class)
         except ValidationError as ve:
@@ -60,7 +59,6 @@ class SchemaBackedModelHelper(object):
                 msgs.append(err.message)
 
             raise SpecValidationException(",\n".join(msgs))
-        #todo secondary validation required here to validate the resource_data field
         resource_data = model_ref['resource_data']
         if isinstance(resource_data,str):
             try:
