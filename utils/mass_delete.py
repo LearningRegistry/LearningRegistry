@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import copy, re, urllib2, json, ConfigParser
+import copy, re, urllib2, json, ConfigParser, time
 import oauth2 as oauth
 from urllib import urlencode
 from argparse import ArgumentParser
@@ -24,9 +24,9 @@ _TOMBSTONE_DOCUMENT = {
     "TOS": {
         "submission_TOS": "http://www.learningregistry.org/tos"
     },
-    "active":False,
+    "active":True,
     "doc_type": "resource_data",
-    "doc_version": "0.49.0",
+    "doc_version": "0.51.0",
     "identity": {
         "submitter": "",
         "submitter_type": "user"
@@ -40,7 +40,7 @@ class MassDelete:
     def __init__(self, options):
         self.options = options
 
-        self.server = 'http://'+options['host']+'/'
+        self.server = 'https://'+options['host']+'/'
         self.identity = options['identity']
 
         if options['key'] is not None and options['key_location'] is not None:
@@ -95,7 +95,7 @@ class MassDelete:
         if resumption_token:
             params['resumption_token'] = resumption_token
 
-        url = self.server+'/slice?from=2015-05-21T15:38:00&until=2015-05-26&'+urlencode(params)
+        url = self.server+'/slice?'+urlencode(params)
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
 
@@ -107,6 +107,8 @@ class MassDelete:
 
         if('resumption_token' in jsonResult):
             result['resumption_token'] = jsonResult['resumption_token']
+            print "sleeping for 20 seconds"
+            time.sleep(20)
 
         return result
 
@@ -132,8 +134,8 @@ class MassDelete:
 
     def sign_and_send(self, document):
         signed = self.sign_document(document)
-        #self.upload_documents([signed])
-        self.upload_documents_oauth([signed])
+        self.upload_documents([signed])
+        #self.upload_documents_oauth([signed])
 
     def sign_document(self, document):
 
@@ -159,7 +161,7 @@ class MassDelete:
         # Create our client.
         client = oauth.Client(consumer, token=token)
         # we only need to do this because Sandbox uses a self-signed SSL cert that is untrusted. This should not be needed on production.
-        client.disable_ssl_certificate_validation = True
+        #client.disable_ssl_certificate_validation = True
         try:
             print "Authenticating..."
             resp, content = client.request(
