@@ -4,7 +4,7 @@
     "description": "Resource Data LRMI",
     "id": "/",
     "definitions": {
-      "thing": { 
+      "thing": {
         "type": "object",
         "properties": {
           "additionalType": { "type": "string", "format":"uri"},
@@ -26,6 +26,7 @@
           "targetName": {"type":"string"},
           "targetUrl": {"type":"string","format":"uri"}
         },
+        "required":["targetName","targetUrl","targetDescription"],
         "additionalProperties" :{"type":"string"}
       },
       "PostalAddress" : {"type": "object",
@@ -35,7 +36,8 @@
           "addressRegion": {"type": "string"},
           "postOfficeBoxNumber": {"type":"string"},
           "streetAddress": {"type":"string"}
-        }
+        },
+        "required":["streetAddress"]
       },
       "person": {"type":"object",
       "additionalProperties":{"type":["string","number","array"],
@@ -82,5 +84,6 @@
       {"#ref":"#/definitions/organisation"}]},
       "educationalRole":{"type":["string","array"],
       "items":{"type":"string"}}
-    }
+    },
+  "required":["name","publisher","useRightsUrl","author"]
 }
