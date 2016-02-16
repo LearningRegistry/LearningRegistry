@@ -53,6 +53,7 @@ class SchemaBackedModelHelper(object):
                 pass
         # primary validation of the record sent
         try:
+            log.warn('validating schema')
             validate(model_ref, self.schema, cls=self.validator_class)
         except ValidationError as ve:
             msgs = []
@@ -61,6 +62,7 @@ class SchemaBackedModelHelper(object):
 
             raise SpecValidationException(",\n".join(msgs))
         try:
+            log.warn('validating resource data')
             resource_data = model_ref['resource_data']
             if isinstance(resource_data,str):
                 try:
@@ -70,6 +72,7 @@ class SchemaBackedModelHelper(object):
 
                 v = self.validator_class(_schemaRef_Resource_Data_LRMI)
                 errors = []
+                log.warn('showing errors if there')
                 for err in v.iter_errors(resource_data):
                     errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
                 if errors:
