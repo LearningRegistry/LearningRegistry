@@ -1,5 +1,5 @@
 from copy import deepcopy
-from jsonschema import validate, Draft3Validator, ValidationError
+from jsonschema import validate, Draft3Validator, ValidationError, Draft4Validator
 from lr.schema.validate import LRDraft3Validator
 from lr.lib import helpers, SpecValidationException
 from pylons import config
@@ -66,8 +66,9 @@ class SchemaBackedModelHelper(object):
             except ValueError:
                 raise ValueError('The resource_data field does not contain valid JSON data')
 
-        v = self.validator_class({"#ref":_schemaRef_Resource_Data_LRMI})
+        v = Draft4Validator({"#ref":_schemaRef_Resource_Data_LRMI})
         errors = []
+        log.warn(resource_data)
         for err in v.iter_errors(resource_data):
             log.warn(err.message)
             errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
