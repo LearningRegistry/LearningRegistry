@@ -69,6 +69,7 @@ class SchemaBackedModelHelper(object):
         v = self.validator_class({"#ref":_schemaRef_Resource_Data_LRMI})
         errors = []
         for err in v.iter_errors(resource_data):
+            log.warn(err.message)
             errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
         if errors:
             raise SpecValidationException(",\n".join(errors))
