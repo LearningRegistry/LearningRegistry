@@ -70,13 +70,13 @@ class SchemaBackedModelHelper(object):
                 except ValueError:
                     raise ValueError('The resource_data field does not contain valid JSON data')
 
-                v = self.validator_class(_schemaRef_Resource_Data_LRMI)
-                errors = []
-                log.warn('showing errors if there')
-                for err in v.iter_errors(resource_data):
-                    errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
-                if errors:
-                    raise SpecValidationException(",\n".join(errors))
+            v = self.validator_class(_schemaRef_Resource_Data_LRMI)
+            errors = []
+            log.warn('showing errors if there')
+            for err in v.iter_errors(resource_data):
+                errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
+            if errors:
+                raise SpecValidationException(",\n".join(errors))
         except:
             raise ValueError('Check failed')
 
