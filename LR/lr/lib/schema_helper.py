@@ -37,7 +37,6 @@ class SchemaBackedModelHelper(object):
         self.defaultDB = _createDB(defaultDBName, server)
 
     def validate_model(self, model):
-        log.warn('validating uploaded document')
 
         model_ref = deepcopy(model)
         #strip couchdb specific stuff before validation
@@ -53,7 +52,6 @@ class SchemaBackedModelHelper(object):
                 pass
         # primary validation of the record sent
         try:
-            log.warn('validating schema')
             validate(model_ref, self.schema, cls=self.validator_class)
         except ValidationError as ve:
             msgs = []
@@ -61,24 +59,19 @@ class SchemaBackedModelHelper(object):
                 msgs.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
 
             raise SpecValidationException(",\n".join(msgs))
-        try:
-            log.warn('validating resource data')
-            resource_data = model_ref['resource_data']
-            if isinstance(resource_data,str):
-                try:
-                    resource_data = json.loads(resource_data)
-                except ValueError:
-                    raise ValueError('The resource_data field does not contain valid JSON data')
+        resource_data = model_ref['resource_data']
+        if isinstance(resource_data,str):
+            try:
+                resource_data = json.loads(resource_data)
+            except ValueError:
+                raise ValueError('The resource_data field does not contain valid JSON data')
 
-            v = self.validator_class(_schemaRef_Resource_Data_LRMI)
-            errors = []
-            log.warn('showing errors if there')
-            for err in v.iter_errors(resource_data):
-                errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
-            if errors:
-                raise SpecValidationException(",\n".join(errors))
-        except:
-            raise ValueError('Check failed')
+        v = self.validator_class(_schemaRef_Resource_Data_LRMI)
+        errors = []
+        for err in v.iter_errors(resource_data):
+            errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
+        if errors:
+            raise SpecValidationException(",\n".join(errors))
 
     def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
 
