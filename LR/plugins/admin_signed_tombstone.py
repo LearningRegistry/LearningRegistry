@@ -17,8 +17,10 @@ class AdminSignedTombstone(ITombstonePolicy):
 
     def activate(self):
         super(ITombstonePolicy, self).activate()
-
-        public_key_directory = config['app_conf']['lr.tombstone.admin_signed.key_directory']
+        try:
+            public_key_directory = config['app_conf']['lr.tombstone.admin_signed.key_directory']
+        except:
+            raise KeyError([x for x in config['app_conf']])
 
         for (dirpath, dirnames, filenames) in walk(public_key_directory):
             for f in filenames:
