@@ -37,6 +37,7 @@ class SchemaBackedModelHelper(object):
         self.defaultDB = _createDB(defaultDBName, server)
 
     def validate_model(self, model):
+        log.warn('validating uploaded document')
 
         model_ref = deepcopy(model)
         #strip couchdb specific stuff before validation
