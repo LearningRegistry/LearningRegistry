@@ -1,6 +1,6 @@
 from copy import deepcopy
 from jsonschema import validate, Draft3Validator, ValidationError, Draft4Validator
-from lr.schema.validate import LRDraft3Validator
+from lr.schema.validate import LRDraft3Validator, LRDraft4Validator
 from lr.lib import helpers, SpecValidationException
 from pylons import config
 from uuid import uuid4
