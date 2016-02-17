@@ -50,16 +50,13 @@
       "items":{"type":["string","number"]}}}
     },
     "properties": {
-      "inLanguage":{"anyOf":[{"type":"string"},
-      {"#ref":"#/definitions/language"}]},
-      "about": { "anyOf":[
-        {"#ref" : "#/definitions/thing"},
-        {"type":"string"}]},
+      "inLanguage":{"type":["string", {"#ref":"#/definitions/language"}]},
+      "about": { "type":[ {"#ref" : "#/definitions/thing"},"string"],"required":true},
       "accessibilityAPI" : {"type": ["string","array"],
         "items" : {"type": "string"}},
       "additionalProperties" : {"type" :["string","array","number"],
         "items": {"type":["string","number"]}},
-      "isBasedOnUrl": {"type": "string"},
+      "isBasedOnUrl": {"type": "string","required":true},
       "interactivityType":{"type": ["string","array"],
         "items": {"type":"string"}},
       "learningResourceType": { "type": ["string","array"],
@@ -75,15 +72,12 @@
       "acceessiblityHazzard": {"type": ["string","array"],
         "items":{"type":"string"}},
       "licence": {"type":"string","format":"uri"},
-      "useRightsUrl":{"type":"string","format":"uri"},
-      "name":{"type":"string"},
-      "dateCreated": {"type":"string","format":"date"},
-      "author":{"anyOf": [{"type":"string"},
-      {"#ref":"#/definitions/person"}]},
-      "publisher":{"anyOf":[{"type":"string"},
-      {"#ref":"#/definitions/organisation"}]},
+      "useRightsUrl":{"type":"string","format":"uri","required":true},
+      "name":{"type":"string","required":true},
+      "dateCreated": {"type":"string","format":"date","required":true},
+      "author":{"type":["string",{"#ref":"#/definitions/person"}]},
+      "publisher":{"type":["string",{"#ref":"#/definitions/organisation"}],"required":true},
       "educationalRole":{"type":["string","array"],
       "items":{"type":"string"}}
-    },
-  "required":["name","publisher","useRightsUrl","author"]
+    }
 }
