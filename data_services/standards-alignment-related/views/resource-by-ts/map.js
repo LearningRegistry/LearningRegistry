@@ -26,7 +26,34 @@ function(doc) {
                 Alignment.parseDCT_ConformsTo(doc.resource_data, parser);
             } catch (e) {}
 
+            try {
+            if (typeof doc.resource_data == 'object') {
+                var LRMIPackage = doc.resource_data; 
+                for (idz in LRMIPackage.educationalAlignment) {
+                    if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'object') {
+                        for (idy in LRMIPackage.educationalAlignment[idz].targetUrl) {
+                                emit([nodeTimestamp, doc.resource_locator],null);
+                        }
+                    } else if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'string') {
+                        emit([nodeTimestamp, doc.resource_locator],null);
+                    }
+                }
+            }
 
+            if (typeof doc.resource_data == 'string'){
+                var LRMIPackage = JSON.parse(doc.resource_data); 
+                for (idz in LRMIPackage.educationalAlignment) {
+                    if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'string') {
+                            emit([nodeTimestamp, doc.resource_locator],null);
+                        } else if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'object') {
+                            for (idy in LRMIPackage.educationalAlignment[idz].targetUrl) {
+                                emit([nodeTimestamp, doc.resource_locator],null);
+                        }
+                    }
+                }
+            }
+            } catch (e) {}
+            
             try {
                 var seen = {};
                 var parser = function (objStr, verb) {
