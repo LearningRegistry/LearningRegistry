@@ -75,10 +75,6 @@ class SchemaBackedModelHelper(object):
             errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
         if errors:
             raise SpecValidationException(",\n".join(errors))
-<<<<<<< HEAD
-
-=======
->>>>>>> d3cde2927c6776ca0423ed9a435a75f9f4e057cf
 
     def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
 
