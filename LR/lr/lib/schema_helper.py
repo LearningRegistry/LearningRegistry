@@ -57,7 +57,7 @@ class SchemaBackedModelHelper(object):
         except ValidationError as ve:
             msgs = []
             for err in self.validator_class(self.schema).iter_errors(model_ref):
-                msgs.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
+                msgs.append("For Item (%s), Error: %s" %(err.path,err.message))
 
             raise SpecValidationException(",\n".join(msgs))
         resource_data = model_ref['resource_data']
@@ -73,7 +73,7 @@ class SchemaBackedModelHelper(object):
         log.warn(resource_data)
         for err in v.iter_errors(resource_data):
             log.warn(err.message)
-            errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
+            errors.append("For Item (%s), Error: %s" %(err.path,err.message))
         if errors:
             raise SpecValidationException(",\n".join(errors))
 
