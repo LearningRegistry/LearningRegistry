@@ -3,68 +3,81 @@
     "title": "lrmi_resource_open",
     "description": "Resource Data LRMI",
     "id": "/",
-    "properties": {
-        "name": {
-            "id": "name",
-            "type": "string",
-            "description": "Name of the resource",
-            "required": true
-        },
-        "url": {
-            "id": "url",
-            "type": "string",
-            "format": "uri",
-            "description": "URL of the resource",
-            "required": true,
-            "minLength": 10
-        },
-        "description": {
-            "id": "description",
-            "type": "string",
-            "description": "Short description of the resource",
-            "required": true,
-            "minLength": 10
-        },
-        "publisher": {
-            "id": "author",
-            "type": "object",
-            "description": "Identity information for the publisher of the resource",
-            "properties": {
-                "@type": {
-                    "enum": [ "Person", "Organization" ],
-                    "description": "Publisher type: Person or Organization",
-                    "required": true
-                },
-                "name": {
-                  "id": "name",
-                  "type": "string",
-                  "description": "Name of the publisher of this resource",
-                  "required": true
-                },
-                "email": {
-                  "id": "email",
-                  "type": "string",
-                  "format": "email",
-                  "description": "Contact email address of the publisher of this resource",
-                  "required": false
-                },
-                "url": {
-                    "id": "url",
-                    "type": "string",
-                    "format": "uri",
-                    "description": "URL of the publisher of this resource",
-                    "required": false,
-                    "minLength": 10
-                }
-            }
-        },
-        "useRightsUrl": {
-            "id": "useRightsUrl",
-            "type": "string",
-            "format": "uri",
-            "required": true,
-            "description": "URL of the use rights for this resource",
-            "minLength": 10
+    "definitions": {
+      "thing": {
+        "type": "object",
+        "properties": {
+          "additionalType": { "type": "string", "format":"uri"},
+          "alternativeName" : {"type": "string"},
+          "description": {"type": "string"},
+          "image": {"type": "string", "format":"uri"},
+          "mainEntryOfPage": {"type":"string","format": "uri"},
+          "name" : { "type": "string"},
+          "sameAs": {"type": "string", "format": "uri"},
+          "url": {"type": "string", "format": "uri"}
         }
+      },
+      "alignmentObject": {
+        "type": "object",
+        "properties": {
+          "alignmentType": { "type": "string"},
+          "educationalFramework": { "type": "string"},
+          "targetDescription": { "type" : "string"},
+          "targetName": {"type":"string"},
+          "targetUrl": {"type":"string","format":"uri"}
+        },
+        "required":["targetName","targetUrl","targetDescription"],
+        "additionalProperties" :{"type":"string"}
+      },
+      "PostalAddress" : {"type": "object",
+        "properties": {
+          "addressCountry": {"type": "string"},
+          "addressLocation": {"type": "string"},
+          "addressRegion": {"type": "string"},
+          "postOfficeBoxNumber": {"type":"string"},
+          "streetAddress": {"type":"string"}
+        },
+        "required":["streetAddress"]
+      },
+      "person": {"type":"object",
+      "additionalProperties":{"type":["string","number","array"],
+      "items":{"type":["string","number"]}}},
+      "organisation": {"type":"object",
+      "additionalProperties":{"type":["string","number","array"],
+      "items":{"type":["string","number"]}}},
+      "language": {"type":"object",
+      "additionalProperties":{"type":["string","number","array"],
+      "items":{"type":["string","number"]}}}
+    },
+    "properties": {
+      "inLanguage":{"type":["string", {"#ref":"#/definitions/language"}]},
+      "about": { "type":[ {"#ref" : "#/definitions/thing"},"string"],"required":true},
+      "accessibilityAPI" : {"type": ["string","array"],
+        "items" : {"type": "string"}},
+      "additionalProperties" : {"type" :["string","array","number"],
+        "items": {"type":["string","number"]}},
+      "isBasedOnUrl": {"type": "string","required":true},
+      "interactivityType":{"type": ["string","array"],
+        "items": {"type":"string"}},
+      "learningResourceType": { "type": ["string","array"],
+        "items": {"type":"string"}},
+      "educationalAlignment": {"#ref" : "#/definitions/alignmentObject"},
+      "timeRequired" : {"type": "string"},
+      "typicalAgeRange" : {"type": ["string","array"],
+        "items" : {"type":"string"}},
+      "accessiblityControl": {"type": ["string","array"],
+        "items": {"type":"string"}},
+      "accessiblityFeature": {"type": ["string","array"],
+      "items": {"type":"string"}},
+      "acceessiblityHazzard": {"type": ["string","array"],
+        "items":{"type":"string"}},
+      "licence": {"type":"string","format":"uri"},
+      "useRightsUrl":{"type":"string","format":"uri","required":true},
+      "name":{"type":"string","required":true},
+      "dateCreated": {"type":"string","format":"date","required":true},
+      "author":{"type":["string",{"#ref":"#/definitions/person"}]},
+      "publisher":{"type":["string",{"#ref":"#/definitions/organisation"}],"required":true},
+      "educationalRole":{"type":["string","array"],
+      "items":{"type":"string"}}
     }
 }
