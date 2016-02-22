@@ -20,6 +20,7 @@ _schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 _ID = "_id"
 _REV = "_rev"
 _DOC_ID = "doc_ID"
+_schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 
 def _createDB(name, server=_defaultCouchServer):
     try:
@@ -50,7 +51,7 @@ class SchemaBackedModelHelper(object):
                 del model_ref[_REV]
             except:
                 pass
-
+        # primary validation of the record sent
         try:
             validate(model_ref, self.schema, cls=self.validator_class)
         except ValidationError as ve:
@@ -74,7 +75,10 @@ class SchemaBackedModelHelper(object):
             errors.append("For Item (%s), Error: %s" %(err.absolute_path[0],err.message))
         if errors:
             raise SpecValidationException(",\n".join(errors))
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3cde2927c6776ca0423ed9a435a75f9f4e057cf
 
     def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
 
@@ -112,6 +116,7 @@ _db_resource_data = appConfig['couchdb.db.resourcedata']
 
 _schemaRef_Resource_Data = appConfig['schema.resource_data']
 _schemaRef_tombstone = appConfig['schema.tombstone']
+
 
 class ResourceDataHelper(SchemaBackedModelHelper):
     DOC_ID = _DOC_ID

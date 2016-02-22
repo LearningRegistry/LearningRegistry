@@ -69,7 +69,7 @@
         "items": {"type":"string"}},
       "accessiblityFeature": {"type": ["string","array"],
       "items": {"type":"string"}},
-      "acceessiblityHazzard": {"type": ["string","array"],
+      "accessiblityHazzard": {"type": ["string","array"],
         "items":{"type":"string"}},
       "licence": {"type":"string","format":"uri"},
       "useRightsUrl":{"type":"string","format":"uri","required":true},
