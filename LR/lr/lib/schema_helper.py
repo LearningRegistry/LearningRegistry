@@ -20,7 +20,7 @@ _schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 _ID = "_id"
 _REV = "_rev"
 _DOC_ID = "doc_ID"
-_schemaRef_Resource_Data_LRMI = json.loads(appConfig['schema.resource_data_lrmi'])
+_schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 
 def _createDB(name, server=_defaultCouchServer):
     try:
