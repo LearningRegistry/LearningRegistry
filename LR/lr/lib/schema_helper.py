@@ -67,7 +67,8 @@ class SchemaBackedModelHelper(object):
             except ValueError:
                 raise ValueError('The resource_data field does not contain valid JSON data')
 
-        v = Draft3Validator({"#ref":_schemaRef_Resource_Data_LRMI})
+        v = Draft3Validator()
+        v=v(_schemaRef_Resource_Data_LRMI)
         errors = []
         log.warn(resource_data)
         for err in v.iter_errors(resource_data):
