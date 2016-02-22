@@ -1,0 +1,123 @@
+ [DEFAULT]
+debug = false
+error_email_from = paste@localhost
+smtp_server = localhost
+
+[uwsgi]
+socket = 127.0.0.1:5000
+master = true
+processes = 1
+
+[loggers]
+keys = root, routes, lr, gnupg
+
+[formatter_generic]
+datefmt = %H:%M:%S
+format = %(asctime)s,%(msecs)03d %(levelname)-5.5s [%(name)s] [%(threadName)s] %(message)s
+
+[handler_console]
+formatter = generic
+args = (sys.stderr,)
+class = StreamHandler
+level = NOTSET
+
+[handlers]
+keys = console
+
+[logger_lr]
+handlers =
+qualname = lr
+level = ERROR
+
+[logger_gnupg]
+handlers =
+qualname = gnupg
+level = ERROR
+
+[formatters]
+keys = generic
+
+[logger_root]
+handlers = console
+level = ERROR
+
+[logger_routes]
+handlers =
+qualname = routes.middleware
+level = ERROR
+
+[server:main]
+use = egg:Flup#fcgi_thread
+host = 127.0.0.1
+port = 5000
+
+[app:main]
+tos.url = http://www.learningregistry.org/tos/
+use = egg:LR
+full_stack = true
+static_files = true
+cache_dir = %(here)s/data
+
+beaker.session.key = lr
+beaker.session.secret = somesecret
+couchdb.db.node.description = description
+couchdb.url = http://localhost:5984/
+couchdb.url.dbadmin = http://localhost:5984/
+couchdb.db.apps = apps
+couchdb.db.node = node
+couchdb.db.resourcedata = resource_data
+couchdb.db.network = network
+couchdb.db.community = community
+couchdb.db.incoming = incoming
+couchdb.db.users = _users
+couchdb.db.users.oauthview = oauth/oauth_credentials
+couchdb.db.resourcesview = _design/learningregistry-resources/_view/docs
+couchdb.db.resourcecount = _design/learningregistry-resources/_view/count
+couchdb.threshold.distributes = 1000
+couchdb.threshold.viewupdate = 100
+couchdb.threshold.compaction = 10000
+couchdb.stale.flag = update_after
+lr.plugins = %(here)s/plugins
+lr.publish.signing.privatekeyid = KEYID
+lr.publish.signing.passphrase = 0
+lr.publish.signing.gnupghome = .gnupg
+lr.publish.signing.gpgbin = gpg
+lr.publish.signing.publickeylocations = [ "http://localhost/pubkey" ]
+lr.publish.signing.signer = Node Signer
+lr.oauth.signup = https://localhost:8443/apps/oauth-key-management
+lr.distribute.url = http://localhost/distribute
+lr.obtain.docid = access:Basic Obtain service
+lr.harvest.docid = access:Basic Harvest service
+lr.oaipmh.docid = access:OAI-PMH Harvest service
+lr.nodestatus.docid = node status
+lr.slice.docid = access:Slice service
+lr.sword.docid = publish:SWORD APP Publish V1.3 service
+lr.publish.docid = publish:Basic Publish service
+lr.description.docid = administrative:Network Node Description service
+lr.services.docid = administrative:Network Node Services service
+lr.policy.docid = administrative:Resource Distribution Network Policy service
+lr.status.docid = administrative:Network Node Status service
+lr.distribute.docid = distribute:Resource Data Distribution service
+lr.distribute_incoming_url = http://localhost/incoming
+lr.tombstone.admin_signed.key_directory=admin/public_keys/
+schema.resource_data_lrmi = file:lr/schema/resource_lrmi_open.json
+schema.resource_data = file:lr/schema/any/resource_data.json
+schema.resource_data_lrmi = file:lr/schema/resource_lrmi_open.json
+schema.tombstone = file:lr/schema/any/tombstone.json
+
+specs_dir = %(here)s/data/specs
+spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
+
+spec.models.resource_data =%(specs_dir)s/v_0_23/models/resource_data_description,
+                                                %(specs_dir)s/v_0_21/models/resource_data_description,
+                                                %(specs_dir)s/v_0_17/models/resource_data_description
+
+spec.models.network_policy_description =%(specs_dir)s/v_0_23/models/policy_description
+spec.models.status_description =%(specs_dir)s/v_0_23/models/status_description
+spec.models.filter_description =%(specs_dir)s/v_0_23/models/filter_description
+spec.models.node_connectivity_description =%(specs_dir)s/v_0_23/models/connection_description
+spec.models.community_description =%(specs_dir)s/v_0_23/models/community_description
+spec.models.network_description =%(specs_dir)s/v_0_23/models/network_description
+spec.models.node_service_description =%(specs_dir)s/v_0_23/models/service_description
+
+
