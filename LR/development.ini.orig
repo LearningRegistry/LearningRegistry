@@ -1,4 +1,4 @@
-[DEFAULT]
+ [DEFAULT]
 debug = false
 error_email_from = paste@localhost
 smtp_server = localhost
@@ -99,8 +99,12 @@ lr.policy.docid = administrative:Resource Distribution Network Policy service
 lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
 lr.distribute_incoming_url = http://localhost/incoming
+lr.tombstone.admin_signed.key_directory=admin/public_keys/
+schema.resource_data_lrmi = file:lr/schema/resource_lrmi_open.json
 schema.resource_data = file:lr/schema/any/resource_data.json
+schema.resource_data_lrmi = file:lr/schema/resource_lrmi_open.json
 schema.tombstone = file:lr/schema/any/tombstone.json
+
 specs_dir = %(here)s/data/specs
 spec.models.node_description =%(specs_dir)s/v_0_23/models/node_description
 
@@ -115,5 +119,5 @@ spec.models.node_connectivity_description =%(specs_dir)s/v_0_23/models/connectio
 spec.models.community_description =%(specs_dir)s/v_0_23/models/community_description
 spec.models.network_description =%(specs_dir)s/v_0_23/models/network_description
 spec.models.node_service_description =%(specs_dir)s/v_0_23/models/service_description
-lr.tombstone.admin_signed.key_directory=admin/public_keys/
+
 
