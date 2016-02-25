@@ -63,6 +63,12 @@
       "additionalProperties":{"type":["string","number","array"], "items":{"type":["string","number"]}}
     },
     "properties": {
+      "name":{"type": "string", "required":true},
+      "url": {"type": "string", "format": "uri", "required":true},
+      "description":{"type": "string", "required":true},
+      "accessRights":{"type":"string","format":"uri","required":true},
+      "publisher":{"type":["string",{"#ref":"#/definitions/Organization"}],"required":true},
+
       "inLanguage":{"type":["string", {"#ref":"#/definitions/language"}]},
       "about": { "type":[ {"#ref" : "#/definitions/thing"},"string"]},
       "accessibilityAPI" : {"type": ["string","array"], "items" : {"type": "string"}},
@@ -77,12 +83,9 @@
       "accessiblityFeature": {"type": ["string","array"], "items": {"type":"string"}},
       "accessiblityHazzard": {"type": ["string","array"], "items": {"type":"string"}},
       "licence": {"type":"string","format":"uri"},
-      "accessRights":{"type":"string","format":"uri","required":true},
       "useRightsUrl":{"type":"string","format":"uri"},
-      "name":{"type":"string","required":true},
-      "dateCreated": {"type":"string","format":"date","required":true},
+      "dateCreated": {"type":"string","format":"date"},
       "author":{"type":["string",{"#ref":"#/definitions/Person"}]},
-      "publisher":{"type":["string",{"#ref":"#/definitions/Organization"}],"required":true},
       "educationalRole":{"type":["string","array"], "items":{"type":"string"}}
     }
 }
