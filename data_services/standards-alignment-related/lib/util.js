@@ -61,6 +61,24 @@ exports.init = function(){
                 group_length: 2 
             };
 
+        } else if (viewname === "discriminator-name-by-resource") {
+            return {
+                discriminator: function(r) {
+                    return getKeyField(r, 1);
+                },
+                resource: function(r) {
+                    return getKeyField(r, 0);
+                },
+                timestamp: function(r) {
+                    return getKeyField(r, 2);
+                },
+                showTimestamp: false,
+                doc: getDoc,
+                id: getId,
+                either: getEither,
+                group_length: 2 
+            };
+
         } else if (viewname === "discriminator-by-resource-ts") {
             return {
                 discriminator: function(r) {
@@ -96,6 +114,23 @@ exports.init = function(){
                 group_length: 2 
             };
         } else if (viewname === "resource-by-discriminator") {
+            return {
+                discriminator: function(r) {
+                    return getKeyField(r, 0);
+                },
+                resource: function(r) {
+                    return getKeyField(r, 1);
+                },
+                timestamp: function(r) {
+                    return getKeyField(r, 2);
+                },
+                showTimestamp: false,
+                doc: getDoc,
+                id: getId,
+                either: getEither,
+                group_length: 2 
+            };
+        } else if (viewname === "resource-name-by-discriminator") {
             return {
                 discriminator: function(r) {
                     return getKeyField(r, 0);

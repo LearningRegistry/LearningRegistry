@@ -24,6 +24,34 @@ function(doc) {
             } catch (e) {}
 
             try {
+            if (typeof doc.resource_data == 'object') {
+                var LRMIPackage = doc.resource_data; 
+                for (idz in LRMIPackage.educationalAlignment) {
+                    if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'object') {
+                        for (idy in LRMIPackage.educationalAlignment[idz].targetUrl) {
+                                emit([doc.resource_locator, LRMIPackage.educationalAlignment[idz].targetUrl[idy], nodeTimestamp]);
+                        }
+                    } else if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'string') {
+                        emit([doc.resource_locator, LRMIPackage.educationalAlignment[idz].targetUrl, nodeTimestamp]);
+                    }
+                }
+            }
+
+            if (typeof doc.resource_data == 'string'){
+                var LRMIPackage = JSON.parse(doc.resource_data); 
+                for (idz in LRMIPackage.educationalAlignment) {
+                    if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'string') {
+                            emit([doc.resource_locator, LRMIPackage.educationalAlignment[idz].targetUrl, nodeTimestamp]);
+                        } else if (LRMIPackage.educationalAlignment[idz].targetUrl != null && typeof LRMIPackage.educationalAlignment[idz].targetUrl == 'object') {
+                            for (idy in LRMIPackage.educationalAlignment[idz].targetUrl) {
+                                emit([doc.resource_locator, LRMIPackage.educationalAlignment[idz].targetUrl[idy], nodeTimestamp]);
+                        }
+                    }
+                }
+            }
+            } catch (e) {}
+
+            try {
                 var seen = {};
                 var parser = function (objStr, verb) {
                     for (re in ASNPatterns){
