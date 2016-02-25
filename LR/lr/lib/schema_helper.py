@@ -20,7 +20,6 @@ _schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 _ID = "_id"
 _REV = "_rev"
 _DOC_ID = "doc_ID"
-_schemaRef_Resource_Data_LRMI = appConfig['schema.resource_data_lrmi']
 
 def _createDB(name, server=_defaultCouchServer):
     try:
@@ -60,8 +59,10 @@ class SchemaBackedModelHelper(object):
                 msgs.append("For Item (%s), Error: %s" %(err.path,err.message))
 
             raise SpecValidationException(",\n".join(msgs))
+        #resource_data validation
         resource_data = model_ref['resource_data']
-        if isinstance(resource_data,str):
+        if isinstance(resource_data,basestring):
+            log.warn("loading resource_data string into an obj")
             try:
                 resource_data = json.loads(resource_data)
             except ValueError:
@@ -72,7 +73,7 @@ class SchemaBackedModelHelper(object):
         errors = []
         log.warn(resource_data)
         for err in v.iter_errors(resource_data):
-            log.warn(err.message)
+            log.warn("resource_lrmi validation error: %s" %err.message)
             errors.append("For Item (%s), Error: %s" %(err.path,err.message))
         if errors:
             raise SpecValidationException(",\n".join(errors))
