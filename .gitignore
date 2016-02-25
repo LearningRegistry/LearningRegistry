@@ -16,10 +16,12 @@ MANIFEST
 
 # the locally generated config file
 docs/_build/*
+config/learningregistry.conf
 
 LR/*.ini
 LR/*.backup
-/LR/data/templates
+LR/data/templates
+LR/data/sessions/*
 
 /data-pumps/oai-pmh-data-pump-config.json
 /utils/testconfig.ini
@@ -27,4 +29,3 @@ LR/*.backup
 env
 couchdb/apps/kanso/*/packages
 
-LR/data/sessions/*
