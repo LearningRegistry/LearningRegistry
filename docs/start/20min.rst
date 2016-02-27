@@ -547,7 +547,7 @@ Removal of documents from Learning Registry follows a similar process as describ
 
 The key differences are:
   * Set the ``"payload_placement": "none"`` 
-  * The ``"resource_locator"``. ``"payload_schema"``, ``"resource_data"``, and ``"recource_data_types"`` properties of the Learning Registry Document may be omitted.
+  * The ``"resource_locator"``. ``"payload_schema"``, ``"resource_data"`` properties of the Learning Registry Document may be omitted.
 
 An example of Learning Registry Delete Document is:
 
@@ -583,7 +583,7 @@ An example of Learning Registry Delete Document is:
         "submitter_type": "agent"
 
       },
-
+      "resource_data_type": "metadata",
       "payload_placement": "none"
 
     }
