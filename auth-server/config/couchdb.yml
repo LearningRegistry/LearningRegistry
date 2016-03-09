@@ -1,0 +1,19 @@
+default: &default
+  protocol: http
+  host: localhost
+  port: 5984
+  prefix: ''
+  username: admin
+  password: password
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
+  protocol: https
+  username: <%= ENV['COUCH_DB_USERNAME'] %>
+  password: <%= ENV['COUCH_DB_PASSWORD'] %>
