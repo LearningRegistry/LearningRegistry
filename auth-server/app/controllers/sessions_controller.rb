@@ -22,6 +22,14 @@ class SessionsController < ApplicationController
     redirect_to verify_url, notice: 'You have been logged out'
   end
 
+  def current
+    if session[:user_id].present?
+      render json: { email: session[:user_id] }
+    else
+      head :unauthorized
+    end
+  end
+
   protected
 
   def auth_hash

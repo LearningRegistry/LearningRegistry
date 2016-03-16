@@ -27,6 +27,22 @@ class SessionsControllerTest < ActionController::TestCase
     assert_equal session[:user_id], 'user@example.org'
   end
 
+  test 'returns the current session when the user has logged in' do
+    session[:user_id] = 'user@example.org'
+
+    get :current
+
+    assert_equal JSON.parse(response.body)['email'], 'user@example.org'
+  end
+
+  test 'returns a 401 Unauthorized status  when session is not available' do
+    session[:user_id] = nil
+
+    get :current
+
+    assert_response :unauthorized
+  end
+
   test 'destroys the active session when the user logs out' do
     get :destroy
 
