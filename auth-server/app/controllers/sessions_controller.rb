@@ -5,12 +5,14 @@ class SessionsController < ApplicationController
   end
 
   def create
+    check_params; return if performed?
+
     email = auth_hash[:info][:email]
 
     if User.exists?(email)
       session[:user_id] = email
 
-      render json: session
+      redirect_to omniauth_params[:back_url]
     else
       redirect_to new_approval_url
     end
@@ -32,7 +34,19 @@ class SessionsController < ApplicationController
 
   protected
 
+  def check_params
+    if omniauth_params[:back_url].blank?
+      response = { error: 'back url is missing' }
+
+      render json: response, status: :bad_request and return
+    end
+  end
+
   def auth_hash
     request.env['omniauth.auth'].with_indifferent_access
+  end
+
+  def omniauth_params
+    request.env['omniauth.params'].with_indifferent_access
   end
 end

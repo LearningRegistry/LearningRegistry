@@ -5,6 +5,7 @@ class SessionsControllerTest < ActionController::TestCase
     OmniAuth.config.test_mode = true
     OmniAuth.config.add_mock(:google, info: { email: 'user@example.org' })
     request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:google]
+    request.env['omniauth.params'] = { back_url: 'http://example.org' }
   end
 
   def teardown
@@ -25,6 +26,16 @@ class SessionsControllerTest < ActionController::TestCase
     end
 
     assert_equal session[:user_id], 'user@example.org'
+    assert_redirected_to 'http://example.org'
+  end
+
+  test 'returns a 400 Bad Request error when the back url param is not set' do
+    request.env['omniauth.params'] = { }
+
+    get :create, provider: 'google'
+
+    assert_response :bad_request
+    assert_equal JSON.parse(response.body)['error'], 'back url is missing'
   end
 
   test 'returns the current session when the user has logged in' do
