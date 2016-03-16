@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
   def destroy
     session[:user_id] = nil
 
-    redirect_to verify_url, notice: 'You have been logged out'
+    head :ok
   end
 
   def current

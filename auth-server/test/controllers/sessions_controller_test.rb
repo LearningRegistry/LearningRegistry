@@ -57,7 +57,7 @@ class SessionsControllerTest < ActionController::TestCase
   test 'destroys the active session when the user logs out' do
     get :destroy
 
+    assert_response :ok
     assert_equal session[:user_id], nil
-    assert_redirected_to verify_url
   end
 end
