@@ -27,5 +27,14 @@ module AuthServer
 
     # Needed to enable session store for omniauth
     config.api_only = false
+
+    # CORS configuration
+    config.middleware.insert_before 0, 'Rack::Cors' do
+      allow do
+        origins '*'
+        resource '/sessions/current', headers: :any, methods: %i(get options)
+        resource '/logout', headers: :any, methods: %i(get options)
+      end
+    end
   end
 end
