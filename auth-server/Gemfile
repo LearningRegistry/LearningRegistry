@@ -4,6 +4,8 @@ gem 'rails', '4.2.5.2'
 
 gem 'spring', group: :development
 
+gem 'sass-rails', '~> 5.0'
+
 # Authentication
 gem 'rack-cors', '~> 0.4'
 gem 'omniauth', '~> 1.3'
@@ -12,3 +14,11 @@ gem 'omniauth-amazon', github: 'nitin007/omniauth-amazon'
 
 # CouchDB
 gem 'couchrest_model', '~> 2.0'
+
+# Mailing
+gem 'mail_form', '~> 1.5'
+gem 'letter_opener', '~> 1.4'
+
+# Views
+gem 'slim-rails', '~> 3.0'
+gem 'simple_form', '~> 3.2'

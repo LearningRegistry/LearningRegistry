@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   get '/logout', to: 'sessions#destroy'
   get '/sessions/current', to: 'sessions#current'
 
-  resources :approvals, only: :new
+  resources :approvals, only: %i(new create)
 
   root 'sessions#new'
 end

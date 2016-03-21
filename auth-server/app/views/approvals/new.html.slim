@@ -1,0 +1,17 @@
+#content
+  h1 Approval Form
+  - if flash[:notice]
+    p.notice = flash[:notice]
+  = simple_form_for @approval, url: approvals_path do |f|
+    = f.input :organization_name, label: 'Name of Organization'
+    = f.input :contact_person, label: 'Point of contact (person responsible '\
+                                        'for metadata)'
+    = f.input :email, label: 'E-mail address for point of contact'
+    = f.input :estimated_records, label: 'Estimated number of records to '\
+                                           'publish'
+    = f.input :sample_record, as: :text,
+            input_html: { rows: 15 },
+            label: 'A sample of a record to be published'
+    = f.hidden_field :phone
+
+    = f.button :submit
