@@ -7,7 +7,6 @@ class SessionsController < ApplicationController
   def create
     check_params; return if performed?
 
-    email = auth_hash[:info][:email]
 
     if User.exists?(email)
       session[:user_id] = email
@@ -40,6 +39,10 @@ class SessionsController < ApplicationController
 
       render json: response, status: :bad_request and return
     end
+  end
+
+  def email
+    auth_hash[:info][:email] || auth_hash[:info][:emails].first[:value]
   end
 
   def auth_hash

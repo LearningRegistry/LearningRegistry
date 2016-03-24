@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/timrogers/omniauth-windowslive.git
+  revision: e257c3686a602c5d2575c5d1a42473df1d3fbee4
+  branch: patch-1
+  specs:
+    omniauth-windowslive (0.0.9.1)
+      multi_json (>= 1.0.3)
+      omniauth-oauth2 (~> 1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -183,6 +192,7 @@ DEPENDENCIES
   omniauth (~> 1.3)
   omniauth-amazon (~> 1.0)
   omniauth-google-oauth2
+  omniauth-windowslive!
   rack-cors (~> 0.4)
   rails (= 4.2.5.2)
   sass-rails (~> 5.0)

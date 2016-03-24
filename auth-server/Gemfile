@@ -11,6 +11,7 @@ gem 'rack-cors', '~> 0.4'
 gem 'omniauth', '~> 1.3'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-amazon', '~> 1.0'
+gem 'omniauth-windowslive', github: 'timrogers/omniauth-windowslive', branch: 'patch-1'
 
 # CouchDB
 gem 'couchrest_model', '~> 2.0'
