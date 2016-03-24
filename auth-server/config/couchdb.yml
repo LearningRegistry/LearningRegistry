@@ -11,6 +11,8 @@ development:
 
 test:
   <<: *default
+  prefix: db
+  suffix: test
 
 production:
   <<: *default
