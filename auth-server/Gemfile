@@ -19,6 +19,9 @@ gem 'couchrest_model', '~> 2.0'
 gem 'mail_form', '~> 1.5'
 gem 'letter_opener', '~> 1.4'
 
+# Token signing and verification
+gem 'jwt', '~> 1.5'
+
 # Views
 gem 'slim-rails', '~> 3.0'
 gem 'simple_form', '~> 3.2'

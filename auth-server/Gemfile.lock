@@ -182,6 +182,7 @@ PLATFORMS
 
 DEPENDENCIES
   couchrest_model (~> 2.0)
+  jwt (~> 1.5)
   letter_opener (~> 1.4)
   mail_form (~> 1.5)
   omniauth (~> 1.3)

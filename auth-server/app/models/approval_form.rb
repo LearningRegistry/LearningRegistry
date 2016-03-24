@@ -5,6 +5,8 @@ class ApprovalForm < MailForm::Base
   attribute :email, validate: /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i
   attribute :estimated_records, validate: true
   attribute :sample_record, validate: true
+  attribute :approval_link
+  attribute :delete_link
   attribute :phone, captcha: true
 
   append :remote_ip, :user_agent

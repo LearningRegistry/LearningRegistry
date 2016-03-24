@@ -4,7 +4,10 @@ Rails.application.routes.draw do
   get '/logout', to: 'sessions#destroy'
   get '/sessions/current', to: 'sessions#current'
 
-  resources :approvals, only: %i(new create)
+  resources :approvals, only: %i(new create) do
+    get :confirm, on: :collection
+    get :delete, on: :collection
+  end
 
   root 'sessions#new'
 end
