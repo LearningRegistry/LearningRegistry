@@ -3,6 +3,7 @@ class ApprovalForm < MailForm::Base
   attribute :organization_name, validate: true
   attribute :contact_person, validate: true
   attribute :email, validate: /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i
+  attribute :authenticated_email
   attribute :estimated_records, validate: true
   attribute :sample_record, validate: true
   attribute :approval_link

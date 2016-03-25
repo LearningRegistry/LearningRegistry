@@ -15,6 +15,8 @@ class SessionsController < ApplicationController
 
       redirect_to session[:back_url]
     else
+      session[:authenticated_email] = email
+
       redirect_to new_approval_url
     end
   end

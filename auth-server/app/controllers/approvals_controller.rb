@@ -9,6 +9,8 @@ class ApprovalsController < ApplicationController
 
   def create
     if @approval.deliver
+      session[:authenticated_email] = nil
+
       redirect_to new_approval_url,
                   notice: 'Your approval request has been sent successfully'
     else
@@ -42,6 +44,7 @@ class ApprovalsController < ApplicationController
   def set_approval_values
     @approval = ApprovalForm.new(params[:approval_form])
     @approval.request = request
+    @approval.authenticated_email = session[:authenticated_email]
     @approval.approval_link = confirm_approvals_url(
       token: approval_process.generate_approval_token
     )
