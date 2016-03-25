@@ -190,7 +190,7 @@ function configureAjaxOptions () {
 /* automatically the back url to the current page */
 function buildProviderLinks () {
     $(".credentials a").each(function () {
-        var url = app.config.authServerBaseUrl + "/auth/" +
+        var url = app.config.authServerBaseUrl + "/verify/" +
             $(this).data("provider") + "?back_url=" + window.location.href;
         $(this).attr("href", url);
     });
@@ -211,6 +211,7 @@ exports.checkCurrentSession = function () {
     var currentSessionUrl = app.config.authServerBaseUrl + '/sessions/current';
 
     $.getJSON(currentSessionUrl, function (data) {
+        log('[Learning Registry Auth Server] Current User: ' + data.email);
         getUserInfo(data.email);
     }).fail(function () {
         log('[Learning Registry Auth Server] User has no active session');
