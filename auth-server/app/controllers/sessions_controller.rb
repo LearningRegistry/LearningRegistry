@@ -1,17 +1,19 @@
 # Controller that gets called after the user has authenticated with a provider
 class SessionsController < ApplicationController
   def new
-    render text: 'LR AUth Server - Main page'
+    check_params
+    return if performed?
+
+    session[:back_url] = params[:back_url]
+
+    redirect_to "/auth/#{params[:provider]}"
   end
 
   def create
-    check_params; return if performed?
-
-
     if User.exists?(email)
       session[:user_id] = email
 
-      redirect_to omniauth_params[:back_url]
+      redirect_to session[:back_url]
     else
       redirect_to new_approval_url
     end
@@ -34,11 +36,7 @@ class SessionsController < ApplicationController
   protected
 
   def check_params
-    if omniauth_params[:back_url].blank?
-      response = { error: 'back url is missing' }
-
-      render json: response, status: :bad_request and return
-    end
+    error('Back url is missing') && return if params[:back_url].blank?
   end
 
   def email

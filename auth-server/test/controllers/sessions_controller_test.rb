@@ -12,6 +12,20 @@ class SessionsControllerTest < ActionController::TestCase
     OmniAuth.config.mock_auth[:google] = nil
   end
 
+  test 'returns a 400 Bad Request error when the back url param is not set' do
+    get :new, provider: 'google'
+
+    assert_response :unprocessable_entity
+    assert_equal 'Back url is missing', JSON.parse(response.body)['error']
+  end
+
+  test 'stores the back url and redirects to the authorization endpoint' do
+    get :new, provider: 'google', back_url: 'http://example.com'
+
+    assert_equal 'http://example.com', session[:back_url]
+    assert_redirected_to '/auth/google'
+  end
+
   test 'redirects to approval form when user is not found' do
     User.stub :exists?, false do
       get :create, provider: 'google'
@@ -21,21 +35,14 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'sets the session with the user when already has an account' do
+    session[:back_url] = 'http://example.org'
+
     User.stub :exists?, true do
       get :create, provider: 'google'
     end
 
-    assert_equal session[:user_id], 'user@example.org'
+    assert_equal 'user@example.org', session[:user_id]
     assert_redirected_to 'http://example.org'
-  end
-
-  test 'returns a 400 Bad Request error when the back url param is not set' do
-    request.env['omniauth.params'] = { }
-
-    get :create, provider: 'google'
-
-    assert_response :bad_request
-    assert_equal JSON.parse(response.body)['error'], 'back url is missing'
   end
 
   test 'returns the current session when the user has logged in' do
@@ -43,7 +50,7 @@ class SessionsControllerTest < ActionController::TestCase
 
     get :current
 
-    assert_equal JSON.parse(response.body)['email'], 'user@example.org'
+    assert_equal 'user@example.org', JSON.parse(response.body)['email']
   end
 
   test 'returns a 401 Unauthorized status  when session is not available' do
@@ -58,6 +65,6 @@ class SessionsControllerTest < ActionController::TestCase
     get :destroy
 
     assert_response :ok
-    assert_equal session[:user_id], nil
+    assert_nil session[:user_id]
   end
 end
