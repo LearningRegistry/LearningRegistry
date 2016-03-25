@@ -21,7 +21,7 @@ class ApprovalsController < ApplicationController
     error('Approval has already expired') && return if @decoded_token.expired?
 
     if User.create(user_attributes)
-      head :ok
+      success('Approval has been successfully confirmed ')
     else
       error('User could not be created')
     end
@@ -31,7 +31,7 @@ class ApprovalsController < ApplicationController
     if @decoded_token.valid?
       User.find_by_name(@decoded_token.email).destroy
 
-      head :ok
+      success('User has been successfully deleted')
     else
       error('Signature validation failed')
     end
