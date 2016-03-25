@@ -23,7 +23,7 @@ class ApprovalsController < ApplicationController
     error('Approval has already expired') && return if @decoded_token.expired?
 
     if User.create(user_attributes)
-      success('Approval has been successfully confirmed ')
+      success('Approval has been successfully confirmed')
     else
       error('User could not be created')
     end
@@ -65,6 +65,7 @@ class ApprovalsController < ApplicationController
     {
       id: "org.couchdb.user:#{@decoded_token.email}",
       name: @decoded_token.email,
+      password: Rails.application.secrets.couchdb_master_password,
       oauth: { consumer_keys: { @decoded_token.email => SecureRandom.hex },
                tokens: { node_sign_token: SecureRandom.hex } }
     }

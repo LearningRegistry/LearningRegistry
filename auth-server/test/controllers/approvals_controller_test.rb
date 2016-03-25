@@ -21,8 +21,6 @@ class ApprovalsControllerTest < ActionController::TestCase
   end
 
   test 'confirms a valid and current token' do
-    valid_token = JWT.encode(default_payload, secret, 'HS256')
-
     assert_difference('User.count') do
       get :confirm, token: valid_token
     end

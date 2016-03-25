@@ -7,6 +7,7 @@ class User < CouchRest::Model::Base
   end
 
   property :name, String
+  property :password, String
   property :roles, [String]
   property :browserid
   property :oauth, Object
@@ -17,5 +18,12 @@ class User < CouchRest::Model::Base
 
   def self.exists?(email)
     find_by_name(email) ? true : false
+  end
+
+  def self.get_auth_session(email, password)
+    response = RestClient.post "#{database.host}/_session",
+                               name: email,
+                               password: password
+    response.cookies['AuthSession']
   end
 end

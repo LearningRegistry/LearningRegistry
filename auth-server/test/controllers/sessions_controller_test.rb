@@ -38,10 +38,13 @@ class SessionsControllerTest < ActionController::TestCase
     session[:back_url] = 'http://example.org'
 
     User.stub :exists?, true do
-      get :create, provider: 'google'
+      User.stub(:get_auth_session, '12345ABC') do
+        get :create, provider: 'google'
+      end
     end
 
     assert_equal 'user@example.org', session[:user_id]
+    assert_equal '12345ABC', cookies['AuthSession']
     assert_redirected_to 'http://example.org'
   end
 

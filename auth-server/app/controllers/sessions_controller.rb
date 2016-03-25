@@ -12,6 +12,7 @@ class SessionsController < ApplicationController
   def create
     if User.exists?(email)
       session[:user_id] = email
+      log_user_into_couchdb
 
       redirect_to session[:back_url]
     else
@@ -49,7 +50,10 @@ class SessionsController < ApplicationController
     request.env['omniauth.auth'].with_indifferent_access
   end
 
-  def omniauth_params
-    request.env['omniauth.params'].with_indifferent_access
+  def log_user_into_couchdb
+    master_password = Rails.application.secrets.couchdb_master_password
+    auth_session = User.get_auth_session(session[:user_id], master_password)
+
+    cookies['AuthSession'] = auth_session
   end
 end
