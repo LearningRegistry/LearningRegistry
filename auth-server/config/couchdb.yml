@@ -16,6 +16,5 @@ test:
 
 production:
   <<: *default
-  protocol: https
   username: <%= ENV['COUCH_DB_USERNAME'] %>
   password: <%= ENV['COUCH_DB_PASSWORD'] %>
