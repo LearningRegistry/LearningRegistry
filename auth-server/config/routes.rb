@@ -9,5 +9,5 @@ Rails.application.routes.draw do
     get :delete, on: :collection
   end
 
-  root 'sessions#new'
+  root 'main#index'
 end
