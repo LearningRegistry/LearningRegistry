@@ -15,9 +15,18 @@ class ApprovalsControllerTest < ActionController::TestCase
   end
 
   test 'delivers a new approval' do
+    session[:authenticated_email] = 'john@example.org'
+
     post :create, approval_form: approval_attributes
 
     assert_redirected_to new_approval_url
+  end
+
+  test 'raises an error if authenticated email is missing' do
+    post :create, approval_form: approval_attributes
+
+    assert_equal 'Authenticated e-mail is missing', flash.alert
+    assert_template :new
   end
 
   test 'confirms a valid and current token' do

@@ -1,7 +1,8 @@
 #content
   h1 Approval Form
-  - if flash[:notice]
-    p.notice = flash[:notice]
+  - %i(notice alert).each do |type|
+    - if flash[type]
+      p class=(type) = flash[type]
   = simple_form_for @approval, url: approvals_path do |f|
     = f.input :organization_name, label: 'Name of Organization'
     = f.input :contact_person, label: 'Point of contact (person responsible '\

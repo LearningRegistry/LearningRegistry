@@ -8,12 +8,13 @@ class ApprovalsController < ApplicationController
   end
 
   def create
-    if @approval.deliver
+    if email_provided? && @approval.deliver
       session[:authenticated_email] = nil
 
       redirect_to new_approval_url,
                   notice: 'Your approval request has been sent successfully'
     else
+      flash.alert = 'Authenticated e-mail is missing' unless email_provided?
       render :new
     end
   end
@@ -58,7 +59,7 @@ class ApprovalsController < ApplicationController
   end
 
   def approval_process
-    @approval_process ||= ApprovalProcess.new(@approval)
+    @approval_process ||= ApprovalProcess.new(@approval.authenticated_email)
   end
 
   def user_attributes
@@ -69,5 +70,9 @@ class ApprovalsController < ApplicationController
       oauth: { consumer_keys: { @decoded_token.email => SecureRandom.hex },
                tokens: { node_sign_token: SecureRandom.hex } }
     }
+  end
+
+  def email_provided?
+    session[:authenticated_email].present?
   end
 end

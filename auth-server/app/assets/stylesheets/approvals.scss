@@ -1,9 +1,13 @@
-h1, p.notice {
+h1, p.notice, p.alert {
   margin-left: 370px;
 }
 
 p.notice {
   color: forestgreen;
+}
+
+p.alert {
+  color: firebrick;
 }
 
 .simple_form {
