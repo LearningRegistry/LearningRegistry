@@ -34,7 +34,8 @@ following environment variables:
 * `RAILS_ENV`: the current environment. Can be `development`, `test` or
 `production`, among others.
 * `SMTP_ADDRESS`: the SMTP host used for sending e-mails (*i.e: smtp.gmail.com*)
-* `SMTP_USERNAME`: the username of the SMTP account
+* `SMTP_USERNAME`: the username of the SMTP account. Should be a member of the
+group that will receive and manage the approvals.
 * `SMTP_PASSWORD`: the password of the SMTP account
 * `GOOGLE_CLIENT_ID`: the client ID of your Google application
 * `GOOGLE_CLIENT_SECRET`: the secret key of your Google application
