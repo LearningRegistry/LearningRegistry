@@ -9,4 +9,8 @@ class ApplicationController < ActionController::Base
   def error(message)
     render json: { error: message }, status: :unprocessable_entity
   end
+
+  def app_sub_uri
+    ENV['APP_SUB_URI'].to_s.chomp('/')
+  end
 end

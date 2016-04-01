@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
 
     session[:back_url] = params[:back_url]
 
-    redirect_to "/auth/#{params[:provider]}"
+    redirect_to "#{app_sub_uri}/auth/#{params[:provider]}"
   end
 
   def create

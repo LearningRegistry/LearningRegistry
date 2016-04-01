@@ -50,6 +50,8 @@ user is created in CouchDB after her approval is confirmed
 * `COUCH_DB_USERNAME`: the user to connect to the CouchDB instance. Must have
 privileges to create & delete users
 * `COUCH_DB_PASSWORD`: the password to connect to the CouchDB instance.
+* `APP_SUB_URI`: if your application is deployed to a sub-URI, set this
+variable with its value; otherwise don't set it.
 
 ### OAuth Key Management Application
 Inside `couchdb/apps/kanso/oauth-key-management/lib/app.js` there's a single
