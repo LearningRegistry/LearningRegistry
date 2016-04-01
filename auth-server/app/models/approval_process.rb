@@ -1,13 +1,13 @@
 # Takes care of generating & validating the tokens required for user approval
 class ApprovalProcess
-  attr_reader :approval
+  attr_reader :email
 
-  def initialize(approval)
-    @approval = approval
+  def initialize(email)
+    @email = email
   end
 
   def generate_approval_token
-    payload = { email: approval.email,
+    payload = { email: email,
                 action: 'approve',
                 exp: default_expiration }
 
@@ -15,7 +15,7 @@ class ApprovalProcess
   end
 
   def generate_delete_token
-    payload = { email: approval.email, action: 'delete' }
+    payload = { email: email, action: 'delete' }
 
     JWT.encode(payload, secret, 'HS256')
   end
