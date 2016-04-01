@@ -83,5 +83,9 @@ same time.
 * [Puma](http://puma.io/): highly optimized for performance. Can use workers
 (process fork) and/or threads.
 
+Also remember to precompile the assets (unless you're using some deploy
+ mechanism that does it automatically) by running
+`bin/rake assets:precompile RAILS_ENV=production`
+
 ## Running the tests
 You can execute the test suite using the `bin/rake test` command.
