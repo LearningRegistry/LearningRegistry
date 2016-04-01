@@ -213,6 +213,7 @@ exports.checkCurrentSession = function () {
     $.getJSON(currentSessionUrl, function (data) {
         log('[Learning Registry Auth Server] Current User: ' + data.email);
         getUserInfo(data.email);
+        $('.credentials').hide();
     }).fail(function () {
         log('[Learning Registry Auth Server] User has no active session');
     });
