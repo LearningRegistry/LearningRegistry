@@ -24,6 +24,7 @@ class ApprovalsController < ApplicationController
     error('Approval has already expired') && return if @decoded_token.expired?
 
     if User.create(user_attributes)
+      ApprovalMailer.confirmation(@decoded_token.email).deliver_now
       success('Approval has been successfully confirmed')
     else
       error('User could not be created')
