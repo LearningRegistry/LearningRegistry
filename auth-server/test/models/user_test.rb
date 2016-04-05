@@ -18,9 +18,7 @@ class UserTest < ActiveSupport::TestCase
     assert_not_nil auth_session
   end
 
-  test 'raises exception when credentials are not valid' do
-    assert_raises RestClient::Unauthorized do
-      User.get_auth_session('invalid@example.org', 'invalid')
-    end
+  test 'returns false when credentials are not valid' do
+    assert_equal false, User.get_auth_session('invalid@example.org', 'invalid')
   end
 end

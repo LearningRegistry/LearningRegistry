@@ -25,5 +25,7 @@ class User < CouchRest::Model::Base
                                name: email,
                                password: password
     response.cookies['AuthSession']
+  rescue RestClient::Unauthorized
+    false
   end
 end

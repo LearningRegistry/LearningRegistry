@@ -48,6 +48,37 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to 'http://example.org'
   end
 
+  test 'renders the couchdb login form when auth session is not available' do
+    session[:back_url] = 'http://example.org'
+
+    User.stub :exists?, true do
+      User.stub(:get_auth_session, false) do
+        get :create, provider: 'google'
+      end
+    end
+
+    assert_redirected_to sessions_couchdb_new_url
+  end
+
+  test 'redirects to the back url when couchdb login succeeds' do
+    session[:back_url] = 'http://example.org'
+
+    User.stub(:get_auth_session, '12345ABC') do
+      post :couchdb_login
+    end
+
+    assert_redirected_to 'http://example.org'
+  end
+
+  test 'renders the couchdb login form when password is incorrect' do
+    User.stub(:get_auth_session, false) do
+      post :couchdb_login
+    end
+
+    assert_template :couchdb_new
+    assert_equal 'Password is not correct', flash.alert
+  end
+
   test 'returns the current session when the user has logged in' do
     session[:user_id] = 'user@example.org'
 
@@ -56,7 +87,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert_equal 'user@example.org', JSON.parse(response.body)['email']
   end
 
-  test 'returns a 401 Unauthorized status  when session is not available' do
+  test 'returns a 401 Unauthorized status when session is not available' do
     session[:user_id] = nil
 
     get :current

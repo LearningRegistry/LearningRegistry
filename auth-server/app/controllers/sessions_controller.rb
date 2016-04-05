@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
   def create
     if User.exists?(email)
       session[:user_id] = email
-      log_user_into_couchdb
+      log_user_into_couchdb { redirect_to(sessions_couchdb_new_url) && return }
 
       redirect_to session[:back_url]
     else
@@ -20,6 +20,15 @@ class SessionsController < ApplicationController
 
       redirect_to new_approval_url
     end
+  end
+
+  def couchdb_login
+    log_user_into_couchdb do
+      flash.now.alert = 'Password is not correct'
+      render(:couchdb_new) && return
+    end
+
+    redirect_to session[:back_url]
   end
 
   def destroy
@@ -42,18 +51,26 @@ class SessionsController < ApplicationController
     error('Back url is missing') && return if params[:back_url].blank?
   end
 
+  def log_user_into_couchdb
+    auth_session = User.get_auth_session(session[:user_id], password)
+
+    if auth_session
+      cookies['AuthSession'] = auth_session
+    else
+      yield
+    end
+  end
+
   def email
     auth_hash[:info][:email] || auth_hash[:info][:emails].first[:value]
   end
 
-  def auth_hash
-    request.env['omniauth.auth'].with_indifferent_access
+  def password
+    params.dig(:couchdb_login, :password) ||
+      Rails.application.secrets.couchdb_master_password
   end
 
-  def log_user_into_couchdb
-    master_password = Rails.application.secrets.couchdb_master_password
-    auth_session = User.get_auth_session(session[:user_id], master_password)
-
-    cookies['AuthSession'] = auth_session
+  def auth_hash
+    request.env['omniauth.auth'].with_indifferent_access
   end
 end
