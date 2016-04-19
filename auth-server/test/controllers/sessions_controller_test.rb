@@ -98,7 +98,7 @@ class SessionsControllerTest < ActionController::TestCase
   test 'destroys the active session when the user logs out' do
     get :destroy
 
-    assert_response :ok
+    assert_response :no_content
     assert_nil session[:user_id]
   end
 end
