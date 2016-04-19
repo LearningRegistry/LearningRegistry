@@ -15,6 +15,15 @@ Rubinius).
 
 ## Configuration
 
+### Providers
+For each provider used (Google, Amazon, MS), you will need to authorized the
+associated redirect URI. Keep in mind that APP_SUB_URI is optional (see Env
+Variables below)
+
+* Google: <APP_SUB_URI>/auth/google/callback
+* Amazon: <APP_SUB_URI>/auth/amazon/callback
+* Microsoft: <APP_SUB_URI>/auth/microsoft/callback
+
 ### Auth Server
 There are a couple of configuration files that need to be tweaked before
 booting up the service:
