@@ -1,7 +1,8 @@
 
 var session = require("session"),
     users = require("users"),
-    _ = require("underscore")._;
+    _ = require("underscore")._,
+    app = require("lib/app");
 
 function log(msg) {
     try{
@@ -176,37 +177,56 @@ function savePassword() {
     }
 }
 
+/* Enables credentials in order to send the cookie in AJAX requests */
+function configureAjaxOptions () {
+    $(document).ajaxSend(function (event, xhr, settings) {
+        settings.xhrFields = {
+            withCredentials: true
+        };
+    });
+}
+
+/* Changes the href attribute of the provider login buttons and sets
+/* automatically the back url to the current page */
+function buildProviderLinks () {
+    $(".credentials a").each(function () {
+        var url = app.config.authServerBaseUrl + "/verify/" +
+            $(this).data("provider") + "?back_url=" + window.location.href;
+        $(this).attr("href", url);
+    });
+}
 
 exports.registerCallbacks = function() {
-    $.couch.browserid.login(function(evt, err, info) { 
-        try {
-            var email = null;
-            if (info && info.name) {
-                email = info.name;
-            } else if (info && info.email) {
-                email = info.email
-            }
-
-            if (email) {
-                log(email);
-                getUserInfo(email);
-            }
-        } catch (error) {
-
-        } finally {
-
-        } 
-    });
-
-    $.couch.browserid.logout(function(evt, err, info){
-        resetForms();
-    });
+    configureAjaxOptions();
+    buildProviderLinks();
+    exports.checkCurrentSession();
 
     $("#info_update").bind('click', setSigningInfo);
     $("#regenerate").bind('click', revokeAndGenerate);
     $("#save_password").bind('click', savePassword);
-}
+};
 
+/* Checks if a current session exists by querying the Auth Server */
+exports.checkCurrentSession = function () {
+    var currentSessionUrl = app.config.authServerBaseUrl + '/sessions/current';
+
+    $.getJSON(currentSessionUrl, function (data) {
+        log('[Learning Registry Auth Server] Current User: ' + data.email);
+        getUserInfo(data.email);
+        $('.credentials').hide();
+    }).fail(function () {
+        log('[Learning Registry Auth Server] User has no active session');
+    });
+};
+
+/* Logs out the current user from the Auth Server */
+exports.logout = function () {
+    var logoutUrl = app.config.authServerBaseUrl + '/logout';
+
+    $.getJSON(logoutUrl, function () {
+        resetForms();
+    });
+};
 
 // Simple secret key generator
 exports.generateSecret = function(length) {

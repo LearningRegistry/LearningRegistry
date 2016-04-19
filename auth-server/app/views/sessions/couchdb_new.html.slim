@@ -1,0 +1,12 @@
+#content
+  .couchdb-login
+    h1 Login into CouchDB
+    p
+      ' Please provide your Learning Registry publishing password in order to
+      ' sign in
+    - %i(notice alert).each do |type|
+      - if flash[type]
+        p class=(type) = flash[type]
+    = simple_form_for :couchdb_login, url: sessions_couchdb_login_path do |f|
+      = f.input :password, label: 'Publishing password'
+      = f.submit 'Login'
