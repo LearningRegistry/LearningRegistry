@@ -39,6 +39,8 @@ class SchemaBackedModelHelper(object):
     def validate_model(self, model):
 
         model_ref = deepcopy(model)
+        log.debug("schema: %s" %self.schema)
+
         #strip couchdb specific stuff before validation
         if _ID in model_ref or _REV in model_ref:
             try:
@@ -50,6 +52,26 @@ class SchemaBackedModelHelper(object):
                 del model_ref[_REV]
             except:
                 pass
+
+        #resource_data validation - do this first in case of non-JSON resource_data
+        if 'resource_data' in model_ref:
+            resource_data = model_ref['resource_data']
+            log.debug("resource data is %s" %resource_data)
+
+            if isinstance(resource_data,basestring):
+                log.warn("loading resource_data string into an obj")
+                try:
+                    resource_data = json.loads(resource_data)
+                except ValueError:
+                    raise ValueError('The resource_data field does not contain valid JSON data')
+            else:
+                raise ValueError('The resource_data field must be a string')
+
+        else:
+            resource_data = None
+            log.debug("no resource data - deleting or replacing?")
+
+
         # primary validation of the record sent
         try:
             validate(model_ref, self.schema, cls=self.validator_class)
@@ -59,26 +81,19 @@ class SchemaBackedModelHelper(object):
                 msgs.append("For Item (%s), Error: %s" %(err.path,err.message))
 
             raise SpecValidationException(",\n".join(msgs))
-        #resource_data validation
-        resource_data = model_ref['resource_data']
-        if isinstance(resource_data,basestring):
-            log.warn("loading resource_data string into an obj")
-            try:
-                resource_data = json.loads(resource_data)
-            except ValueError:
-                raise ValueError('The resource_data field does not contain valid JSON data')
-        log.warn(_schemaRef_Resource_Data_LRMI)
+
+        log.debug("Resource Data schema validator is : %s" %_schemaRef_Resource_Data_LRMI)
         f=open(_schemaRef_Resource_Data_LRMI.split('file:')[1],'r').read()
         v = Draft3Validator(json.loads(f))
         errors = []
-        log.warn(resource_data)
+        log.debug("Resource Data is : %s" %resource_data)
         for err in v.iter_errors(resource_data):
             log.warn("resource_lrmi validation error: %s" %err.message)
             errors.append("For Item (%s), Error: %s" %(err.path,err.message))
         if errors:
             raise SpecValidationException(",\n".join(errors))
 
-    def save(self,  model, database=None, log_exceptions=True, skip_validation=False):
+    def save(self, model, database=None, log_exceptions=True, skip_validation=False):
 
             # Make sure the spec data conforms to the spec before saving
             # it to the database
