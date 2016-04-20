@@ -59,7 +59,7 @@ class SchemaBackedModelHelper(object):
             log.debug("resource data is %s" %resource_data)
 
             if isinstance(resource_data,basestring):
-                log.warn("loading resource_data string into an obj")
+                log.debug("loading resource_data string into an obj")
                 try:
                     resource_data = json.loads(resource_data)
                 except ValueError:
