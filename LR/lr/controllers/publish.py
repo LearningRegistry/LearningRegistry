@@ -63,7 +63,7 @@ class PublishController(BaseController):
     __DOCUMENTS = 'documents'
 
     repl_helper = ResourceDataReplacement()
-    
+
 
     @oauth.authorize("oauth-sign", _service_doc(True), roles=None, mapper=signing.lrsignature_mapper, post_cond=_no_abort)
     @bauth.authorize("oauth-sign", _service_doc(), roles=None, pre_cond=_continue_if_missing_oauth, realm="Learning Registry")
@@ -74,7 +74,7 @@ class PublishController(BaseController):
         try:
             data = json.loads(request.body)
             doc_limit =  _service_doc()()['service_data']['doc_limit']
-            
+
             if not self.__DOCUMENTS in data.keys():
                 # Comply with LR-RQST-009 'Missing documents in POST'
                 results[self.__ERROR] = "Missing field 'documents' in post body"
@@ -91,37 +91,37 @@ class PublishController(BaseController):
         except Exception as ex:
             log.exception(ex)
             results[self.__ERROR] = str(ex)
-        
+
         if results.has_key(self.__ERROR):
            results[self.__OK] = False
         return json.dumps(results)
-        
-        
+
+
     def _isResourceDataFilteredOut(self, resourceData):
-        
+
         if (LRNode.filterDescription is None or
-            LRNode.filterDescription.filter is None or 
+            LRNode.filterDescription.filter is None or
             LRNode.filterDescription.custom_filter == True):
             #Do custom the filter I supposed ... for now just resturn false.
             return [False, None]
-        
+
         matchResult = False
         envelopFilter = ""
         for f in LRNode.filterDescription.filter:
             log.info("\n"+str(f)+"\n")
-            # Ckeck if jsonObject object has the key if it has search 
+            # Ckeck if jsonObject object has the key if it has search
             # for the regular expression in the filter otherwise keep looking
             key = f['filter_key']
             resourceValue = None
-            
+
             for k in resourceData.keys():
                 if re.search(key, k) is not None:
                     resourceValue = str(resourceData[k])
                     break
-                    
+
             if  resourceValue is None:
                 continue
-                
+
             value = f['filter_value']
             log.info("\n"+str(key)+", "+str(value)+", "+ resourceValue+"\n")
             if(re.search(value,  resourceValue) is not None):
@@ -129,7 +129,7 @@ class PublishController(BaseController):
                 envelopFilter = "Filter '"+str(f)+"' for key '"+str(key)+\
                                           "' matches '"+resourceValue+"'"
                 break
-        
+
         #Check if what matching means base on the include_exclude
         # True: the filters describe what documents to accept all others
         # are rejected
@@ -143,13 +143,13 @@ class PublishController(BaseController):
         else:
             if matchResult == True:
                return True, "\nExcluded by filter: \n"+envelopFilter
-             
+
         return [False, None]
-        
+
     def _publish(self, resourceData):
         if isinstance(resourceData,unicode):
             resourceData = json.loads(resourceData)
-            
+
         result={self.__OK: True}
 
         try:
@@ -166,15 +166,17 @@ class PublishController(BaseController):
                 # ResourceDataModelValidator.save(resourceData)
                 result[ResourceDataModelValidator.DOC_ID] = resourceData[ResourceDataModelValidator.DOC_ID]
 
-                 
+
         except SpecValidationException as ex:
+            log.debug("Spec Validation Exception - resourceData:")
+            log.debug(resourceData)
             log.exception(ex)
-            result[self.__ERROR]  = "\n"+pprint.pformat(str(ex), indent=4)
+            result[self.__ERROR]  = pprint.pformat(str(ex), indent=4)
         except Exception as ex:
             log.exception(ex)
             result[self.__ERROR]  = str(ex)
-            
+
         if result.has_key(self.__ERROR):
             result[self.__OK] = False
-        
+
         return result

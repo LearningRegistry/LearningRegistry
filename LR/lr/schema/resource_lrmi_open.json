@@ -1,0 +1,91 @@
+{
+    "$schema": "http://tools.ietf.org/html/draft-zyp-json-schema-03",
+    "title": "lrmi_resource_open",
+    "description": "Resource Data LRMI",
+    "id": "/",
+    "definitions": {
+      "thing": {
+        "type": "object",
+        "properties": {
+          "additionalType": { "type": "string", "format":"uri"},
+          "alternativeName" : {"type": "string"},
+          "description": {"type": "string"},
+          "image": {"type": "string", "format":"uri"},
+          "mainEntryOfPage": {"type":"string","format": "uri"},
+          "name" : { "type": "string"},
+          "sameAs": {"type": "string", "format": "uri"},
+          "url": {"type": "string", "format": "uri"}
+        }
+      },
+      "alignmentObject": {
+        "type": "object",
+        "properties": {
+          "alignmentType": { "type": "string"},
+          "educationalFramework": { "type": "string"},
+          "targetDescription": { "type" : "string"},
+          "targetName": {"type":"string"},
+          "targetUrl": {"type":"string","format":"uri"}
+        },
+        "required":["targetName","targetUrl","targetDescription"],
+        "additionalProperties" :{"type":"string"}
+      },
+      "PostalAddress" : {"type": "object",
+        "properties": {
+          "addressCountry": {"type": "string"},
+          "addressLocation": {"type": "string"},
+          "addressRegion": {"type": "string"},
+          "postOfficeBoxNumber": {"type":"string"},
+          "streetAddress": {"type":"string"}
+        },
+        "required":["streetAddress"]
+      },
+
+      "Person": {"type":"object",
+        "properties": {
+          "name": {"type": "string"},
+          "url": {"type": "string", "format":"uri"},
+          "email": {"type": "string"}
+        },
+        "additionalProperties":{"type": ["string","number","array"],"items":{"type":["string","number"]}},
+        "required":["name"]
+      },
+
+      "Organization": {"type":"object",
+        "properties": {
+          "name": {"type": "string"},
+          "url": {"type": "string", "format":"uri"},
+          "email": {"type": "string"}
+        },
+        "additionalProperties":{"type": ["string","number","array"],"items":{"type":["string","number"]}},
+        "required":["name"]
+      },
+      "language": {"type":"object", "additionalProperties":{"type":["string","number","array"], "items":{"type":["string","number"]}}},
+      "additionalProperties":{"type":["string","number","array"], "items":{"type":["string","number"]}}
+    },
+    "properties": {
+      "name":{"type": "string", "required":true},
+      "url": {"type": "string", "format": "uri", "required":true},
+      "description":{"type": "string", "required":true},
+      "license":{"type":"string","format":"uri","required":true},
+      "publisher":{"type":["string",{"#ref":"#/definitions/Organization"}],"required":true},
+
+      "inLanguage":{"type":["string", {"#ref":"#/definitions/language"}]},
+      "about": { "type":[ {"#ref" : "#/definitions/thing"},"string"]},
+      "accessibilityAPI" : {"type": ["string","array"], "items" : {"type": "string"}},
+      "additionalProperties" : {"type" :["string","array","number"], "items": {"type":["string","number"]}},
+      "isBasedOnUrl": {"type": "string","format":"uri"},
+      "interactivityType":{"type": ["string","array"], "items": {"type":"string"}},
+      "learningResourceType": { "type": ["string","array"], "items": {"type":"string"}},
+      "educationalAlignment": {"#ref" : "#/definitions/alignmentObject"},
+      "timeRequired": {"type": "string"},
+      "typicalAgeRange": {"type": ["string","array"], "items" : {"type":"string"}},
+      "accessiblityControl": {"type": ["string","array"], "items": {"type":"string"}},
+      "accessiblityFeature": {"type": ["string","array"], "items": {"type":"string"}},
+      "accessiblityHazzard": {"type": ["string","array"], "items": {"type":"string"}},
+      "accessRights": {"type":"string","format":"uri"},
+      "useRightsUrl":{"type":"string","format":"uri"},
+      "dateCreated": {"type":"string","format":"date"},
+      "author":{"type":["string",{"#ref":"#/definitions/Person"}]},
+      "educationalRole":{"type":["string","array"], "items":{"type":"string"}}
+    }
+}

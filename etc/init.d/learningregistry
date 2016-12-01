@@ -54,7 +54,8 @@ lr_restart () {
         echo "Restarting LR Node. Log: $LR_LOG   PID: $LR_PID"
         su $LR_USER -c "source $LR_VIRTUALENV/bin/activate;uwsgi --stop $LR_PID; deactivate"
         su $LR_USER -c "rm -f $LR_PID"
-        su $LR_USER -c "cd $LR_HOME; source $LR_VIRTUALENV/bin/activate; uwsgi --enable-threads --no-orphans --ini-paste $LR_HOME/development.ini -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG; deactivate"
+        sleep 4s
+        su $LR_USER -c "cd $LR_HOME; source $LR_VIRTUALENV/bin/activate; cd $LR_HOME; uwsgi --enable-threads --no-orphans --ini-paste $LR_HOME/development.ini -H $LR_VIRTUALENV --pidfile $LR_PID --daemonize $LR_LOG; deactivate"
     else
         echo "LR Node not running.  Please use [start]"
     fi

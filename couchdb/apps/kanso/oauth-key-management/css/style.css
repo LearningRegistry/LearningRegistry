@@ -20,6 +20,11 @@ div.head , div.credentials {
     clear: both;
 }
 
+div.credentials a {
+    margin-right: 15px;
+    text-decoration: none;
+}
+
 #browserid {
     width: auto;
 }
