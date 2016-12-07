@@ -16,9 +16,17 @@ class SessionsController < ApplicationController
 
       redirect_to session[:back_url]
     else
-      session[:authenticated_email] = email
+      if Rails.application.secrets.approval_enabled == true
+        session[:authenticated_email] = email
 
-      redirect_to new_approval_url
+        redirect_to new_approval_url
+      else
+        User.create(user_attributes)
+        session[:user_id] = email
+        log_user_into_couchdb { redirect_to(sessions_couchdb_new_url) && return }
+
+        redirect_to session[:back_url]
+      end
     end
   end
 
@@ -72,5 +80,15 @@ class SessionsController < ApplicationController
 
   def auth_hash
     request.env['omniauth.auth'].with_indifferent_access
+  end
+
+  def user_attributes
+    {
+      id: "org.couchdb.user:#{email}",
+      name: email,
+      password: Rails.application.secrets.couchdb_master_password,
+      oauth: { consumer_keys: { email => SecureRandom.hex },
+               tokens: { node_sign_token: SecureRandom.hex } }
+    }
   end
 end
