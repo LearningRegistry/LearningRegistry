@@ -7,6 +7,13 @@
 # Ignore bundler config.
 /.bundle
 
+# Ignore Rails stuff
+.rbenv-vars
+app/controllers/___*
+public/assets
+vendor
+Gemfile.lock
+
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
