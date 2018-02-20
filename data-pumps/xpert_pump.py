@@ -16,14 +16,14 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
 def getDocTemplate():
-    return { 
-            "doc_type": "resource_data", 
-            "doc_version": "0.11.0", 
+    return {
+            "doc_type": "resource_data",
+            "doc_version": "0.11.0",
             "resource_data_type" : "metadata",
             "active" : True,
             "submitter_type": "agent",
             "submitter": "Nottingham Xpert",
-            "TOS": {"submission_TOS": "http://www.learningregistry.org/tos/cc-by-3-0/v0-5/"},
+            "TOS": {"submission_TOS": "https://www.learningregistry.org/tos/cc-by-3-0/v0-5/"},
             "resource_locator": None,
             "keys": [],
             "payload_placement": None,
@@ -47,13 +47,13 @@ def getKeywords():
             keywords.append(w.strip())
     f.close()
     return keywords
-    
+
 def getData(sourceUrl, keyword=None):
     f = urllib2.urlopen(sourceUrl)
     data = f.read()
     f.close()
     jsonList = json.loads(str(data).replace("\r", " "))
-    
+
     resourceDataList = []
     for r in jsonList:
         doc = getDocTemplate()
@@ -66,7 +66,7 @@ def getData(sourceUrl, keyword=None):
         cleanDoc(doc)
         resourceDataList.append(doc)
     return resourceDataList
-  
+
 def getByAllKeyWords(baseUrl):
     keywords = getKeywords()
     # Use a dictionary to store the data to avoid duplicate data from the different
@@ -88,7 +88,7 @@ def getByAllKeyWords(baseUrl):
             else:
                 dataDict[doc['doc_ID']] = doc
     return [dataDict.values]
-    
+
 def bulkUpdate(resourceList, destinationUrl):
     '''
     Save to Learning Registry
@@ -113,24 +113,24 @@ def parseCommand():
     parser.add_option('-o', '--output', dest="output", help='Output file instead of publish', default=None)
     parser.add_option('-s', '--source-url', dest="sourceUrl", help="The source url where to pull the data from")
     parser.add_option('-b', '--base-source-url', dest="baseSourceUrl", default=None, help="Base source url, keywords will be append to it")
-    
+
     (options, args) = parser.parse_args()
     docList =[]
-    
+
     if options.baseSourceUrl is not None:
         docList = getByAllKeyWords(options.baseSourceUrl)
     else:
         docList = getData(options.sourceUrl)
-           
+
     print ("Number of collected  data: %d " %(len(docList)))
-    
+
     if options.output is None:
         bulkUpdate(docList, options.registryUrl)
-    else:    
+    else:
         for d in docList:
             print d
-    
-    
+
+
 
 if __name__ == '__main__':
     log.info("Update Started.")

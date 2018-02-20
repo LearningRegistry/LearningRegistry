@@ -4,10 +4,10 @@
     from datetime import datetime
     import iso8601
 %>
-<OAI-PMH xmlns="http://www.learningregistry.org/OAI/2.0/"
+<OAI-PMH xmlns="https://www.learningregistry.org/OAI/2.0/"
          xmlns:oai="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd">
+         xsi:schemaLocation="https://www.learningregistry.org/OAI/2.0/ https://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd">
   <responseDate>${c.datetime_now | x}</responseDate>
   <request verb="Identify">${c.path_url | x}</request>
   <Identify>

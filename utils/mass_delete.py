@@ -22,7 +22,7 @@ _debug_ID = ""
 _TOMBSTONE_DOCUMENT = {
     "replaces": [],
     "TOS": {
-        "submission_TOS": "http://www.learningregistry.org/tos"
+        "submission_TOS": "https://www.learningregistry.org/tos"
     },
     "active":True,
     "doc_type": "resource_data",

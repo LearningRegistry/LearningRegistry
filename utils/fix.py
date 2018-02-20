@@ -39,7 +39,7 @@ for fname in os.listdir(base_path):
 		del data['submitter']
     if data.has_key('submitter_type'):
 		changed = True
-		del data['submitter_type']		
+		del data['submitter_type']
     if data.has_key('identify'):
         del data['identify']
         changed = True
@@ -52,34 +52,34 @@ for fname in os.listdir(base_path):
 		    'owner':'European School Net'
 #		    'signer':''
         }
-        data['identity'] = identity	 
+        data['identity'] = identity
     if data.has_key('submission_TOS'):
         changed = True
         del data['submission_TOS']
     if not data.has_key('TOS'):
         changed = True
         data['TOS'] = {
-            'submission_TOS':'http://www.learningregistry.org/tos/cc0/v0-5/'
+            'submission_TOS':'https://www.learningregistry.org/tos/cc0/v0-5/'
         }
-	
+
     if data.has_key('payload_schema') and not goodPayloadSchema(data['payload_schema']):
         bad = data['payload_schema']
         better = "".join(bad)
         good = re.split("\\s+", better)
         data['payload_schema'] = good
         changed = True
-        
-    	
+
+
     if data.has_key('created_timestamp'):
         changed = True
         del data['created_timestamp']
     if data.has_key('update_timestamp'):
         changed = True
-        del data['update_timestamp']        
-    
+        del data['update_timestamp']
+
     if data.has_key('publishing_node'):
         del data['publishing_node']
-    
+
     if changed == True:
         data = json.dumps(data, sort_keys=True, indent=4)
         mkdir_p(out_path)

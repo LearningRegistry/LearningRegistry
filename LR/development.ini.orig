@@ -52,7 +52,7 @@ host = 127.0.0.1
 port = 5000
 
 [app:main]
-tos.url = http://www.learningregistry.org/tos/
+tos.url = https://www.learningregistry.org/tos/
 use = egg:LR
 full_stack = true
 static_files = true

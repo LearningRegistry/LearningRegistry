@@ -1,6 +1,6 @@
 ﻿Learning Registry Technical Specification V 0.23.0
-Draft in Progress.  See the Change Log for links to prior stable versions.  
-Shading indicates major changes and additions from the prior version (0.22.0). Also indicated with . 
+Draft in Progress.  See the Change Log for links to prior stable versions.
+Shading indicates major changes and additions from the prior version (0.22.0). Also indicated with .
 Significant deletions are shaded.
 Features to be deprecated in a future version are shaded and indicated with.
 
@@ -128,7 +128,7 @@ There is no central control, central registry, or central repository in the core
 Specification License
 
 
-This specification is being developed under licensing created by the Open Web Foundation Contributor License Agreement (CLA 1.0). The intent is that the final specification will be released under the Open Web Foundation Agreement (OWFa 0.9).  Later versions may apply. Both licenses are available on the Open Web Foundation website at http://www.openwebfoundation.org. 
+This specification is being developed under licensing created by the Open Web Foundation Contributor License Agreement (CLA 1.0). The intent is that the final specification will be released under the Open Web Foundation Agreement (OWFa 0.9).  Later versions may apply. Both licenses are available on the Open Web Foundation website at http://www.openwebfoundation.org.
 
 
 Your use of this Specification may be subject to other third party rights. THIS SPECIFICATION IS PROVIDED “AS IS.” The contributors expressly disclaim any warranties (express, implied, or otherwise), including implied warranties of merchantability, non-infringement, fitness for a particular purpose, or title, related to the Specification. The entire risk as to implementing or otherwise using the Specification is assumed by the Specification implementer and user. IN NO EVENT WILL ANY PARTY BE LIABLE TO ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS SPECIFICATION OR ITS GOVERNING AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -137,7 +137,7 @@ Your use of this Specification may be subject to other third party rights. THIS 
 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in the Internet Engineering Task Force (IETF) document, Best Current Practice
-(RFC 2119) which is available on the IETF website at http://tools.ietf.org/html/rfc2119. 
+(RFC 2119) which is available on the IETF website at http://tools.ietf.org/html/rfc2119.
 
 
 The vocabulary of terms used in describing the LR are listed in the Glossary.  Specific terms are set in bold when introduced in context.
@@ -272,7 +272,7 @@ Two types of network communities are defined:
 2. Closed Community:  A closed community provides no connectivity outside of the community. A network within a closed community  SHALL NOT connect with another network within a different community.
 
 
-For example, the LR is a social community; other social communities may connect to the LR community.  For security and testing, the Learning Registry Testbed is a closed community, i.e., it consists of different networks (multiple networks to enable testing gateway protocols) but the testbed cannot be connected to the social production community.   
+For example, the LR is a social community; other social communities may connect to the LR community.  For security and testing, the Learning Registry Testbed is a closed community, i.e., it consists of different networks (multiple networks to enable testing gateway protocols) but the testbed cannot be connected to the social production community.
 
 
 The LR community might consist of multiple networks and gateways.  One network might be for uncurated OERs (open educational resources).  A second network might be for curated OERs.  And several others networks could be established for commercial resources (e.g., one per publisher).   If the uncurated OER network has a gateway to the curated OER network, and there are gateways to each commercial networks, resource data can flow in only one direction, e.g., resource data for OERs into the commercial networks, but not the reverse.
@@ -281,7 +281,7 @@ The LR community might consist of multiple networks and gateways.  One network m
 A network SHALL not transition or be moved from one network community to another.  A network MAY only be added to or removed from a network community.  NB: This is a security constraint.
 
 
-The resource network model provides nodes, collections of connected nodes within a network and the interconnection of networks in communities.  The network model has this fixed hierarchy of components.  Network communities connect to other communities using the same mechanism as networks that connect within a community.  
+The resource network model provides nodes, collections of connected nodes within a network and the interconnection of networks in communities.  The network model has this fixed hierarchy of components.  Network communities connect to other communities using the same mechanism as networks that connect within a community.
 
 
 Other network topology restrictions MAY be established by the policies of a particular network or community.  This specification is intentionally minimal and does not define or limit other topologies, including degenerate topologies.  NB: The model lets one design a network topology that might violate the policy and security constraints of a participating organization.
@@ -335,7 +335,7 @@ The data model describing a node document.  Once the data model has been instant
  "node_name":                 “string”,                  // name of the node, optional
  "node_description":        “string”,                // description of the node, optional
  "node_admin_identity":        “string”,                // identity of node admin, optional
- "network_id":                “string”,                // id of the network that this node is a part of                 
+ "network_id":                “string”,                // id of the network that this node is a part of
 // recommended (required for gateway distribution)
 // immutable
         "community_id":                “string”,                // id of the community that this node is a part of
@@ -351,7 +351,7 @@ The data model describing a node document.  Once the data model has been instant
 //  to connect to any other node
                                                 // F if node connectivity is restricted
                                                 // recommended; F if not present
-        “node_policy”:                                
+        “node_policy”:
          {
  "sync_frequency":        integer,                // target time between synchronizations in minutes
 // optional
@@ -377,7 +377,7 @@ The data model describing a node document.  Once the data model has been instant
                                                 // optional, F if not present
 ”max_doc_size”:        integer                // maximum size of a document that a node will store
 // in bytes
-// optional, if not present behavior is not defined        
+// optional, if not present behavior is not defined
           },
          “node_key”:                “string”,                // node public key, optional
 "X_xxx":                ?????                // placeholder for extensibility, optional
@@ -399,7 +399,7 @@ NB: Signing, trust, etc., are all OPTIONAL.  Default policy values imply that th
 Open Question:  Should there be a short cut notation for ranges of accepted document versions?
 Open Question:  Have a list of accepted document versions, or just make this a filter?
 Network Node Service Description Data Model
-The data model describing a service description document; one document per service available at a node.  Once the data model has been instantiated for a service, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the node document.  
+The data model describing a service description document; one document per service available at a node.  Once the data model has been instantiated for a service, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the node document.
 NB:  Ownership and control of the node description document and of the node service description document are vested in the same identity.
         {
  "doc_type":                “service_description”,        // the literal “node_description”
@@ -413,7 +413,7 @@ NB:  Ownership and control of the node description document and of the node serv
  "service_id":                “string”,                // id of the service, required
 // unique within scope of the LR
 // immutable
-"service_type":                “string”,                // fixed vocabulary [“publish”, “access”, 
+"service_type":                “string”,                // fixed vocabulary [“publish”, “access”,
 // “distribute”, “broker”, “administrative”]
 // required, immutable
         "service_name":                “string”,                // name of the service, optional
@@ -422,7 +422,7 @@ NB:  Ownership and control of the node description document and of the node serv
                                                 // version is local to the Learning Registry
                                                 // not the version of some underlying spec for the service
         "service_endpoint":        “string”,                // URL of service, required
-        ”service_auth”:                                
+        ”service_auth”:
          {
         "service_authz":                [“string”],         // fixed vocabulary
 // [“none”, “basicauth”, “oauth”, “ssh”,  ...]
@@ -440,7 +440,7 @@ NB:  A service description document is required for each service.  Services fail
 NB:  Whenever a service is modified (e.g., added capabilities, support for different data formats, API changes, …), a new service description document with an updated version number SHOULD be published.  The service version and service description document version SHOULD be synchronized.
 NB:  The service description document enables both automatic discovery of services and management of service configuration data that is needed by clients.
 Network Node Connectivity Description Data Model
-The data model describing a node connectivity document; one document per connection at a node.  Once the data model has been instantiated for a connection, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the node document.  
+The data model describing a node connectivity document; one document per connection at a node.  Once the data model has been instantiated for a connection, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the node document.
 NB:  Ownership and control of the node description document and of the node connectivity description document are vested in the same identity.
 {
  "doc_type":                “connection_description”,        // the literal “connection_description”
@@ -470,7 +470,7 @@ NB: By policy, there SHALL be only one document with an active value of T and ga
 NB: The source URL is not strictly needed.  It is present to enable building a network map.
 Working Assumption: It is assumed that a vocabulary to describe additional types of connections is not needed.
 Network Node Filter Description Data Model
-The data model describing a node filter; one document per node.  Filters are used to restrict the resource data that is held at a node.  Once the data model has been instantiated for a filter, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the node document. 
+The data model describing a node filter; one document per node.  Filters are used to restrict the resource data that is held at a node.  Once the data model has been instantiated for a filter, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the node document.
 NB:  Ownership and control of the node description document and of the node filter description document are vested in the same identity.
 {
  "doc_type":                “filter_description”,        // the literal “filter_description”
@@ -489,12 +489,12 @@ NB:  Ownership and control of the node description document and of the node filt
                                         // F if the filters describe what documents to reject
                                         // all others are accepted
                                         // optional, T if not present
- “filter”:                                       
+ “filter”:
  [
   {“filter_key”:                “string”,                // REGEX that matches names in the
                                         // resource data description
                                         // required
-    “filter_value”:                “string”                // REGEX that matches values in the 
+    “filter_value”:                “string”                // REGEX that matches values in the
 // resource data description
 // optional, if not present, any value matches
           }
@@ -533,7 +533,7 @@ The data model describing a resource distribution network document.  Once the da
 NB:  The network admin identity SHOULD be a URL, e.g., an email address.  A deployment MAY specify that the identity be used to look up the network’s public key in a key server.
 NB:  The network MAY advertise its public key in the data model instance versus requiring key server lookup.
 Resource Distribution Network Policy Data Model
-The data model describing the policies of a resource distribution network document.  Once the data model has been instantiated for a network, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the network description document.  
+The data model describing the policies of a resource distribution network document.  Once the data model has been instantiated for a network, the value of an immutable element SHALL NOT change.  Other values MAY be changed only by the owner of the network description document.
 NB:  Ownership and control of the network description document and of the policy description document are vested in the same identity.
         {
  "doc_type":                “policy_description”,        // the literal “policy_description”
@@ -580,7 +580,7 @@ The data model describing a network community document.  Once the data model has
                                         // F if the community is a closed community
                                         // recommended; F if not present (closed community)
                                         // immutable
- “community_key”:        “string”,                // node public key, optional                                
+ “community_key”:        “string”,                // node public key, optional
 "X_xxx":                ?????                // placeholder for extensibility, optional
 }
 
@@ -593,9 +593,9 @@ A valid, consistent network SHALL be described through a set of documents stored
 2. Each node SHALL store one instance of the network node services document for each service that it provides.  A document SHALL be unique per node.
 3. Each node SHALL store one instance of the network node connectivity document for each connection to the node.  A document SHALL be unique per node.
 4. Each node MAY store one instance of the network node filter document.  A document SHALL be unique per node.
-5. Each node SHALL store one instance of the resource distribution network description document.  This document SHALL describe the network that the node is a part of.  The contents of this document SHALL be identical for all nodes in the network. 
-6. Each node SHALL store one instance of the resource distribution network policy document.  This document SHALL describe the policies of the network that the node is a part of.  The contents of this document SHALL be identical for all nodes in the network. 
-7. The node SHALL store one instance of the network community description document.  This document SHALL describe the community that the network is a part of.  The contents of this document SHALL be identical for all nodes in the community. 
+5. Each node SHALL store one instance of the resource distribution network description document.  This document SHALL describe the network that the node is a part of.  The contents of this document SHALL be identical for all nodes in the network.
+6. Each node SHALL store one instance of the resource distribution network policy document.  This document SHALL describe the policies of the network that the node is a part of.  The contents of this document SHALL be identical for all nodes in the network.
+7. The node SHALL store one instance of the network community description document.  This document SHALL describe the community that the network is a part of.  The contents of this document SHALL be identical for all nodes in the community.
 
 
 Additional types of node and network description documents MAY be defined, but SHALL be defined as either (1) unique per node, (2) identical for nodes in a network or (3) identical for all nodes in a community.  Other organizational classifications SHALL NOT be used.
@@ -610,7 +610,7 @@ The resource distribution network and its nodes process and distribute resource 
 
 
 Resource data is described in a different documents that includes:
-1. The description of the resource, metadata, paradata, etc. 
+1. The description of the resource, metadata, paradata, etc.
 
 
 All data models MAY be extended with additional elements. The name of any extension element SHALL begin with the characters “X_” designating an extension element.  Any document that includes any element that is not is the defined data model or is not an extension element is non conforming and SHALL be rejected by any service.
@@ -648,7 +648,7 @@ The data model describing resources, metadata, paradata, etc., that is distribut
 
  // information about the submission, independent of the resource data
  “identity”:
-  {                               
+  {
   “submitter_type”:        “string”,                // fixed vocabulary [“anonymous”, “user”, “agent”]
                                         // required, immutable
                                         // “anonymous” -- submitter is unknown
@@ -697,7 +697,7 @@ The data model describing resources, metadata, paradata, etc., that is distribut
 // required, immutable
 // provided by the initial publishing node on first publish
 // not by a distribution node or not an update
-“TOS”: {                               
+“TOS”: {
   “submission_TOS”:        “string”,                // agreed terms of service by submitter
                         // required
  “submission_attribution”:”string”                // attribution statement from submitter
@@ -711,8 +711,8 @@ The data model describing resources, metadata, paradata, etc., that is distribut
 
  “weight”:                “integer”,        // submitter assigned weight (strength)
                                         // -100:100
-                                       
-“digital_signature”: {                         
+
+“digital_signature”: {
   “signature”:                “string”,                // signature string, required
    “key_location”:        [“string”],        // array of public key locations,, required
   “signing_method”:        “string”,                // fixed vocabulary [“LR-PGP.1.0”]
@@ -785,9 +785,9 @@ Resource Data Description
 	Dublin Core
 	IEEE LOM
 	resource_data_owner
-	
 
-	3.3.2: LifeCycle.Contribute.Entity when 
+
+	3.3.2: LifeCycle.Contribute.Entity when
 2.3.1: LifeCycle.Contribute.Role has a value of “Submitter.”
 	resource_description
 	dc:description
@@ -821,9 +821,9 @@ Resource Data Description
 	dc:title
 	1.2: General.Title
 	resource_TTL
-	
 
-	
+
+
 
 	resource_type
 	dc:type
@@ -831,7 +831,7 @@ Resource Data Description
 	related_resource
 	dc:resource
 	7.2.1: Relation.Identifier.Identifier
-	
+
 
 Metadata Formats
 The metadata in a resource data description MAY be defined using any metadata standard.  Metadata documents SHALL include the reference to the defining standard or schema.  The following list of schema values SHALL be used to refer to common schemata.  Implementations MAY extend this list.
@@ -843,11 +843,11 @@ Metadata Standard
 	“DC 1.1”
 	IEEE LOM 2002
 	“IEEE LOM 2002”
-	OAI-PMH Dublin Core 
+	OAI-PMH Dublin Core
 	“oai_dc”
-	
 
-Attached and linked metadata SHALL include appropriate schema definitions and schema locators in the metadata file. 
+
+Attached and linked metadata SHALL include appropriate schema definitions and schema locators in the metadata file.
 
 
 NB. There is currently no machine-readable list of schemata.  Such a list could be defined in additional network description documents.
@@ -863,13 +863,13 @@ The paradata in a resource data description MAY be defined using any paradata st
 
 Paradata Standard
 	payload_schema value
-	
 
-	
 
-	
 
-Attached and linked paradata SHALL include appropriate schema definitions and schema locators in the paradata file. 
+
+
+
+Attached and linked paradata SHALL include appropriate schema definitions and schema locators in the paradata file.
 
 
 NB. There is currently no machine-readable list of schemata.  Such a list could be defined in additional network description documents.
@@ -904,9 +904,9 @@ The controller of the identity MUST publish their public key at one or more loca
 
 
 The following process SHALL be used to generate the signature:
-1. Create the  complete UTF-8 JSON form of the resource data description document.  The JSON SHALL conform to the JSON definition in RFC4647.  
+1. Create the  complete UTF-8 JSON form of the resource data description document.  The JSON SHALL conform to the JSON definition in RFC4647.
 2. Create a canonical document to sign:
-1. Make a working copy of the JSON form of the resource data description document.  
+1. Make a working copy of the JSON form of the resource data description document.
 2. Eliminate all objects that are generated by a node in the LR network, leaving only those objects that are supplied by the user .  Objects to be eliminated include: doc_id, publishing_node, update_timestamp, node_timestamp, create_timestamp
 3. Eliminate all implementation-specific objects, i.e., in Couch these are the _* objects, e.g., _id, _rev (NB: These will exist only when verifying a signature.)
 4. Eliminate all objects where the object is a number. (NB: There are currently no numeric objects.)
@@ -919,10 +919,10 @@ The following process SHALL be used to generate the signature:
 1. Clear sign the hash using signer’s private key yielding the value for the signature.  The signer (key owner) MAY be an identity that is just used to sign the document, or it MAY be the identity of the submitter.  Other identities SHALL NOT be used to sign the document.
 
 
-Insert the digital signature data into the complete, unmodified UTF-8 JSON form of the resource data description document.  Insert:  
+Insert the digital signature data into the complete, unmodified UTF-8 JSON form of the resource data description document.  Insert:
 1. The signature value.
 1. The designation of one or more key_locations that can be used to obtain the public key of the signer. The value of a key_location designator SHALL be sufficient to obtain the public key by sending an HTTP GET request to the location (URL) value of the key_location.
-1. An optional value of the key_owner as the identity of the signer of the document if the submitter is not the signer.  
+1. An optional value of the key_owner as the identity of the signer of the document if the submitter is not the signer.
 2. The value of signing_method SHALL be “LR-PGP.1.0”.
 
 
@@ -933,11 +933,11 @@ Any node or data consumer MAY validate a signature to determine if the signing p
 
 
 To validate the signature:
-1. Obtain the public key for the signer of the document.  
-1. Iterate through the list of  key_locations in the order provided until you find an acceptable, usable public key. 
+1. Obtain the public key for the signer of the document.
+1. Iterate through the list of  key_locations in the order provided until you find an acceptable, usable public key.
 1. Perform an HTTP GET on the location to get a document containing the public key.
 2. Examine the returned document to obtain the public key. (NB: The returned document may include more than the key or the key may be embedded in the document.  How to extract the key will depend on the type of certificate [e.g., doing a grep of the file for an ASCII-armored OpenPGP key].  The type of certificate is goverened by the policies of the network and is not part of this specification.)
-1. Create a canonical document to verify.  
+1. Create a canonical document to verify.
 1. Follow the exact procedure that was used to produce the hash of the document that was signed, e.g., eliminate fields, transform fields, encode, hash.
 1. Verify the signature value using the obtained public key.
 
@@ -951,7 +951,7 @@ A service MAY require authentication to access the service.  The service SHALL d
 
 The following authentication methods MAY be supported:
 1. None (none) -- the service is available without any authentication.  If this authentication method is specified, other methods SHALL NOT be specified.
-2. Basic access authentication (basicauth) -- the service uses HTTP basic-auth for authentication.  User identity and password credentials are included in the HTTP request.  NB:  A network node connectivity document includes the URL of the source and destination nodes used in content distribution, and a service description includes the URL of the service end point.  For security, the URLs in these documents SHOULD NOT include credentials.  
+2. Basic access authentication (basicauth) -- the service uses HTTP basic-auth for authentication.  User identity and password credentials are included in the HTTP request.  NB:  A network node connectivity document includes the URL of the source and destination nodes used in content distribution, and a service description includes the URL of the service end point.  For security, the URLs in these documents SHOULD NOT include credentials.
 3. OAUTH (oauth) -- the service is available through two-legged OAUTH.
 4. Secure Shell Protocol (SSH) -- the service is available through an SSH connection with SSH authentication.
 NB:  The list of authentication methods MAY be extended by a service.
@@ -959,7 +959,7 @@ NB:  The list of authentication methods MAY be extended by a service.
 
 Storage, processing and distribution of authentication credentials and establishing and provisioning OAUTH or SSH connections is out of scope for this specification.  A deployment of the LR SHALL specify how to provision authentication.
 Authorization
-A service MAY require authorization to access the service.  The service SHALL declare the authorization methods it supports.  
+A service MAY require authorization to access the service.  The service SHALL declare the authorization methods it supports.
 
 
 Currently, only one authorization method is supported: a service MAY require an access key be included in the service request.  A service that requires an access key specifies that the value of the service_key element of the service_auth element of the service description model is TRUE.
@@ -983,9 +983,9 @@ Sevices may be accessed on specific TCP/IP ports.  The service_endpoint element 
 
 Additional information on authorization and authentication may be provided in a future version or draft of the specification.
 Trust
-The section on security and information assurance will be provided in a future version or draft of the specification. 
+The section on security and information assurance will be provided in a future version or draft of the specification.
 Security and Information Assurance
-The section on security and information assurance will be provided in a future version or draft of the specification. 
+The section on security and information assurance will be provided in a future version or draft of the specification.
 
 
 All services SHOULD maintain a secure log of all service actions.  Details of logging requirements will be provided in a future version or draft of the specification.
@@ -993,7 +993,7 @@ Services and APIs
 The services and their APIs provide the functionality that edge node producer and consumer agents use to push resource data into the distribution network and to discover and pull resource data from the network.  They also define how to distribute the resource data throughout a network and how to manage and observe resource distribution network behavior.
 
 
-The defined list of services follows.  Any non gateway node MAY provide any of these services.  A node MAY provide additional services not specified herein. 
+The defined list of services follows.  Any non gateway node MAY provide any of these services.  A node MAY provide additional services not specified herein.
 
 
 NB:  There is no mechanism to reserve names for APIs, tag them as authoritative (i.e., they are defined in this specification), etc.  A future version of the specification MAY extend the service definition to include tags (e.g., authoritative, experimental, third-party) and other validation or conformance information.
@@ -1025,18 +1025,18 @@ The resource data distribution service examines the network topology and verifie
 NB: There is no assumption that one type of document (node description or connection) is more authoritative.
 
 
-A task scheduler SHOULD trigger resource data distribution from a source node to all of its destination nodes according to the frequency specified by the sync_frequency in the node description document.  
+A task scheduler SHOULD trigger resource data distribution from a source node to all of its destination nodes according to the frequency specified by the sync_frequency in the node description document.
 
 
 The service provides three distinct functions:
-1. A service with an API at the source node which is used to trigger the resource data distribution.  
+1. A service with an API at the source node which is used to trigger the resource data distribution.
 2. A service at each destination node that processes the incoming resource data.
-3. A service and API at each destination node that is used to return descriptive information from the destination node to the source node to validate the connection.  
+3. A service and API at each destination node that is used to return descriptive information from the destination node to the source node to validate the connection.
 
 
 API: Data Distribution
 POST <node-service-endpoint-URL>/distribute
-        
+
 Arguments:
         None
 
@@ -1050,7 +1050,7 @@ Results Object:                                        // results summary and er
                  "OK":                boolean,                // T if successful
                  "error":                “string”                        // text describing error
                 }
-                
+
         Return Codes:
                 200        Successful
                 500        An error
@@ -1068,7 +1068,7 @@ GET the network community description document for the source node to obtain
         source.social_community
 GET the network node connectivity documents for the source node
                 IF > 1 connectivity document with active = T AND gateway_connection = T
-                        THEN ABORT 
+                        THEN ABORT
 // only one active gateway is allowed, faulty network description
                 FOR EACH node connectivity document
                         GET the network node description document for the destination node
@@ -1080,7 +1080,7 @@ GET the network community description document for the destination node
 to obtain
                         destination.social_community
 IF source.community_id <> destination.community_id
-     AND ((NOT source,social_community) 
+     AND ((NOT source,social_community)
 OR (NOT destination.social_community))
         THEN SKIP
 // cannot distribute across non social communities
@@ -1128,7 +1128,7 @@ NB:  An implementation SHALL maintain node_timestamp in a manner that does not t
 
 API: Destination Node Information
 GET <node-service-endpoint-URL>/destination
-        
+
 Arguments:
         None
 
@@ -1150,7 +1150,7 @@ Results Object:                                        // results summary and er
   "gateway_node":        boolean,        // destination node is a gateway node
   “social_community”:        boolean,        // is community a social community
                 }
-                
+
         Return Codes:
                 200        Successful
                 500        An error
@@ -1163,22 +1163,22 @@ network node description document containing the required output fields
 + network community description document containing the required output fields
         QUERY
 RETURN Results document
-        
+
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “distribute”,
-         "service_name":        “Resource Data Distribution”,                
+         "service_name":        “Resource Data Distribution”,
          "service_version":        “0.23.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
@@ -1192,7 +1192,7 @@ Publish services are used to push resource data into the network.  They are used
 3. Not signed
 4. Signature not valid
 5. Does not conform to the node’s ToS.
-6. Is larger than the node can store.  
+6. Is larger than the node can store.
 All resource data publishing services SHALL reject any document with a “do_not_distribute” key-value pair; this verification SHALL be performed before any other verification and SHALL short circuit all other verification.
 NB:  There is no defined mechanism to define the acceptable ToS for a node.  A node MAY advertise acceptable ToS in the node description document, but this MAY not be accurate.
 NB:  How a data publishing service decides if it accepts or rejects resource data that comes from an untrusted submitter, is not signed, signature cannot be validated, or that does not conform to the data publishing service’s ToS, is determined by the data publishing service’s policy and is not defined in this specification.
@@ -1201,7 +1201,7 @@ NB:  How a data publishing service decides that a document is too large is deter
 
 Future drafts or versions of this specification MAY define additional resource data publish services.
 Basic Publish Service
-The basic publish service pushes an instance of a resource data description document (or a set of documents) directly to a node in a resource distribution network.  It is the most basic, direct mechanism to publish resource data.  
+The basic publish service pushes an instance of a resource data description document (or a set of documents) directly to a node in a resource distribution network.  It is the most basic, direct mechanism to publish resource data.
 
 
 Each resource data description document in the supplied set is published independently. In addition to the overall service return indicating status,  there SHALL be one returned object per resource data description document, aligned 1:1 to the documents in the supplied resource data description document array, indicating status of publishing of the resource data description document.
@@ -1213,7 +1213,7 @@ Each resource data description document SHALL be published to the node’s resou
 The publication process provides values for specific elements in the resource data description document.
 
 
-If the resource data description document does not have an assigned identifier, the service SHALL assign one and return the value.  
+If the resource data description document does not have an assigned identifier, the service SHALL assign one and return the value.
 
 
 If the resource data description document has an identifier and a document with the same identifier exists in the resource data description document collection, the new document SHALL be an update, replacing the existing document in total.  If the resource data description document is being updated, the value of an immutable element SHALL NOT be changed.
@@ -1233,13 +1233,13 @@ NB:  The process currently does not handle attachments.
 
 API
 POST <node-service-endpoint-URL>/publish
-        
+
 Arguments:
         None
 
 
 Request Object:                                        // resource data to be published
-        {“documents”: 
+        {“documents”:
  [                                        // array of
           {resource_data_description}                // resource data description documents
         ]}
@@ -1267,7 +1267,7 @@ Return Codes:
 
 Basic Publish
         // Publish each resource data description document in the supplied list
-// Perform Validation        
+// Perform Validation
  VALIDATE  the resource data description document does not contain a do_not_distribute key.
                 IF do_not_distribute key is present
                         THEN         // create the global error object
@@ -1275,7 +1275,7 @@ OK := F
                                 error := “cannot publish” // an appropriate error for global condition
                                 EXIT
         VALIDATE the publish request // apply appropriate business rules
-                IF there is an overall error 
+                IF there is an overall error
                         THEN         // create the global error object
 OK := F
                                 error := “error msg” // an appropriate error for global condition
@@ -1284,10 +1284,10 @@ OK := F
         FOR EACH resource data description document
                 VALIDATE the resource data description document // all syntactical and semantic rules
                 IF there is an error
-                        THEN // create an error object array element object for the individual document        
+                        THEN // create an error object array element object for the individual document
 OK := F
                                 error := “error msg” // an appropriate error for the document
-                                doc_ID := supplied doc_ID 
+                                doc_ID := supplied doc_ID
 SKIP
 IF the network node filter description document exists and contains active filters
 THEN PERFORM filtering and store only documents that pass the filter
@@ -1295,84 +1295,84 @@ IF the resource data description document does NOT pass the filter
         THEN // indicate filtering was applied
 OK := F
                                         error := “rejected by filter” // an appropriate filtering message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
                 IF the service applies ToS checks
 AND the resource data description document TOS is unacceptable
                         THEN // indicate ToS was rejected
 OK := F
                                         error := “rejected by ToS” // an appropriate message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
                 IF the service does not accept anonymous submissions
 AND the resource data description document has submitted_type==”anonymous”
                         THEN // indicate submitted type was rejected
 OK := F
                                         error := “anon submission rejected” // an appropriate message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
         IF the service validates the submitter
 AND the resource data description document submitter cannot be verified or trusted
                 THEN // indicate submitter was rejected
 OK := F
                                         error := “rejected submitter” // an appropriate message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
 IF the service requires a signature
 AND the resource data description document signature not present
                 THEN // indicate signature was rejected
 OK := F
                                         error := “no signature” // an appropriate message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
  IF the service validates the signature
 AND the resource data description document signature cannot be verified
                 THEN // indicate signature was rejected
 OK := F
                                         error := “rejected signature” // an appropriate message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
  IF the node limits the size of document that can be stored
 AND the resource data description document is too large
                 THEN // indicate document too large
 OK := F
                                         error := “too large” // an appropriate message
-                                        doc_ID := supplied doc_ID 
+                                        doc_ID := supplied doc_ID
 SKIP
 IF resource data description document did not have a supplied doc_ID
                         THEN generate a new unique doc_ID
                 PUBLISH the resource data description document to the node
-by the owner of the node 
+by the owner of the node
          to the node’s resource data description document database
         SET publish_node, update_timestamp, node_timestamp, create_timestamp
                 IF there is a publishing error
-                        THEN // create an error object array element object for the individual document        
+                        THEN // create an error object array element object for the individual document
 OK := F
                                 error := “publish failed” // an appropriate error for the publish failure
-                                doc_ID := supplied doc_ID 
+                                doc_ID := supplied doc_ID
 SKIP
                 // create a return object array element object for the individual document
                 OK := T
                 doc_ID // supplied or generated doc_ID
-        
+
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “publish”,
-         "service_name":        “Basic Publish”,                
+         "service_name":        “Basic Publish”,
          "service_version":        “0.23.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
-          "service_data": 
+          "service_data":
   {
            “doc_limit”:                integer,                 // specify the maximum number of documents in a batch
            “msg_size_limit”:        integer                 // specify the maximum message size
@@ -1402,7 +1402,7 @@ Atom Pub Protocol Operation
 	Currently not supported.  May be added in a later version of the specification
 	Retrieving a Resource
 	Not supported -- provided via the Atom Pub Service
-	
+
 
 
 
@@ -1473,7 +1473,7 @@ SWORD: swordservice
                 THEN EMIT the collection elements
                         <collection
                                 href=”URL of the network node”>
-                         <atom:title>node_name or node_id from the network node 
+                         <atom:title>node_name or node_id from the network node
 description data model</atom:title>
                                      <accept>application/json</accept>
                                     <sword:mediation>true</sword:mediation>
@@ -1503,19 +1503,19 @@ SWORD: swordpub
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “publish”,
-         "service_name":        “SWORD APP Publish V1.3”,                
+         "service_name":        “SWORD APP Publish V1.3”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
           "service_data":
@@ -1524,7 +1524,7 @@ Service Description
            }
         }
 Basic Delete Service
-The basic delete service “deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.  
+The basic delete service “deletes” an instance of a resource data description document (or a set of documents) directly from a node in a resource distribution network.
 
 
 Each resource data description document identified in the supplied set is deleted independently. In addition to the overall service return indicating status,  there SHALL be one returned object per resource data description document, aligned 1:1 to the documents identified in the supplied resource data description document array, indicating deletion of the resource data description document.
@@ -1545,7 +1545,7 @@ NB:  The deletion process SHALL be consistent with the resource data persistence
 
 API
 POST <node-service-endpoint-URL>/delete
-        
+
 Arguments:
         None
 
@@ -1583,44 +1583,44 @@ Basic Delete
 FOR EACH resource data description document ID
 Put the resource data description document ID in the results object
 IF the document does not exist
-        THEN 
+        THEN
 OK := FALSE
 error := “document doesn’t exist”
 SKIP
                 IF the document has been deleted
-        THEN 
+        THEN
 OK := FALSE
 error := “document already deleted
-SKIP        
+SKIP
                 // otherwise delete
                 OK := TRUE
 CASE delete_action
         ignore:
 NO OP
-        mark: 
+        mark:
 set a flag on the document that it is deleted // ACTIVE := FALSE
-        delete: 
+        delete:
 perform a system-level delete // whatever “delete” means
-        purge:  
+        purge:
 perform a system-level delete // whatever “delete” means
 trigger system level purge // may run at some later time
 
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “delete”,
- "service_name":        “Basic Delete”,                
+ "service_name":        “Basic Delete”,
  "service_version":        “0.10.0”,
  "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
  "service_data":
@@ -1640,10 +1640,10 @@ Access services are used to pull resource data from the network.  They are used 
 
 NB: The services do not currently define a specific process to find or maintain all resource data description documents in a collation for a specific resource locator, i.e., for a unique resource identifier.  A future version of the specification MAY define additional resource data document types that maintain collation descriptions.
 Basic Obtain Service
-The basic obtain service pulls an instance of a resource data description document (or a set of documents) directly from a node on a resource distribution network.  It is the most basic, direct mechanism to access resource data. 
+The basic obtain service pulls an instance of a resource data description document (or a set of documents) directly from a node on a resource distribution network.  It is the most basic, direct mechanism to access resource data.
 
 
-For the list of supplied request IDs, the service SHALL return the corresponding resource data description documents from the node’s resource data description document database where they exist.  Optionally, the service MAY return just the document IDs and not full documents.  The results SHALL be aligned 1:1 with the IDs in the request.  
+For the list of supplied request IDs, the service SHALL return the corresponding resource data description documents from the node’s resource data description document database where they exist.  Optionally, the service MAY return just the document IDs and not full documents.  The results SHALL be aligned 1:1 with the IDs in the request.
 
 
 If the request ID is not provided, the service MAY return all or a service-determined subset of the resource data description documents.  The service description SHALL specify how the service implementation responds to an ALL request (returning ALL, none, or a limited subset).  When returning a subset of the documents, the service SHOULD return the documents with the most recent node_timestamp values.
@@ -1668,7 +1668,7 @@ The service description SHALL specify if the service implementation supports flo
 In response to the next call to the service from the same client that includes the resumption token, the service MAY return another portion of the results set, including a new resumption token if the response is still not the complete set of results.  When the results set is complete, the service SHALL return a resumption token with a value of NULL.  The service SHALL NOT return a resumption token if it does not support flow control or if the entire results set is returned on the first call.
 
 
-When flow control is supported, the next request MAY include the resumption token.  If the request includes a resumption token, the service SHOULD attempt to return the next portion of the results.  When the client begins making requests with a resumption token, only the most recent token MAY be used in the call.  Any client call without a resumption token invalidates the current resumption token.  Including a resumption token on the first call SHALL return a flow control error.  
+When flow control is supported, the next request MAY include the resumption token.  If the request includes a resumption token, the service SHOULD attempt to return the next portion of the results.  When the client begins making requests with a resumption token, only the most recent token MAY be used in the call.  Any client call without a resumption token invalidates the current resumption token.  Including a resumption token on the first call SHALL return a flow control error.
 
 
 The service SHALL determine how long to maintain state to support flow control and how many clients it can support simultaneously.  If the service cannot return the next portion of the results, it SHALL return a flow control error.
@@ -1696,7 +1696,7 @@ ToDo: Extend to produce (log)  a usage record of the obtain.
 
 API
 POST <node-service-endpoint-URL>/obtain
-        
+
 Arguments:
         None
 
@@ -1706,8 +1706,8 @@ Request Object:                                        // list of resource data 
  “by_doc_ID”:                boolean,        // request is for specific document for each ID
                                         // request_ID is a doc_ID
                                         // optional, default FALSE,
-  
-“by_resource_ID”:        boolean        ,        // request is for a collation of documents 
+
+“by_resource_ID”:        boolean        ,        // request is for a collation of documents
 // for each ID
                                         // optional, default TRUE
                                         // request_ID is a resource_locator
@@ -1715,7 +1715,7 @@ Request Object:                                        // list of resource data 
                                         // optional, default FALSE
 “resumption_token”:        “string”,                // flow control resumption token
                                         // optional; provided as a result on prior calls
-“request_IDs”: 
+“request_IDs”:
 [                                        // array of
  “request_ID”:        ID                // resource ID or
 // resource data description document ID
@@ -1726,15 +1726,15 @@ Request Object:                                        // list of resource data 
 
 
 Results Object:                                        // list of resource data description documents
-                {“documents”: 
+                {“documents”:
   [
-                  {                                
+                  {
    “doc_ID”:        ID,                        // document ID
     “document”:
             [{resource_data_description}]        // resource data description documents
                                                 // array
                                                 // present only if ID is valid, otherwise NULL
-           }        
+           }
                   ],
 “resumption_token”:        “string”                // flow control resumption token
                                         // present only if flow control is supported
@@ -1758,8 +1758,8 @@ EXIT
                 THEN
                         error // flow control error
                         EXIT
-        IF resumption_token present AND 
-    (resumption_token DOES NOT MATCH saved state for this this client 
+        IF resumption_token present AND
+    (resumption_token DOES NOT MATCH saved state for this this client
         // test must recognize that client did not get last resuts and is re-requesting last set
         // or client may be requesting next set
         OR
@@ -1770,10 +1770,10 @@ EXIT
 
 
 IF by_doc_ID
-        IF request_ID not specified 
+        IF request_ID not specified
                 THEN set doc_IDs in request_ID array
 //  based on the values in the service description (none, ALL, subset)
-FOR EACH request_ID 
+FOR EACH request_ID
         IF flow_control AND resumption_token is present
                 THEN SKIP if entry is prior to resumption point
         IF results object exceeds flow control or results size limits
@@ -1781,7 +1781,7 @@ FOR EACH request_ID
                 Put the request_ID in the results object
                 IF ids_only THEN SKIP
                 GET the corresponding resource data description document
-IF Successful 
+IF Successful
                      THEN PUT the resource data description document in the results object
                         //  all stored key-value pairs or only those defined in the spec
                         // as defined in the service description
@@ -1796,10 +1796,10 @@ IF Loop exited because of flow control or results size limits
 
 
 IF by_resource_ID
-IF request_ID not specified 
+IF request_ID not specified
 THEN set unique_resource_locations in  request_ID array
 //  based on the values in the service description (none, ALL, subset)
-FOR EACH request_ID 
+FOR EACH request_ID
         IF flow_control AND resumption_token is present
                 THEN SKIP if entry is prior to resumption point
         IF results object exceeds flow control or results size limits
@@ -1807,8 +1807,8 @@ FOR EACH request_ID
         IF NOT ids_only
 THEN FIND the collation of resource data description documents
 WHERE resource_locator MATCHES supplied request_ID
-IF Successful               
-PUT the request ID in the results object                
+IF Successful
+PUT the request ID in the results object
 IF ids_only THEN SKIP
 FOR EACH resource data description document
                                 GET the corresponding resource data description document
@@ -1827,19 +1827,19 @@ IF Loop exited because of flow control or results size limits
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Basic Obtain”,                
+         "service_name":        “Basic Obtain”,
          "service_version":        “0.21.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
  "service_data":
@@ -1907,7 +1907,7 @@ Resouce ID/Resource Locator
 	<nodelURL>harvest/listmetadataformats
 	ListSets Verb
 	<nodelURL>harvest/listsets
-	
+
 
 Each of the six harvest verbs are specified separately.  The Service Description document SHALL apply to the entire API.
 
@@ -1988,13 +1988,13 @@ Results Object:
                    “record”:                                // record container
                      [{
      “header”:                                // header info
-      {                                
+      {
        “identifier”:                ID,                // resource data description document ID
          “datestamp”:        “string”,                // resource data timestamp, date/time
                                         // requried, granularity of 1 second
        “status”:                “string”                // fixed vocabulary [“active”, “deleted”]                                                                // optional, “active” if not present
       },
-             “resource_data”:        
+             “resource_data”:
       {resource_data_description}                // resource data description documents
     }]
   }
@@ -2107,7 +2107,7 @@ Results Object:
 // present only if ID is valid, otherwise NULL
    {
     “header”:
-    {                                
+    {
      “identifier”:                ID,                // resource data description document ID
      “datestamp”:                “string”,                // resource data timestamp, date/time
                                         // required, granularity of 1 second
@@ -2137,7 +2137,7 @@ IF granularity of from time <> granularity of until time // return error
             THEN         OK := FALSE
                   error := ‘badArgument”
                    EXIT
-IF granularity of from time < service granularity 
+IF granularity of from time < service granularity
 // request is for seconds, service instance only supports days (not seconds)
             THEN         OK := FALSE
                   error := ‘badArgument”
@@ -2224,7 +2224,7 @@ Results Object:
                  “listidentifiers”:                                // array of headers
                   [
    “header”:
-   {                                
+   {
     “identifier”:                ID,                // resource data description document ID
     “datestamp”:                “string”,                // resource data timestamp, date/time
                                         // requried, granularity of 1 second
@@ -2252,7 +2252,7 @@ IF granularity of from time <> granularity of until time // return error
             THEN         OK := FALSE
                   error := ‘badArgument”
                    EXIT
-IF  granularity of from time < service granularity 
+IF  granularity of from time < service granularity
 // request is for seconds, service instance only supports days (not seconds)
             THEN         OK := FALSE
                   error := ‘badArgument”
@@ -2262,7 +2262,7 @@ IF until not specified THEN unti := latest timestamp
         FOR EACH resource data description document
 IF from <= node_ timestamp from the resource data description document
         <= until // timestamp inclusive in [from:until] range
-           THEN 
+           THEN
 // return header for resource data
 datestamp := node_timestamp from the resource data description
 identifier := resource data description document ID
@@ -2286,12 +2286,12 @@ A network node SHALL maintain all of the data necessary to return the required k
 API
 GET <node-service-endpoint-URL>/harvest/identify
 POST <node-service-endpoint-URL>/harvest/identify
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -2334,13 +2334,13 @@ node_id := node_id from the network node description
 repositoryName := node_name from the network node description
 baseURL := <node-service-endpoint-URL> // URL of the network node
 protocolVersion := “2.0” // the OAI-PMH version
-service_version := service_version from the Harvest service description 
-earliestDatestamp := timestamp 
+service_version := service_version from the Harvest service description
+earliestDatestamp := timestamp
 // the oldest guaranteed publish/update or delete timestamp
 // time/date encoding with service-specified granularity
 deletedRecord := deleted_data_policy from the node_policy from the
  network node description
-granularity := granularity from the Harvest service description 
+granularity := granularity from the Harvest service description
 adminEmail := node_admin_identity from the network node description
 TRANSFORM results to specified CONTENT-TYPE
 List Metadata Formats
@@ -2353,12 +2353,12 @@ The services does not support the retrieval of the metadata format for an indivi
 API
 GET <node-service-endpoint-URL>/harvest/listmetadataformats
 POST <node-service-endpoint-URL>/harvest/listmetadataformats
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -2371,7 +2371,7 @@ Results Object:
  “request”:                                // the API request
  {
   “verb”:                        “listmetadataformats”,        // the literal “listmetadataformats”
-  “HTTP_request”:        “string”                 // the HTTP request as a string 
+  “HTTP_request”:        “string”                 // the HTTP request as a string
   },
  “listmetadatadormats”:                        // array of supported metadata formats
   [
@@ -2393,7 +2393,7 @@ request := // the API request
  {“verb”:                        “listmetadataformats”,        // the literal “listmetadataformats”
   “HTTP_request”:        “string”                        // the HTTP request as a string
   }
-metadataFormat := metadataformat structure from the Harvest service description 
+metadataFormat := metadataformat structure from the Harvest service description
         // the key-value pair [{“metadataPrefix”: “LR_JSON_0.10.0”}]
 TRANSFORM results to specified CONTENT-TYPE
 
@@ -2405,12 +2405,12 @@ The List Sets verb returns the list of sets used to organize resource data descr
 API
 GET <node-service-endpoint-URL>/harvest/listsets
 POST <node-service-endpoint-URL>/harvest/listsets
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -2443,19 +2443,19 @@ TRANSFORM results to specified CONTENT-TYPE
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Basic Harvest”,                
+         "service_name":        “Basic Harvest”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
          “service_data”:
@@ -2483,14 +2483,14 @@ Service Description
          }
         }
 OAI-PMH Harvest Service
-The OAI-PMH harvest services can be used by an external agent to connect to a node to harvest (pull) the resource data (e.g., the metadata or paradata) contained in the resource data description documents stored at the node.  The service defines how to harvest a variety of metadata formats (DC, LOM), paradata formats, etc., along with full resource data description documents stored at the node.  Unless specified, the service SHALL support OAI-PMH V2.0.  Harvest is done by resource data description document ID or by resource ID, i.e., by resource locator.  Set-based harvesting is not currently supported.  Flow control is not currently supported.  
+The OAI-PMH harvest services can be used by an external agent to connect to a node to harvest (pull) the resource data (e.g., the metadata or paradata) contained in the resource data description documents stored at the node.  The service defines how to harvest a variety of metadata formats (DC, LOM), paradata formats, etc., along with full resource data description documents stored at the node.  Unless specified, the service SHALL support OAI-PMH V2.0.  Harvest is done by resource data description document ID or by resource ID, i.e., by resource locator.  Set-based harvesting is not currently supported.  Flow control is not currently supported.
 
 
 OAI-PMH Extension:  IDs MAY be:sulimans
-sent in basic harvest service.  A transformation would be applied to the results to convert them from JSON to XML.  
+sent in basic harvest service.  A transformation would be applied to the results to convert them from JSON to XML.
 
 
-To support extensions, the OAI-PMH XSD has been extended.  A copy of the schema is currently available at: http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd
+To support extensions, the OAI-PMH XSD has been extended.  A copy of the schema is currently available at: https://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd
 This schema:
 1. adds the ID arguments for GetRecord
 2. supports the return of a multiple records from GetRecord
@@ -2529,7 +2529,7 @@ Resource ID/Resource Locator
 	<nodelURL>OAI-PMH?verb=ListMetadataFormats
 	ListSets Verb
 	<nodelURL>OAI-PMH?verb=ListSets
-	
+
 
 Each of the six harvest verbs are specified separately.  The Service Description document SHALL apply to the entire API.
 
@@ -2540,7 +2540,7 @@ NB:  All times are UTC 0.
 NB:  As specified in OAI-PMH, the granularity in response data SHALL be seconds.
 
 
-OAI-PMH Extension:  If the requested dissemination format in metadataPrefix matches the JSON   metadataPrefix in the servcie description (e.g., “LR_JSON_0.10.0”), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.  
+OAI-PMH Extension:  If the requested dissemination format in metadataPrefix matches the JSON   metadataPrefix in the servcie description (e.g., “LR_JSON_0.10.0”), the service SHALL behave as the basic harvest service, i.e., it returns the complete resource data description document as JSON.
 
 
 The internal JSON storage of a resource data description document MAY include additional key-value pairs defined in this specification.  The service MAY return all stored key-value pairs, or only the key-value pairs defined in this specification for the resource data description document.  The service document SHALL indicate if the returned documents are limited to the specification-defined key-value pairs only or if all stored key-value pairs are returned.
@@ -2600,7 +2600,7 @@ by_resource_ID         = boolean        ,        // request is for a collation o
 
 
         Results XML
-                Well formed XML instance document that validates according to the Learning Registry 
+                Well formed XML instance document that validates according to the Learning Registry
 extended OAI-PMH XML XSD
                 Contains:
                         <responseDate />                 // required XML element
@@ -2608,14 +2608,14 @@ extended OAI-PMH XML XSD
                                                         // includes extensions
                         <error />                        // XML element if errors
                         <GetRecord />                        // XML element with results if no errors
-        
+
 OAI-PMH: GetRecord
 // Return the resource data from the resource data description document for the ID in the request
 Build XML results document
 EMIT OAI-PMH namespace declarations
         EMIT the required + extension elements
 <responseDate>time of report<responseDate>
-<request 
+<request
         verb=”GetRecord”                        // the literal “GetRecord”
 identifier=<ID>                                // request ID
 metadataPrefix=<metadataformat>        // requested metadata format
@@ -2675,7 +2675,7 @@ THEN status =“deleted”
 </header>
 EMIT <metadata>
 <metadata>
-        CASE 
+        CASE
 payload_placement = “inline”
                         EMIT resource data in XML
                 payload_placement = “attachment”
@@ -2691,14 +2691,14 @@ payload_placement = “inline”
 </record>
 </GetRecord>
 List Records
-The List Records verb returns the resource data description documents for the specified resource data document IDs within a specified time/date range.  Set-based harvesting is not currently supported.  
+The List Records verb returns the resource data description documents for the specified resource data document IDs within a specified time/date range.  Set-based harvesting is not currently supported.
 The List Records verb SHALL support the return of any resource_data that matches the requested dissemination format that is associated with the specified resource data document, i.e., any payload where the payload_schema matches the requested dissemination format.  An implementation MAY support the translation of the stored resource_data to the requested dissemination format.  An implementation MAY support equivalence matching for the requested dissemination format, e.g., the available format X is recognized to be the same as the requested format Y.  An implementation MAY support the automated generation of resource_data in the requested dissemination format.
 
 
 The List Records verb SHALL support the return of resource_data independent of where it is stored in the payload, i.e., it returns any inline, attached or referenced resource data in the  payload of the specified resource data description document.
 
 
-NB: The combination of processing deleted records and records that do not have the specified metadata dissemination is not clear in the OAI-PMH specification.   Since not all resource data description documents support all formats, the service only returns deleted status for documents that match the requested dissemination format.  
+NB: The combination of processing deleted records and records that do not have the specified metadata dissemination is not clear in the OAI-PMH specification.   Since not all resource data description documents support all formats, the service only returns deleted status for documents that match the requested dissemination format.
 
 
 NB:  A test to determine if no records match the requested metadata dissemination format is not included. The resulting error code of cannotDisseminateFormat  does not occur.  If  no records match the requested metadata dissemination format, the error code SHALL be noRecordsMatch.
@@ -2738,7 +2738,7 @@ Post Payload: verb=ListRecords
 
 
         Results XML
-                Well formed XML instance document that validates according to the Learning Registry 
+                Well formed XML instance document that validates according to the Learning Registry
 extended OAI-PMH XML XSD
                 Contains:
                         <responseDate />                 // required XML element
@@ -2753,7 +2753,7 @@ Build XML results document
 EMIT OAI-PMH namespace declarations
 EMIT the required elements
 <responseDate>time of report<responseDate>
-<request 
+<request
         verb=”ListRecords”                         // the literal “ListRecords”
 metadataPrefix=<metadataformat>        // requested metadata format
 from=<date>                                // start of harvest time/date range
@@ -2799,7 +2799,7 @@ THEN status =“deleted”
 </header>
 EMIT <metadata>
 <metadata>
-        CASE 
+        CASE
 payload_placement = “inline”
                         EMIT resource data  in XML
                 payload_placement = “attachment”
@@ -2871,7 +2871,7 @@ Build XML results document
 EMIT OAI-PMH namespace declarations
 EMIT the required elements
 <responseDate>time of report<responseDate>
-<request 
+<request
         verb=”ListIdentifiers”                        // the literal “ListIdentifiers”
 metadataPrefix=<metadataformat>        // requested metadata format
 from=<date>                                // start of harvest time/date range
@@ -2957,7 +2957,7 @@ Build XML results document
 EMIT OAI-PMH namespace declarations
 EMIT the required elements
 <responseDate>time of report<responseDate>
-<request 
+<request
         verb=”Identify”                        // the literal “Identify”
 >
 HTTP_request                        // the HTTP request as a string
@@ -2978,7 +2978,7 @@ List Metadata Formats
 The List Metadata Formats verb returns the list of metadata formats available for harvests.  The service SHALL return all of the elements specified in the OAI-PMH specification, using the specified XML schema.  The service SHALL NOT return additional XML elements.
 
 
-The metadata format is a triple of three XML elements: <metadataPrefix>, <schema> and  <metadataNameSpace>.  The service determines the available formats from the payload_schema key-value pair in the resource data description documents.  Each value in the payload_schema array SHALL be considered as a separate dissemination format, i.e., a separate value for <metadataPrefix>.  The value for <schema> SHALL be the value of corresponding  payload_schema_locator.  
+The metadata format is a triple of three XML elements: <metadataPrefix>, <schema> and  <metadataNameSpace>.  The service determines the available formats from the payload_schema key-value pair in the resource data description documents.  Each value in the payload_schema array SHALL be considered as a separate dissemination format, i.e., a separate value for <metadataPrefix>.  The value for <schema> SHALL be the value of corresponding  payload_schema_locator.
 
 
 Determining the value of <metadataNameSpace> is optional.  The service does not define how to determine the value for <metadataNameSpace>.
@@ -3005,7 +3005,7 @@ The service MAY order the resulting list of formats by the occurrences, most com
 The service SHOULD NOT return values that do not satisfy the OAI-PMH requirement that <metadataPrefix> be a string of “any valid URI unreserved characters”.
 
 
-The service SHALL include the LR JSON resource data description document format 
+The service SHALL include the LR JSON resource data description document format
 metadataPrefix specified in the metadataformats structure in the service description (e.g., “LR_JSON_0.10.0”) in the results list of formats.
 
 
@@ -3037,7 +3037,7 @@ by_resource_ID         = boolean        ,        // request is for a collation o
 
 
         Results XML
-                Well formed XML instance document that validates according to the Learning Registry 
+                Well formed XML instance document that validates according to the Learning Registry
 extended OAI-PMH XML XSD
                 Contains:
                         <responseDate />                 // required XML element
@@ -3051,7 +3051,7 @@ OAI-PMH: List Metadata Formats
         // Results View
         Define a view of the resource data description documents
                 IF identifier is provided
-THEN 
+THEN
 IF by_doc_ID
 THEN use the resource data description document where                                         doc_ID = <identifier>
 IF by_resource_ID
@@ -3083,13 +3083,13 @@ IF by_doc_ID AND by_resource_ID
 <error code=”badArgument” />                         // only one can be true
 Complete XML
 EXIT
-IF <identifier> provided AND 
+IF <identifier> provided AND
 by_doc_ID AND
 no resource data description document with doc_ID  = <identifier>
 <error code=”idDoesNotExist” />
 Complete XML
 EXIT
-IF <identifier> provided AND 
+IF <identifier> provided AND
 by_resoruce_ID AND
 no resource data description document with resource_locator  = <identifier>
 <error code=”idDoesNotExist” />
@@ -3109,7 +3109,7 @@ EXIT
 </metadataFormat>
 // Add Learning Registry Native JSON format
                 <metadataFormat>
-                        <metadataPrefix>metadataformat structure from the 
+                        <metadataPrefix>metadataformat structure from the
 Harvest service description</metadataPrefix>
         // the value LR_JSON_0.10.0
 
@@ -3155,7 +3155,7 @@ Build XML results document
 EMIT OAI-PMH namespace declarations
 EMIT the required elements
 <responseDate>time of report<responseDate>
-<request 
+<request
         verb=”ListSets”                         // the literal “ListSets”
 >
 HTTP_request                        // the HTTP request as a string
@@ -3166,19 +3166,19 @@ HTTP_request                        // the HTTP request as a string
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “OAI-PMH Harvest”,                
+         "service_name":        “OAI-PMH Harvest”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>/OAI-PMH”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
          "service_data":
@@ -3193,34 +3193,34 @@ Service Description
         }
 
 
-NB: A copy of the schema is currently available at: http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd
+NB: A copy of the schema is currently available at: https://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd
 There is no guarantee of persistence of this copy of the XSD.  A deployed service instance SHOULD use an existing copy of the XSD or maintain a private copy of the XSD according to the node’s data persistence policies.
 Basic Query Service
-This service will be deprecated and removed in V 0.24.0. 
+This service will be deprecated and removed in V 0.24.0.
 Basic Query
         // pseudo code in a future draft of the specification
 
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Basic Query”,                
+         "service_name":        “Basic Query”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
 SRU Service
-This service will be deprecated and removed in V 0.24.0. 
+This service will be deprecated and removed in V 0.24.0.
 
 
 API
@@ -3233,24 +3233,24 @@ SRU
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “SRU”,                
+         "service_name":        “SRU”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
 SiteMap Service
-This service will be deprecated and removed in V 0.24.0. 
+This service will be deprecated and removed in V 0.24.0.
 
 
 API
@@ -3263,24 +3263,24 @@ SiteMap
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “SiteMap”,                
+         "service_name":        “SiteMap”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
           ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
 Atom Pub Service
-This service will be deprecated and removed in V 0.24.0. 
+This service will be deprecated and removed in V 0.24.0.
 
 
 API
@@ -3293,19 +3293,19 @@ Atom Pub
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Atom Pub”,                
+         "service_name":        “Atom Pub”,
          "service_version":        “0.10.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
@@ -3327,12 +3327,12 @@ A network node SHALL maintain all of the data necessary to return the required k
 
 API
 GET <node-service-endpoint-URL>/status
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -3350,7 +3350,7 @@ Results Object:
                                                 // including non distributable documents
          “install_time”:                “string”,                // time/date of node install
  “start_time”:                “string”,                // server restart time/date
-                                        // last reboot 
+                                        // last reboot
  “last_in_sync”:                “string”,                // time of last inbound sync
                                         // omit if node has not sync’ed
  “in_sync_node”:        “string”,                // id of the node from the last inbound sync
@@ -3366,8 +3366,8 @@ Results Object:
 
 Network Node Status
         // Return the operational status of a network node
-        DEFINE VIEW on 
-network node description document containing the required fields 
+        DEFINE VIEW on
+network node description document containing the required fields
 + network node operational data containing the required fields
         QUERY
         TRANSFORM results to specified CONTENT-TYPE
@@ -3375,19 +3375,19 @@ network node description document containing the required fields
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Network Node Status”,                
+         "service_name":        “Network Node Status”,
          "service_version":        “0.23.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
@@ -3397,12 +3397,12 @@ The network node description service is used to return descriptive information a
 
 API
 GET <node-service-endpoint-URL>/description
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -3427,7 +3427,7 @@ Results Object:
  ”community_key”:        “string”,                // community public key
  "policy_id":                “string”,                // id of the policy description
                  "policy_version":        “string”,                // version identifier for the policy
- "gateway_node":        boolean,        // node is a gateway node                        
+ "gateway_node":        boolean,        // node is a gateway node
  "open_connect_source":boolean,        // node is willing to be a source
  "open_connect_dest":        boolean,        // node is willing to be a destination
  “social_community”:        boolean        ,        // is community is a social community
@@ -3435,10 +3435,10 @@ Results Object:
                  {
   "sync_frequency":        integer,                // target time between synchronizations
                   “deleted_data_policy”:        “string”,                // policy value
-                  “TTL”:                        integer,                // minimum time to live for resource data 
-                  ”accepted_version”:        [‘string”],        // list of resource data description document 
+                  “TTL”:                        integer,                // minimum time to live for resource data
+                  ”accepted_version”:        [‘string”],        // list of resource data description document
 // versions that the node can process
-                  “accepted_TOS”:        [“string”],        // list of ToS that the node will accept        
+                  “accepted_TOS”:        [“string”],        // list of ToS that the node will accept
                   “accepts_anon”:        boolean,        // node takes anonymous submissions
   “accepts_unsigned”:        boolean,        // node takes unsigned submissions
   “validates_signature”:        boolean        ,        // node will validate signatures
@@ -3462,8 +3462,8 @@ Results Object:
 
 Network Node Description
         // Return the description of a network node
-        DEFINE VIEW on 
-network node description document containing the required output fields 
+        DEFINE VIEW on
+network node description document containing the required output fields
 + resource distribution network description document containing the required output fields
 + resource distribution network policy document containing the required output fields
 + network community description document containing the required output fields
@@ -3474,24 +3474,24 @@ network node description document containing the required output fields
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Network Node Description”,                
+         "service_name":        “Network Node Description”,
          "service_version":        “0.21.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
 Network Node Services Service
-The network node services service is used to return the list of services available at a network node.  For each service at a node, the service SHALL return all of the key-value pairs listed that have a valid value.  The service MAY return additional key-value pairs for a service.  
+The network node services service is used to return the list of services available at a network node.  For each service at a node, the service SHALL return all of the key-value pairs listed that have a valid value.  The service MAY return additional key-value pairs for a service.
 
 
 The service SHOULD group and sort the results in some logical form, e.g., by ACTIVE, by TYPE.
@@ -3499,12 +3499,12 @@ The service SHOULD group and sort the results in some logical form, e.g., by ACT
 
 API
 GET <node-service-endpoint-URL>/services
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -3537,8 +3537,8 @@ Results Object:
 
 Network Node Services
         // Return the description of network node services
-        DEFINE VIEW on 
-network node description document containing the required output fields 
+        DEFINE VIEW on
+network node description document containing the required output fields
 + ALL network node service description documents containing the required output fields
 GROUPED and ORDERED on service attributes.
         QUERY
@@ -3547,19 +3547,19 @@ GROUPED and ORDERED on service attributes.
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Network Node Services”,                
+         "service_name":        “Network Node Services”,
          "service_version":        “0.21.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
@@ -3569,12 +3569,12 @@ The resource distribution network policies service is used to return information
 
 API
 GET <node-service-endpoint-URL>/policy
-        
+
 Arguments:
         None
 
 
-Request Object:        
+Request Object:
         None
 
 
@@ -3595,8 +3595,8 @@ Results Object:
 
 Resource Distribution Network Policy
         // Return the description of network policies
-        DEFINE VIEW on 
-network node description document containing the required output fields 
+        DEFINE VIEW on
+network node description document containing the required output fields
 + resource distribution network description document containing the required output fields
 + resource distribution network policy document containing the required output fields
         QUERY
@@ -3605,19 +3605,19 @@ network node description document containing the required output fields
 
 Service Description
         {
- "doc_type":                “service_description”,        
+ "doc_type":                “service_description”,
  "doc_version":                “0.20.0”,
  "doc_scope":                “node”,
  "active":                true,
- "service_id":                “<uniqueid>”,                
+ "service_id":                “<uniqueid>”,
  "service_type":                “access”,
-         "service_name":        “Resource Distribution Network Policy”,                
+         "service_name":        “Resource Distribution Network Policy”,
          "service_version":        “0.21.0”,
          "service_endpoint":        “<node-service-endpoint-URL>”,
          ”service_auth”:                                // service authentication and authorization descriptions
          {
           "service_authz":        [“<authvalue>”],         // authz values for the service
-          “service_key”:                T/F,                // does service use an access key                        
+          “service_key”:                T/F,                // does service use an access key
           “service_https”:        T/F                // does service require https
           }
         }
@@ -3633,7 +3633,7 @@ Most data models include one or more identifiers.  An identifier SHALL be unique
 NB: What is called an identifier in a data model is more precisely just a label.  The use of the label to identify an instance of the data model within the scope or context of the LR makes it an identifier (within that scope).
 
 
-NB: For many items, the scope could be all implementations of the LR within one network 
+NB: For many items, the scope could be all implementations of the LR within one network
 community.  Extending the scope to all implementations is an intentional simplification.
 
 
@@ -3657,7 +3657,7 @@ Description here about RESTful APIs, CoolURIs, Context negotiation, application/
 HTTP requests SHALL use HTTP 1.1.   Communications MAY use TLS.
 
 
-HTTP requests SHOULD include a CONTENT-TYPE header.  Unless noted, the header SHOULD be 
+HTTP requests SHOULD include a CONTENT-TYPE header.  Unless noted, the header SHOULD be
 CONTENT-TYPE: application/JSON
 
 
@@ -3681,7 +3681,7 @@ If the service description document indicates that the service is not active, th
 NB: These validation checks are performed by the service.  If the service is not instantiated at a node, the returned HTTP status code SHALL be 404.
 NB: A service description document and installed code are both required in a valid service instantiation.  One SHOULD NOT exist without the other.
 Transactional Behaviors and Data Consistency
-Unless stated in an individual API specification, transactional atomicity SHALL BE document granularity.  
+Unless stated in an individual API specification, transactional atomicity SHALL BE document granularity.
 
 
 Requirements for consistency of documents across multiple nodes apply only when the nodes are consistent.  Prior to, or during document distribution, documents MAY be inconsistent.
@@ -3704,7 +3704,7 @@ Resource Data Validation and Publication
         IF any required element is missing
                 THEN
 REJECT the document
-EXIT        
+EXIT
         // changes in mutable fields are only allowed in an update
         IF submission is an update
                 IF any immutable field in the new document does not match old field
@@ -3716,7 +3716,7 @@ EXIT
                 THEN
 REJECT the document
 EXIT
-        IF payload_placement = “inline” and no resource_document in the submission 
+        IF payload_placement = “inline” and no resource_document in the submission
                 THEN
 REJECT the document
 EXIT
@@ -3739,13 +3739,13 @@ IF doc_ID isn’t provided
         // Set local node data
         publish_node := node_id
         IF submission is an update
-                THEN 
+                THEN
 update_timestamp := node_timestamp := current time  // granularity of seconds
 ELSE
         create_timestamp :=update_timestamp := node_timestamp := current time
         IF frbr_level not specified
                 THEN frbr_level := “copy”
- 
+
 Open Question:  Should an update delete the attachments automatically, or should this be an option?
 Resource Data ToS, Signatures and Trust Policy Enforcement
 All resource data publishing services and resource data distribution services MAY apply ToS, digital signature and submitter identity checks to resource data.
@@ -3826,7 +3826,7 @@ Resource Data Filtering
         // Filter a resource data description document
         // No filter test
         IF the network node filter description document does NOT exist
-                THEN store the resource data description document 
+                THEN store the resource data description document
                         EXIT
         // Filter not active test
         IF NOT active in the network node filter description document
@@ -3835,7 +3835,7 @@ Resource Data Filtering
         // Use custom filter if defined
         IF custom_filter in the the network node filter description document
                 THEN eval the custom filter code
-                        IF the code returns true 
+                        IF the code returns true
 THEN store the resource data description document
 EXIT
         // Expression-based filtering
@@ -3848,11 +3848,11 @@ EXIT
                                 THEN match := T
                                         SKIP ALL
                         FOR EACH value of the  key/name in the resource data description document
-                                IF the filter_value REGEX matches the value 
+                                IF the filter_value REGEX matches the value
                                         THEN match := T
                                                 SKIP ALL
         // Store or reject
-        IF include_exclude 
+        IF include_exclude
 IF match  // matches what to include
                         THEN  store the resource data description document
                                 EXIT
@@ -3868,7 +3868,7 @@ Building the Network Description
 Node-specific information (i.e., description, filters, services and connectivity) SHALL be maintained on a per node basis.  Authorized document updates MAY be applied only at the node.  All node-specific information MAY be maintained in a node document collection per node.
 
 
-Network-specific information (i.e., network description, network policy) SHALL be replicated on a per node basis.  The initial document MAY be stored at any node in the network.  Authorized document updates MAY be applied at any node in the network.  Replication, using the node’s connectivity information, MAY be used to propagate the documents throughout the network.  All network-specific information MAY be maintained in a network document collection per node.  
+Network-specific information (i.e., network description, network policy) SHALL be replicated on a per node basis.  The initial document MAY be stored at any node in the network.  Authorized document updates MAY be applied at any node in the network.  Replication, using the node’s connectivity information, MAY be used to propagate the documents throughout the network.  All network-specific information MAY be maintained in a network document collection per node.
 
 
 Community-specific information (i.e., community description) SHALL be replicated on a per node basis.  The initial document MAY be stored at any node in the network.  Authorized document updates MAY be applied at any node in the community.  Replication, using the node’s connectivity information, MAY be used to propagate the documents throughout the network, including across network gateways between different communities.  All community-specific information MAY be maintained in a community document collection per node.
@@ -3899,7 +3899,7 @@ Open Question:  How to establish a security model so that only an authorized use
 Open Question:  How to constrain the network so that if someone finds a connection, they cannot exploit it.
 
 
-The network model MAY be instantiated in a set of procedures.  The procedures assume the resource distribution network description document, resource distribution network policy document and network community description document are published before the network is expanded from the base node.  If network expansion is done prior to these documents being created, appropriate Distribution processes SHALL be triggered after the documents are published to distribute them to all nodes in the network or community.  
+The network model MAY be instantiated in a set of procedures.  The procedures assume the resource distribution network description document, resource distribution network policy document and network community description document are published before the network is expanded from the base node.  If network expansion is done prior to these documents being created, appropriate Distribution processes SHALL be triggered after the documents are published to distribute them to all nodes in the network or community.
 
 
 NB: The procedures only establish the network structure and descriptive documents.  They do not populate the network with resource data.  In particular, adding a new node to a network does not load resource data into the node’s resource data description document database.
@@ -3916,8 +3916,8 @@ Establish a Network Node
 FIND  a source for the node software, e.g., the Learning Registry GitHub
         // out of band process
 INSTALL the node software on a hardware node // physical or virtual
-CONFIGURE  the node software 
-CREATE an identity for the node owner 
+CONFIGURE  the node software
+CREATE an identity for the node owner
 // used to own node documents, proxy for document owner
 CREATE a network node description document for the node
 PUBLISH the network node description document to the new node
@@ -3942,11 +3942,11 @@ REJECT if the network node service description document is not valid
 
 Establish a Resource Distribution Network
         // Create a base, one-node network with a network description
-        PREREQUISITE: one active node // denoted the base node 
+        PREREQUISITE: one active node // denoted the base node
 // via the Establish a Node process
-CREATE an identity for the network owner 
+CREATE an identity for the network owner
         CREATE a resource distribution network description document
-        PUBLISH the resource distribution network description document to the first node 
+        PUBLISH the resource distribution network description document to the first node
 by the owner of the resource distribution network description document
 to the node’s network document database
 VALIDATE // same network
@@ -3967,13 +3967,13 @@ REJECT if a resource distribution network policy document exists
 
 Establish a Network Community
         // Create a base, one-network community with a network description
-        PREREQUISITE: one active node // denoted the base node 
+        PREREQUISITE: one active node // denoted the base node
 // via the Establish a Network Node process
 PREREQUISITE: one active network
         // via the Establish a Resource Distribution Network process
 CREATE an identity for the network community owner
         CREATE a network community description document
-        PUBLISH the network community description document to the base node 
+        PUBLISH the network community description document to the base node
 by the owner of the network community
 to the node’s network community document database
 VALIDATE // same community in network and community descriptions
@@ -3996,7 +3996,7 @@ Add a Network Node to a Resource Distribution Network
         PERFORM the Adding Connections within a Resource Distribution Network process
                 source node is the existing node
                 destination node is the new node
-        PERFORM the Distribution process to replicate the network document database 
+        PERFORM the Distribution process to replicate the network document database
 from the source node to the destination node
                 // propagates network description and policy to only the new node
                 // may proceed asynchronously
@@ -4104,7 +4104,7 @@ Delete a Network Node
         // first sync the documents so that others have them
         // sync before delete is an operational policy choice; could be modeled in policy
 COMMIT all outstanding resource data description database operations
-        PERFORM the Distribute Resource process 
+        PERFORM the Distribute Resource process
         FOR EACH resource data description document
                 delete the document from the node’s resource data description document database
                 // this is an explicit delete
@@ -4258,7 +4258,7 @@ Change Network Community Description
 to the node’s network community document database
 REJECT if the network community description document is not valid
 REJECT if the network community description document is not an update
-PERFORM a community-wide Distribution process to replicate the 
+PERFORM a community-wide Distribution process to replicate the
 community document database to the other nodes in the community
                 // propagates community description to all nodes in the community
         // may proceed asynchronously
@@ -4275,12 +4275,12 @@ Delete Network Community Description
 to the node’s network community document database
 REJECT if the network community description document is not valid
 REJECT if the network community description document is not an update
-PERFORM a community-wide Distribution process to replicate the 
+PERFORM a community-wide Distribution process to replicate the
 community document database to the other nodes in the community
                 // propagates community description to all nodes in the communities
         // may proceed asynchronously
 Network Discovery
-Finding all the nodes in a network or community is a non core service.  One approach is to use replication and distribution to build a complete list of all network links at each node (an alternative is to traverse the network and build the link structure).  Given a database of node-specific documents that includes a node’s connectivity that is not replicated (private to the node), and a second duplicate database that is replicated across the entire network or community, first replicate the connectivity document from the private node database to the network or community database stored at the node.  This replication is done at each node in the network.  It is a one-way replication from the private node database to the second database, not a full synchronization.  Then distribute (synchronize) the second database across all nodes. Distribution (synchronization) across nodes of the network or community database will build a network connectivity link table at each node.  
+Finding all the nodes in a network or community is a non core service.  One approach is to use replication and distribution to build a complete list of all network links at each node (an alternative is to traverse the network and build the link structure).  Given a database of node-specific documents that includes a node’s connectivity that is not replicated (private to the node), and a second duplicate database that is replicated across the entire network or community, first replicate the connectivity document from the private node database to the network or community database stored at the node.  This replication is done at each node in the network.  It is a one-way replication from the private node database to the second database, not a full synchronization.  Then distribute (synchronize) the second database across all nodes. Distribution (synchronization) across nodes of the network or community database will build a network connectivity link table at each node.
 
 
 The completeness of the table in showing the entire network or part of the network will depend on the connectivity and gateways, i.e., the connectivity of a network will not be propagated to nodes outside the network unless there is a directional gateway.  The tables of networks or communities with only inbound connectivity will include the entries of the external networks.
@@ -4291,7 +4291,7 @@ Network Design
 Any resource distribution network is technically open; any node MAY connect.  Managing connectivity and details of the topology and operations of any specific resource distribution network (and its connection to other resource distribution networks and network communities) SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 
 
-Multiple resource distribution networks and network communities MAY be established and connected.  In addition to external governance and policies, this specification imposes restrictions on connections between network communities and resource distribution networks, i.e., 1:1 connections only using gateway nodes.  Because of the technical burden imposed, multiple resource distribution networks and network communities SHOULD only be created when these specification-imposed criteria are needed to enable additional security and technical criteria that cannot be adequately satisfied by policy alone.  
+Multiple resource distribution networks and network communities MAY be established and connected.  In addition to external governance and policies, this specification imposes restrictions on connections between network communities and resource distribution networks, i.e., 1:1 connections only using gateway nodes.  Because of the technical burden imposed, multiple resource distribution networks and network communities SHOULD only be created when these specification-imposed criteria are needed to enable additional security and technical criteria that cannot be adequately satisfied by policy alone.
 
 
 For example, connecting an open community in an open IP space to a more restricted community might involve establishing a gateway node in the open community in a public IP space, providing a gateway node in for the restricted community in a DMZ, opening limited network ports between the DMZ and the other nodes in restricted community that operate within a closed IP space (possibly using an additional gateway), and locking down the connections between the open community and the DMZ gateway node.  The illustration shows an example of such a gateway structure.
@@ -4299,7 +4299,7 @@ For example, connecting an open community in an open IP space to a more restrict
 
 
 Resource Data Publication, Distribution and Access
-Once a resource distribution network has been established, external agents use the publish services at network nodes to publish or update resource data to nodes in the resource distribution network.  Network nodes SHALL store the valid, published resource data in their resource data description documents database.  Publication MAY be performed via any of the supplied publish services, value-added services or via tools and applications that are built upon these services.  Other mechanisms to publish resource data (e.g., direct access to the underlying data stores) SHALL NOT be supported. 
+Once a resource distribution network has been established, external agents use the publish services at network nodes to publish or update resource data to nodes in the resource distribution network.  Network nodes SHALL store the valid, published resource data in their resource data description documents database.  Publication MAY be performed via any of the supplied publish services, value-added services or via tools and applications that are built upon these services.  Other mechanisms to publish resource data (e.g., direct access to the underlying data stores) SHALL NOT be supported.
 
 
 Publication SHALL reject any resource data that is tagged as not distributable.
@@ -4308,7 +4308,7 @@ Publication SHALL reject any resource data that is tagged as not distributable.
 Publication SHALL satisfy trust and identity conditions.  The same resource data may be published to one or more nodes in one or more resource distribution networks subject to their policies and the trust and identity conditions.
 
 
-Publication SHALL satisfy network node filters.  Only resource data that passes the filters (if they exist) SHALL be published.  Filters are optional.  
+Publication SHALL satisfy network node filters.  Only resource data that passes the filters (if they exist) SHALL be published.  Filters are optional.
 
 
 Publication SHALL add or update any node-specific data.
@@ -4317,7 +4317,7 @@ Publication SHALL add or update any node-specific data.
 In distribution, destination nodes SHALL reject any resource data that is tagged as not distributable.
 
 
-In distribution, destination nodes SHALL filter all incoming resource data.  Only resource data that passes the filters (if they exist) SHALL be persisted.  Filters are optional.  
+In distribution, destination nodes SHALL filter all incoming resource data.  Only resource data that passes the filters (if they exist) SHALL be persisted.  Filters are optional.
 
 
 Distribution SHALL add or update any node-specific data.
@@ -4340,7 +4340,7 @@ Resource distribution network nodes MAY provide broker services.  Operation of a
 
 Service provisioning (publish, access, distribution, broker) SHALL be determined by the governance and policy rules of a resource distribution network or network node, not via this specification.
 Resource Data Persistence
-A node SHALL persist resource data stored at a node for at least as many days as specified by the TTL (time to live) in the resource distribution network policy description.  A node MAY “delete” documents that have been stored longer than the network’s TTL.  
+A node SHALL persist resource data stored at a node for at least as many days as specified by the TTL (time to live) in the resource distribution network policy description.  A node MAY “delete” documents that have been stored longer than the network’s TTL.
 
 
 If the node supports harvest, the node SHALL maintain a value for earliestDatestamp.  This value is the oldest publish, update or delete time for a resource data description document that can be accessed at the node via harvest.  The timestamp SHALL be precise to the nearest second.  The value is based on the time the resource data description documents are published at the node (node_timestamp).
@@ -4403,7 +4403,7 @@ metadata (n):  formally authored and curated information describing a learning r
 network (n):  see resource distribution network.  A network need not correspond to a physical or logical network of computing devices.
 
 
-network community (n):  a group of interconnected resource distribution networks.  
+network community (n):  a group of interconnected resource distribution networks.
 
 
 network node (n):  a service end point in a resource distribution network that may provide services to process resource data and that may connect to any other nodes to distribute resource data.  A network node need not correspond to a physical or logical computing device.
@@ -4451,7 +4451,7 @@ Additional references will be provided in a future draft or version of the speci
 8. ISO 8601:  Data elements and interchange formats -- Information interchange -- Representation of dates and times, ISO 8601:2004, http://www.iso.org/iso/catalogue_detail?csnumber=40874
 9. IEEE LOM: IEEE Standard for Learning Object Metadata, IEEE Std 1484.12.1™-2002, IEEE Computer Society, September 2002.
 10. OAI-PMH:  The Open Archives Initiative Protocol for Metadata Harvesting, V2.0, http://www.openarchives.org/OAI/openarchivesprotocol.html
-11. OAUTH: OAUTH, http://oauth.net/ 
+11. OAUTH: OAUTH, http://oauth.net/
 12. RFC 3880:  OpenPGP Messange Format, http://tools.ietf.org/rfc/rfc4880.txt
 13. RFC 4122:  A Universally Unique Identifier (UUID) URN Namespace, RFC 4122, http://www.ietf.org/rfc/rfc4122.txt
 14. RFC 4627:  The application/json Media Type for JavaScript Object Notation (JSON), http://tools.ietf.org/html/rfc4627
@@ -4461,7 +4461,7 @@ Additional references will be provided in a future draft or version of the speci
 18. Unicode:  The Unicode Consortium. The Unicode Standard, Version 6.0.0, http://www.unicode.org/versions/Unicode6.0.0/
 19. UTF-8: TBC (where in Unicode 6.0.0 doc?)
 Change Log
-NB: The change log only lists major updates to the specification.  
+NB: The change log only lists major updates to the specification.
 NB: Updates and edits may not results in a version update.
 
 
@@ -4482,7 +4482,7 @@ Version
 	Clarified that services are optional, described operational requirements to provision services.  Revised XSD to support OAI-PMH harvest by resouce_ID.  Clarified times are UTC 0.  Clarified distributeAPI to uncouple it from other APIs.  Add ToS checks to distribute and publish.   Update reource doc to include ToS attribution.  Added SWORD API.  Archived copy.
 	0.20.0
 	20110422
-	Added digital signature k-v pairs to resource documents.  Added public key k-v pairs to all description documents.  Updated network and node policy descripitons.  Added signature, trust, ... verification to publish.  Added identity section. Defined ALL behavior for obtain for size limited.  Defined returning spec JSON vs. stored JSON for obtain and harvest.  Authn (none, basic, SSH, Oauth, ...).  Authz (access keys).  
+	Added digital signature k-v pairs to resource documents.  Added public key k-v pairs to all description documents.  Updated network and node policy descripitons.  Added signature, trust, ... verification to publish.  Added identity section. Defined ALL behavior for obtain for size limited.  Defined returning spec JSON vs. stored JSON for obtain and harvest.  Authn (none, basic, SSH, Oauth, ...).  Authz (access keys).
 Archived copy.
 	0.21.0
 	20110706
@@ -4493,17 +4493,17 @@ Archived copy.
 	0.23.0
 	201107xx
 	Added k-v pair to mark documents as non distributable and process to block publication and distribution (take down process is policy, not part of the specification.  Added checks on max doc size.  Indicated that node time stamp is to be depricated.  Indicated services to be deprecated.
-TODO: Documented obtain get interface.  
+TODO: Documented obtain get interface.
 Archived copy location TBD.
 	0.24.0
-	
+
 
 	Remove deprecated servcies (query, SRW, Sitemap).
 Archived copy location TBD.
 	Future
 	TBD
 	ToS attribution output to OAI. Harvest flow control.  Flow control to OAI.  Logging/tracking emit as paradata to services.  Assertion (relation/sameas) and trust documents.  Deduplication service.  RESTful APIs.  Details of attachments on publish, obtain, harvest.
-	
+
 
 Working Notes and Placeholder Text
 

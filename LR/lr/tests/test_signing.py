@@ -32,7 +32,7 @@ def test_fetchSelfHostedKey(*args, **kw):
             "signature": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA1\n\n47766650c7a3a81409e53161c918e9312994718e7d8d2a0c67ed6bb05d83566a\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v1.4.11 (Darwin)\nComment: GPGTools - http://gpgtools.org\n\niQEcBAEBAgAGBQJRyXG7AAoJEKPVkXeiZE8+R8UH/RVyspUdg1+iUiRG5+hIlsFl\ndgccEKubzTmps3G6vIOD7LEmObx23/dMhQiQByOvqLyjQkSv1E9E9NL/aOCGE7X4\nWUDaV5EheHKnnEP2q4w91qPuJ9GKU2XIE0n8wQVSLjFTju9Oc0IsFQMERbiew+WD\nwRwmc2SiaJBmLQ68fmEht07+R/fBw0aoHVl3lt+tz7VKao2A5+L3QHMQqwaILBdV\nJysFtSrrz3s2lopuuG4hRz+2rh/tPQwUWUS+kABg2s073Tt+fahHHekuG5ugamU8\nzzcNysozxFQACk4pbSGc7f/V8hxRFo6V5XxLjfgS06QfMFkdDFn7sbL3nB58oaA=\n=jBP2\n-----END PGP SIGNATURE-----\n"
         },
         "TOS": {
-            "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+            "submission_TOS": "https://www.learningregistry.org/tos/cc0/v0-5/"
         },
         "_rev": "1-d0879e7751add53f72d1672dec4a70da",
         "resource_data_type": "paradata",

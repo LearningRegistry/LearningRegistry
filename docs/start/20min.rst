@@ -14,11 +14,11 @@ found in the
 Setup
 -----
 
-Before you start your 20-minute clock, you’ll need to make sure you’re set up properly. 
-You need to know just enough Unix to be dangerous because you’ll be entering commands 
+Before you start your 20-minute clock, you’ll need to make sure you’re set up properly.
+You need to know just enough Unix to be dangerous because you’ll be entering commands
 into the shell. That means in order to get up and running, you'll need to have
 `Python 2.7+ <http://www.python.org/>`_ and `GPG 2.0.17+ <http://www.gnupg.org/>`_
-installed and accessible in your path. Depending upon your development platform, you 
+installed and accessible in your path. Depending upon your development platform, you
 may have to separately download and install some of the additional modules mentioned below.
 
 .. important::
@@ -167,7 +167,7 @@ document.
 
       "TOS": {
 
-        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+        "submission_TOS": "https://www.learningregistry.org/tos/cc0/v0-5/"
 
       },
 
@@ -437,7 +437,7 @@ Verifying Signatures
 
     {"results": [{"resource\_locator": "http://resource\_locator\_url\_will\_appear\_here", "verified": true}]}
 
-OK! That's a full round-trip. You created and uploaded a valid Learning Registry document, and then downloaded a copy back to your local machine. 
+OK! That's a full round-trip. You created and uploaded a valid Learning Registry document, and then downloaded a copy back to your local machine.
 
 
 --------------
@@ -456,7 +456,7 @@ At some point in you publishing endeavors, you may need to update or delete prev
 Learning Registry V 0.50.1 introduces the concept of document replacement, where you may publish a new document to replace a previously published version.  There are some caveats to this process:
 
   1. Replacement documents must be signed with the same private key as the original document.
-    
+
     - If replacment and original documents were signed by a node using proxy signing services, the ``submitter`` fields must also match.
 
   2. Replacement documents must indicate exactly which document they are replacing, using the ``doc_ID`` in the ``replaces`` field of the `Resource Data Description Document <Resource Data Description Data Model>`_. You may specify more than one ``doc_ID`` to replace.
@@ -479,7 +479,7 @@ This process is identical to steps followed in `Create the JSON File`_ however y
 
       "TOS": {
 
-        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+        "submission_TOS": "https://www.learningregistry.org/tos/cc0/v0-5/"
 
       },
 
@@ -546,7 +546,7 @@ Deleting a Learning Registry Document
 Removal of documents from Learning Registry follows a similar process as described in `Updating a Learning Registry Document`_ with the only difference being the contents of the published document.
 
 The key differences are:
-  * Set the ``"payload_placement": "none"`` 
+  * Set the ``"payload_placement": "none"``
   * The ``"resource_locator"``. ``"payload_schema"``, ``"resource_data"``, and ``"recource_data_types"`` properties of the Learning Registry Document may be omitted.
 
 An example of Learning Registry Delete Document is:
@@ -560,7 +560,7 @@ An example of Learning Registry Delete Document is:
 
       "TOS": {
 
-        "submission_TOS": "http://www.learningregistry.org/tos/cc0/v0-5/"
+        "submission_TOS": "https://www.learningregistry.org/tos/cc0/v0-5/"
 
       },
 
@@ -708,7 +708,7 @@ Change Log
 ----------
 
 ===========   ==========    =========================================================================
-Version       Date          Description  
+Version       Date          Description
 ===========   ==========    =========================================================================
 1.00          2011-06-16    Initial version
 
@@ -733,7 +733,7 @@ Version       Date          Description
 1.09          2013-03-21    Converted into RestructuredText from the original version. Minor edits.
                             `Archive Copy (V 1.08) <https://docs.google.com/document/d/12nvvm5ClvLxSWptlo52rTwIDvobiFylYhWLVPbVcesU/edit>`_
 
-1.10          2013-03-26    Added section on publishing replacement documents.                            
+1.10          2013-03-26    Added section on publishing replacement documents.
 ===========   ==========    =========================================================================
 
 
