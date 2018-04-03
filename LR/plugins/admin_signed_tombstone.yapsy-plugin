@@ -6,4 +6,4 @@ Module = admin_signed_tombstone
 Description = Permits a tombstone creation if replacement document is signed by a pre-determined set of public keys
 Author = Dan Krieger (Navigation North)
 Version = 0.1.0
-Website = http://www.learningregistry.org
+Website = https://www.learningregistry.org

@@ -28,8 +28,3 @@ LR/data/sessions/*
 
 env
 couchdb/apps/kanso/*/packages
-
-auth-server/.rbenv-vars
-auth-server/app/controllers/___*
-auth-server/public/assets
-auth-server/vendor

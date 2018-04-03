@@ -64,7 +64,7 @@ Any resource data publishing service MAY reject any resource data for any reason
 - Does not conform to the node’s ToS.
 
 - Is larger than the node can store.
-  
+
 
 All resource data publishing services SHALL reject any document with a "do_not_distribute" key-value pair; this verification SHALL be performed before any other verification and SHALL short circuit all other verification.
 
@@ -138,11 +138,11 @@ API
         .. sourcecode:: http
 
             {
-                "documents": [ 
+                "documents": [
                                         // array of
                                         // resource data description documents
 
-                    {resource_data_description} 
+                    {resource_data_description}
                                         // resource data to be published
 
                 ]
@@ -155,10 +155,10 @@ API
 
             {
 
-                "OK": boolean,          
+                "OK": boolean,
                                         // T if successful
 
-                "error": "string",      
+                "error": "string",
                                         // text describing global error
                                         // present only if NOT OK
 
@@ -167,13 +167,13 @@ API
 
                     {
 
-                        "doc_ID": "string",            
+                        "doc_ID": "string",
                                         // ID of the document
 
-                        "OK": boolean   
+                        "OK": boolean
                                         // T if document was published
 
-                        "error": "string"              
+                        "error": "string"
                                         // text describing error or filter failure
                                         // present only if NOT OK
                     }
@@ -183,8 +183,8 @@ API
             }
 
         :statuscode 200: no error
-        :statuscode 500: error            
-            
+        :statuscode 500: error
+
 Basic Publish
 =============
 
@@ -192,7 +192,7 @@ Basic Publish
 
     // Publish each resource data description document in the supplied list
 
-    // Perform Validation    
+    // Perform Validation
 
     VALIDATE the *resource* *data* *description* document does not contain a do_not_distribute key.
 
@@ -203,13 +203,13 @@ Basic Publish
                 OK := F
 
                 error := "cannot publish"  // an appropriate error for global condition
-                                
+
                 EXIT
 
-    VALIDATE the publish request 
+    VALIDATE the publish request
                                         // apply appropriate business rules
 
-        IF there is an overall error 
+        IF there is an overall error
 
             THEN // create the global error object
 
@@ -219,25 +219,25 @@ Basic Publish
 
                 EXIT
 
-    OK := T                     
+    OK := T
                                         // global return status
 
     FOR EACH *resource* *data* *description* document
 
-        VALIDATE the *resource* *data* *description* document 
+        VALIDATE the *resource* *data* *description* document
                                         // all syntactical and semantic rules
 
         IF there is an error
 
-            THEN                
-                                        // create an error object array element object for the individual document    
-    
+            THEN
+                                        // create an error object array element object for the individual document
+
                 OK := F
-    
+
                 error := "error msg"    // an appropriate error for the document
-    
-                doc_ID := supplied doc_ID 
-    
+
+                doc_ID := supplied doc_ID
+
                 SKIP
 
         IF the *network* *node* *filter* *description* document exists and contains active filters
@@ -247,28 +247,28 @@ Basic Publish
             IF the *resource* *data* *description* document does NOT pass the filter
 
                 THEN     // indicate filtering was applied
-    
+
                     OK := F
-    
+
                     error := "rejected by filter"  // an appropriate filtering message
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         IF the service applies ToS checks
 
             AND the *resource* *data* *description* document TOS is unacceptable
 
-                THEN    
+                THEN
                                         // indicate ToS was rejected
-    
+
                     OK := F
-    
+
                     error := "rejected by ToS" // an appropriate message
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         IF the service does not accept anonymous submissions
@@ -276,13 +276,13 @@ Basic Publish
             AND the *resource* *data* *description* document has submitted_type=="anonymous"
 
                 THEN     // indicate submitted type was rejected
-    
+
                     OK := F
-    
+
                     error := "anon submission rejected"  // an appropriate message
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         IF the service validates the submitter
@@ -290,13 +290,13 @@ Basic Publish
             AND the *resource* *data* *description* document submitter cannot be verified or trusted
 
                 THEN // indicate submitter was rejected
-    
+
                     OK := F
-    
+
                     error := "rejected submitter"  // an appropriate message
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         IF the service requires a signature
@@ -305,26 +305,26 @@ Basic Publish
 
                 THEN // indicate signature was rejected
                     OK := F
-    
+
                     error := "no signature" // an appropriate message
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         IF the service validates the signature
 
             AND the *resource* *data* *description* document signature cannot be verified
 
-                THEN    
+                THEN
                                         // indicate signature was rejected
-    
+
                     OK := F
-    
+
                     error := "rejected signature"  // an appropriate message
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         IF the node limits the size of document that can be stored
@@ -332,20 +332,20 @@ Basic Publish
             AND the *resource* *data* *description* document is too large
 
                 THEN     // indicate document too large
-    
+
                     OK := F
-    
+
                     error := "too large"  // an appropriate message
-    
+
                     doc_ID := supplied doc_ID
-    
+
                     SKIP
 
         IF *resource* *data* *description* document did not have a supplied doc_ID
 
             THEN generate a new unique doc_ID
 
-        
+
         :changes:`▲ graveyard := []`
 
         `IF *resource* *data* *description* document has a non-empty "replaces" property`:changes:
@@ -381,16 +381,16 @@ Basic Publish
 
         IF there is a publishing error
 
-                THEN            
-                                        // create an error object array element object for the individual document    
+                THEN
+                                        // create an error object array element object for the individual document
 
                     OK := F
-    
-                    error := "publish failed" 
+
+                    error := "publish failed"
                                         // an appropriate error for the publish failure
-    
-                    doc_ID := supplied doc_ID 
-    
+
+                    doc_ID := supplied doc_ID
+
                     SKIP
 
         :changes:`▲ VALIDATE tombstones in graveyard may be saved.`
@@ -407,17 +407,17 @@ Basic Publish
 
                         ELSE
 
-                            UPDATE original *resource data description document* specified in *tombstone document* with the *tombstone document*  
+                            UPDATE original *resource data description document* specified in *tombstone document* with the *tombstone document*
                                         // this is a replacement operation
 
                                         // create a return object array element object for the individual document
-    
+
         OK := T
-    
-        doc_ID  
+
+        doc_ID
                                         // supplied or generated doc_ID
 
-    
+
 
 Service Description
 ===================
@@ -446,18 +446,18 @@ Service Description
 
         "service_endpoint": "<node-service-endpoint-URL>",
 
-        "service_auth":                     
+        "service_auth":
                                         // service authentication and authorization descriptions
 
         {
 
-            "service_authz": ["<authvalue>"], 
+            "service_authz": ["<authvalue>"],
                                         // authz values for the service
 
-            "service_key": < T / F > ,      
-                                        // does service use an access key            
+            "service_key": < T / F > ,
+                                        // does service use an access key
 
-            "service_https": < T / F >      
+            "service_https": < T / F >
                                         // does service require https
 
         },
@@ -466,10 +466,10 @@ Service Description
 
         {
 
-            "doc_limit": integer, 
+            "doc_limit": integer,
                                         // specify the maximum number of documents in a batch
 
-            "msg_size_limit": integer   
+            "msg_size_limit": integer
                                         // specify the maximum message size
 
         }
@@ -554,7 +554,7 @@ The SWORD Service Document endpoint SHALL return an XML SWORD Service Document w
     If the node_description is missing, the element SHALL be omitted.
 
   - <sword:collectionPolicy> element MAY be present.
-    The value is determined by the policies of the node, network or community (e.g., for the public Learning Registry community, the policy is the terms of service for the community, `http://www.learningregistry.org/tos/ <http://www.learningregistry.org/tos/>`_ )
+    The value is determined by the policies of the node, network or community (e.g., for the public Learning Registry community, the policy is the terms of service for the community, `https://www.learningregistry.org/tos/ <https://www.learningregistry.org/tos/>`_ )
 
   - <sword:treatment> and <sword:service> elements SHALL be omitted.
 
@@ -691,18 +691,18 @@ Service Description
 
         "service_endpoint": "<node-service-endpoint-URL>",
 
-        "service_auth":                 
+        "service_auth":
                                         // service authentication and authorization descriptions
 
         {
 
-            "service_authz": ["<authvalue>"], 
+            "service_authz": ["<authvalue>"],
                                         // authz values for the service
 
-            "service_key": < T / F > ,  
-                                        // does service use an access key            
+            "service_key": < T / F > ,
+                                        // does service use an access key
 
-            "service_https": < T / F >  
+            "service_https": < T / F >
                                         // does service require https
 
         },
@@ -775,14 +775,14 @@ API
 
         {
             "request_IDs":      // list of resource data descriptions to delete
-          
+
 
             [                   // array of resource data description document ID
 
                 doc_ID          // required
-     
+
             ]
-        
+
         }
 
     **Results Object:**
@@ -791,13 +791,13 @@ API
 
         {
             "OK": boolean,              // T if successful
-            
+
             "error": "string",          // text describing global error
-                                
+
                                         // present only if NOT OK
 
             "document_results": [       // array of per document results
-            
+
 
                 {
                     "doc_ID": "string", // ID of the document
@@ -832,7 +832,7 @@ Basic Delete
 
         IF the document does not exist
 
-            THEN 
+            THEN
 
                 OK := FALSE
 
@@ -842,13 +842,13 @@ Basic Delete
 
         IF the document has been deleted
 
-            THEN 
+            THEN
 
                 OK := FALSE
 
                 error := "document already deleted
 
-                SKIP    
+                SKIP
 
                                         // otherwise delete
 
@@ -860,22 +860,22 @@ Basic Delete
 
                     NO OP
 
-                mark: 
+                mark:
 
-                    set a flag on the document that it is deleted 
+                    set a flag on the document that it is deleted
                                         // ACTIVE := FALSE
 
-                delete: 
+                delete:
 
-                    perform a system-level delete 
+                    perform a system-level delete
                                         // whatever "delete" means
 
-                purge: 
+                purge:
 
-                    perform a system-level delete 
+                    perform a system-level delete
                                         // whatever "delete" means
 
-                    trigger system level purge 
+                    trigger system level purge
                                         // may run at some later time
 
 
@@ -908,18 +908,18 @@ Service Description
 
         "service_endpoint": "<node-service-endpoint-URL>",
 
-        "service_auth": 
+        "service_auth":
                                         // service authentication and authorization descriptions
 
         {
 
-            "service_authz": ["<authvalue>"], 
+            "service_authz": ["<authvalue>"],
                                         // authz values for the service
 
-            "service_key": < T / F > , 
-                                        // does service use an access key            
+            "service_key": < T / F > ,
+                                        // does service use an access key
 
-            "service_https": < T / F > 
+            "service_https": < T / F >
                                         // does service require https
 
         },
@@ -928,7 +928,7 @@ Service Description
 
         {
 
-            "delete_action": "string", 
+            "delete_action": "string",
                                         // fixed vocabulary ["ignore", "mark", "delete", "purge"]
 
                                         // ignore -- ignore the delete request
@@ -939,10 +939,10 @@ Service Description
 
                                         // purge -- purge the document
 
-            "doc_limit": integer, 
+            "doc_limit": integer,
                                         // specify the maximum number of documents in a batch
 
-            "msg_size_limit": integer 
+            "msg_size_limit": integer
                                         // specify the maximum message size
 
         }

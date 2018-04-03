@@ -92,7 +92,7 @@ public class RIMLiteDataPump {
 		envelope.put(RESOURCE_LOCATOR, result.getInstanceURL());
 		JSONObject tos = new JSONObject();
 		tos.put(SUBMISSION_TOS,
-				"http://www.learningregistry.org/tos/cc0/v0-5/");
+				"https://www.learningregistry.org/tos/cc0/v0-5/");
 		envelope.put(TOS2, tos);
 		envelope.put(RESOURCE_DATA, result.getObjectURL());
 		return envelope;
@@ -125,13 +125,13 @@ public class RIMLiteDataPump {
 		mainMap.put(TOS2, tos.map);
 		mainMap.put(IDENTITY, identity.map);
 		return mainMap;
-		
+
 	}
 	private static String Bencode(JSONObject obj) throws IOException,
 			JSONException {
 		Map mainMap = CreateCleanMap(obj);
 		ByteArrayOutputStream s = new ByteArrayOutputStream();
-		BencodingOutputStream bencoder = new BencodingOutputStream(s);		
+		BencodingOutputStream bencoder = new BencodingOutputStream(s);
 		bencoder.writeMap(mainMap);
 		bencoder.flush();
 		String encodedString = s.toString();
@@ -144,14 +144,14 @@ public class RIMLiteDataPump {
 		md.update(content.getBytes());
 		byte[] mdbytes  = md.digest();
         StringBuffer hexString = new StringBuffer();
-    	for (int i=0;i<mdbytes.length;i++) {	
+    	for (int i=0;i<mdbytes.length;i++) {
     		String hex = Integer.toHexString(0xFF & mdbytes[i]);
     		if (hex.length() == 1) {
     		    // could use a for loop, but we're only dealing with a single byte
     		    hexString.append('0');
     		}
     		hexString.append(hex);
-    	}		
+    	}
     	return hexString.toString();
 	}
 	private static JSONObject ProcessSearchResult(SearchResult result) throws IOException, JSONException, NoSuchAlgorithmException, PGPException
@@ -166,7 +166,7 @@ public class RIMLiteDataPump {
 		digitalSignature.put("signature", signature);
 		envelope.put("digital_signature", digitalSignature);
 		return envelope;
-	
+
 	}
 	public static void main(String[] args) {
 		Handle CAK = new Handle("wgrata001/AAddLL##2011");

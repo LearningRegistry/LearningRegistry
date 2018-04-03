@@ -7,9 +7,9 @@ Created on Oct 12, 2011
 import socket, uuid
 
 
-def getDC_v1_1(resource_url="http://www.learningregistry.org/test-data"):
+def getDC_v1_1(resource_url="https://www.learningregistry.org/test-data"):
     blob = '''<metadata
-  xmlns="http://www.learningregistry.org/"
+  xmlns="https://www.learningregistry.org/"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://example.org/myapp/ http://example.org/myapp/schema.xsd"
   xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -29,7 +29,7 @@ def getDC_v1_1(resource_url="http://www.learningregistry.org/test-data"):
 def buildTestDoc(submitter, keys, type, schemas, data, locator, schema_locator):
   testDoc = {
              "resource_data": data,
-             "keys": keys, 
+             "keys": keys,
              "TOS":{
                   "submission_attribution":"My Attribution",
                   "submission_TOS":"My TOS"
@@ -60,24 +60,24 @@ def buildReplacementTestDoc(doc_ID):
   base_rd3 = {
     'doc_ID': doc_ID,
     'TOS': {
-        'submission_attribution': 'Example', 
+        'submission_attribution': 'Example',
         'submission_TOS': 'http://example.com/terms'
-    }, 
-    'payload_placement': 'inline', 
-    'active': True, 
+    },
+    'payload_placement': 'inline',
+    'active': True,
     'identity': {
-        'submitter': 'Test Agent', 
+        'submitter': 'Test Agent',
         'submitter_type': 'agent'
-    }, 
-    'resource_locator': 'http://example.com', 
-    'doc_type': 'resource_data', 
+    },
+    'resource_locator': 'http://example.com',
+    'doc_type': 'resource_data',
     'resource_data': {
-        "testing":"data", 
+        "testing":"data",
         "version":0
     },
-    'resource_data_type': 'metadata', 
-    'payload_schema_locator': 'http://example.com/schema/locator', 
-    'payload_schema': ['example'], 
+    'resource_data_type': 'metadata',
+    'payload_schema_locator': 'http://example.com/schema/locator',
+    'payload_schema': ['example'],
     'doc_version': '0.49.0'
   }
   return base_rd3
@@ -121,8 +121,8 @@ def getTestDataForMetadataFormats(count=1):
           "submitter": "OAI-PMH Test Harness",
           "keys": ["lr-test-data"],
           "type": "metadata",
-          "locator": "http://www.learningregistry.org/test-metadata-formats",
-          "data": getDC_v1_1("http://www.learningregistry.org/test-metadata-formats"),
+          "locator": "https://www.learningregistry.org/test-metadata-formats",
+          "data": getDC_v1_1("https://www.learningregistry.org/test-metadata-formats"),
           "schemas": [
                       "0valid_ABCDEFGHIJKLMNOPQRSTUVWXYZ_schema",
                       "1valid_abcdefghijklmnopqrstuvwxyz_schema",
@@ -142,7 +142,7 @@ def getTestDataForEmbeddedXMLDOCTYPEHeaders():
         "submitter": "OAI-PMH Test Harness",
         "keys": ["lr-test-data"],
         "type": "metadata",
-        "locator": "http://www.learningregistry.org/test-metadata-formats",
+        "locator": "https://www.learningregistry.org/test-metadata-formats",
         "schema_locator": "http://example.org/myapp/ http://example.org/myapp/schema.xsd"
         }
 
@@ -154,53 +154,53 @@ def getTestDataForEmbeddedXMLDOCTYPEHeaders():
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION","DC_XML_HEADERS"],
-      "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_ML","DC_XML_HEADERS"],
       "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-      ''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      ''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_DOCTYPE","DC_XML_HEADERS"],
-      "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?><!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?><!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_DOCTYPE_ML1","DC_XML_HEADERS"],
       "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-      <!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      <!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_DOCTYPE_ML2","DC_XML_HEADERS"],
       "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-      <!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      <!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_DOCTYPE_ML3","DC_XML_HEADERS"],
       "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
       <!DOCTYPE rdf:RDF SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">
-      ''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      ''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_DOCTYPE_ML4","DC_XML_HEADERS"],
       "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-      <!DOCTYPE rdf:RDF 
+      <!DOCTYPE rdf:RDF
       SYSTEM "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">
-      ''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      ''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
 
   push({
       "schemas":["DC_WITH_XML_DECLARATION_DOCTYPE_ML4","DC_XML_HEADERS"],
       "data": '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-      <!DOCTYPE rdf:RDF SYSTEM 
+      <!DOCTYPE rdf:RDF SYSTEM
       "http://dublincore.org/documents/2001/04/11/dcmes-xml/dcmes-xml-dtd.dtd">
-      ''' + getDC_v1_1("http://www.learningregistry.org/test-metadata-formats")
+      ''' + getDC_v1_1("https://www.learningregistry.org/test-metadata-formats")
   })
- 
+
   return data

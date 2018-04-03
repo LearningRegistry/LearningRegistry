@@ -9,7 +9,7 @@ def create_envelope(doc, url):
            "resource_data_type":    "metadata",
            "submitter_type":    "anonymous",
            "submitter":        "ADL 3d Repository",
-		   "TOS" : {"submission_TOS":    "http://www.learningregistry.org/tos-v1-0.html"},           
+		   "TOS" : {"submission_TOS":    "https://www.learningregistry.org/tos-v1-0.html"},
            "resource_locator":    url,
            "keys":        ["3dr"],
            "payload_placement":    "inline",

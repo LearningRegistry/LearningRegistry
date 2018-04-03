@@ -52,7 +52,7 @@ host = 127.0.0.1
 port = 5000
 
 [app:main]
-tos.url = http://www.learningregistry.org/tos/
+tos.url = https://www.learningregistry.org/tos/
 use = egg:LR
 full_stack = true
 static_files = true
@@ -100,7 +100,7 @@ lr.status.docid = administrative:Network Node Status service
 lr.distribute.docid = distribute:Resource Data Distribution service
 lr.distribute_incoming_url = http://localhost/incoming
 lr.tombstone.admin_signed.key_directory=admin/public_keys/
-schema.resource_data = file:lr/schema/v_0_51/resource_data.json
+schema.resource_data = file:lr/schema/any/resource_data.json
 schema.resource_data_lrmi = file:lr/schema/resource_lrmi_open.json
 schema.tombstone = file:lr/schema/any/tombstone.json
 

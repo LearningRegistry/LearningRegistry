@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <%!
     from datetime import datetime
     import iso8601
 %>
-<OAI-PMH 
-            xmlns="http://www.learningregistry.org/OAI/2.0/"
+<OAI-PMH
+            xmlns="https://www.learningregistry.org/OAI/2.0/"
             xmlns:oai="http://www.openarchives.org/OAI/2.0/"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ http://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd" 
+            xsi:schemaLocation="https://www.learningregistry.org/OAI/2.0/ https://www.learningregistry.org/documents/downloads/OAI-PMH-LR.xsd"
 >
   <responseDate>${c.datetime_now | x}</responseDate>
   <request verb="GetRecord" identifier="${c.identifier | x}"
@@ -18,9 +18,9 @@
  % if c.docList != None:
   <GetRecord>
     % for doc in c.docList:
-   <record> 
+   <record>
     <oai:header>
-      <oai:identifier>${doc["doc_ID"] | x}</oai:identifier> 
+      <oai:identifier>${doc["doc_ID"] | x}</oai:identifier>
       <%
         tstamp = iso8601.parse_date(doc["node_timestamp"])
       %>

@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 
-<OAI-PMH xsi:schemaLocation="http://www.learningregistry.org/OAI/2.0/ /Users/jklo/Git/LearningRegistry-STEM-fork/LR/schemas/OAI/2.0/OAI-PMH-LR.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns="http://www.learningregistry.org/OAI/2.0/">
+<OAI-PMH xsi:schemaLocation="https://www.learningregistry.org/OAI/2.0/ /Users/jklo/Git/LearningRegistry-STEM-fork/LR/schemas/OAI/2.0/OAI-PMH-LR.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns="https://www.learningregistry.org/OAI/2.0/">
   <responseDate>2011-03-16T00:38:03.212595</responseDate>
   <request verb="GetRecord" identifier="http://www.purplemath.com/modules/ratio.htm"
            metadataPrefix="nsdl_dc"
            by_doc_ID="False"
            by_resource_ID="True">http://localhost:8080/OAI-PMH</request>
   <GetRecord>
-   <record> 
+   <record>
     <oai:header>
-      <oai:identifier>5c1070a1c5cb4eda8d460cf9b004c22a</oai:identifier> 
-      
+      <oai:identifier>5c1070a1c5cb4eda8d460cf9b004c22a</oai:identifier>
+
       <oai:datestamp>2011-03-14T13:37:15.398095Z</oai:datestamp>
     </oai:header>
     <oai:metadata>
@@ -57,14 +57,14 @@
     <dc:format>text/html</dc:format>
     <dc:date>2000</dc:date>
 </nsdl_dc:nsdl_dc>
- 
-    
+
+
     </oai:metadata>
   </record>
-   <record> 
+   <record>
     <oai:header>
-      <oai:identifier>dca82ce067594300a15e7532e842e0cb</oai:identifier> 
-      
+      <oai:identifier>dca82ce067594300a15e7532e842e0cb</oai:identifier>
+
       <oai:datestamp>2011-03-11T18:26:26.183874Z</oai:datestamp>
     </oai:header>
     <oai:metadata>
@@ -111,8 +111,8 @@
     <dc:format>text/html</dc:format>
     <dc:date>2000</dc:date>
 </nsdl_dc:nsdl_dc>
- 
-    
+
+
     </oai:metadata>
   </record>
  </GetRecord>

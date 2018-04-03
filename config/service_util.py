@@ -63,6 +63,14 @@ def prompt():
 start_stop_template = '''#! /bin/bash
 # /etc/init.d/learningregistry
 #
+### BEGIN INIT INFO
+# Provides:          learningregistry
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: LearningRegistry init script
+### END INIT INFO
 
 LR_HOME={{LR_BASE}}/LR
 LR_USER={{LR_USER}}
