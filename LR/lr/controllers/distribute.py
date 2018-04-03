@@ -35,59 +35,59 @@ class DistributeController(BaseController):
     __TARGET_NODE_INFO = 'taget_node_info'
     __OK = 'ok'
     __ERROR = 'error'
-    
+
     def __before__(self):
         self.resource_data = appConfig['couchdb.db.resourcedata']
-            
-        
+
+
     """REST Controller styled on the Atom Publishing Protocol"""
     # To properly map this controller, ensure your config/routing.py
     # file has a resource setup:
     #     map.resource('distribute', 'distribute')
-    
+
     def destination(self):
         """GET /destination: return node information"""
         # url('distribute')
         response = {self.__OK: True}
-        
+
         try:
             response[self.__TARGET_NODE_INFO] = sourceLRNode.distributeInfo
         except Exception as ex:
             log.exception(ex)
             response["error":"Internal error"]
-            
+
         log.info("received distribute request...returning: \n"+pprint.pformat(response, 4))
         return json.dumps(response)
-        
+
     def _getDistinationInfo(self, connection):
-        # Make sure we only have one slash in the url path. More than one 
+        # Make sure we only have one slash in the url path. More than one
         #confuses pylons routing libary.
         destinationURL = urlparse.urljoin(connection.destination_node_url.strip(),
                                                                 "destination")
-        
+
         request = urllib2.Request(destinationURL)
         credential = sourceLRNode.getDistributeCredentialFor(destinationURL)
-        
+
         if credential is not None:
             base64string = base64.encodestring('%s:%s' % (credential['username'],credential['password'])).replace("\n", "")
             request.add_header("Authorization", "Basic %s" % base64string)
-        
+
         log.info("\n\nAccess destination node at: "+pprint.pformat(request.__dict__))
         return json.load(urllib2.urlopen(request))
 
     def _canDistributeTo(self, connection, sourceNodeInfo):
-        
+
         if  not connection.active:
-            return {self.__OK: False, 
-                         'connection_id': connection.connection_id, 
+            return {self.__OK: False,
+                         'connection_id': connection.connection_id,
                          self.__ERROR: 'Inactive connection'}
-              
+
         result={self.__OK:True, 'connection_id': connection.connection_id }
         sourceNodeInfo = h.dictToObject(sourceNodeInfo)
         try:
             destinationNodeInfo = h.dictToObject(self._getDistinationInfo(connection)[self.__TARGET_NODE_INFO])
             result['destinationNodeInfo'] = destinationNodeInfo
-            # Don't bother going through all the filter out rules if the source and 
+            # Don't bother going through all the filter out rules if the source and
             # destionation nodes are on the same community and network.
             if((sourceNodeInfo.community_id == destinationNodeInfo.community_id) and
                 (sourceNodeInfo.network_id == destinationNodeInfo.network_id) and
@@ -96,18 +96,18 @@ class DistributeController(BaseController):
 
             elif sourceNodeInfo.node_id == destinationNodeInfo.node_id:
                 result[self.__ERROR] = "Source and destination node must be different node."
-                
+
             elif ((sourceNodeInfo.gateway_node or destinationNodeInfo.gateway_node)  != connection.gateway_connection):
                 result[self.__ERROR] = " 'gateway_connection' mismatch between nodes and connection data"
-            
+
             elif ((sourceNodeInfo.community_id != destinationNodeInfo.community_id) and
                     ((not sourceNodeInfo.social_community) or (not destinationNodeInfo.social_community))):
                 result[self.__ERROR] = 'cannot distribute across non social communities'
-             
+
             elif ((sourceNodeInfo.network_id != destinationNodeInfo.network_id) and
                     ((not sourceNodeInfo.gateway_node)or(not destinationNodeInfo.gateway_node))):
                 result[self.__ERROR] = 'cannot distribute across networks (or communities) unless gateway'
-            
+
             elif ((sourceNodeInfo.gateway_node and destinationNodeInfo.gateway_node)
                     and (sourceNodeInfo.network_id == destinationNodeInfo.network_id)):
                 result[self.__ERROR]  = 'gateways must only distribute across different networks'
@@ -120,10 +120,10 @@ class DistributeController(BaseController):
         except Exception as ex:
             log.exception(ex)
             result[self.__ERROR] = "Internal error. Cannot process destination node info"
-        
+
         if result.has_key(self.__ERROR):
             result[self.__OK] = False
-        
+
         return result
 
 
@@ -132,12 +132,12 @@ class DistributeController(BaseController):
              if the connections are valid"""
         gatewayConnectionList = []
         connectionsStatusInfo = {self.__OK:True, 'connections':[]}
-        
+
         for connection in sourceLRNode.connections:
             # Make sure that the connection is active
             connectionsStatusInfo['connections'].append(self._canDistributeTo(connection, sourceLRNode.distributeInfo))
-        
-            if (connectionsStatusInfo['connections'][-1][self.__OK] and 
+
+            if (connectionsStatusInfo['connections'][-1][self.__OK] and
                 sourceLRNode.distributeInfo['gateway_node'] and
                 connectionsStatusInfo['connections'][-1]['destinationNodeInfo'].gateway_node and
                 connection.gateway_connection):
@@ -147,34 +147,34 @@ class DistributeController(BaseController):
                 log.info("***Abort distribution. More than one gateway node connection")
                 connectionsStatusInfo[self.__ERROR] ="only one active gateway connection is allowed, faulty network description"
                 break
-        
+
         if len (sourceLRNode.connections) == 0:
             connectionsStatusInfo[self.__ERROR] ="No connection present for distribution"
 
         if connectionsStatusInfo.has_key(self.__ERROR) :
             connectionsStatusInfo[self.__OK] = False
-          
+
         return connectionsStatusInfo
-        
+
     def create(self):
         """POST / distribute start distribution"""
-        
+
         distributeResults = Queue.Queue()
 
         def doDistribution(connectionInfo, server, sourceUrl):
             # We want to always use the replication filter function to replicate
             # only distributable doc and filter out any other type of documents.
             # However we don't have any query arguments until we test if there is any filter.
-            replicationOptions={'filter':ResourceDataModel.REPLICATION_FILTER, 
+            replicationOptions={'filter':ResourceDataModel.REPLICATION_FILTER,
                                              'source':sourceUrl,
                                              'connection_id':  connectionInfo['connection_id'],
                                              'query_params': None}
             # If the destination node is using an filter and is not custom use it
             # as the query params for the filter function
-            if ((connectionInfo['destinationNodeInfo'].filter_description is not None ) and 
+            if ((connectionInfo['destinationNodeInfo'].filter_description is not None ) and
                  (connectionInfo['destinationNodeInfo'].filter_description.get('custom_filter') == False)):
                      replicationOptions['query_params'] =connectionInfo['destinationNodeInfo'].filter_description
-                     
+
             #if distinationNode['distribute service'] .service_auth["service_authz"] is not  None:
                 #log.info("Destination node '{}' require authentication".format(destinationUrl))
                 #Try to get the user name and password the url
@@ -186,43 +186,45 @@ class DistributeController(BaseController):
                 parsedUrl = urlparse.urlparse(destinationUrl)
                 destinationUrl = destinationUrl.replace(parsedUrl.netloc, "{0}:{1}@{2}".format(
                                                 credential['username'], credential['password'], parsedUrl.netloc))
-            
-            if replicationOptions['query_params'] is  None: 
+
+            if replicationOptions['query_params'] is  None:
                 del replicationOptions['query_params']
-                
+
             replicationOptions['target'] = destinationUrl
-            
+
             authz_header = h.getBasicAuthHeaderFromURL(appConfig['couchdb.url.dbadmin']);
             authz_header.update( { 'Content-Type': 'application/json'})
             request = urllib2.Request(urlparse.urljoin(appConfig['couchdb.url'], '_replicator'),
                                     headers=authz_header,
                                     data = json.dumps(replicationOptions))
-            
+
             log.info("\n\nReplication started\nSource:{0}\nDestionation:{1}\nArgs:{2}".format(
                             sourceUrl, destinationUrl, pprint.pformat(replicationOptions)))
-                            
+
+            log.info("Replication request: " + pprint.pformat(request))
             results = json.load(urllib2.urlopen(request))
+            log.info("Replication results: " + pprint.pformat(results))
             connectionInfo['replication_results'] = results
             distributeResults.put(connectionInfo)
             log.debug("Replication results: " + pprint.pformat(results))
 
-        
+
         log.info("Distribute.......\n")
         ##Check if the distribte service is available on the node.
         #if(sourceLRNode.isServiceAvailable(NodeServiceModel.DISTRIBUTE) == False):
             #log.info("Distribute not available on node ")
             #return
-        if((sourceLRNode.connections is None) or 
+        if((sourceLRNode.connections is None) or
             (len(sourceLRNode.connections) ==0)):
             log.info("No connection present for distribution")
             return json.dumps({self.__ERROR:''})
         log.info("Connections: \n{0}\n"+pprint.pformat([c.specData for c in sourceLRNode.connections]))
-        
+
         connectionsStatusInfo = self._getDistributeDestinations()
         log.debug("\nSource Node Info:\n{0}".format(pprint.pformat(sourceLRNode.distributeInfo)))
         log.debug("\n\n Distribute connections:\n{0}\n\n".format(pprint.pformat(connectionsStatusInfo)))
-        
-      
+
+
         for connectionStatus in  connectionsStatusInfo['connections']:
             if connectionsStatusInfo.has_key(self.__ERROR) or connectionStatus.has_key(self.__ERROR) == True:
                 distributeResults.put(connectionStatus)
@@ -233,8 +235,8 @@ class DistributeController(BaseController):
                 replicationThread.start()
                 replicationThread.join()
             log.debug("\n\n\n---------------------distribute threads end--------------------\n\n\n")
-            
-            
+
+
         log.debug("\n\n\n----------Queue results Completed size: {0}--------------\n\n\n".format(distributeResults.qsize()))
         connectionsStatusInfo['connections'] = []
 
