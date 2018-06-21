@@ -61,7 +61,7 @@ class DistributeController(BaseController):
 
     def _getDistinationInfo(self, connection):
         # Make sure we only have one slash in the url path. More than one
-        #confuses pylons routing libary.
+        # confuses pylons routing libary.
         destinationURL = urlparse.urljoin(connection.destination_node_url.strip(),
                                                                 "destination")
 
@@ -69,8 +69,11 @@ class DistributeController(BaseController):
         credential = sourceLRNode.getDistributeCredentialFor(destinationURL)
 
         if credential is not None:
+            log.debug("Credentials for distribute destination: "  + destinationURL + " - " + credential['username'] + ":" + credential['password']))
             base64string = base64.encodestring('%s:%s' % (credential['username'],credential['password'])).replace("\n", "")
             request.add_header("Authorization", "Basic %s" % base64string)
+        else
+            log.debug("No credentials for distribute destination: "  + destinationURL)
 
         log.info("\n\nAccess destination node at: "+pprint.pformat(request.__dict__))
         return json.load(urllib2.urlopen(request))
@@ -87,6 +90,8 @@ class DistributeController(BaseController):
         try:
             destinationNodeInfo = h.dictToObject(self._getDistinationInfo(connection)[self.__TARGET_NODE_INFO])
             result['destinationNodeInfo'] = destinationNodeInfo
+            log.debug("Distribute result: "  + pprint.pformat(result))
+
             # Don't bother going through all the filter out rules if the source and
             # destionation nodes are on the same community and network.
             if((sourceNodeInfo.community_id == destinationNodeInfo.community_id) and

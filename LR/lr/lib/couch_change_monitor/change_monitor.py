@@ -116,7 +116,8 @@ class MonitorChanges(BaseChangeMonitor):
         #call all change handlers
         for handler in self._changeHandlerSet:
             try:
-                log.debug(self._database.resource.credentials)
+                #log.debug(self._database.resource.credentials)
+                log.debug("Handling change")
                 handler.handle(change, self._database)
             except Exception as e:
                 log.error("Cannot run handler " + str(handler.handle))
